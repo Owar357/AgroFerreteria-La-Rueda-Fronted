@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* 1. Plugin para conectar los colores de PrimeVue con Tailwind v4 */
+@plugin "tailwindcss-primeui";
+
+/* 2. El "Parche Maestro" para que las columnas de Sakai funcionen */
+/* Esto traduce el lenguaje de Sakai (PrimeFlex) al lenguaje de Tailwind v4 */
+@custom-variant sm (min-width: 640px);
+@custom-variant md (min-width: 768px);
+@custom-variant lg (min-width: 1024px);
+
+@layer utilities {
+  .grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-right: -0.5rem !important;
+    margin-left: -0.5rem !important;
+  }
+
+  /* Forzamos las columnas de la Agroferretería */
+  .col-12 { width: 100% !important; }
+  .md\:col-6 { @media (min-width: 768px) { width: 50% !important; } }
+  .md\:col-4 { @media (min-width: 768px) { width: 33.3333% !important; } }
+  .lg\:col-3 { @media (min-width: 1024px) { width: 25% !important; } }
+  
+  .p-2 { padding: 0.5rem !important; }
+}
+
+/* 3. Estilos base del sistema */
+body {
+  @apply bg-slate-50 text-slate-900;
+  margin: 0;
+  font-family: var(--font-family, sans-serif);
+}
+
