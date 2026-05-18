@@ -13,12 +13,15 @@
   import '@/assets/styles.scss'
   import '@/assets/tailwind.css'
 
+
   import PrimeVue from 'primevue/config'
   import Lara from '@primeuix/themes/lara'
   import ConfirmationService from 'primevue/confirmationservice';
+  
 
 
   const app = createApp(App)
+
 
   app.use(createPinia())
   app.use(router)
@@ -30,6 +33,8 @@
       }
     }
   })
+
+
 
   app.use(ToastService);
   app.use(ConfirmationService);
