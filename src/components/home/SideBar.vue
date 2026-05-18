@@ -54,25 +54,44 @@
       </div>
     </transition>
 
-    <!-- Desplegable: Venta -->
-    <div @click="toggleVenta"
+    <!-- Desplegable: Procesos -->
+    <div @click="toggleProcesos"
       class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 text-xl font-medium transition-colors duration-150"
-      :class="ventaActive ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
+      :class="procesosActive ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
       <div class="flex items-center">
         <i class="pi pi-shopping-cart mr-2"></i>
-        <span>Venta</span>
+        <span>Procesos</span>
       </div>
-      <i :class="showVenta ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="text-xs"></i>
+      <i :class="showProcesos ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="text-xs"></i>
     </div>
 
     <transition name="slide">
-      <div v-if="showVenta" class="ml-3 mb-1">
+      <div v-if="showProcesos" class="ml-3 mb-1">
+
+        <!-- Turno de caja -->
         <div @click="navigate('/admin/venta/turno-caja')"
           class="flex items-center p-2 rounded-lg cursor-pointer mb-1 text-base font-medium transition-colors duration-150"
           :class="activeItem === 'turno-caja' ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
           <i class="pi pi-money-bill mr-2"></i>
           <span>Turno de caja</span>
         </div>
+
+        <!-- Venta -->
+        <div @click="navigate('/admin/venta/venta')"
+          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 text-base font-medium transition-colors duration-150"
+          :class="activeItem === 'venta' ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
+          <i class="pi pi-receipt mr-2"></i>
+          <span>Venta</span>
+        </div>
+
+        <!-- Compra -->
+        <div @click="navigate('/admin/venta/compra')"
+          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 text-base font-medium transition-colors duration-150"
+          :class="activeItem === 'compra' ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
+          <i class="pi pi-shopping-bag mr-2"></i>
+          <span>Compra</span>
+        </div>
+
       </div>
     </transition>
 
@@ -101,7 +120,7 @@ const router = useRouter()
 const route = useRoute()
 
 const showInventario = ref(false)
-const showVenta = ref(false)
+const showProcesos = ref(false)
 
 const activeItem = computed(() => {
   if (route.path.includes('usuarios')) return 'usuarios'
@@ -109,6 +128,8 @@ const activeItem = computed(() => {
   if (route.path.includes('categorias')) return 'categorias'
   if (route.path.includes('proveedores')) return 'proveedores'
   if (route.path.includes('turno-caja')) return 'turno-caja'
+  if (route.path.includes('venta')) return 'venta'
+  if (route.path.includes('compra')) return 'compra'
   if (route.path.includes('reportes')) return 'reportes'
   return 'estadistiscas'
 })
@@ -117,16 +138,16 @@ const inventarioActive = computed(() =>
   ['productos', 'categorias', 'proveedores'].includes(activeItem.value)
 )
 
-const ventaActive = computed(() =>
-  ['turno-caja'].includes(activeItem.value)
+const procesosActive = computed(() =>
+  ['turno-caja', 'venta', 'compra'].includes(activeItem.value)
 )
 
 const toggleInventario = () => {
   showInventario.value = !showInventario.value
 }
 
-const toggleVenta = () => {
-  showVenta.value = !showVenta.value
+const toggleProcesos = () => {
+  showProcesos.value = !showProcesos.value
 }
 
 const navigate = (ruta) => {
@@ -135,7 +156,6 @@ const navigate = (ruta) => {
 </script>
 
 <style scoped>
-
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.2s ease;
@@ -148,7 +168,7 @@ const navigate = (ruta) => {
 }
 .slide-enter-to,
 .slide-leave-from {
-  max-height: 200px;
+  max-height: 300px;
   opacity: 1;
 }
 </style>
