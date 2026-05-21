@@ -1,6 +1,11 @@
 <template>
-    <div class="min-h-screen p-8" style="font-family: 'Poppins', sans-serif; background-color: #121212; color: #EAEAEA;">
-
+    <div class="min-h-screen p-8" style="font-family: 'Poppins', sans-serif; background-color: #1a1a1a; color: #EAEAEA;">
+                 <div class="flex justify-end">
+            <Button label="Regresar" icon="pi pi-arrow-left"
+             
+            style="font-size: 22px; padding: 16px 40px; background-color: #4A8C3F; border-color: #4A8C3F; font-family: 'Poppins', sans-serif;" />
+            
+        </div>
         <!-- Header -->
         <div class="flex justify-between items-start mb-8">
             <div>
@@ -8,7 +13,7 @@
                 <p style="font-size: 20px; color: #B0B0B0; margin: 8px 0 0;">Completa la información del producto y sus presentaciones</p>
             </div>
         </div>
-
+        
         <!-- Sección 1: Información General -->
         <div class="rounded-2xl p-8 mb-6" style="background-color: #1E1E1E; border: 1px solid #2a2a2a;">
             <div class="flex items-center gap-3 mb-6 pb-5" style="border-bottom: 1px solid #2a2a2a;">
@@ -214,8 +219,13 @@
         <!-- Botón Guardar -->
         <div class="flex justify-end">
             <Button label="Guardar Producto" icon="pi pi-save"
-                style="font-size: 22px; padding: 16px 40px; background-color: #4A8C3F; border-color: #4A8C3F; font-family: 'Poppins', sans-serif;" />
+             
+            style="font-size: 22px; padding: 16px 40px; background-color: #4A8C3F; border-color: #4A8C3F; font-family: 'Poppins', sans-serif;" />
+            
         </div>
+       
+        
+        
 
     </div>
 </template>
@@ -260,4 +270,6 @@ const agregarPresentacion = () => {
     })
     borrarDatos()
 }
+
+const emit = defineEmits(['close'])
 </script>

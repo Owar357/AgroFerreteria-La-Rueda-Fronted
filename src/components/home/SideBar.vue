@@ -23,7 +23,7 @@
     <!-- Desplegable: Inventario -->
     <div @click="toggleInventario"
       class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 text-xl font-medium transition-colors duration-150"
-      :class="inventarioActive ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
+      :class="inventarioClass">
       <div class="flex items-center">
         <i class="pi pi-box mr-2"></i>
         <span>Inventario</span>
@@ -63,31 +63,12 @@
         <span>Procesos</span>
       </div>
       <i :class="showProcesos ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="text-xs"></i>
-      
-     </div>
-
     </div>
 
     <transition name="slide">
       <div v-if="showProcesos" class="ml-3 mb-1">
 
-      
-    <!-- Desplegable: Venta -->
-    <div @click="toggleVenta"
-      class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 text-xl font-medium transition-colors duration-150"
-      :class="ventaActive ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
-      <div class="flex items-center">
-        <i class="pi pi-shopping-cart mr-2"></i>
-        <span>Venta</span>
-      </div>
-      <i :class="showVenta ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="text-xs"></i>
-    </div>
-    </div>
-    </transition>
-    
-
-    <transition name="slide">
-      <div v-if="showVenta" class="ml-3 mb-1">
+        <!-- Turno de caja -->
         <div @click="navigate('/admin/venta/turno-caja')"
           class="flex items-center p-2 rounded-lg cursor-pointer mb-1 text-base font-medium transition-colors duration-150"
           :class="activeItem === 'turno-caja' ? 'text-[#EAEAEA]' : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'">
@@ -127,6 +108,8 @@
       <i class="pi pi-file-pdf mr-2"></i>
       <span>Reportes</span>
     </div>
+
+  </div>
 </template>
 
 <script setup>
@@ -138,7 +121,6 @@ const route = useRoute()
 
 const showInventario = ref(false)
 const showProcesos = ref(false)
-const showVenta = ref(false)
 
 const activeItem = computed(() => {
   if (route.path.includes('usuarios')) return 'usuarios'
@@ -156,13 +138,14 @@ const inventarioActive = computed(() =>
   ['productos', 'categorias', 'proveedores'].includes(activeItem.value)
 )
 
-
 const procesosActive = computed(() =>
   ['turno-caja', 'venta', 'compra'].includes(activeItem.value)
 )
 
-const ventaActive = computed(() =>
-  ['turno-caja'].includes(activeItem.value)
+const inventarioClass = computed(() =>
+  inventarioActive.value
+    ? 'text-[#EAEAEA]'
+    : 'text-[#B0B0B0] hover:bg-[#2a4a28] hover:text-[#EAEAEA]'
 )
 
 const toggleInventario = () => {
@@ -171,8 +154,6 @@ const toggleInventario = () => {
 
 const toggleProcesos = () => {
   showProcesos.value = !showProcesos.value
-const toggleVenta = () => {
-  showVenta.value = !showVenta.value
 }
 
 const navigate = (ruta) => {
@@ -181,7 +162,6 @@ const navigate = (ruta) => {
 </script>
 
 <style scoped>
-
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.2s ease;
@@ -195,7 +175,6 @@ const navigate = (ruta) => {
 .slide-enter-to,
 .slide-leave-from {
   max-height: 300px;
-  max-height: 200px;
   opacity: 1;
 }
 </style>

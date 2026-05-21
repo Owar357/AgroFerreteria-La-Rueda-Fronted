@@ -17,13 +17,23 @@ const router = createRouter({
         {
           path: 'inventario/productos',
           name: 'Producto',
-          component: () => import('../views/Producto.vue'),
+          component: () => import('../views/productosView.vue')
         },
         {
           path: 'venta/venta',
           name: 'Venta',
           component: () => import('../views/FromVenta.vue'),
         },
+        {
+             path: 'usuarios',
+             name: 'Usuarios',
+             component: () => import('../views/UsuariosView.vue'),
+        },
+              {
+             path: 'inventario/proveedores',
+             name: 'proveedor',
+             component: () => import('../components/Usuarios/SupplierTable.vue'),
+        }, 
       ]
     },
   ],
