@@ -91,6 +91,11 @@ import Select from 'primevue/select'
 // Modificado: Importación obligatoria del modo de filtrado nativo
 import { FilterMatchMode } from '@primevue/core/api'
 
+
+const irARegistroCompra = () => emit('open-add')
+const emit = defineEmits(['open-add'])
+
+
 const comprasRealizadas = ref([
   { id: 1, fechaEmision: '10-02-2025', fechaVencimiento: 'N/A', tipoDocumento: 'Factura', numDocumento: 'F-00124', precioFactura: '1,250.00', estadoPago: 'PAGADO' },
   { id: 2, fechaEmision: '12-02-2025', fechaVencimiento: '12-03-2025', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9902', precioFactura: '3,420.50', estadoPago: 'PENDIENTE' },
@@ -105,9 +110,6 @@ const filtros = ref({
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
 
-const irARegistroCompra = () => {
-  console.log('Navegando a RegistroComprasView.vue...')
-}
 
 const verDetalles = (compra) => {
   console.log('Viendo detalles de:', compra.numDocumento)

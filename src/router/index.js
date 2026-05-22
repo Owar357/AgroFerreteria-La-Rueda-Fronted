@@ -6,32 +6,21 @@ import UserTable from '@/components/Usuarios/UserTable.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import Login from '@/views/auth/Login.vue'
 
-import CategoriasView from '@/views/CategoriasView.vue'
+
 
 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      redirect: '/admin/inventario/productos'
-    },
-    {
-      path: '/Usuarios',
-      name: 'ususarios',
-      component: UsuariosView
-    },
+   
+  
     {
       path: '/Login',
       name:'login',
       component: Login
     },
-     {
-      path: '/categorias',
-      name:'Categorias',
-      component: CategoriasView 
-    },
+    
     {
       path: '/ComprasRealizadas',
       name:'comprasRealizadas',
@@ -62,11 +51,22 @@ const router = createRouter({
              name: 'Usuarios',
              component: () => import('../views/UsuariosView.vue'),
         },
-              {
+        {
              path: 'inventario/proveedores',
              name: 'proveedor',
              component: () => import('../components/Usuarios/SupplierTable.vue'),
         }, 
+         {
+             path: 'inventario/Categorias',
+             name: 'categorias',
+             component: () => import('../views/CategoriasView.vue'),
+        }, 
+         {
+             path: 'Venta/Compra',
+             name: 'Compra',
+             component: () => import('../views/CompraView.vue'),
+        }, 
+        
       ]
     },
   ],
