@@ -17,7 +17,7 @@
           </div>
           
           <h2 class="text-white text-[28px] md:text-[32px] font-bold leading-tight tracking-wide">
-            Agro-Ferretería<br>La Rueda
+            AgroFerretería<br>La Rueda
           </h2>
         </div>
 
