@@ -10,56 +10,56 @@
       root: { class: 'rounded-2xl overflow-hidden' }
     }"
   >
-    <div class="bg-[#101410] p-2 text-[#EAEAEA] flex flex-col gap-5 font-[Poppins]">
+    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Nombre</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
         <InputText
           v-model="form.name"
           placeholder="Nombre completo"
-          class="w-full bg-[#0d0c0c] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg focus:border-[#4A8C3F]"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg focus:border-[#2b5e3b]"
         />
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Email</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Email</label>
         <InputText
           v-model="form.email"
           placeholder="correo@ejemplo.com"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg focus:border-[#4A8C3F]"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg focus:border-[#2b5e3b]"
         />
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Contraseña</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña</label>
         <Password
           v-model="form.password"
           toggleMask
           :feedback="false"
           placeholder="********"
           class="w-full"
-          inputClass="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg"
+          inputClass="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg focus:border-[#2b5e3b]"
         />
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Rol</label>
-        <dropdown
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Rol</label>
+        <Dropdown
           v-model="form.role"
           :options="roles"
           placeholder="Seleccionar rol"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 flex items-center px-2 rounded-lg"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 flex items-center px-2 rounded-lg"
         />
       </div>
 
       <div class="flex flex-col gap-1">
-        <label class="text-[18px] font-medium popins">Clave de caja</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
         <InputText
           v-model="form.cashKey"
           placeholder="Código de apertura"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg focus:border-[#2b5e3b]"
         />
-        <small class="text-[13px] text-[#888] popins mt-1">
+        <small class="text-[13px] text-[#6b7280] font-normal mt-1">
           (Si el usuario podrá aperturar caja, ingresar código)
         </small>
       </div>
@@ -67,7 +67,7 @@
       <div class="flex justify-center mt-4">
         <Button
           label="Guardar"
-          class="!bg-[#074e09] text-white text-[20px] px-7 py-3 rounded-lg border-none font-bold popins shadow-lg"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
           @click="handleSave"
         />
       </div>
@@ -80,7 +80,7 @@ import { reactive, ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
-import Dropdown from 'primevue/dropdown' // Corregido minúscula
+import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 
 const props = defineProps({
@@ -113,21 +113,53 @@ const handleSave = () => {
 </script>
 
 <style>
-/* Estilos estructurales para el modal oscuro */
+/* Estilos estructurales del cuadro de diálogo adaptados a la nueva línea visual */
 .custom-dialog .p-dialog-header {
-  background-color: #0a5611 !important;
+  background-color: #1e3a2f !important; /* Sidebar fondo / Cabecera de modales */
   color: #ffffff !important;
-  border-bottom: 1px solid #333;
-  font-style: italic;
+  border-bottom: 1px solid #e2e8dd;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 1.25rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
-  background-color: #151715 !important;
+  background-color: #ffffff !important; /* Contenedor interno en Blanco Puro */
   padding: 1.5rem !important;
 }
 
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
-  box-shadow: none !important;
-  border-color: #4A8C3F !important;
+/* Enfoque global de inputs en color principal #2b5e3b */
+.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus, .p-password-input:enabled:focus {
+  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
+}
+
+.p-dropdown {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+.p-dropdown-label {
+  color: #1a2e1f !important;
+}
+
+.p-dropdown-overlay {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.p-dropdown-item {
+  color: #1a2e1f !important;
+  font-size: 14px !important;
+}
+
+.p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+  background-color: #eef2e9 !important;
+}
+
+.p-password-toggle-icon {
+  color: #6b7280 !important;
 }
 </style>
