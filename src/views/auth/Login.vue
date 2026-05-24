@@ -7,7 +7,6 @@
         <div class="hidden md:block"></div>
 
         <div class="flex flex-col items-center gap-4 my-auto">
-          <!-- SE REEMPLAZÓ EL ICONO DE USUARIO POR TU LOGO REAL -->
           <div class="bg-[#1e3a2f] p-2 rounded-2xl w-40 h-40 flex items-center justify-center shadow-md overflow-hidden">
             <img 
               src="/src/assets/logo.png" 
@@ -35,11 +34,19 @@
             <p class="text-[#6b7280] text-[15px] mt-1">Ingrese su correo y contraseña para continuar</p>
           </div>
 
+          <div
+            v-if="errorMessage"
+            class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-[13px] px-4 py-3 rounded-xl"
+          >
+            <i class="pi pi-exclamation-circle text-red-500"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
+
           <form @submit.prevent="handleLogin" class="flex flex-col gap-5">
             
             <div class="w-full">
               <IconField>
-                <InputIcon class="pi pi-envelope text-[#9ca3af]" />
+                <InputIcon class="pi pi-envelope text-[#9ca3af] text-[14px]" />
                 <InputText
                   v-model="form.identity"
                   placeholder="correo o usuario"
@@ -83,43 +90,118 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import authService from '@/services/authService'
+
+// Componentes de PrimeVue con rutas individuales correctas
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 
+import Swal from 'sweetalert2'
+
+const router = useRouter()
+
 const loading = ref(false)
+const errorMessage = ref('')
 
 const form = reactive({
   identity: '',
-  password: ''
+  password: '',
 })
 
-const handleLogin = () => {
-  if (!form.identity || !form.password) return
-  
-  loading.value = true
-  console.log('Login JS activado:', { ...form })
+function validate() {
+  if (!form.identity.trim()) {
+    errorMessage.value = 'El correo o usuario es requerido.'
+    return false
+  }
+  if (!form.password) {
+    errorMessage.value = 'La contraseña es requerida.'
+    return false
+  }
+  return true
+}
 
-  setTimeout(() => {
+async function handleLogin() {
+  errorMessage.value = ''
+  if (!validate()) return
+
+  loading.value = true
+
+  try {
+    // Enviamos las credenciales de forma estructurada como objeto
+    await authService.login({
+      email: form.identity,
+      password: form.password
+    })
+
+    // Alerta estilo Toast verde translúcido para el éxito
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: '¡Sesión iniciada con éxito!',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      background: 'rgba(30, 58, 47, 0.85)',
+      color: '#ffffff',
+      iconColor: '#a7f3d0',
+    })
+
+    // Consultamos el rol guardado para gestionar la redirección
+    const infoRol = localStorage.getItem('user_role')
+
+    setTimeout(() => {
+      if (infoRol === 'administrador') {
+        router.push('/categorias')
+      } else if (infoRol === 'cajero') {
+        router.push('/FromVenta')
+      } else if (infoRol === 'contador') {
+        router.push('/ComprasView')
+      } else {
+        router.push('/login')
+      }
+    }, 1200)
+
+  } catch (error) {
+    console.error('Error en login:', error)
+    
+    if (error.response && error.response.status === 401) {
+      errorMessage.value = 'Usuario o contraseña incorrectos.'
+      Swal.fire({
+        icon: 'error',
+        title: 'Credenciales inválidas',
+        text: 'El usuario o la contraseña son incorrectos. Por favor, verifique.',
+        confirmButtonColor: '#1e3a2f',
+      })
+    } else {
+      errorMessage.value = 'Error de conexión con el servidor.'
+      Swal.fire({
+        icon: 'warning',
+        title: 'Error de respuesta',
+        text: 'Hubo un inconveniente al conectar con el servidor backend.',
+        confirmButtonColor: '#1e3a2f',
+      })
+    }
+  } finally {
     loading.value = false
-  }, 1500)
+  }
 }
 </script>
 
 <style>
-/* Estilos especializados adaptados a la nueva paleta clara corporativa */
 .custom-login-input {
-  background-color: #f9fafb !important; 
-  color: #1a2e1f !important;            
-  border: 1.5px solid #d1d5db !important; 
-  border-radius: 9999px !important;      
+  background-color: #f9fafb !important;
+  color: #1a2e1f !important;
+  border: 1.5px solid #d1d5db !important;
+  border-radius: 9999px !important;
   padding: 0.75rem 1.25rem 0.75rem 2.8rem !important;
   height: auto !important;
 }
-
 
 .custom-login-input:enabled:focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
