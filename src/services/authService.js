@@ -2,12 +2,12 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
-// ── Claves en localStorage ────────────────────────────────────────────────────
+// son las claves ocales
 const TOKEN_KEY = 'auth_token'
 const USER_KEY  = 'auth_user'
 const ROLE_KEY  = 'auth_role'
 
-// ── Axios con token automático ────────────────────────────────────────────────
+// ── Aqui axios crea el token automatico
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -22,12 +22,12 @@ api.interceptors.request.use((config) => {
 // ── Helpers internos ──────────────────────────────────────────────────────────
 
 /**
- * Los roles vienen del backend como ['ADMIN'], ['CAJERO'], ['CONTADOR']
- * Los normalizamos a minúsculas para que coincidan con allowedRoles del router.
+ * qui los roles  venian com ADMIN Y CAJERO // falra el del contado porque los bichos no han eho las intefaces
+ * los normalizamos  para que cabien a las minisculas
  */
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
-  return roles[0].toLowerCase() // 'ADMIN' → 'admin'
+  return roles[0].toLowerCase() // 'ADMIN' a 'admin'
 }
 
 function saveSession(token, user, role) {

@@ -132,13 +132,25 @@ async function handleLogin() {
   loading.value = true
 
   try {
-    // Enviamos las credenciales de forma estructurada como objeto
-    await authService.login({
-      email: form.identity,
-      password: form.password
-    })
 
-    // Alerta estilo Toast verde translúcido para el éxito
+    const response = await authService.login(
+      form.identity,
+      form.password
+    )
+
+    if (!response.success) {
+      errorMessage.value = response.message
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: response.message,
+        confirmButtonColor: '#1e3a2f',
+      })
+
+      return
+    }
+
     Swal.fire({
       toast: true,
       position: 'top-end',
@@ -152,41 +164,23 @@ async function handleLogin() {
       iconColor: '#a7f3d0',
     })
 
-    // Consultamos el rol guardado para gestionar la redirección
-    const infoRol = localStorage.getItem('user_role')
-
     setTimeout(() => {
-      if (infoRol === 'administrador') {
-        router.push('/categorias')
-      } else if (infoRol === 'cajero') {
-        router.push('/FromVenta')
-      } else if (infoRol === 'contador') {
-        router.push('/ComprasView')
-      } else {
-        router.push('/login')
-      }
+      router.push(response.route)
     }, 1200)
 
   } catch (error) {
+
     console.error('Error en login:', error)
-    
-    if (error.response && error.response.status === 401) {
-      errorMessage.value = 'Usuario o contraseña incorrectos.'
-      Swal.fire({
-        icon: 'error',
-        title: 'Credenciales inválidas',
-        text: 'El usuario o la contraseña son incorrectos. Por favor, verifique.',
-        confirmButtonColor: '#1e3a2f',
-      })
-    } else {
-      errorMessage.value = 'Error de conexión con el servidor.'
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error de respuesta',
-        text: 'Hubo un inconveniente al conectar con el servidor backend.',
-        confirmButtonColor: '#1e3a2f',
-      })
-    }
+
+    errorMessage.value = 'Error de conexión con el servidor.'
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Error de respuesta',
+      text: 'Hubo un inconveniente al conectar con el servidor backend.',
+      confirmButtonColor: '#1e3a2f',
+    })
+
   } finally {
     loading.value = false
   }
