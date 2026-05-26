@@ -6,7 +6,7 @@
                 <h1 class="text-[26px] font-semibold tracking-tight text-[#1a2e1f]">Registro de Proveedores</h1>
 
                 <button
-                    class="bg-[#2b5e3b] hover:bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-2.5 rounded-lg transition-colors duration-200 cursor-pointer"
+                    class="bg-[#2b5e3b] hover:bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-4.5 rounded-lg transition-colors duration-260 cursor-pointer"
                     @click="$emit('open-add')"
                 >
                     + Agregar
@@ -30,7 +30,7 @@
                 <div class="relative">
                     <select
                         v-model="filters.selectedEstado"
-                        class="w-44 bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] appearance-none cursor-pointer"
+                        class="w-54 bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] appearance-none cursor-pointer"
                     >
                         <option :value="null">Todos los estados</option>
                         <option value="Activo">Activo</option>
