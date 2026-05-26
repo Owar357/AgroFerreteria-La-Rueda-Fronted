@@ -20,12 +20,7 @@
       </div>
     </div>
 
-    <!-- Usuario -->
-    <div class="flex items-center">
-      <div class="w-9 h-9 rounded-full border border-[#4FC3F7] flex items-center justify-center text-[#4FC3F7] text-base">
-        <i class="pi pi-user"></i>
-      </div>
-    </div>
+  
 
   </header>
 </template>
