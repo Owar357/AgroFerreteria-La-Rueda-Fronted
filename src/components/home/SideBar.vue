@@ -29,8 +29,32 @@
         <SidebarItem icon="pi pi-truck"    label="Proveedor" :active="activeItem === 'proveedores'" @click="navigate('/admin/inventario/proveedores')" sub />
       </SidebarDropdown>
 
+<<<<<<< HEAD
       <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
     </template>
+=======
+    <div @click="navigate('/admin/caja')"
+      class="flex items-center p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
+      :style="activeItem === 'caja' ? activeStyle : inactiveStyle"
+      @mouseenter="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
+      @mouseleave="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = 'transparent' }">
+      <i class="pi pi-users mr-2"></i>
+      <span>Caja</span>
+    </div>
+
+    <!-- Desplegable: Inventario -->
+    <div @click="toggleInventario"
+      class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
+      :style="inventarioActive ? activeParentStyle : inactiveStyle"
+      @mouseenter="e => { if (!inventarioActive) e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
+      @mouseleave="e => { if (!inventarioActive) e.currentTarget.style.backgroundColor = 'transparent' }">
+      <div class="flex items-center">
+        <i class="pi pi-box mr-2"></i>
+        <span>Inventario</span>
+      </div>
+      <i :class="showInventario ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" style="font-size: 11px;"></i>
+    </div>
+>>>>>>> e1d815b6c01d6acf3415cb0da44fde656c9b4a6c
 
     <!--roceso del admin mas el cajero-->
     <template v-if="isAdmin || isCajero">
@@ -137,6 +161,7 @@ const isContador = userRole === 'contador'
 
 // Item activo según la ruta actual
 const activeItem = computed(() => {
+<<<<<<< HEAD
   const p = route.path
   if (p.includes('usuarios'))    return 'usuarios'
   if (p.includes('productos'))   return 'productos'
@@ -147,6 +172,18 @@ const activeItem = computed(() => {
   if (p.includes('venta'))       return 'venta'
   if (p.includes('reportes'))    return 'reportes'
   return ''
+=======
+  if (route.path.includes('usuarios'))    return 'usuarios'
+  if (route.path.includes('productos'))   return 'productos'
+  if (route.path.includes('categorias'))  return 'categorias'
+  if (route.path.includes('proveedores')) return 'proveedores'
+  if (route.path.includes('turno-caja'))  return 'turno-caja'
+   if (route.path.includes('compra'))      return 'compra'
+  if (route.path.includes('venta'))       return 'venta'
+  if (route.path.includes('reportes'))    return 'reportes'
+  if (route.path.includes('caja'))    return 'caja'         
+  return 'estadistiscas'
+>>>>>>> e1d815b6c01d6acf3415cb0da44fde656c9b4a6c
 })
 
 const inventarioActive = computed(() =>
