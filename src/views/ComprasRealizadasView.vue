@@ -21,6 +21,28 @@
           class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
           showClear
         />
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-[#4b5563]">Fecha Inicio:</span>
+          <DatePicker
+            v-model="fechaInicio"
+            placeholder="dd-mm-aaaa"
+            dateFormat="dd-mm-yy"
+            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
+            showClear
+            @update:modelValue="actualizarFiltroFecha"
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-[#4b5563]">Fecha Fin:</span>
+          <DatePicker
+            v-model="fechaFin"
+            placeholder="dd-mm-aaaa"
+            dateFormat="dd-mm-yy"
+            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
+            showClear
+            @update:modelValue="actualizarFiltroFecha"
+          />
+        </div>
       </div>
     </div>
 
@@ -31,9 +53,14 @@
         :filters="filtros"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
+        :paginator="true"
+        :rows="5"
+        :rowsPerPageOptions="[5,15,25]"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       >
         <Column field="fechaEmision" header="Fecha Emisión" />
-        <Column field="fechaVencimiento" header="Fecha Vencimiento" class="text-[#6b7280]" />
+        <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
         <Column field="tipoDocumento" header="Tipo Documento" />
         <Column field="numDocumento" header="Nº Documento" />
         
@@ -89,26 +116,76 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Select from 'primevue/select' 
 // Modificado: Importación obligatoria del modo de filtrado nativo
+import { DatePicker } from 'primevue'
 import { FilterMatchMode } from '@primevue/core/api'
+import { resolveUserAgent } from '@primeuix/utils'
 
 
 const irARegistroCompra = () => emit('open-add')
 const emit = defineEmits(['open-add'])
 
+//variables para fecjas inicio y fin individuales
+const fechaInicio = ref(null)
+const fechsFin = ref(null)
+
 
 const comprasRealizadas = ref([
-  { id: 1, fechaEmision: '10-02-2025', fechaVencimiento: 'N/A', tipoDocumento: 'Factura', numDocumento: 'F-00124', precioFactura: '1,250.00', estadoPago: 'PAGADO' },
-  { id: 2, fechaEmision: '12-02-2025', fechaVencimiento: '12-03-2025', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9902', precioFactura: '3,420.50', estadoPago: 'PENDIENTE' },
-  { id: 3, fechaEmision: '14-02-2025', fechaVencimiento: '14-03-2025', tipoDocumento: 'Factura', numDocumento: 'F-00125', precioFactura: '850.00', estadoPago: 'ABONADO' },
-  { id: 4, fechaEmision: '16-02-2025', fechaVencimiento: '16-02-2025', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9903', precioFactura: '2,100.00', estadoPago: 'VENCIDO' }
+  { id: 1, fechaEmision: '10-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00124', precioFactura: '1,250.00', estadoPago: 'PAGADO' },
+  { id: 2, fechaEmision: '12-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9902', precioFactura: '3,420.50', estadoPago: 'PENDIENTE' },
+  { id: 3, fechaEmision: '14-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00125', precioFactura: '850.00', estadoPago: 'ABONADO' },
+  { id: 4, fechaEmision: '16-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9903', precioFactura: '2,100.00', estadoPago: 'VENCIDO' },
+  { id: 5, fechaEmision: '05-05-2024', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00841', precioFactura: '920.00', estadoPago: 'PAGADO' },
+  { id: 6, fechaEmision: '20-11-2024', proveedor: 'NutriGreen S.A.', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-1024', precioFactura: '4,150.00', estadoPago: 'PAGADO' },
+  { id: 7, fechaEmision: '15-01-2025', proveedor: 'Agroservicios del Centro', tipoDocumento: 'Factura', numDocumento: 'F-00210', precioFactura: '600.00', estadoPago: 'PAGADO' },
+  { id: 8, fechaEmision: '18-05-2026', proveedor: 'TecnoAgro Global', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-4412', precioFactura: '1,850.00', estadoPago: 'PENDIENTE' },
+  { id: 9, fechaEmision: '22-05-2026', proveedor: 'Semillas del Pacífico', tipoDocumento: 'Factura', numDocumento: 'F-00302', precioFactura: '1,100.00', estadoPago: 'ABONADO' },
+  { id: 10, fechaEmision: '25-05-2026', proveedor: 'Importaciones InterAgro', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-8819', precioFactura: '2,750.40', estadoPago: 'PENDIENTE' },
+  { id: 11, fechaEmision: '12-08-2023', proveedor: 'BioProtect S.A.', tipoDocumento: 'Factura', numDocumento: 'F-00912', precioFactura: '320.00', estadoPago: 'PAGADO' },
+  { id: 12, fechaEmision: '04-03-2025', proveedor: 'Fertilizantes del Norte', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9945', precioFactura: '1,430.00', estadoPago: 'VENCIDO' }
 ])
 
 // Modificado: Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
-  estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS }
+  estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
+  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM}
 })
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
+
+//cdispara el filtro golobal de la columna  mandando una señar reativa al atbla
+const actualizarFiltroFecha = () => {
+  // este es un objeto personal para a fprzar a prume vue a realizar la funcion
+  //falta hacer todo el procesos en los stores
+  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechsFin.value}
+}
+
+
+//Reisttro de ña ficion personalizada d efiltado en el objeto 
+//filtros de la yabla
+filtros.value.fechaEmision.constraits = (value, filter) => {
+  if (!filter || !filter[0] || !filter[1]) return true
+  if (!value) return false
+
+  const [dia, mes, anio] = value.split('-').map(Number)
+  const fechaRegistro = new Date(anio, mes -1, dia)
+  fechaRegistro.setHours(0,0,0,0)
+
+  //valisdamos si la fecha de inicio existe
+  if(filter.inicio) {
+    const inicio = new Date(filter.inicio)
+    inicio.setHours(0,0,0,0)
+    if (fechaRegistro < inicio) return false
+  }
+  
+    //Validamos que la fecha fin ingresada exista
+    if (filter.fin) {
+      const fin = new Date(filter.fin)
+      fin.setHours(23,59,59,999)
+      if (fechaRegistro > fin) return false
+    }
+
+  return true
+}
 
 
 const verDetalles = (compra) => {

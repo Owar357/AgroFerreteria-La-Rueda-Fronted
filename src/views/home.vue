@@ -6,10 +6,10 @@
     <div style="flex: 1; display: flex; overflow: hidden;">
 
       <transition name="sidebar-slide">
-        <SideBar v-if="sidebarOpen" />
+        <SideBar v-if="sidebarOpen"  style="flex-shrink: 0;"/>
       </transition>
 
-      <div style="flex: 1; overflow-y: auto; background: #f5f5f5;">
+      <div style="flex: 1;min-width: 0;overflow-y: auto; background: #f5f5f5;">
         <router-view />
       </div>
 
