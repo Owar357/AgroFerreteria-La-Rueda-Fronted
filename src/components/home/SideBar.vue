@@ -25,6 +25,15 @@
       <span>Usuarios</span>
     </div>
 
+    <div @click="navigate('/admin/caja')"
+      class="flex items-center p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
+      :style="activeItem === 'caja' ? activeStyle : inactiveStyle"
+      @mouseenter="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
+      @mouseleave="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = 'transparent' }">
+      <i class="pi pi-users mr-2"></i>
+      <span>Caja</span>
+    </div>
+
     <!-- Desplegable: Inventario -->
     <div @click="toggleInventario"
       class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
@@ -182,6 +191,7 @@ const activeItem = computed(() => {
    if (route.path.includes('compra'))      return 'compra'
   if (route.path.includes('venta'))       return 'venta'
   if (route.path.includes('reportes'))    return 'reportes'
+  if (route.path.includes('caja'))    return 'caja'         
   return 'estadistiscas'
 })
 
