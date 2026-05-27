@@ -39,6 +39,11 @@
         :globalFilterFields="['name', 'role']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
+        :paginator="true"
+        :rows="5"
+        :rowsPerPageOptions="[5,15,20]"
+        currentPageReportTemplate="Monstrando {first} a {last} de {totalRecord} ususarios"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       >
         <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
         
@@ -100,7 +105,12 @@ const users = ref([
   { id: 2, name: 'Maria Lopez', email: '@mlopez.email.com', status: 'Activo', role: 'Cajero', createdBy: 'Samuel lara', date: '11-02-2025', visible: true },
   { id: 3, name: 'Carlos Ruiz', email: '@cruiz.email.com', status: 'Inactivo', role: 'Administrador', createdBy: 'Daniel Melgar', date: '12-02-2025', visible: false },
   { id: 4, name: 'Ana Beltrán', email: '@abeltran.email.com', status: 'Activo', role: 'Contador', createdBy: 'Samuel lara', date: '13-02-2025', visible: true },
-  { id: 5, name: 'Roberto Sosa', email: '@rsosa.email.com', status: 'Inactivo', role: 'Contador', createdBy: 'Daniel Melgar', date: '14-02-2025', visible: false }
+  { id: 5, name: 'Roberto Sosa', email: '@rsosa.email.com', status: 'Inactivo', role: 'Contador', createdBy: 'Daniel Melgar', date: '14-02-2025', visible: false },
+  { id: 6, name: 'Daniel Melgar', email: '@dniel.email.com', status: 'Activo', role: 'Administrador', createdBy: 'Samuel lara', date: '10-02-2025', visible: true },
+  { id: 7, name: 'Maria Lopez', email: '@mlopez.email.com', status: 'Activo', role: 'Cajero', createdBy: 'Samuel lara', date: '11-02-2025', visible: true },
+  { id: 8, name: 'Carlos Ruiz', email: '@cruiz.email.com', status: 'Inactivo', role: 'Administrador', createdBy: 'Daniel Melgar', date: '12-02-2025', visible: false },
+  { id: 9, name: 'Ana Beltrán', email: '@abeltran.email.com', status: 'Activo', role: 'Contador', createdBy: 'Samuel lara', date: '13-02-2025', visible: true },
+  { id: 10, name: 'Roberto Sosa', email: '@rsosa.email.com', status: 'Inactivo', role: 'Contador', createdBy: 'Daniel Melgar', date: '14-02-2025', visible: false }
 ])
 
 const statusOptions = ref(['Activo', 'Inactivo'])

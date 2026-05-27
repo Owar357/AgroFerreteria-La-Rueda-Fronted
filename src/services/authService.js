@@ -2,32 +2,51 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
-// son las claves ocales
+// Claves locales
 const TOKEN_KEY = 'auth_token'
 const USER_KEY  = 'auth_user'
 const ROLE_KEY  = 'auth_role'
 
-// ── Aqui axios crea el token automatico
-const api = axios.create({
+// ── Instancia personalizada de Axios (Exportada para los demás servicios) ────
+export const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY)
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+// Interceptor de petición: Adjunta el token en tiempo real en cada solicitud
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    } else {
+      delete config.headers.Authorization
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// Interceptor de respuesta: Captura de forma global sesiones expiradas (401)
+api.interceptors.response.use(
+  (response) => response, 
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
+      localStorage.removeItem(ROLE_KEY)
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
 
 // ── Helpers internos ──────────────────────────────────────────────────────────
-
-/**
- * qui los roles  venian com ADMIN Y CAJERO // falra el del contado porque los bichos no han eho las intefaces
- * los normalizamos  para que cabien a las minisculas
- */
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
-  return roles[0].toLowerCase() // 'ADMIN' a 'admin'
+  return roles[0].toLowerCase()
 }
 
 function saveSession(token, user, role) {
@@ -42,17 +61,9 @@ function clearSession() {
   localStorage.removeItem(ROLE_KEY)
 }
 
-// ── Redirección según rol ─────────────────────────────────────────────────────
-/**
- * Devuelve la ruta inicial según el rol del usuario.
- * - ADMIN    → /admin/usuarios  (acceso total)
- * - CAJERO   → /admin/venta/turno-caja
- * - CONTADOR → /admin/reportes
- */
 function getHomeRouteByRole(role) {
   switch (role) {
     case 'admin':    return '/admin/usuarios'
-    //case 'cajero':   return '/admin/venta/turno-caja'
     case 'contador': return '/admin/reportes'
     default:         return '/login'
   }
@@ -60,13 +71,6 @@ function getHomeRouteByRole(role) {
 
 // ── API pública del servicio ──────────────────────────────────────────────────
 const authService = {
-
-  /**
-   * Hace login contra el backend Laravel/JWT.
-   * @param {string} identity  - correo o usuario
-   * @param {string} password
-   * @returns {{ success: boolean, route?: string, message?: string }}
-   */
   async login(identity, password) {
     try {
       const { data } = await api.post('/auth/login', {
@@ -75,7 +79,6 @@ const authService = {
       })
 
       const role = normalizeRole(data.roles)
-
       if (!role) {
         return { success: false, message: 'El usuario no tiene un rol asignado.' }
       }
@@ -87,42 +90,28 @@ const authService = {
         route: getHomeRouteByRole(role),
       }
     } catch (error) {
-      const message =
-        error.response?.data?.message || 'Error al conectar con el servidor.'
+      const message = error.response?.data?.message || 'Error al conectar con el servidor.'
       return { success: false, message }
     }
   },
 
-  /**
-   * Cierra sesión: invalida el token en el backend y limpia localStorage.
-   */
   async logout() {
     try {
       await api.post('/auth/logout')
     } catch (_) {
-      // Si falla el backend igual limpiamos local
     } finally {
       clearSession()
     }
   },
 
-  /**
-   * Verifica si hay una sesión activa.
-   */
   isAuthenticated() {
     return !!localStorage.getItem(TOKEN_KEY)
   },
 
-  /**
-   * Devuelve el rol normalizado ('admin' | 'cajero' | 'contador' | null).
-   */
   getUserRole() {
     return localStorage.getItem(ROLE_KEY)
   },
 
-  /**
-   * Devuelve los datos del usuario guardados en localStorage.
-   */
   getUser() {
     try {
       return JSON.parse(localStorage.getItem(USER_KEY))
@@ -131,9 +120,6 @@ const authService = {
     }
   },
 
-  /**
-   * Devuelve la ruta home según el rol actual.
-   */
   getHomeRoute() {
     return getHomeRouteByRole(this.getUserRole())
   },
