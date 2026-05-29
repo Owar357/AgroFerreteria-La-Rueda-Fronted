@@ -84,7 +84,7 @@
         @toggle="toggleGestion"
       >
         <SidebarItem icon="pi pi-wallet"       label="Caja"            :active="activeItem === 'caja'"           @click="navigate('/admin/caja')"           sub />
-        <SidebarItem icon="pi pi-percentage"   label="Movimiento Caja" :active="activeItem === 'movimiento-caja'" @click="navigate('/admin/gestion/movimiento-caja')" sub />
+        <SidebarItem icon="pi pi-percentage"   label="Movimientos de Caja" :active="activeItem === 'movimientos-caja'" @click="navigate('/admin/venta/movimientos-de-caja')" sub />
         <SidebarItem icon="pi pi-calculator"   label="POS"             :active="activeItem === 'pos'"             @click="navigate('/admin/gestion/pos')"             sub />
       </SidebarDropdown>
       <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
@@ -141,30 +141,17 @@ const isContador = userRole === 'contador'
 
 // Determinar el ítem activo evaluando la URL actual del navegador
 const activeItem = computed(() => {
-<<<<<<< HEAD
-  if (route.path.includes('usuarios'))    return 'usuarios'
-  if (route.path.includes('productos'))   return 'productos'
-  if (route.path.includes('categorias'))  return 'categorias'
-  if (route.path.includes('proveedores')) return 'proveedores'
-  if (route.path.includes('turno-caja'))  return 'turno-caja'
-   if (route.path.includes('compra'))      return 'compra'
-  if (route.path.includes('venta'))       return 'venta'
-  if (route.path.includes('reportes'))    return 'reportes'
-  if (route.path.includes('caja'))    return 'caja'     
-  return 'estadistiscas'
-=======
   if (route.path.includes('usuarios'))        return 'usuarios'
   if (route.path.includes('productos'))       return 'productos'
   if (route.path.includes('categorias'))      return 'categorias'
   if (route.path.includes('proveedores'))     return 'proveedores'
   if (route.path.includes('compra'))          return 'compra'
   if (route.path.includes('historial-ventas')) return 'historial-ventas'
+  if (route.path.includes('movimientos-de-caja')) return 'movimientos-caja'
   if (route.path.includes('caja'))            return 'caja'
-  if (route.path.includes('movimiento-caja')) return 'movimiento-caja'
   if (route.path.includes('pos'))             return 'pos'
   if (route.path.includes('reportes'))        return 'reportes'
   return 'dashboard'
->>>>>>> 03946be83c9897a220602d9dfcacef0f295a79a6
 })
 
 // Mantiene iluminado el título del desplegable padre si un hijo está activo
