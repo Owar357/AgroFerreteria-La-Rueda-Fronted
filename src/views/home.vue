@@ -6,7 +6,7 @@
     <div style="flex: 1; display: flex; overflow: hidden;">
 
       <transition name="sidebar-slide">
-        <SideBar v-if="sidebarOpen" />
+        <SideBar v-if="sidebarOpen"  style="flex-shrink: 0;"/>
       </transition>
 
       <!-- Contenedor del contenido que ahora incluye el Footer -->
