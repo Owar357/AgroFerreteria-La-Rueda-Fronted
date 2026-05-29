@@ -1,144 +1,118 @@
 <template>
-  <div class="w-64 h-screen flex flex-col p-6 flex-shrink-0 border-r border-[#162e1e]"
-    style="background-color: #1e3a2f; font-family: 'Inter', sans-serif;">
+  <div
+    class="w-64 h-screen flex flex-col p-6 flex-shrink-0 border-r border-[#162e1e]"
+    style="background-color: #1e3a2f; font-family: 'Inter', sans-serif;"
+  >
 
-    <!-- Analíticas -->
-    <div @click="navigate('/admin/estadistiscas')"
-      class="flex items-center p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-      :style="activeItem === 'estadistiscas' ? activeStyle : inactiveStyle"
-      @mouseenter="e => { if (activeItem !== 'estadistiscas') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (activeItem !== 'estadistiscas') e.currentTarget.style.backgroundColor = 'transparent' }">
-      <i class="pi pi-chart-bar mr-2"></i>
-      <span>Analíticas</span>
-    </div>
+    <template v-if="isAdmin">
+      <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
+        ADMINISTRACIÓN
+      </p>
 
-    <!-- Label REGISTROS -->
-    <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mt-4 mb-1.5 mx-1">REGISTROS</p>
+      <SidebarItem
+        icon="pi pi-users"
+        label="Usuarios"
+        :active="activeItem === 'usuarios'"
+        @click="navigate('/admin/usuarios')"
+      />
+      <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
+    </template>
 
-    <!-- Usuarios -->
-    <div @click="navigate('/admin/usuarios')"
-      class="flex items-center p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-      :style="activeItem === 'usuarios' ? activeStyle : inactiveStyle"
-      @mouseenter="e => { if (activeItem !== 'usuarios') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (activeItem !== 'usuarios') e.currentTarget.style.backgroundColor = 'transparent' }">
-      <i class="pi pi-users mr-2"></i>
-      <span>Usuarios</span>
-    </div>
 
-    <div @click="navigate('/admin/caja')"
-      class="flex items-center p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-      :style="activeItem === 'caja' ? activeStyle : inactiveStyle"
-      @mouseenter="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (activeItem !== 'caja') e.currentTarget.style.backgroundColor = 'transparent' }">
-      <i class="pi pi-users mr-2"></i>
-      <span>Caja</span>
-    </div>
+    <template v-if="isAdmin || isContador">
+      <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
+        LOGÍSTICA
+      </p>
 
-    <!-- Desplegable: Inventario -->
-    <div @click="toggleInventario"
-      class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-      :style="inventarioActive ? activeParentStyle : inactiveStyle"
-      @mouseenter="e => { if (!inventarioActive) e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (!inventarioActive) e.currentTarget.style.backgroundColor = 'transparent' }">
-      <div class="flex items-center">
-        <i class="pi pi-box mr-2"></i>
-        <span>Inventario</span>
-      </div>
-      <i :class="showInventario ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" style="font-size: 11px;"></i>
-    </div>
+      <SidebarDropdown
+        icon="pi pi-box"
+        label="Inventario"
+        :open="showInventario"
+        :parentActive="inventarioActive"
+        @toggle="toggleInventario"
+      >
+        <SidebarItem icon="pi pi-th-large" label="Categorías" :active="activeItem === 'categorias'"  @click="navigate('/admin/inventario/categorias')" sub />
+        <SidebarItem icon="pi pi-tag"       label="Productos"  :active="activeItem === 'productos'"   @click="navigate('/admin/inventario/productos')"  sub />
+        <SidebarItem icon="pi pi-truck"     label="Proveedores" :active="activeItem === 'proveedores'" @click="navigate('/admin/inventario/proveedores')" sub />
+      </SidebarDropdown>
+      <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
+    </template>
 
-    <transition name="slide">
-      <div v-if="showInventario" class="ml-3 mb-1">
-        <div @click="navigate('/admin/inventario/productos')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'productos' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'productos') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'productos') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-tag mr-2"></i>
-          <span>Producto</span>
-        </div>
-        <div @click="navigate('/admin/inventario/categorias')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'categorias' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'categorias') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'categorias') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-th-large mr-2"></i>
-          <span>Categoría</span>
-        </div>
-        <div @click="navigate('/admin/inventario/proveedores')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'proveedores' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'proveedores') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'proveedores') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-truck mr-2"></i>
-          <span>Proveedor</span>
-        </div>
-      </div>
-    </transition>
 
-    <!-- Desplegable: Procesos -->
-    <div @click="toggleProcesos"
-      class="flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-      :style="procesosActive ? activeParentStyle : inactiveStyle"
-      @mouseenter="e => { if (!procesosActive) e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (!procesosActive) e.currentTarget.style.backgroundColor = 'transparent' }">
-      <div class="flex items-center">
-        <i class="pi pi-shopping-cart mr-2"></i>
-        <span>Procesos</span>
-      </div>
-      <i :class="showProcesos ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" style="font-size: 11px;"></i>
-    </div>
+    <template v-if="isAdmin || isCajero || isContador">
+      <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
+        OPERACIONES
+      </p>
 
-    <transition name="slide">
-      <div v-if="showProcesos" class="ml-3 mb-1">
+      <SidebarDropdown
+        icon="pi pi-sync"
+        label="Procesos"
+        :open="showProcesos"
+        :parentActive="procesosActive"
+        @toggle="toggleProcesos"
+      >
+        <SidebarItem
+          v-if="isAdmin || isContador"
+          icon="pi pi-shopping-bag"
+          label="Compra"
+          :active="activeItem === 'compra'"
+          @click="navigate('/admin/venta/compra')"
+          sub
+        />
+        <SidebarItem
+          icon="pi pi-history"
+          label="Historial Ventas"
+          :active="activeItem === 'historial-ventas'"
+          @click="navigate('/admin/procesos/historial-ventas')"
+          sub
+        />
+      </SidebarDropdown>
+      <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
+    </template>
 
-        <!-- Turno de caja -->
-        <div @click="navigate('/admin/venta/turno-caja')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'turno-caja' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'turno-caja') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'turno-caja') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-money-bill mr-2"></i>
-          <span>Turno de caja</span>
-        </div>
 
-        <!-- Venta -->
-        <div @click="navigate('/admin/venta/venta')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'venta' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'venta') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'venta') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-receipt mr-2"></i>
-          <span>Venta</span>
-        </div>
+    <template v-if="isAdmin || isCajero">
+      <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
+        PUNTO DE VENTA
+      </p>
 
-        <!-- Compra -->
-        <div @click="navigate('/admin/venta/compra')"
-          class="flex items-center p-2 rounded-lg cursor-pointer mb-1 transition-colors duration-150"
-          :style="activeItem === 'compra' ? activeStyle : inactiveStyle"
-          @mouseenter="e => { if (activeItem !== 'compra') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-          @mouseleave="e => { if (activeItem !== 'compra') e.currentTarget.style.backgroundColor = 'transparent' }">
-          <i class="pi pi-shopping-bag mr-2"></i>
-          <span>Compra</span>
-        </div>
+      <SidebarDropdown
+        icon="pi pi-sliders-h"
+        label="Gestión"
+        :open="showGestion"
+        :parentActive="gestionActive"
+        @toggle="toggleGestion"
+      >
+        <SidebarItem icon="pi pi-wallet"       label="Caja"            :active="activeItem === 'caja'"           @click="navigate('/admin/caja')"           sub />
+        <SidebarItem icon="pi pi-percentage"   label="Movimiento Caja" :active="activeItem === 'movimiento-caja'" @click="navigate('/admin/gestion/movimiento-caja')" sub />
+        <SidebarItem icon="pi pi-calculator"   label="POS"             :active="activeItem === 'pos'"             @click="navigate('/admin/gestion/pos')"             sub />
+      </SidebarDropdown>
+      <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
+    </template>
 
-      </div>
-    </transition>
 
-    <!-- Divider -->
-    <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
+    <template v-if="isAdmin || isContador">
+      <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
+        ESTADÍSTICAS
+      </p>
 
-    <!-- Label SISTEMA -->
-    <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mt-2 mb-1.5 mx-1">SISTEMA</p>
+      <SidebarItem
+        icon="pi pi-chart-bar"
+        label="Reportes (Pendiente)"
+        :active="activeItem === 'reportes'"
+        class="opacity-60 cursor-not-allowed"
+      />
+    </template>
 
-    <!-- Reportes -->
-    <div @click="navigate('/admin/reportes')"
-      class="flex items-center p-3 rounded-lg cursor-pointer transition-colors duration-150"
-      :style="activeItem === 'reportes' ? activeStyle : inactiveStyle"
-      @mouseenter="e => { if (activeItem !== 'reportes') e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-      @mouseleave="e => { if (activeItem !== 'reportes') e.currentTarget.style.backgroundColor = 'transparent' }">
-      <i class="pi pi-file-pdf mr-2"></i>
-      <span>Reportes</span>
+
+    <div class="mt-auto mb-8">
+      <hr class="border-none border-t mb-3" style="border-color: #162e1e;" />
+      <SidebarItem
+        icon="pi pi-sign-out"
+        label="Cerrar sesión"
+        :active="false"
+        @click="handleLogout"
+      />
     </div>
 
   </div>
@@ -147,42 +121,27 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import authService from '@/services/authService'
+import SidebarItem     from '@/components/home/SidebarItem.vue'
+import SidebarDropdown from '@/components/home/SidebarDropdown.vue'
 
 const router = useRouter()
-const route = useRoute()
+const route  = useRoute()
 
+// Estados para controlar los menús desplegables
 const showInventario = ref(false)
-const showProcesos = ref(false)
+const showProcesos   = ref(false)
+const showGestion    = ref(false)
 
-// ── Estilos según guía ────────────────────────────────────────────────────────
+// Mapeo dinámico y control de Roles
+const userRole   = authService.getUserRole()
+const isAdmin    = userRole === 'admin'
+const isCajero   = userRole === 'cajero'
+const isContador = userRole === 'contador'
 
-// Item activo: fondo dorado, texto oscuro, 14px / 500
-const activeStyle = {
-  backgroundColor: '#e0b354',
-  color: '#1e3a2f',
-  fontSize: '14px',
-  fontWeight: '500',
-  borderRadius: '8px',
-}
-
-// Item activo padre (Inventario / Procesos abiertos pero no seleccionados)
-const activeParentStyle = {
-  backgroundColor: 'transparent',
-  color: '#e0b354',
-  fontSize: '14px',
-  fontWeight: '500',
-}
-
-// Item inactivo: texto claro, 14px / 500
-const inactiveStyle = {
-  backgroundColor: 'transparent',
-  color: '#b8cfaa',
-  fontSize: '14px',
-  fontWeight: '500',
-}
-
-// ── Lógica de ruta activa ─────────────────────────────────────────────────────
+// Determinar el ítem activo evaluando la URL actual del navegador
 const activeItem = computed(() => {
+<<<<<<< HEAD
   if (route.path.includes('usuarios'))    return 'usuarios'
   if (route.path.includes('productos'))   return 'productos'
   if (route.path.includes('categorias'))  return 'categorias'
@@ -193,36 +152,41 @@ const activeItem = computed(() => {
   if (route.path.includes('reportes'))    return 'reportes'
   if (route.path.includes('caja'))    return 'caja'     
   return 'estadistiscas'
+=======
+  if (route.path.includes('usuarios'))        return 'usuarios'
+  if (route.path.includes('productos'))       return 'productos'
+  if (route.path.includes('categorias'))      return 'categorias'
+  if (route.path.includes('proveedores'))     return 'proveedores'
+  if (route.path.includes('compra'))          return 'compra'
+  if (route.path.includes('historial-ventas')) return 'historial-ventas'
+  if (route.path.includes('caja'))            return 'caja'
+  if (route.path.includes('movimiento-caja')) return 'movimiento-caja'
+  if (route.path.includes('pos'))             return 'pos'
+  if (route.path.includes('reportes'))        return 'reportes'
+  return 'dashboard'
+>>>>>>> 03946be83c9897a220602d9dfcacef0f295a79a6
 })
 
+// Mantiene iluminado el título del desplegable padre si un hijo está activo
 const inventarioActive = computed(() =>
   ['productos', 'categorias', 'proveedores'].includes(activeItem.value)
 )
-
 const procesosActive = computed(() =>
-  ['turno-caja', 'venta', 'compra'].includes(activeItem.value)
+  ['compra', 'historial-ventas'].includes(activeItem.value)
+)
+const gestionActive = computed(() =>
+  ['caja', 'movimiento-caja', 'pos'].includes(activeItem.value)
 )
 
+// Funciones para abrir/cerrar desplegables
 const toggleInventario = () => { showInventario.value = !showInventario.value }
-const toggleProcesos   = () => { showProcesos.value   = !showProcesos.value   }
+const toggleProcesos   = () => { showProcesos.value   = !showProcesos.value }
+const toggleGestion    = () => { showGestion.value    = !showGestion.value }
 
 const navigate = (ruta) => { router.push(ruta) }
-</script>
 
-<style scoped>
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.2s ease;
-  overflow: hidden;
+async function handleLogout() {
+  await authService.logout()
+  router.push('/login')
 }
-.slide-enter-from,
-.slide-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-.slide-enter-to,
-.slide-leave-from {
-  max-height: 300px;
-  opacity: 1;
-}
-</style>
+</script>

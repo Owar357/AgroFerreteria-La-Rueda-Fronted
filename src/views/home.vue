@@ -19,8 +19,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import NavBar from '../components/shared/navbar.vue'
-import SideBar from '../components/home/SideBar.vue'
+import NavBar from '@/components/shared/navbar.vue'
+import SideBar from '@/components/home/SideBar.vue'
 
 const sidebarOpen = ref(true)
 const windowWidth = ref(window.innerWidth)

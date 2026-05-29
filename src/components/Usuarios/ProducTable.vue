@@ -1,6 +1,5 @@
 <template>
     <div class="bg-[#eef2e9] min-h-screen p-8 font-['Inter']">
-        <!-- Header y Botón Agregar -->
         <div class="flex flex-col mb-8 gap-4">
             <div class="flex justify-between items-center w-full">
                 <h1 class="text-[26px] font-semibold tracking-tight text-[#1a2e1f]">Registro de Productos</h1>
@@ -13,10 +12,7 @@
                 </button>
             </div>
 
-
-            <!-- Filtros -->
             <div class="flex justify-start items-center w-full gap-4">
-                <!-- Búsqueda por Nombre -->
                 <div class="relative w-80">
                     <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-sm"></i>
                     <input
@@ -27,7 +23,6 @@
                     />
                 </div>
 
-                <!-- Dropdown Categorías -->
                 <div class="relative">
                     <select
                         v-model="filters.selectedCategory"
@@ -41,7 +36,6 @@
                     <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-xs pointer-events-none"></i>
                 </div>
 
-                <!-- Botón para limpiar filtros (opcional) -->
                 <button
                     v-if="hasActiveFilters"
                     @click="clearFilters"
@@ -52,7 +46,6 @@
             </div>
         </div>
 
-        <!-- Tabla -->
         <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-100">
@@ -70,7 +63,7 @@
                             No se encontraron productos
                         </td>
                     </tr>
-                    <tr v-for="product in filteredProducts" :key="product.id" class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                    <tr v-for="product in paginatedProducts" :key="product.id" class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                         <td class="py-3 px-4 text-[14px] font-medium text-[#1a2e1f]">{{ product.name }}</td>
                         <td class="py-3 px-4 text-[14px] text-[#4b5563]">{{ product.categoria }}</td>
                         <td class="py-3 px-4 text-[14px] text-[#4b5563]">{{ product.fabricante }}</td>
@@ -87,11 +80,24 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-4">
+            <Paginator 
+                v-model:first="first" 
+                v-model:rows="rows" 
+                :totalRecords="filteredProducts.length" 
+                :rowsPerPageOptions="[5, 15, 25]"
+                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+            />
+        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+// Importación del componente Paginator de PrimeVue 4
+import Paginator from 'primevue/paginator'
 
 // Datos de ejemplo
 const products = ref([
@@ -101,7 +107,13 @@ const products = ref([
     { id: 4, name: 'Maíz Tolerant', categoria: 'Semilla', fabricante: 'Biosem', codigo: 'PRN-345-123', visible: true },
     { id: 5, name: 'Fungicida Protector', categoria: 'Fungicida', fabricante: 'AgroProtect', codigo: 'FUN-654-321', visible: true },
     { id: 6, name: 'Insecticida Natural', categoria: 'Insecticida', fabricante: 'BioProtect', codigo: 'INS-123-456', visible: true },
+    { id: 7, name: 'Insecticida Natural', categoria: 'Insecticida', fabricante: 'BioProtect', codigo: 'INS-123-456', visible: true },
+    { id: 8, name: 'Insecticida Natural', categoria: 'Insecticida', fabricante: 'BioProtect', codigo: 'INS-123-456', visible: true },
 ])
+
+// Variables reactivas para el control de la paginación
+const first = ref(0)
+const rows = ref(5) // Bloque inicial por defecto
 
 // Filtros actualizados
 const filters = ref({
@@ -120,11 +132,11 @@ const hasActiveFilters = computed(() => {
     return filters.value.searchName !== '' || filters.value.selectedCategory !== null
 })
 
-// Productos filtrados
+// Productos filtrados por los buscadores (Base de datos local filtrada)
 const filteredProducts = computed(() => {
     let result = products.value
     
-    // Filtro por nombre (solo por nombre)
+    // Filtro por nombre
     if (filters.value.searchName && filters.value.searchName.trim()) {
         const searchTerm = filters.value.searchName.toLowerCase().trim()
         result = result.filter(product => 
@@ -142,10 +154,16 @@ const filteredProducts = computed(() => {
     return result
 })
 
-// Limpiar todos los filtros
+// Segmentación de productos para la vista actual (Paginación)
+const paginatedProducts = computed(() => {
+    return filteredProducts.value.slice(first.value, first.value + rows.value)
+})
+
+// Limpiar todos los filtros y reiniciar paginación
 const clearFilters = () => {
     filters.value.searchName = ''
     filters.value.selectedCategory = null
+    first.value = 0 // Regresa a la primera página al limpiar
 }
 
 // Emits
