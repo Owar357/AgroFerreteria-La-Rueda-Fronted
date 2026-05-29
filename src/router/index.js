@@ -63,7 +63,7 @@ const routes = [
       {
         path: 'inventario/proveedores',
         name: 'proveedores',
-        component: () => import('@/components/Usuarios/SupplierTable.vue'),
+        component: () => import('@/views/ProveedoresView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       //aqui va  lo de la caja

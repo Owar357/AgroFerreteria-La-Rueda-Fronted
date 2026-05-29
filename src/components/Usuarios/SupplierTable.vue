@@ -128,6 +128,7 @@ const toggleEstado = (proveedor) => {
   proveedor.estado = proveedor.estado === 'Activo' ? 'Inactivo' : 'Activo'
   emit('update-estado', proveedor)
 }
+
 </script>
 
 <style>

@@ -78,12 +78,12 @@
       <Button
         @click="guardar"
         :pt="{
-          root: { class: 'flex items-center gap-2 px-6 py-2 rounded-lg border-0 text-[#1a2e1f] text-sm font-semibold font-inter transition-all cursor-pointer' },
+          root: { class: 'flex items-center gap-2 px-8 py-2 rounded-lg border-0 text-[#1a2e1f] text-sm font-semibold font-inter transition-all cursor-pointer' },
           label: { class: 'font-inter font-semibold text-sm' },
         }"
-        style="background: #e0b354;"
-        @mouseenter="(e) => e.currentTarget.style.background = '#cda03f'"
-        @mouseleave="(e) => e.currentTarget.style.background = '#e0b354'"
+        style="background: #2b5e3b;"
+        @mouseenter="(e) => e.currentTarget.style.background = '#2b5e3b'"
+        @mouseleave="(e) => e.currentTarget.style.background = '#2b5e3b'"
       >
         <template #icon>
           <i class="pi pi-check-circle text-sm" />
