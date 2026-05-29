@@ -4,10 +4,6 @@
     style="background-color: #1e3a2f; font-family: 'Inter', sans-serif;"
   >
 
-<<<<<<< HEAD
-    <!--registro solo para el admin-->
-=======
->>>>>>> 03946be83c9897a220602d9dfcacef0f295a79a6
     <template v-if="isAdmin">
       <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
         ADMINISTRACIÓN

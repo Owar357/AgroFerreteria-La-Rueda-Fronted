@@ -11,6 +11,7 @@ import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
 import { all } from 'axios'
+import RegistroComprasView from '@/views/RegistroComprasView.vue'
 
 const routes = [
   {
