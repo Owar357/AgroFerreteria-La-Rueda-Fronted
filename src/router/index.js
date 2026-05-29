@@ -10,9 +10,7 @@ import CompraView      from '@/views/CompraView.vue'
 import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
-import RegistroComprasView from '@/views/RegistroComprasView.vue'
-import ProveedoresView from '../views/ProveedoresView.vue'
-
+import { all } from 'axios'
 
 const routes = [
   {
@@ -23,6 +21,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login,
+  },
+  {
+    path: '/compras-Realizadas',
+    name: 'comprasRealizadas',
+    component: ComprasRealizadasView,
   },
 
   {
@@ -56,12 +59,27 @@ const routes = [
         component: ProductosView,
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-          {
+      {
         path: 'inventario/proveedores',
         name: 'proveedores',
-        component: ProveedoresView,
+        component: () => import('@/components/Usuarios/SupplierTable.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+      //aqui va  lo de la caja
+      {
+        path: 'venta/venta',
+        name: 'venta',
+        component: FromVenta,
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+      },
+      {
+        path: 'caja',
+        name: 'caja',
+        component: () => import('@/views/CajaView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+      },
+
+     
       /*
       {
         path: 'venta/turno-caja',
@@ -70,13 +88,7 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
       */
-      {
-        path: 'venta/venta',
-        name: 'venta',
-        component: FromVenta,
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
-      },
-
+    
       // ── ADMIN + CONTADOR ───────────────────────────────────────────────────
       {
         path: 'venta/compra',
@@ -184,9 +196,8 @@ router.beforeEach((to) => {
     return authService.getHomeRoute()
   }
 
+  return true
   
-    },
-  
-)
+})
 
 export default router
