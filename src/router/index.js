@@ -10,6 +10,7 @@ import CompraView      from '@/views/CompraView.vue'
 import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
+import { all } from 'axios'
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login,
+  },
+  {
+    path: '/compras-Realizadas',
+    name: 'comprasRealizadas',
+    component: ComprasRealizadasView,
   },
 
   {
@@ -53,7 +59,27 @@ const routes = [
         component: ProductosView,
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+      {
+        path: 'inventario/proveedores',
+        name: 'proveedores',
+        component: () => import('@/components/Usuarios/SupplierTable.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
+      //aqui va  lo de la caja
+      {
+        path: 'venta/venta',
+        name: 'venta',
+        component: FromVenta,
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+      },
+      {
+        path: 'caja',
+        name: 'caja',
+        component: () => import('@/views/CajaView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+      },
 
+     
       /*
       {
         path: 'venta/turno-caja',
@@ -62,13 +88,7 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
       */
-      {
-        path: 'venta/venta',
-        name: 'venta',
-        component: FromVenta,
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
-      },
-
+    
       // ── ADMIN + CONTADOR ───────────────────────────────────────────────────
       {
         path: 'venta/compra',
@@ -119,67 +139,7 @@ router.beforeEach((to) => {
   }
 
   return true
-  routes: [
-   
   
-    {
-      path: '/Login',
-      name:'login',
-      component: Login
-    },
-    
-    {
-      path: '/ComprasRealizadas',
-      name:'comprasRealizadas',
-      component: ComprasRealizadasView
-    },
-     {
-      path: '/RegistroCompras',
-      name:'registroCompras',
-      component: RegistroComprasView
-    },
-    {
-      path: '/admin',
-      component: () => import('../views/home.vue'),
-      children: [
-        {
-          path: 'inventario/productos',
-          name: 'Producto',
-          component: () => import('../views/productosView.vue')
-        },
-        {
-          path: 'venta/venta',
-          name: 'Venta',
-          component: () => import('../views/FromVenta.vue'),
-        },
-        {
-             path: 'usuarios',
-             name: 'Usuarios',
-             component: () => import('../views/UsuariosView.vue'),
-        },
-        {
-             path: 'inventario/proveedores',
-             name: 'proveedor',
-             component: () => import('../components/Usuarios/SupplierTable.vue'),
-        }, 
-         {
-             path: 'inventario/Categorias',
-             name: 'categorias',
-             component: () => import('../views/CategoriasView.vue'),
-        }, 
-        {
-             path: 'Venta/Compra',
-             name: 'Compra',
-             component: () => import('../views/CompraView.vue'),
-        }, 
-        {
-             path: 'Caja',
-             name: 'Caja',
-             component: () => import('../views/CajaView.vue'),
-        }, 
-      ]
-    },
-  ],
 })
 
 export default router
