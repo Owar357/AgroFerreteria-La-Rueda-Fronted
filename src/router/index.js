@@ -10,6 +10,9 @@ import CompraView      from '@/views/CompraView.vue'
 import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
+import RegistroComprasView from '@/views/RegistroComprasView.vue'
+import ProveedoresView from '../views/ProveedoresView.vue'
+
 
 const routes = [
   {
@@ -53,7 +56,12 @@ const routes = [
         component: ProductosView,
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-
+          {
+        path: 'inventario/proveedores',
+        name: 'proveedores',
+        component: ProveedoresView,
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
       /*
       {
         path: 'venta/turno-caja',

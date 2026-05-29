@@ -9,8 +9,16 @@
         <SideBar v-if="sidebarOpen" />
       </transition>
 
-      <div style="flex: 1; overflow-y: auto; background: #f5f5f5;">
-        <router-view />
+      <!-- Contenedor del contenido que ahora incluye el Footer -->
+      <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f5f5f5;">
+        
+        <!-- Zona con scroll exclusivo para las vistas -->
+        <div style="flex: 1; overflow-y: auto;">
+          <router-view />
+        </div>
+
+        <Footer />
+        
       </div>
 
     </div>
@@ -21,6 +29,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import NavBar from '@/components/shared/navbar.vue'
 import SideBar from '@/components/home/SideBar.vue'
+import Footer from '@/components/shared/Footer.vue' // <-- Asegúrate de crear e importar tu footer aquí
 
 const sidebarOpen = ref(true)
 const windowWidth = ref(window.innerWidth)

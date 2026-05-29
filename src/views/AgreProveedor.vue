@@ -147,29 +147,9 @@
         </div>
 
       </div>
+      </div>
 
-      <hr class="border-t border-[#dce8dc] my-3.5" />
 
-      <!-- Estado -->
-      <p class="text-[11px] font-semibold tracking-widest uppercase text-[#4b5563] mb-2.5 font-inter">Estado</p>
-      <Select
-        v-model="form.estado"
-        :options="estadoOptions"
-        option-label="label"
-        option-value="value"
-        placeholder="Seleccionar estado"
-        :pt="{
-          root: { class: 'w-full' },
-          label: { class: 'text-sm text-[#1a2e1f] font-inter px-2.5' },
-          trigger: { class: 'text-[#4b5563]' },
-          overlay: { class: 'border border-[#c8ddd0] rounded-lg shadow-md mt-1' },
-          option: { class: 'text-sm font-inter text-[#1a2e1f] px-3 py-2 hover:bg-[#dff0e0] cursor-pointer' },
-          listContainer: { class: 'rounded-lg' },
-        }"
-        class="h-9 border border-[#c8ddd0] rounded-lg bg-white focus-within:border-[#2b5e3b] focus-within:ring-2 focus-within:ring-[#2b5e3b]/10"
-      />
-
-    </div>
 
     <!-- Footer -->
     <div class="flex justify-end gap-2.5 px-6 py-3.5 border-t border-[#dce8dc]" style="background: #eef2e9;">
@@ -198,7 +178,7 @@
         <template #default>Guardar proveedor</template>
       </Button>
     </div>
-
+    
   </Dialog>
 </template>
 
