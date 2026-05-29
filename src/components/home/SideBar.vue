@@ -191,7 +191,7 @@ const activeItem = computed(() => {
    if (route.path.includes('compra'))      return 'compra'
   if (route.path.includes('venta'))       return 'venta'
   if (route.path.includes('reportes'))    return 'reportes'
-  if (route.path.includes('caja'))    return 'caja'         
+  if (route.path.includes('caja'))    return 'caja'     
   return 'estadistiscas'
 })
 

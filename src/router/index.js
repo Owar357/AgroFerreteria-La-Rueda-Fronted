@@ -5,6 +5,7 @@ import RegistroComprasView from '@/views/RegistroComprasView.vue'
 import UserTable from '@/components/Usuarios/UserTable.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import Login from '@/views/auth/Login.vue'
+import MovimientosCajaView from '@/views/MovimientosCajaView.vue'
 
 
 
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/RegistroCompras',
       name:'registroCompras',
       component: RegistroComprasView
+    },
+    {
+      path: '/movimientos/caja',
+      name:'CajaExterna',
+      component: MovimientosCajaView
     },
     {
       path: '/admin',
