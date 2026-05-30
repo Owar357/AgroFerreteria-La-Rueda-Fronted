@@ -104,7 +104,6 @@
       />
     </template>
 
-
     <div class="mt-auto mb-8">
       <hr class="border-none border-t mb-3" style="border-color: #162e1e;" />
       <SidebarItem
