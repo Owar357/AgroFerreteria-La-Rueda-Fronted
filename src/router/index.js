@@ -66,6 +66,12 @@ const routes = [
         component: () => import('@/views/ProveedoresView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+       {
+        path: 'Gestion/POS',
+        name: 'FromVenta',
+        component: () => import('@/views/FromVenta.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
       //aqui va  lo de la caja
       {
         path: 'venta/venta',
@@ -79,7 +85,7 @@ const routes = [
         component: () => import('@/views/CajaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
-
+      
      
       /*
       {
