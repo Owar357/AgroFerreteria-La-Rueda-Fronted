@@ -1,9 +1,8 @@
 <template>
-    <div class="bg-[#eef2e9]  min-h-screen p-6 max-w-7xl mx-auto">
+    <div class="bg-[#eef2e9]  min-h-screen p-6  mx-auto">
 
         <!-- Botón volver -->
-        <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
-        class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b]
+        <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b]
          hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200" @click="volver" />
 
 
@@ -25,18 +24,18 @@
         </div>
 
         <!-- Encabezado Presentaciones + botón Agregar -->
-      <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-semibold text-[#1e3a2f] flex items-center gap-2">
-        <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
-    </h2>
-    <Button
-        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-[14px] font-semibold !px-4 !py-2.5 !rounded-lg !border-none shadow-md transition-all duration-200"
-        label="Agregar presentación" icon="pi pi-plus" />
-</div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-[#1e3a2f] flex items-center gap-2">
+                <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
+            </h2>
+            <Button
+                class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-[14px] font-semibold !px-4 !py-3 !rounded-lg !border-none shadow-md transition-all duration-200"
+                label="Agregar presentación" icon="pi pi-plus" />
+        </div>
 
         <!-- Tabla de presentaciones con botones mejorados -->
         <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
-            <DataTable :value="presentaciones" stripedRows responsiveLayout="scroll" class="p-datatable-sm">
+            <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-sm">
                 <Column field="nombre" header="Nombre" class="text-sm"></Column>
                 <Column field="unidadMedida" header="Unidad medida" class="text-sm"></Column>
                 <Column field="precio" header="Precio" class="text-sm">
@@ -148,23 +147,32 @@ const toggleEstadoPresentacion = (pres) => {
 <style scoped>
 /* Ajustes adicionales */
 :deep(.p-datatable .p-datatable-thead > tr > th) {
-    background-color: #fafdf7;
-    color: #3c674b;
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 0.75rem 1rem;
+  background-color: #fafdf7;
+  color: #3c674b;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.2s;
 }
 
 :deep(.p-datatable .p-datatable-tbody > tr > td) {
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
 }
 
+/* Hover en fila completa - verde muy suave */
 :deep(.p-datatable .p-datatable-tbody > tr:hover) {
-    background-color: #fefcf5;
+  background-color: #eef5e9 !important;  /* verde suave agro */
 }
+
+/* Opcional: si quieres hover por celda (más intenso al pasar por cada celda) */
+:deep(.p-datatable .p-datatable-tbody > tr:hover > td) {
+  background-color: transparent; /* para que herede el de la fila, no es necesario */
+}
+
 
 :deep(.p-button.p-button-text) {
-    font-weight: 500;
+  font-weight: 500;
 }
 </style>

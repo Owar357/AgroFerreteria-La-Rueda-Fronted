@@ -5,41 +5,26 @@
       <div class="flex justify-between items-center w-full">
         <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de Proveedores</h1>
 
-        <Button
-          label="+ Agregar"
+        <Button label="+ Agregar"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="$emit('open-add')"
-        />
+          @click="$emit('open-add')" />
       </div>
 
       <div class="flex justify-start items-center w-full gap-8">
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
-          <InputText
-            v-model="filters['global'].value"
-            placeholder="Buscar por nombre..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] focus:ring-1 focus:ring-[#2b5e3b]"
-          />
+          <InputText v-model="filters['global'].value" placeholder="Buscar por nombre..."
+            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] focus:ring-1 focus:ring-[#2b5e3b]" />
         </IconField>
 
-        <Dropdown
-          v-model="filters['estado'].value"
-          :options="estadoOptions"
-          showClear
-          placeholder="Todos los estados"
-          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]"
-        />
+        <Dropdown v-model="filters['estado'].value" :options="estadoOptions" showClear placeholder="Todos los estados"
+          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]" />
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <DataTable
-        :value="proveedores"
-        v-model:filters="filters"
-        :globalFilterFields="['nombre', 'correo']"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
-      >
+      <DataTable :value="proveedores" v-model:filters="filters" :globalFilterFields="['nombre', 'correo']"
+        responsiveLayout="scroll" class="p-datatable-custom text-[14px]">
         <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
 
         <Column field="correo" header="Correo" class="text-[#4b5563]" />
@@ -48,45 +33,24 @@
 
         <Column field="estado" header="Estado">
           <template #body="slotProps">
-            <span
-              :class="[
-                'px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide',
-                slotProps.data.estado === 'Activo'
-                  ? 'bg-[#dff0e0] text-[#2b5e3b]'
-                  : 'bg-[#fee2e2] text-[#b91c1c]'
-              ]"
-            >
-              {{ slotProps.data.estado }}
-            </span>
+            <Tag :value="slotProps.data.estado === 'Activo' ? 'ACTIVO' : 'INACTIVO'"
+              :severity="slotProps.data.estado === 'Activo' ? 'success' : 'danger'" rounded />
           </template>
         </Column>
 
-        <Column header="Acciones" class="text-center w-[180px]">
+
+        <Column header="Acciones">
           <template #body="slotProps">
-            <div class="flex gap-2 justify-center">
-              <!-- Editar -->
-              <Button
-                icon="pi pi-pencil"
-                class="!bg-[#e0b354] hover:!bg-[#cda03f] border-none text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                @click="handleEdit(slotProps.data)"
-              />
-              <!-- Ver Detalles -->
-              <Button
-                icon="pi pi-eye"
-                class="bg-[#eef2e9] hover:bg-[#e2e8dd] border border-[#cbd5e1] text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors"
-                @click="handleDetail(slotProps.data)"
-              />
-              <!-- Activar / Desactivar -->
-              <Button
-                :icon="slotProps.data.estado === 'Activo' ? 'pi pi-ban' : 'pi pi-check'"
-                :class="[
-                  'w-8 h-8 rounded-full p-0 transition-colors border',
-                  slotProps.data.estado === 'Activo'
-                    ? '!bg-[#034780] hover:!bg-[#2065c0] border-[#1e6fbb] text-[#b91c1c]'
-                    : '!bg-[#f15106] hover:!bg-[#c44901] border-[#c41205] text-[#2b5e3b]'
-                ]"
-                @click="toggleEstado(slotProps.data)"
-              />
+            <div class="flex gap-2">
+              <Button icon="pi pi-pencil" label="Editar" severity="secondary" text rounded size="small"
+                v-tooltip="'Editar proveedor'" @click="handleEdit(slotProps.data)" />
+              <Button icon="pi pi-eye" label="Ver" severity="secondary" text rounded size="small"
+                v-tooltip="'Ver detalles'" @click="handleDetail(slotProps.data)" />
+              <Button :label="slotProps.data.estado === 'Activo' ? 'Desactivar' : 'Activar'"
+                :icon="slotProps.data.estado === 'Activo' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                :severity="slotProps.data.estado === 'Activo' ? 'danger' : 'success'" text rounded size="small"
+                v-tooltip="slotProps.data.estado === 'Activo' ? 'Desactivar proveedor' : 'Activar proveedor'"
+                @click="toggleEstado(slotProps.data)" />
             </div>
           </template>
         </Column>
@@ -132,7 +96,7 @@ const toggleEstado = (proveedor) => {
 </script>
 
 <style>
-.p-datatable-custom .p-datatable-thead > tr > th {
+.p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
   border-bottom: 2px solid #e2e8dd !important;
@@ -143,17 +107,18 @@ const toggleEstado = (proveedor) => {
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr {
+.p-datatable-custom .p-datatable-tbody>tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
   border-bottom: 1px solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr:hover {
+.p-datatable-custom .p-datatable-tbody>tr:hover {
   background-color: #f4f7f2 !important;
 }
 
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
+.p-inputtext:enabled:focus,
+.p-dropdown:not(.p-disabled).p-focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
