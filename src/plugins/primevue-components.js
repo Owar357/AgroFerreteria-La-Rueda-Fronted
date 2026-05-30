@@ -8,6 +8,7 @@ import Rating from 'primevue/rating';
 import SelectButton from 'primevue/selectbutton';
 import DataTable  from 'primevue/datatable';
 import Column from 'primevue/column'
+import  Tooltip  from 'primevue/tooltip';
 
 
 export default {
@@ -21,5 +22,6 @@ export default {
         app.component('Tag', Tag);
         app.component('Rating', Rating);
         app.component('SelectButton', SelectButton);
+        app.directive('tooltip', Tooltip);
     }
 }

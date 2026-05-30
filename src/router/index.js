@@ -10,6 +10,7 @@ import CompraView      from '@/views/CompraView.vue'
 import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
+import DetalleProductosView from '@/views/DetalleProductosView.vue'
 
 
 const routes = [
@@ -27,6 +28,14 @@ const routes = [
     name: 'comprasRealizadas',
     component: ComprasRealizadasView,
   },
+
+   {
+    path: '/presentaciones',
+    name: 'presentaciones',
+    component: DetalleProductosView,
+  },
+
+  
 
   {
     // Layout padre — todas las rutas protegidas van aquí
