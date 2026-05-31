@@ -1,26 +1,27 @@
 <template>
     <div class="min-h-screen p-8" style="font-family: 'Inter', sans-serif; background-color: #eef2e9; color: #1a2e1f;">
-           
-         <!-- Botón Regresar -->
-        <div class="flex justify-end">
-            <Button label="Regresar" icon="pi pi-arrow-left"
-             
-            style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;" />
+
+        <!-- Botón Regresar -->
+        <Button label="Regresar" icon="pi pi-arrow-left"
+            style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;"
+            @click="$emit('close')" />
             
-        </div>
         <!-- Header -->
         <div class="flex justify-between items-start mb-8">
             <div>
-                <h1 style="font-size: 48px; font-weight: 600; color: #1a2e1f; margin: 0; line-height: 1.1;">Nuevo Producto</h1>
-                <p style="font-size: 20px; color: #6b7280; margin: 8px 0 0;">Completa la información del producto y sus presentaciones</p>
+                <h1 style="font-size: 48px; font-weight: 600; color: #1a2e1f; margin: 0; line-height: 1.1;">Nuevo
+                    Producto</h1>
+                <p style="font-size: 20px; color: #6b7280; margin: 8px 0 0;">Completa la información del producto y sus
+                    presentaciones</p>
             </div>
         </div>
-        
+
         <!-- Sección 1: Información General -->
         <div class="rounded-2xl p-8 mb-6" style="background-color: #ffffff; border: 1px solid #e2e8dd;">
             <div class="flex items-center gap-3 mb-6 pb-5" style="border-bottom: 1px solid #e2e8dd;">
                 <i class="pi pi-box" style="color: #e0b354; font-size: 22px;"></i>
-                <span style="font-size: 32px; font-weight: 600; color: #1a2e1f;">1. Información General del Producto</span>
+                <span style="font-size: 32px; font-weight: 600; color: #1a2e1f;">1. Información General del
+                    Producto</span>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
@@ -37,10 +38,7 @@
                 <!-- Categoría -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Categoría</label>
-                    <input
-                        v-model="categoria"
-                        list="lista-categorias"
-                        placeholder="Buscar o seleccionar categoría..."
+                    <input v-model="categoria" list="lista-categorias" placeholder="Buscar o seleccionar categoría..."
                         style="width: 100%; background-color: #ffffff; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; border-radius: 12px; outline: none; border: 1px solid #d1d5db;"
                         onfocus="this.style.borderColor='#2b5e3b'; this.style.borderWidth='2px';"
                         onblur="this.style.borderColor='#d1d5db'; this.style.borderWidth='1px';" />
@@ -80,7 +78,8 @@
                         onfocus="this.style.borderColor='#2b5e3b'; this.style.borderWidth='2px'; this.style.boxShadow='none';"
                         onblur="this.style.borderColor='#d1d5db'; this.style.borderWidth='1px'; this.style.boxShadow='none';" />
                     <p style="font-size: 16px; color: #6b7280; margin-top: 4px;">
-                        Es la unidad mínima en la que se almacenará el stock. Todas las presentaciones se convertirán a esta unidad.
+                        Es la unidad mínima en la que se almacenará el stock. Todas las presentaciones se convertirán a
+                        esta unidad.
                     </p>
                 </div>
 
@@ -90,7 +89,8 @@
                     <div class="flex flex-wrap gap-6">
                         <div class="flex items-center gap-2">
                             <RadioButton v-model="tipoVenta" inputId="venta1" name="tipoVenta" value="UnidadFija" />
-                            <label for="venta1" style="font-size: 20px; color: #1a2e1f; cursor: pointer;">Unidad Fija</label>
+                            <label for="venta1" style="font-size: 20px; color: #1a2e1f; cursor: pointer;">Unidad
+                                Fija</label>
                         </div>
                         <div class="flex items-center gap-2">
                             <RadioButton v-model="tipoVenta" inputId="venta2" name="tipoVenta" value="Granel" />
@@ -98,8 +98,10 @@
                         </div>
                     </div>
                     <p style="font-size: 16px; color: #6b7280; margin-top: 4px;">
-                        <span v-if="tipoVenta === 'UnidadFija'">El producto se vende en cantidades exactas (ej: 1 quintal, 1 caja).</span>
-                        <span v-else-if="tipoVenta === 'Granel'">El producto se vende por peso o volumen variable (ej: 2.5 libras, 300ml).</span>
+                        <span v-if="tipoVenta === 'UnidadFija'">El producto se vende en cantidades exactas (ej: 1
+                            quintal, 1 caja).</span>
+                        <span v-else-if="tipoVenta === 'Granel'">El producto se vende por peso o volumen variable (ej:
+                            2.5 libras, 300ml).</span>
                     </p>
                 </div>
 
@@ -110,7 +112,8 @@
         <div class="rounded-2xl p-8 mb-6" style="background-color: #ffffff; border: 1px solid #e2e8dd;">
             <div class="flex items-center gap-3 mb-6 pb-5" style="border-bottom: 1px solid #e2e8dd;">
                 <i class="pi pi-tags" style="color: #e0b354; font-size: 22px;"></i>
-                <span style="font-size: 32px; font-weight: 600; color: #1a2e1f;">2. Información de las Presentaciones del Producto</span>
+                <span style="font-size: 32px; font-weight: 600; color: #1a2e1f;">2. Información de las Presentaciones
+                    del Producto</span>
             </div>
 
             <div class="grid grid-cols-2 gap-6">
@@ -128,7 +131,9 @@
                 <!-- Equivalencia -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">
-                        ¿Cuántas <span style="background-color: #dff0e0; color: #1e3a2f; font-size: 20px; padding: 2px 8px; border-radius: 40px;">[unidad base]</span> equivale esta presentación?
+                        ¿Cuántas <span
+                            style="background-color: #dff0e0; color: #1e3a2f; font-size: 20px; padding: 2px 8px; border-radius: 40px;">[unidad
+                            base]</span> equivale esta presentación?
                     </label>
                     <div class="flex items-center gap-4">
                         <InputNumber v-model="presentacion.equivalencia" placeholder="0" :min="0"
@@ -147,8 +152,8 @@
                 <!-- Precio Neto -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Precio Neto</label>
-                    <InputNumber v-model="presentacion.precioNeto" placeholder="0.00" :min="0"
-                        :minFractionDigits="2" :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
+                    <InputNumber v-model="presentacion.precioNeto" placeholder="0.00" :min="0" :minFractionDigits="2"
+                        :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; box-shadow: none;"
                         :inputProps="{ onfocus: 'this.style.borderColor=\'#2b5e3b\'; this.style.borderWidth=\'2px\'; this.style.boxShadow=\'none\';', onblur: 'this.style.borderColor=\'#d1d5db\'; this.style.borderWidth=\'1px\'; this.style.boxShadow=\'none\';' }"
                         class="w-full" />
@@ -158,15 +163,16 @@
                 <div class="flex flex-col justify-end">
                     <div class="flex items-center gap-3" style="padding: 14px 0;">
                         <Checkbox v-model="aplicaIva" :binary="true" inputId="iva" style="width: 22px; height: 22px;" />
-                        <label for="iva" style="font-size: 20px; color: #1a2e1f; cursor: pointer;">Aplica IVA 13%</label>
+                        <label for="iva" style="font-size: 20px; color: #1a2e1f; cursor: pointer;">Aplica IVA
+                            13%</label>
                     </div>
                 </div>
 
                 <!-- IVA Aplicado -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">IVA Aplicado (13%)</label>
-                    <InputNumber :modelValue="ivaCalculado" :disabled="true"
-                        :minFractionDigits="2" :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
+                    <InputNumber :modelValue="ivaCalculado" :disabled="true" :minFractionDigits="2"
+                        :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #f2f5ef; border-color: #d1d5db; color: #6b7280; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; cursor: not-allowed;"
                         class="w-full" />
                 </div>
@@ -174,8 +180,8 @@
                 <!-- Precio Total -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Precio Total</label>
-                    <InputNumber :modelValue="precioTotal" :disabled="true"
-                        :minFractionDigits="2" :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
+                    <InputNumber :modelValue="precioTotal" :disabled="true" :minFractionDigits="2"
+                        :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #f2f5ef; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; cursor: not-allowed;"
                         class="w-full" />
                 </div>
@@ -221,13 +227,12 @@
         <!-- Botón Guardar -->
         <div class="flex justify-end">
             <Button label="Guardar Producto" icon="pi pi-save"
-             
-            style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;" />
-            
+                style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;" />
+
         </div>
-       
-        
-        
+
+
+
 
     </div>
 </template>

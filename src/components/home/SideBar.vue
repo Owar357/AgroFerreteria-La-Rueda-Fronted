@@ -1,9 +1,10 @@
 <template>
   <div
-    class="w-64 h-screen flex flex-col p-6 flex-shrink-0 border-r border-[#162e1e]"
+  class="w-64 h-screen flex flex-col p-6 flex-shrink-0 border-r border-[#162e1e] overflow-y-auto"
     style="background-color: #1e3a2f; font-family: 'Inter', sans-serif;"
-  >
-
+>
+  
+  
     <template v-if="isAdmin">
       <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;" class="mb-1.5 mx-1">
         ADMINISTRACIÓN
@@ -104,7 +105,8 @@
       />
     </template>
 
-    <div class="mt-auto mb-8">
+     
+  <div class="p-3 pt-0">
       <hr class="border-none border-t mb-3" style="border-color: #162e1e;" />
       <SidebarItem
         icon="pi pi-sign-out"
