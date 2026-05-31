@@ -130,7 +130,7 @@ const eliminarCodigo = (id) => {
         icon: 'success',
         title: '¡Código eliminado!',
         showConfirmButton: false,
-        timer: 1500,
+        timer: 1500,  
         timerProgressBar: true,
         background: '#ffffff',
         color: '#1e3a2f',
