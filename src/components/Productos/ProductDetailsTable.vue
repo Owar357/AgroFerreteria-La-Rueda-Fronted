@@ -5,9 +5,6 @@
         <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b]
          hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200" @click="volver" />
 
-
-
-
         <!-- Tarjeta del producto -->
         <div class="bg-white rounded-2xl border border-[#e8efe1] shadow-sm p-6 mb-6">
             <div class="flex flex-wrap justify-between items-start gap-4">
@@ -30,7 +27,7 @@
             </h2>
             <Button
                 class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-[14px] font-semibold !px-4 !py-3 !rounded-lg !border-none shadow-md transition-all duration-200"
-                label="Agregar presentación" icon="pi pi-plus" />
+                label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
         </div>
 
         <!-- Tabla de presentaciones con botones mejorados -->
@@ -54,13 +51,14 @@
                 <Column header="Acciones" :exportable="false" class="text-sm">
                     <template #body="{ data }">
                         <div class="flex flex-wrap gap-2">
+
                             <!-- Botón Editar -->
                             <Button icon="pi pi-pencil" label="Editar" severity="secondary" text rounded size="small"
-                                v-tooltip="'Editar presentación'" />
+                                v-tooltip="'Editar presentación'" @click="abrirEditar(data)" />
 
                             <!-- Botón Ver código de barras -->
                             <Button icon="pi pi-qrcode" label="Código" severity="secondary" text rounded size="small"
-                                @click="verCodigoBarras(data)" v-tooltip="'Ver código de barras'" />
+                                v-tooltip="'Ver códigos de barra'" @click="abrirCodigos(data)" />
 
                             <!-- Botón dual Activar/Desactivar -->
                             <Button :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'"
@@ -76,6 +74,13 @@
                     <div class="text-center py-8 text-gray-400">No hay presentaciones registradas</div>
                 </template>
             </DataTable>
+
+            <AñadirPresentacionDialog v-model:visible="AgregarVisible" @guardar="onGuardar" />
+
+            <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
+                @guardar="onGuardarEdicion" />
+
+            <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
         </div>
     </div>
 </template>
@@ -86,6 +91,10 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
+import AñadirPresentacionDialog from '@/components/Productos/AddPresentation.vue'
+import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vue'
+import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
+import Swal from 'sweetalert2'
 
 // ========== PROPS ==========
 const props = defineProps({
@@ -97,6 +106,15 @@ const props = defineProps({
 
 // ========== EMITS ==========
 const emit = defineEmits(['volver'])
+
+
+const editarVisible = ref(false)
+const presentacionSeleccionada = ref(null)
+const codigosVisible = ref(false)
+const presentacionCodigos = ref(null)
+
+
+
 
 // ========== DATOS DEL PRODUCTO==========
 const producto = ref({
@@ -115,16 +133,9 @@ const presentaciones = ref([
     { id: 4, nombre: 'Caja 10uds', unidadMedida: 'unidad', precio: 45.00, stock: 80, estado: 'ACTIVO' }
 ])
 
-// ========== ESTADO DEL DIÁLOGO ==========
-const dialogVisible = ref(false)
-const editando = ref(false)
-const form = ref({
-    nombre: '',
-    unidadMedida: '',
-    precio: null,
-    stock: null,
-    estado: 'ACTIVO'
-})
+
+
+const AgregarVisible = ref(false)
 
 
 // ========== MÉTODOS ==========
@@ -136,43 +147,114 @@ const volver = () => {
 
 // Botón dual: activar/desactivar
 const toggleEstadoPresentacion = (pres) => {
-    const nuevoEstado = pres.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
-    const index = presentaciones.value.findIndex(p => p.id === pres.id)
+    const esActivo = pres.estado === 'ACTIVO'
+
+    Swal.fire({
+        html: `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+        <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dff0e0'}; display:flex; align-items:center; justify-content:center;">
+          <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#2b5e3b'};"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}</h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}</p>
+      </div>
+    `,
+        showCancelButton: true,
+        confirmButtonColor: esActivo ? '#b91c1c' : '#2b5e3b',
+        cancelButtonColor: '#e2e8dd',
+        confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            container: '!z-[9999]',
+            confirmButton: '!rounded-lg !font-semibold !text-sm',
+            cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
+            popup: '!rounded-2xl',
+        },
+        buttonsStyling: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const nuevoEstado = esActivo ? 'INACTIVO' : 'ACTIVO'
+            const index = presentaciones.value.findIndex(p => p.id === pres.id)
+            if (index !== -1) {
+                presentaciones.value[index].estado = nuevoEstado
+            }
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+                background: '#ffffff',
+                color: '#1e3a2f',
+                iconColor: '#2b5e3b',
+            })
+        }
+    })
+}
+// ========== Abrir modal para AÑADIR presentación==========
+const abrirAñadir = () => {
+    AgregarVisible.value = true
+}
+
+const onGuardar = (nuevaPresentacion) => {
+    presentaciones.value.push(nuevaPresentacion)
+}
+
+// ========== Abrir modal para EDITAR presentación==========
+const abrirEditar = (presentacion) => {
+    presentacionSeleccionada.value = { ...presentacion }
+    editarVisible.value = true
+}
+
+const onGuardarEdicion = (presentacionEditada) => {
+    const index = presentaciones.value.findIndex(p => p.id === presentacionEditada.id)
     if (index !== -1) {
-        presentaciones.value[index].estado = nuevoEstado
+        presentaciones.value[index] = { ...presentacionEditada }
     }
 }
+
+// ========== Abrir modal para VER y AÑADIR código  de barra ==========
+const abrirCodigos = (presentacion) => {
+    presentacionCodigos.value = { ...presentacion }
+    codigosVisible.value = true
+}
+
 </script>
 
 <style scoped>
 /* Ajustes adicionales */
 :deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #fafdf7;
-  color: #3c674b;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.75rem 1rem;
-  transition: background-color 0.2s;
+    background-color: #fafdf7;
+    color: #3c674b;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s;
 }
 
 :deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
 }
 
 /* Hover en fila completa - verde muy suave */
 :deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #eef5e9 !important;  /* verde suave agro */
+    background-color: #eef5e9 !important;
+    /* verde suave agro */
 }
 
 /* Opcional: si quieres hover por celda (más intenso al pasar por cada celda) */
 :deep(.p-datatable .p-datatable-tbody > tr:hover > td) {
-  background-color: transparent; /* para que herede el de la fila, no es necesario */
+    background-color: transparent;
+    /* para que herede el de la fila, no es necesario */
 }
 
 
 :deep(.p-button.p-button-text) {
-  font-weight: 500;
+    font-weight: 500;
 }
 </style>
