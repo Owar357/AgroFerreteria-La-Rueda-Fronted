@@ -178,7 +178,7 @@ import Column from 'primevue/column'
 
 const fechaActual = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
-const tipoFactura              = ref('')
+const tipoFactura              = ref('consumidor_final')
 const busquedaProducto         = ref('')
 const presentacionSeleccionada = ref('')
 const productosVenta           = ref([])
