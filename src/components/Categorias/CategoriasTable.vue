@@ -16,8 +16,6 @@
           <div class="flex gap-2 justify-end">
             <Button icon="pi pi-pencil" label="Editar" severity="secondary" text rounded size="small"
               v-tooltip="'Editar categoría'" @click="$emit('open-edit', slotProps.data)" />
-            <Button icon="pi pi-eye" label="Ver" severity="secondary" text rounded size="small"
-              v-tooltip="'Ver categoría'" @click="$emit('open-view', slotProps.data)" />
           </div>
         </template>
       </Column>

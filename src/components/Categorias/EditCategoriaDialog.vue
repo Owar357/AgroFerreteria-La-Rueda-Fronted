@@ -113,36 +113,42 @@ const dispararActualizar = async () => {
   }
   if (!validarInput()) return
 
-  // Cerramos el modal ANTES del SweetAlert de confirmación
-  // para que no quede detrás del diálogo
-  localVisible.value = false
-
   const confirmacion = await Swal.fire({
-    icon: 'question',
-    title: '¿Guardar cambios?',
-    text: `¿Deseas actualizar la categoría a "${form.nombre.trim()}"?`,
+    html: `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+        <div style="width:56px; height:56px; border-radius:50%; background:#fef3c7; display:flex; align-items:center; justify-content:center;">
+          <i class="pi pi-pencil" style="font-size:24px; color:#b45309;"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">¿Guardar cambios?</h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">Se actualizará la categoría a "${form.nombre.trim()}"</p>
+      </div>
+    `,
     showCancelButton: true,
     confirmButtonColor: '#2b5e3b',
-    cancelButtonColor:  '#6b7280',
-    confirmButtonText:  'Sí, guardar',
-    cancelButtonText:   'Cancelar'
+    cancelButtonColor: '#e2e8dd',
+    confirmButtonText: 'Sí, guardar',
+    cancelButtonText: 'Cancelar',
+    customClass: {
+      container: '!z-[9999]',
+      confirmButton: '!rounded-lg !font-semibold !text-sm',
+      cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
+      popup: '!rounded-2xl',
+    },
+    buttonsStyling: true,
   })
 
-  // Si cancela, volvemos a abrir el modal
-  if (!confirmacion.isConfirmed) {
-    localVisible.value = true
-    return
-  }
+  if (!confirmacion.isConfirmed) return
 
   guardando.value = true
   const resultado = await store.actualizarCategoria(form.id, { nombre: form.nombre.trim() })
   guardando.value = false
 
-  // Si hubo error de validación del servidor, volvemos a abrir el modal con el error
   if (!resultado.ok && resultado.error) {
-    error.value        = resultado.error
-    localVisible.value = true
+    error.value = resultado.error
+    return
   }
+
+  localVisible.value = false
 }
 </script>
 
