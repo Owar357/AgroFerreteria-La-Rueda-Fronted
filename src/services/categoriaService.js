@@ -1,28 +1,11 @@
-import { api } from './authService' // Asegúrate de que la ruta relativa apunte bien a tu authService
+//importamos la intancia de axios que ya tiene el token automatico
+import { api } from './authService'
 
-/**
- * Obtiene todas las categorías
- * @returns {Promise} Respuesta de Axios
- */
-export const getCategorias = () => {
-  return api.get('/categorias')
-}
+//Metodo para obtener todas las cateorias
+export const getCategorias = (page = 1, perPage = 5) => api.get('/categorias', { params: {page, per_page: perPage}})
 
-/**
- * Crea una nueva categoría
- * @param {{ nombre: string, estado: string }} data
- * @returns {Promise} Respuesta de Axios
- */
-export const createCategoria = (data) => {
-  return api.post('/categorias', data)
-}
+//metodo para cerar una nueva categoria
+export const createCategoria = (data) => api.post('/categorias', data)
 
-/**
- * Actualiza una categoría existente
- * @param {number|string} id
- * @param {{ nombre: string, estado: string }} data
- * @returns {Promise} Respuesta de Axios
- */
-export const updateCategoria = (id, data) => {
-  return api.put(`/categorias/${id}`, data)
-}
+//Metodo para actualizar una nueva ategoria
+export const updateCategoria = (id, data) => api.put(`/categorias/${id}`, data)

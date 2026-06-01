@@ -5,145 +5,101 @@ import { getCategorias, createCategoria, updateCategoria } from '../services/cat
 
 export const useCategoriaStore = defineStore('categoria', () => {
 
-  const categorias = ref([])
-  const cargando   = ref(false)
+  // ── Estado ─────────────────────────────────────────────────────────────────
+  const categorias   = ref([])
+  const cargando     = ref(false)
+  const totalRecords = ref(0)
+  const currentPage  = ref(1)
+  const perPage      = ref(5)
 
-  /**
-   * Carga todas las categorías desde la API
-   */
-  const cargarCategorias = async () => {
+  // ── Cargar categorías con paginación del servidor ─────────────────────────
+  const cargarCategorias = async (page = 1, rows = perPage.value) => {
     cargando.value = true
     try {
-      const response = await getCategorias()
-      categorias.value = response.data
+      const response = await getCategorias(page, rows)
+      categorias.value   = response.data.data
+      totalRecords.value = response.data.total
+      currentPage.value  = response.data.current_page
+      perPage.value      = response.data.per_page
+
     } catch (error) {
-      const status = error.response?.status
-      
-      if (status === 404) {
-        categorias.value = []
+      if (error.response?.status === 404) {
+        categorias.value   = []
+        totalRecords.value = 0
         return
       }
-
-      if (status === 403) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Sin autorización',
-          text: 'No tienes permisos para ver las categorías.',
-          confirmButtonColor: '#2b5e3b'
-        })
+      if (error.response?.status === 403) {
+        await Swal.fire({ icon: 'error', title: 'Sin autorización', text: 'No tienes permisos para ver las categorías.', confirmButtonColor: '#2b5e3b' })
         return
       }
-
-      await Swal.fire({
-        icon: 'error',
-        title: 'Error de conexión',
-        text: 'No se pudo cargar la lista de categorías. Verifica tu conexión.',
-        confirmButtonColor: '#2b5e3b'
-      })
+      await Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo cargar la lista de categorías.', confirmButtonColor: '#2b5e3b' })
     } finally {
       cargando.value = false
     }
   }
 
-  /**
-   * Crea una nueva categoría y la agrega al inicio de la lista
-   */
+  // ── Crear categoría ───────────────────────────────────────────────────────
   const crearCategoria = async (data) => {
     try {
       const response = await createCategoria(data)
-      
-      if (response.status === 201 || response.status === 200) {
-        const categoriaCreada = response.data.categoria
-        categorias.value.unshift(categoriaCreada)
 
-        await Swal.fire({
-          icon: 'success',
-          title: '¡Categoría creada!',
-          text: `La categoría "${categoriaCreada.nombre}" fue registrada exitosamente.`,
-          confirmButtonColor: '#2b5e3b',
-          confirmButtonText: 'Aceptar',
-          timer: 3000,
-          timerProgressBar: true
-        })
-        return { ok: true }
-      }
+      // Recargamos la primera página para reflejar el nuevo registro
+      await cargarCategorias(1, perPage.value)
+
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Categoría creada!',
+        text: `La categoría "${response.data.categoria.nombre}" fue registrada exitosamente.`,
+        confirmButtonColor: '#2b5e3b',
+        confirmButtonText: 'Aceptar',
+        timer: 3000,
+        timerProgressBar: true
+      })
+      return { ok: true }
+
     } catch (error) {
-      const status = error.response?.status
-      const responseData = error.response?.data
-
-      if (status === 422) {
-        const mensajes = Object.values(responseData.errors).flat()
+      if (error.response?.status === 422) {
+        const mensajes = Object.values(error.response.data.errors).flat()
         return { ok: false, error: mensajes[0] }
       }
-
-      if (status === 403) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Sin autorización',
-          text: 'No tienes permisos para realizar esta acción.',
-          confirmButtonColor: '#2b5e3b'
-        })
+      if (error.response?.status === 403) {
+        await Swal.fire({ icon: 'error', title: 'Sin autorización', text: 'No tienes permisos.', confirmButtonColor: '#2b5e3b' })
         return { ok: false }
       }
-
-      return { ok: false, error: responseData?.message || 'Ocurrió un problema en el servidor.' }
+      await Swal.fire({ icon: 'error', title: 'Error al crear categoría', text: error.response?.data?.message || 'Error en el servidor.', confirmButtonColor: '#2b5e3b' })
+      return { ok: false }
     }
   }
 
-  /**
-   * Actualiza una categoría existente y sincroniza la lista local
-   */
+  // ── Actualizar categoría ──────────────────────────────────────────────────
   const actualizarCategoria = async (id, data) => {
     try {
       const response = await updateCategoria(id, data)
+      const index = categorias.value.findIndex((c) => c.id === id)
+      if (index !== -1) categorias.value[index] = response.data.categoria
 
-      if (response.status === 200 || response.status === 204) {
-        const categoriaActualizada = response.data.categoria
-        const index = categorias.value.findIndex((c) => c.id === id)
-        
-        if (index !== -1) {
-          categorias.value[index] = categoriaActualizada
-        }
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Categoría actualizada!',
+        text: 'La categoría fue actualizada exitosamente.',
+        confirmButtonColor: '#2b5e3b',
+        timer: 3000,
+        timerProgressBar: true
+      })
+      return { ok: true }
 
-        await Swal.fire({
-          icon: 'success',
-          title: '¡Categoría actualizada!',
-          text: 'La categoría fue actualizada exitosamente.',
-          confirmButtonColor: '#2b5e3b',
-          confirmButtonText: 'Aceptar',
-          timer: 3000,
-          timerProgressBar: true
-        })
-        return { ok: true }
-      }
     } catch (error) {
-      const status = error.response?.status
-      const responseData = error.response?.data
-
-      if (status === 422) {
-        const mensajes = Object.values(responseData.errors).flat()
+      if (error.response?.status === 422) {
+        const mensajes = Object.values(error.response.data.errors).flat()
         return { ok: false, error: mensajes[0] }
       }
-
-      if (status === 403) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Sin autorización',
-          text: 'No tienes permisos para realizar esta acción.',
-          confirmButtonColor: '#2b5e3b'
-        })
-        return { ok: false }
-      }
-
-      return { ok: false, error: responseData?.message || 'Ocurrió un problema en el servidor.' }
+      await Swal.fire({ icon: 'error', title: 'Error al actualizar', text: error.response?.data?.message || 'Error en el servidor.', confirmButtonColor: '#2b5e3b' })
+      return { ok: false }
     }
   }
 
   return {
-    categorias,
-    cargando,
-    cargarCategorias,
-    crearCategoria,
-    actualizarCategoria
+    categorias, cargando, totalRecords, currentPage, perPage,
+    cargarCategorias, crearCategoria, actualizarCategoria
   }
 })

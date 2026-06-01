@@ -17,18 +17,25 @@
             class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] focus:ring-1 focus:ring-[#2b5e3b]" />
         </IconField>
 
-        <Dropdown v-model="filters['categoria'].value" :options="uniqueCategories" showClear
+        <Select v-model="filters['categoria'].value" :options="uniqueCategories" showClear
           placeholder="Todas las categorías"
           class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]" />
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <DataTable :value="products" v-model:filters="filters" :globalFilterFields="['name', 'fabricante', 'codigo']"
-        responsiveLayout="scroll" :paginator="true" :rows="5" :rowsPerPageOptions="[5, 15, 25]"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      <DataTable 
+      :value="products" 
+      v-model:filters="filters" 
+      :globalFilterFields="['name', 'fabricante', 'codigo']"
+      responsiveLayout="scroll" 
+      :paginator="true" 
+      :rows="8" 
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
         class="p-datatable-custom text-[14px]">
+
+
         <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
         <Column field="categoria" header="Categoría" class="text-[#4b5563]" />
         <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
@@ -56,7 +63,7 @@ import { ref, computed } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
+import { Select } from 'primevue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
