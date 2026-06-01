@@ -4,66 +4,43 @@
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
         <h1 class="text-[26px] font-semibold tracking-tigh !text-black">Registro de Compras Realizadas</h1>
-        
-        <Button
-          label="+ Agregar compra"
+
+        <Button label="+ Agregar compra"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="irARegistroCompra"
-        />
+          @click="irARegistroCompra" />
       </div>
 
       <div class="flex justify-start items-center w-full gap-8">
         <!-- Modificado: Ahora el v-model apunta directo al valor del filtro interno -->
-        <Select
-          v-model="filtros['estadoPago'].value"
-          :options="estadosPago"
-          placeholder="Filtrar por Estado..."
+        <Select v-model="filtros['estadoPago'].value" :options="estadosPago" placeholder="Filtrar por Estado..."
           class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-          showClear
-        />
+          showClear />
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Inicio:</span>
-          <DatePicker
-            v-model="fechaInicio"
-            placeholder="dd-mm-aaaa"
-            dateFormat="dd-mm-yy"
+          <DatePicker v-model="fechaInicio" placeholder="dd-mm-aaaa" dateFormat="dd-mm-yy"
             class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-            showClear
-            @update:modelValue="actualizarFiltroFecha"
-          />
+            showClear @update:modelValue="actualizarFiltroFecha" />
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Fin:</span>
-          <DatePicker
-            v-model="fechaFin"
-            placeholder="dd-mm-aaaa"
-            dateFormat="dd-mm-yy"
+          <DatePicker v-model="fechaFin" placeholder="dd-mm-aaaa" dateFormat="dd-mm-yy"
             class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-            showClear
-            @update:modelValue="actualizarFiltroFecha"
-          />
+            showClear @update:modelValue="actualizarFiltroFecha" />
         </div>
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <!-- Modificado: Vinculamos la propiedad :filters con nuestro objeto reactivo -->
-      <DataTable
-        :value="comprasRealizadas"
-        :filters="filtros"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
-        :paginator="true"
-        :rows="5"
-        :rowsPerPageOptions="[5,15,25]"
+      <DataTable :value="comprasRealizadas" :filters="filtros" responsiveLayout="scroll"
+        class="p-datatable-custom text-[14px]" :paginator="true" :rows="5" :rowsPerPageOptions="[5, 15, 25]"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-      >
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport">
         <Column field="fechaEmision" header="Fecha Emisión" />
         <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
         <Column field="tipoDocumento" header="Tipo Documento" />
         <Column field="numDocumento" header="Nº Documento" />
-        
+
         <Column field="precioFactura" header="Precio Factura">
           <template #body="slotProps">
             <span class="font-bold text-[#2b5e3b]">${{ slotProps.data.precioFactura }}</span>
@@ -72,35 +49,25 @@
 
         <Column field="estadoPago" header="Estado de Pago">
           <template #body="slotProps">
-            <span 
-              class="font-semibold px-3 py-1 rounded text-[13px] tracking-wide"
-              :class="{
-                'bg-[#dff0e0] text-[#2b5e3b]': slotProps.data.estadoPago === 'PAGADO',
-                'bg-[#fef3c7] text-[#b45309]': slotProps.data.estadoPago === 'PENDIENTE',
-                'bg-[#e0f2fe] text-[#0369a1]': slotProps.data.estadoPago === 'ABONADO',
-                'bg-[#fee2e2] text-[#b91c1c]': slotProps.data.estadoPago === 'VENCIDO'
-              }"
-            >
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" :class="{
+              'bg-green-100 text-green-800': slotProps.data.estadoPago === 'PAGADO',
+              'bg-yellow-100 text-yellow-800': slotProps.data.estadoPago === 'PENDIENTE',
+              'bg-blue-100 text-blue-800': slotProps.data.estadoPago === 'ABONADO',
+              'bg-red-100 text-red-800': slotProps.data.estadoPago === 'VENCIDO'
+            }">
               {{ slotProps.data.estadoPago }}
             </span>
           </template>
         </Column>
 
-        <Column header="Acciones" class="text-center w-[180px]">
+
+        <Column header="Acciones" class="text-right w-[200px]">
           <template #body="slotProps">
-            <div class="flex gap-3 justify-center">
-              <Button
-                icon="pi pi-eye"
-                class="!bg-[#e0b354] hover:bg-[#e2e8dd] border border-[#cbd5e1] text-[#1a2e1f] w-9 h-9 rounded-full p-0 transition-colors"
-                v-tooltip.top="'Ver detalles'"
-                @click="verDetalles(slotProps.data)"
-              />
-              <Button
-                icon="pi pi-ban"
-                class="bg-[#fee2e2] hover:bg-[#fca5a5] border border-[#f87171] text-[#b91c1c] w-9 h-9 rounded-full p-0 transition-colors"
-                v-tooltip.top="'Anular compra'"
-                @click="anularCompra(slotProps.data)"
-              />
+            <div class="flex gap-2 justify-end">
+              <Button icon="pi pi-eye" label="Ver" severity="secondary" text rounded size="small"
+                v-tooltip.top="'Ver detalles'" @click="verDetalles(slotProps.data)" />
+              <Button icon="pi pi-ban" label="Anular" severity="danger" text rounded size="small"
+                v-tooltip.top="'Anular compra'" @click="anularCompra(slotProps.data)" />
             </div>
           </template>
         </Column>
@@ -114,7 +81,7 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Select from 'primevue/select' 
+import Select from 'primevue/select'
 // Modificado: Importación obligatoria del modo de filtrado nativo
 import { DatePicker } from 'primevue'
 import { FilterMatchMode } from '@primevue/core/api'
@@ -147,7 +114,7 @@ const comprasRealizadas = ref([
 // Modificado: Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
   estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
-  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM}
+  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM }
 })
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
@@ -156,7 +123,7 @@ const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
 const actualizarFiltroFecha = () => {
   // este es un objeto personal para a fprzar a prume vue a realizar la funcion
   //falta hacer todo el procesos en los stores
-  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechsFin.value}
+  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechsFin.value }
 }
 
 
@@ -167,22 +134,22 @@ filtros.value.fechaEmision.constraits = (value, filter) => {
   if (!value) return false
 
   const [dia, mes, anio] = value.split('-').map(Number)
-  const fechaRegistro = new Date(anio, mes -1, dia)
-  fechaRegistro.setHours(0,0,0,0)
+  const fechaRegistro = new Date(anio, mes - 1, dia)
+  fechaRegistro.setHours(0, 0, 0, 0)
 
   //valisdamos si la fecha de inicio existe
-  if(filter.inicio) {
+  if (filter.inicio) {
     const inicio = new Date(filter.inicio)
-    inicio.setHours(0,0,0,0)
+    inicio.setHours(0, 0, 0, 0)
     if (fechaRegistro < inicio) return false
   }
-  
-    //Validamos que la fecha fin ingresada exista
-    if (filter.fin) {
-      const fin = new Date(filter.fin)
-      fin.setHours(23,59,59,999)
-      if (fechaRegistro > fin) return false
-    }
+
+  //Validamos que la fecha fin ingresada exista
+  if (filter.fin) {
+    const fin = new Date(filter.fin)
+    fin.setHours(23, 59, 59, 999)
+    if (fechaRegistro > fin) return false
+  }
 
   return true
 }
@@ -199,7 +166,7 @@ const anularCompra = (compra) => {
 
 <style>
 /* Se mantienen tus estilos CSS globales exactamente idénticos */
-.p-datatable-custom .p-datatable-thead > tr > th {
+.p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
   border-bottom: 2px solid #e2e8dd !important;
@@ -210,13 +177,13 @@ const anularCompra = (compra) => {
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr {
+.p-datatable-custom .p-datatable-tbody>tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
   border-bottom: 1px solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr:hover {
+.p-datatable-custom .p-datatable-tbody>tr:hover {
   background-color: #f4f7f2 !important;
 }
 
@@ -228,28 +195,34 @@ const anularCompra = (compra) => {
   display: flex !important;
   align-items: center !important;
 }
+
 .p-select:not(.p-disabled).p-focus {
   border-color: #2b5e3b !important;
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
 }
+
 .p-select-label {
   color: #1a2e1f !important;
   font-size: 14px !important;
 }
+
 .p-select-overlay {
   background-color: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
 }
+
 .p-select-option {
   color: #1a2e1f !important;
   background: transparent !important;
   font-size: 14px !important;
 }
+
 .p-select-option:not(.p-placeholder-option):not(.p-select-option-selected):not(.p-disabled).p-focus,
 .p-select-option:not(.p-placeholder-option):not(.p-select-option-selected):not(.p-disabled):hover {
   background-color: #eef2e9 !important;
   color: #1a2e1f !important;
 }
+
 .p-select-option-selected {
   background-color: #e2e8dd !important;
   color: #1a2e1f !important;

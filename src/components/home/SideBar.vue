@@ -85,7 +85,7 @@
         @toggle="toggleGestion"
       >
         <SidebarItem icon="pi pi-wallet"       label="Caja"            :active="activeItem === 'caja'"           @click="navigate('/admin/caja')"           sub />
-        <SidebarItem icon="pi pi-percentage"   label="Movimiento Caja" :active="activeItem === 'movimiento-caja'" @click="navigate('/admin/gestion/movimiento-caja')" sub />
+        <SidebarItem icon="pi pi-percentage"   label="Movimientos de Caja" :active="activeItem === 'movimientos-caja'" @click="navigate('/admin/venta/movimientos-de-caja')" sub />
         <SidebarItem icon="pi pi-calculator"   label="POS"             :active="activeItem === 'pos'"             @click="navigate('/admin/gestion/pos')"             sub />
       </SidebarDropdown>
       <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
@@ -148,8 +148,8 @@ const activeItem = computed(() => {
   if (route.path.includes('proveedores'))     return 'proveedores'
   if (route.path.includes('compra'))          return 'compra'
   if (route.path.includes('historial-ventas')) return 'historial-ventas'
+  if (route.path.includes('movimientos-de-caja')) return 'movimientos-caja'
   if (route.path.includes('caja'))            return 'caja'
-  if (route.path.includes('movimiento-caja')) return 'movimiento-caja'
   if (route.path.includes('pos'))             return 'pos'
   if (route.path.includes('reportes'))        return 'reportes'
   return 'dashboard'
