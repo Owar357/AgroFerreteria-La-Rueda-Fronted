@@ -1,41 +1,64 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
-        <h1 class="text-[26px] font-semibold tracking-tigh !text-black">Registro de Compras Realizadas</h1>
+        <h1 class="text-[26px] font-semibold tracking-tigh !text-black">
+          Registro de Compras Realizadas
+        </h1>
 
-        <Button label="+ Agregar compra"
+        <Button
+          label="+ Agregar compra"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="irARegistroCompra" />
+          @click="irARegistroCompra"
+        />
       </div>
 
       <div class="flex justify-start items-center w-full gap-8">
         <!-- Modificado: Ahora el v-model apunta directo al valor del filtro interno -->
-        <Select v-model="filtros['estadoPago'].value" :options="estadosPago" placeholder="Filtrar por Estado..."
+        <Select
+          v-model="filtros['estadoPago'].value"
+          :options="estadosPago"
+          placeholder="Filtrar por Estado..."
           class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-          showClear />
+          showClear
+        />
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Inicio:</span>
-          <DatePicker v-model="fechaInicio" placeholder="dd-mm-aaaa" dateFormat="dd-mm-yy"
+          <DatePicker
+            v-model="fechaInicio"
+            placeholder="dd-mm-aaaa"
+            dateFormat="dd-mm-yy"
             class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-            showClear @update:modelValue="actualizarFiltroFecha" />
+            showClear
+            @update:modelValue="actualizarFiltroFecha"
+          />
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Fin:</span>
-          <DatePicker v-model="fechaFin" placeholder="dd-mm-aaaa" dateFormat="dd-mm-yy"
+          <DatePicker
+            v-model="fechaFin"
+            placeholder="dd-mm-aaaa"
+            dateFormat="dd-mm-yy"
             class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
-            showClear @update:modelValue="actualizarFiltroFecha" />
+            showClear
+            @update:modelValue="actualizarFiltroFecha"
+          />
         </div>
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <!-- Modificado: Vinculamos la propiedad :filters con nuestro objeto reactivo -->
-      <DataTable :value="comprasRealizadas" :filters="filtros" responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]" :paginator="true" :rows="5" :rowsPerPageOptions="[5, 15, 25]"
+      <DataTable
+        :value="comprasRealizadas"
+        :filters="filtros"
+        responsiveLayout="scroll"
+        class="p-datatable-custom text-[14px]"
+        :paginator="true"
+        :rows="5"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport">
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      >
         <Column field="fechaEmision" header="Fecha Emisión" />
         <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
         <Column field="tipoDocumento" header="Tipo Documento" />
@@ -49,25 +72,43 @@
 
         <Column field="estadoPago" header="Estado de Pago">
           <template #body="slotProps">
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" :class="{
-              'bg-green-100 text-green-800': slotProps.data.estadoPago === 'PAGADO',
-              'bg-yellow-100 text-yellow-800': slotProps.data.estadoPago === 'PENDIENTE',
-              'bg-blue-100 text-blue-800': slotProps.data.estadoPago === 'ABONADO',
-              'bg-red-100 text-red-800': slotProps.data.estadoPago === 'VENCIDO'
-            }">
+            <span
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+              :class="{
+                'bg-green-100 text-green-800': slotProps.data.estadoPago === 'PAGADO',
+                'bg-yellow-100 text-yellow-800': slotProps.data.estadoPago === 'PENDIENTE',
+                'bg-blue-100 text-blue-800': slotProps.data.estadoPago === 'ABONADO',
+                'bg-red-100 text-red-800': slotProps.data.estadoPago === 'VENCIDO',
+              }"
+            >
               {{ slotProps.data.estadoPago }}
             </span>
           </template>
         </Column>
 
-
         <Column header="Acciones" class="text-right w-[200px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-end">
-              <Button icon="pi pi-eye" label="Ver" severity="secondary" text rounded size="small"
-                v-tooltip.top="'Ver detalles'" @click="verDetalles(slotProps.data)" />
-              <Button icon="pi pi-ban" label="Anular" severity="danger" text rounded size="small"
-                v-tooltip.top="'Anular compra'" @click="anularCompra(slotProps.data)" />
+              <Button
+                icon="pi pi-eye"
+                label="Ver"
+                severity="secondary"
+                text
+                rounded
+                size="small"
+                v-tooltip.top="'Ver detalles'"
+                @click="verDetalles(slotProps.data)"
+              />
+              <Button
+                icon="pi pi-ban"
+                label="Anular"
+                severity="danger"
+                text
+                rounded
+                size="small"
+                v-tooltip.top="'Anular compra'"
+                @click="anularCompra(slotProps.data)"
+              />
             </div>
           </template>
         </Column>
@@ -87,7 +128,6 @@ import { DatePicker } from 'primevue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { resolveUserAgent } from '@primeuix/utils'
 
-
 const irARegistroCompra = () => emit('open-add')
 const emit = defineEmits(['open-add'])
 
@@ -95,26 +135,121 @@ const emit = defineEmits(['open-add'])
 const fechaInicio = ref(null)
 const fechsFin = ref(null)
 
-
 const comprasRealizadas = ref([
-  { id: 1, fechaEmision: '10-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00124', precioFactura: '1,250.00', estadoPago: 'PAGADO' },
-  { id: 2, fechaEmision: '12-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9902', precioFactura: '3,420.50', estadoPago: 'PENDIENTE' },
-  { id: 3, fechaEmision: '14-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00125', precioFactura: '850.00', estadoPago: 'ABONADO' },
-  { id: 4, fechaEmision: '16-02-2025', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9903', precioFactura: '2,100.00', estadoPago: 'VENCIDO' },
-  { id: 5, fechaEmision: '05-05-2024', proveedor: 'Distribuidora San Carlos', tipoDocumento: 'Factura', numDocumento: 'F-00841', precioFactura: '920.00', estadoPago: 'PAGADO' },
-  { id: 6, fechaEmision: '20-11-2024', proveedor: 'NutriGreen S.A.', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-1024', precioFactura: '4,150.00', estadoPago: 'PAGADO' },
-  { id: 7, fechaEmision: '15-01-2025', proveedor: 'Agroservicios del Centro', tipoDocumento: 'Factura', numDocumento: 'F-00210', precioFactura: '600.00', estadoPago: 'PAGADO' },
-  { id: 8, fechaEmision: '18-05-2026', proveedor: 'TecnoAgro Global', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-4412', precioFactura: '1,850.00', estadoPago: 'PENDIENTE' },
-  { id: 9, fechaEmision: '22-05-2026', proveedor: 'Semillas del Pacífico', tipoDocumento: 'Factura', numDocumento: 'F-00302', precioFactura: '1,100.00', estadoPago: 'ABONADO' },
-  { id: 10, fechaEmision: '25-05-2026', proveedor: 'Importaciones InterAgro', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-8819', precioFactura: '2,750.40', estadoPago: 'PENDIENTE' },
-  { id: 11, fechaEmision: '12-08-2023', proveedor: 'BioProtect S.A.', tipoDocumento: 'Factura', numDocumento: 'F-00912', precioFactura: '320.00', estadoPago: 'PAGADO' },
-  { id: 12, fechaEmision: '04-03-2025', proveedor: 'Fertilizantes del Norte', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9945', precioFactura: '1,430.00', estadoPago: 'VENCIDO' }
+  {
+    id: 1,
+    fechaEmision: '10-02-2025',
+    proveedor: 'Distribuidora San Carlos',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00124',
+    precioFactura: '1,250.00',
+    estadoPago: 'PAGADO',
+  },
+  {
+    id: 2,
+    fechaEmision: '12-02-2025',
+    proveedor: 'Distribuidora San Carlos',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-9902',
+    precioFactura: '3,420.50',
+    estadoPago: 'PENDIENTE',
+  },
+  {
+    id: 3,
+    fechaEmision: '14-02-2025',
+    proveedor: 'Distribuidora San Carlos',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00125',
+    precioFactura: '850.00',
+    estadoPago: 'ABONADO',
+  },
+  {
+    id: 4,
+    fechaEmision: '16-02-2025',
+    proveedor: 'Distribuidora San Carlos',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-9903',
+    precioFactura: '2,100.00',
+    estadoPago: 'VENCIDO',
+  },
+  {
+    id: 5,
+    fechaEmision: '05-05-2024',
+    proveedor: 'Distribuidora San Carlos',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00841',
+    precioFactura: '920.00',
+    estadoPago: 'PAGADO',
+  },
+  {
+    id: 6,
+    fechaEmision: '20-11-2024',
+    proveedor: 'NutriGreen S.A.',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-1024',
+    precioFactura: '4,150.00',
+    estadoPago: 'PAGADO',
+  },
+  {
+    id: 7,
+    fechaEmision: '15-01-2025',
+    proveedor: 'Agroservicios del Centro',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00210',
+    precioFactura: '600.00',
+    estadoPago: 'PAGADO',
+  },
+  {
+    id: 8,
+    fechaEmision: '18-05-2026',
+    proveedor: 'TecnoAgro Global',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-4412',
+    precioFactura: '1,850.00',
+    estadoPago: 'PENDIENTE',
+  },
+  {
+    id: 9,
+    fechaEmision: '22-05-2026',
+    proveedor: 'Semillas del Pacífico',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00302',
+    precioFactura: '1,100.00',
+    estadoPago: 'ABONADO',
+  },
+  {
+    id: 10,
+    fechaEmision: '25-05-2026',
+    proveedor: 'Importaciones InterAgro',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-8819',
+    precioFactura: '2,750.40',
+    estadoPago: 'PENDIENTE',
+  },
+  {
+    id: 11,
+    fechaEmision: '12-08-2023',
+    proveedor: 'BioProtect S.A.',
+    tipoDocumento: 'Factura',
+    numDocumento: 'F-00912',
+    precioFactura: '320.00',
+    estadoPago: 'PAGADO',
+  },
+  {
+    id: 12,
+    fechaEmision: '04-03-2025',
+    proveedor: 'Fertilizantes del Norte',
+    tipoDocumento: 'Crédito Fiscal',
+    numDocumento: 'CF-9945',
+    precioFactura: '1,430.00',
+    estadoPago: 'VENCIDO',
+  },
 ])
 
 // Modificado: Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
   estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
-  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM }
+  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM },
 })
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
@@ -126,8 +261,7 @@ const actualizarFiltroFecha = () => {
   filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechsFin.value }
 }
 
-
-//Reisttro de ña ficion personalizada d efiltado en el objeto 
+//Reisttro de ña ficion personalizada d efiltado en el objeto
 //filtros de la yabla
 filtros.value.fechaEmision.constraits = (value, filter) => {
   if (!filter || !filter[0] || !filter[1]) return true
@@ -154,7 +288,6 @@ filtros.value.fechaEmision.constraits = (value, filter) => {
   return true
 }
 
-
 const verDetalles = (compra) => {
   console.log('Viendo detalles de:', compra.numDocumento)
 }
@@ -166,7 +299,7 @@ const anularCompra = (compra) => {
 
 <style>
 /* Se mantienen tus estilos CSS globales exactamente idénticos */
-.p-datatable-custom .p-datatable-thead>tr>th {
+.p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
   border-bottom: 2px solid #e2e8dd !important;
@@ -177,13 +310,13 @@ const anularCompra = (compra) => {
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody>tr {
+.p-datatable-custom .p-datatable-tbody > tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
   border-bottom: 1px solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody>tr:hover {
+.p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f7f2 !important;
 }
 
