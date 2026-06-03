@@ -96,11 +96,7 @@ import Password  from 'primevue/password'
 import Select    from 'primevue/select'
 import Button    from 'primevue/button'
 import Swal      from 'sweetalert2'
-<<<<<<< HEAD
-import { useUserStore } from '@/stores/userStore'
-=======
 import { useUserStore } from '@/stores/usuarioStore'
->>>>>>> rama_prueba
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -144,28 +140,15 @@ const validateField = (field) => {
 
   if (field === 'email') {
     const v = form.email.trim()
-<<<<<<< HEAD
-    if (!v)                                                                          errors.email = 'El correo electrónico es obligatorio.'
-    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v))          errors.email = 'Formato de correo inválido.'
-    else                                                                             errors.email = ''
-=======
     if (!v) errors.email = 'El correo electrónico es obligatorio.'
     else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v)) 
     errors.email = 'Formato de correo inválido.'
     else                                                                            
     errors.email = ''
->>>>>>> rama_prueba
   }
 
   if (field === 'password') {
     const v = form.password
-<<<<<<< HEAD
-    if (!v)                                                                                        errors.password = 'La contraseña es obligatoria.'
-    else if (v.length < 8)                                                                         errors.password = 'Mínimo 8 caracteres.'
-    else if (/\s/.test(v))                                                                         errors.password = 'La contraseña no puede contener espacios.'
-    else if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v)) errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
-    else                                                                                           errors.password = ''
-=======
     if (!v)                                                                                        
     errors.password = 'La contraseña es obligatoria.'
     else if (v.length < 8)
@@ -176,7 +159,6 @@ const validateField = (field) => {
     errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
     else                                                                                           
     errors.password = ''
->>>>>>> rama_prueba
   }
 
   if (field === 'role') {
@@ -218,21 +200,13 @@ const handleSave = async () => {
 
   loading.value = false
 
-<<<<<<< HEAD
-  
-=======
   // Si hubo error de validación del servidor, volvemos a abrir el modal con el error
->>>>>>> rama_prueba
   if (!resultado.ok && resultado.error) {
     // Detectamos a qué campo pertenece el error del servidor
     const msg = resultado.error.toLowerCase()
     if (msg.includes('correo') || msg.includes('email')) errors.email = resultado.error
     else if (msg.includes('nombre') || msg.includes('name'))  errors.name  = resultado.error
-<<<<<<< HEAD
-    else errors.email = resultado.error
-=======
     else errors.email = resultado.error // fallback
->>>>>>> rama_prueba
     localVisible.value = true
   }
 }

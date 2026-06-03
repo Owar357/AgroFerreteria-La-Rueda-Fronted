@@ -23,11 +23,7 @@
           />
         </IconField>
 
-<<<<<<< HEAD
-        <Select
-=======
         <Dropdown
->>>>>>> rama_prueba
           v-model="filters['estado'].value"
           :options="estadoOptions"
           showClear
@@ -40,11 +36,7 @@
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
         :value="proveedores"
-<<<<<<< HEAD
-        :lazy="true"
-=======
         :lazy="false"
->>>>>>> rama_prueba
         :totalRecords="totalProveedores"
         v-model:filters="filters"
         :globalFilterFields="['nombre', 'correo']"
@@ -156,30 +148,15 @@ const proveedores = ref([
     telefono: '4444-4444',
     estado: 'Activo',
   },
-<<<<<<< HEAD
-  {
-    id: 5,
-    nombre: 'Proveedor Delta',
-    correo: 'delta@mail.com',
-    telefono: '4444-4444',
-=======
    {
     id: 5,
     nombre: 'Proveedor Alianza',
     correo: 'Alianza@mail.com',
     telefono: '5678-0089',
->>>>>>> rama_prueba
     estado: 'Activo',
   },
   {
     id: 6,
-<<<<<<< HEAD
-    nombre: 'Proveedor Delta',
-    correo: 'delta@mail.com',
-    telefono: '4444-4444',
-    estado: 'Activo',
-  },
-=======
     nombre: 'Proveedor Gamma',
     correo: 'gamma@mail.com',
     telefono: '3333-3333',
@@ -213,7 +190,6 @@ const proveedores = ref([
     telefono: '1276-5467',
     estado: 'inactivo',
   },
->>>>>>> rama_prueba
 ])
 
 const totalProveedores = ref(4)

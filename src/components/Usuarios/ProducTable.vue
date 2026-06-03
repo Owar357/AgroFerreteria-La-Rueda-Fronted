@@ -21,14 +21,10 @@
           />
         </IconField>
 
-<<<<<<< HEAD
-        <Select v-model="filters['categoria'].value" :options="uniqueCategories" showClear
-=======
         <Select
           v-model="filters['categoria'].value"
           :options="uniqueCategories"
           showClear
->>>>>>> rama_prueba
           placeholder="Todas las categorías"
           class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]"
         />
@@ -36,20 +32,6 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-<<<<<<< HEAD
-      <DataTable 
-      :value="products" 
-      v-model:filters="filters" 
-      :globalFilterFields="['name', 'fabricante', 'codigo']"
-      responsiveLayout="scroll" 
-      :paginator="true" 
-      :rows="8" 
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
-        class="p-datatable-custom text-[14px]">
-
-
-=======
       <DataTable
         :value="products"
         v-model:filters="filters"
@@ -61,7 +43,6 @@
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
         class="p-datatable-custom text-[14px]"
       >
->>>>>>> rama_prueba
         <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
         <Column field="categoria" header="Categoría" class="text-[#4b5563]" />
         <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />

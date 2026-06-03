@@ -48,11 +48,7 @@
           ].join(' ')"
         />
         <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
-<<<<<<< HEAD
-        <small class="text-[13px] text-[#6b7280]"></small>
-=======
         <small class="text-[13px] text-[#6b7280]">(Opcional — dejar vacío para no cambiar la contraseña)</small>
->>>>>>> rama_prueba
       </div>
 
       <!-- Confirmar contraseña -->
@@ -110,21 +106,6 @@ const localVisible = ref(false)
 const loading      = ref(false)
 
 const form = reactive({
-<<<<<<< HEAD
-  cashKey:  '',
-  password:  '',
-  confirmPassword: ''
-})
-
-const errors = reactive({
-  cashKey:  '',
-  password: '',
-  confirmPassword: ''
-})
-
-watch(() => props.visible, (val) => (localVisible.value = val))
-watch(localVisible, (val) => emit('update:visible', val))
-=======
   cashKey:         '',
   password:        '',
   confirmPassword: ''
@@ -138,19 +119,13 @@ const errors = reactive({
 
 watch(() => props.visible, (val) => (localVisible.value = val))
 watch(localVisible,        (val) => emit('update:visible', val))
->>>>>>> rama_prueba
 
 watch(
   () => props.user,
   (val) => {
     if (val) {
-<<<<<<< HEAD
-      form.cashKey = val.cashKey || ''
-      form.password = ''
-=======
       form.cashKey         = val.cashKey || ''
       form.password        = ''
->>>>>>> rama_prueba
       form.confirmPassword = ''
       errors.cashKey = errors.password = errors.confirmPassword = ''
     }
@@ -167,13 +142,8 @@ const resetForm = () => {
 const validarCashKey = () => {
   const v = form.cashKey.trim()
   if (!v) { errors.cashKey = ''; return true } // es opcional
-<<<<<<< HEAD
-  if (!/^\d+$/.test(v)) { errors.cashKey = 'La clave de caja solo puede contener números.'; return false }
-  if (v.length !== 6)   { errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'; return false }
-=======
   if (!/^\d+$/.test(v))      { errors.cashKey = 'La clave de caja solo puede contener números.'; return false }
   if (v.length !== 6)        { errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'; return false }
->>>>>>> rama_prueba
   errors.cashKey = ''
   return true
 }
@@ -181,15 +151,9 @@ const validarCashKey = () => {
 const validarPassword = () => {
   const v = form.password
   if (!v) { errors.password = ''; return true } // es opcional
-<<<<<<< HEAD
-  if (v.length < 8) { errors.password = 'Mínimo 8 caracteres.'; return false }
-  if (/\s/.test(v)) { errors.password = 'No puede contener espacios.'; return false }
-  if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v)) { errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'; return false }
-=======
   if (v.length < 8)                                                                                  { errors.password = 'Mínimo 8 caracteres.'; return false }
   if (/\s/.test(v))                                                                                  { errors.password = 'No puede contener espacios.'; return false }
   if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v))        { errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'; return false }
->>>>>>> rama_prueba
   errors.password = ''
   // Re-validar confirmación si ya tiene algo escrito
   if (form.confirmPassword) validarConfirmPassword()
@@ -217,15 +181,9 @@ const handleUpdate = async () => {
   }
 
   // Ejecutar todas las validaciones
-<<<<<<< HEAD
-  const cashKeyOk = validarCashKey()
-  const passwordOk = validarPassword()
-  const confirmOk  = validarConfirmPassword()
-=======
   const cashKeyOk    = validarCashKey()
   const passwordOk   = validarPassword()
   const confirmOk    = validarConfirmPassword()
->>>>>>> rama_prueba
 
   // Si se escribió contraseña, la confirmación es obligatoria
   if (form.password && !form.confirmPassword) {

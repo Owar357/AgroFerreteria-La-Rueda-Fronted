@@ -1,24 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div
-    class="min-h-screen p-8"
-    style="font-family: 'Inter', sans-serif; background-color: #eef2e9; color: #1a2e1f"
-  >
-    <!-- Botón Regresar -->
-    <Button
-      label="Regresar"
-      icon="pi pi-arrow-left"
-      style="
-        font-size: 22px;
-        padding: 16px 40px;
-        background-color: #2b5e3b;
-        border-color: #2b5e3b;
-        color: #ffffff;
-        font-family: 'Inter', sans-serif;
-      "
-      @click="$emit('close')"
-    />
-=======
     <div class="min-h-screen p-8" style="font-family: 'Inter', sans-serif; background-color: #eef2e9; color: #1a2e1f;">
 
         <!-- Botón Regresar -->
@@ -267,7 +247,6 @@
 
 
 
->>>>>>> rama_prueba
 
     <!-- Header -->
     <div class="flex justify-between items-start mb-8">
@@ -752,16 +731,10 @@ const tipoVenta = ref(null)
 const aplicaIva = ref(false)
 const tipoProducto = ref(null)
 const presentacion = ref({
-<<<<<<< HEAD
-  nombre: '',
-  equivalencia: null,
-  precioNeto: null,
-=======
     nombre: '',
     codigoBarra: '',
     equivalencia: null,
     precioNeto: null,
->>>>>>> rama_prueba
 })
 
 // Lista de presentaciones agregadas
