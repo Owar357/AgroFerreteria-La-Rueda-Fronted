@@ -5,7 +5,7 @@
         <Button label="Regresar" icon="pi pi-arrow-left"
             style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;"
             @click="$emit('close')" />
-            
+
         <!-- Header -->
         <div class="flex justify-between items-start mb-8">
             <div>
@@ -116,19 +116,33 @@
                     del Producto</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
+            <!-- Nombre  + Código de barra-->
+            <div class="flex gap-6 mb-6">
 
-                <!-- Nombre de la presentación -->
-                <div class="flex flex-col gap-2">
+                <!-- Nombre de la presentación (ocupa 2 columnas) -->
+                <div class="flex flex-col gap-2" style="flex: 2;">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Nombre de la presentación</label>
                     <InputText v-model="presentacion.nombre"
-                        placeholder="Ej: Quintal, Arroba, Libra, 50ml, caja, sobre, lt." class="w-full"
-                        style="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 22px; font-family: 'Inter', sans-serif; min-width: 100%;"
+                        placeholder="Ej: Quintal, Arroba, Libra, 50ml, caja, sobre, lt."
+                        style="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 22px; font-family: 'Inter', sans-serif; width: 100%;"
                         onfocus="this.style.borderColor='#2b5e3b'; this.style.borderWidth='2px'; this.style.boxShadow='none';"
                         onblur="this.style.borderColor='#d1d5db'; this.style.borderWidth='1px'; this.style.boxShadow='none';" />
                 </div>
 
-                <!-- Equivalencia -->
+
+                <!-- Código de barra -->
+                <div class="flex flex-col gap-2">
+                    <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Código de barra</label>
+                    <InputText v-model="presentacion.codigoBarra" placeholder="Ej: 7501234567890"
+                        style="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 22px; font-family: 'Inter', sans-serif; width: 100%;"
+                        onfocus="this.style.borderColor='#2b5e3b'; this.style.borderWidth='2px'; this.style.boxShadow='none';"
+                        onblur="this.style.borderColor='#d1d5db'; this.style.borderWidth='1px'; this.style.boxShadow='none';" />
+                </div>
+
+            </div>
+
+            <!-- Equivalencia-->
+            <div class="mb-6">
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">
                         ¿Cuántas <span
@@ -139,8 +153,8 @@
                         <InputNumber v-model="presentacion.equivalencia" placeholder="0" :min="0"
                             inputStyle="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 160px; box-shadow: none;"
                             :inputProps="{ onfocus: 'this.style.borderColor=\'#2b5e3b\'; this.style.borderWidth=\'2px\'; this.style.boxShadow=\'none\';', onblur: 'this.style.borderColor=\'#d1d5db\'; this.style.borderWidth=\'1px\'; this.style.boxShadow=\'none\';' }" />
-                        <span class="rounded-xl px-5 py-3"
-                            style="background-color: #dff0e0; color: #1e3a2f; font-size: 20px; font-weight: 500; white-space: nowrap; border-radius: 40px;">
+                        <span
+                            style="background-color: #dff0e0; color: #1e3a2f; font-size: 20px; font-weight: 500; white-space: nowrap; border-radius: 40px; padding: 12px 20px;">
                             unidad base
                         </span>
                     </div>
@@ -148,6 +162,10 @@
                         Si la unidad base es 'libra' y esta presentación es Quintal, equivale a 100 libras.
                     </p>
                 </div>
+            </div>
+
+            <!-- Precio Neto + IVA checkbox + IVA aplicado + Precio Total -->
+            <div class="grid grid-cols-3 gap-6">
 
                 <!-- Precio Neto -->
                 <div class="flex flex-col gap-2">
@@ -155,23 +173,17 @@
                     <InputNumber v-model="presentacion.precioNeto" placeholder="0.00" :min="0" :minFractionDigits="2"
                         :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #ffffff; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; box-shadow: none;"
-                        :inputProps="{ onfocus: 'this.style.borderColor=\'#2b5e3b\'; this.style.borderWidth=\'2px\'; this.style.boxShadow=\'none\';', onblur: 'this.style.borderColor=\'#d1d5db\'; this.style.borderWidth=\'1px\'; this.style.boxShadow=\'none\';' }"
                         class="w-full" />
                 </div>
 
                 <!-- Checkbox IVA -->
-                <div class="flex flex-col justify-end">
-                    <div class="flex items-center gap-3" style="padding: 14px 0;">
-                        <Checkbox v-model="aplicaIva" :binary="true" inputId="iva" style="width: 22px; height: 22px;" />
-                        <label for="iva" style="font-size: 20px; color: #1a2e1f; cursor: pointer;">Aplica IVA
-                            13%</label>
-                    </div>
-                </div>
-
-                <!-- IVA Aplicado -->
                 <div class="flex flex-col gap-2">
-                    <label style="font-size: 20px; font-weight: 500; color: #4b5563;">IVA Aplicado (13%)</label>
-                    <InputNumber :modelValue="ivaCalculado" :disabled="true" :minFractionDigits="2"
+                    <div class="flex items-center gap-3 mb-1">
+                        <label style="font-size: 20px; font-weight: 500; color: #4b5563;">IVA Aplicado (13%)</label>
+                        <Checkbox v-model="aplicaIva" :binary="true" inputId="iva" style="width: 22px; height: 22px;" />
+                        <label for="iva" style="font-size: 16px; color: #6b7280; cursor: pointer;">Aplica</label>
+                    </div>
+                    <InputNumber :modelValue="ivaCalculado" placeholder="0.00"  :disabled="true" :minFractionDigits="2"
                         :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #f2f5ef; border-color: #d1d5db; color: #6b7280; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; cursor: not-allowed;"
                         class="w-full" />
@@ -180,7 +192,7 @@
                 <!-- Precio Total -->
                 <div class="flex flex-col gap-2">
                     <label style="font-size: 20px; font-weight: 500; color: #4b5563;">Precio Total</label>
-                    <InputNumber :modelValue="precioTotal" :disabled="true" :minFractionDigits="2"
+                    <InputNumber :modelValue="precioTotal" placeholder="0.00"  :disabled="true" :minFractionDigits="2"
                         :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                         inputStyle="background-color: #f2f5ef; border-color: #d1d5db; color: #1a2e1f; font-size: 20px; padding: 14px 18px; font-family: 'Inter', sans-serif; width: 100%; cursor: not-allowed;"
                         class="w-full" />
@@ -197,7 +209,9 @@
                     style="font-size: 20px; padding: 16px; background-color: #eef2e9; border-color: #e2e8dd; color: #1a2e1f; font-family: 'Inter', sans-serif;"
                     @click="borrarDatos" />
             </div>
-        </div><!-- fin sección 2 -->
+
+        </div>
+        <!-- fin sección 2 -->
 
         <!-- Tabla -->
         <div class="rounded-2xl p-8 mb-6" style="background-color: #ffffff; border: 1px solid #e2e8dd;">
@@ -260,6 +274,7 @@ const aplicaIva = ref(false)
 const tipoProducto = ref(null)
 const presentacion = ref({
     nombre: '',
+    codigoBarra: '',
     equivalencia: null,
     precioNeto: null,
 })

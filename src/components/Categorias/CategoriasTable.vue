@@ -1,13 +1,17 @@
 <template>
   <DataTable
     :value="store.categorias"
+    :loading="store.cargando"
     responsiveLayout="scroll"
     class="p-datatable-custom text-[14px]"
     :paginator="true"
     :lazy="true"
-    :rows="5"
+    :rows="store.perPage"
+    :totalRecords="store.totalRecords"
+    :first="(store.currentPage - 1) * store.perPage"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
+    @page="onPageChange"
   >
     <template #empty>
       <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay categorías registradas.</div>
@@ -50,9 +54,17 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 
-defineEmits(['open-edit', 'open-view'])
-
+const emit = defineEmits(['open-edit', 'open-view'])
 const store = useCategoriaStore()
+
+
+// Cargar primera página al montar
+store.cargarCategorias(1, store.perPage)
+
+const onPageChange = (event) => {
+  const page = event.page + 1  
+  store.cargarCategorias(page, event.rows)
+}
 </script>
 
 <style>
