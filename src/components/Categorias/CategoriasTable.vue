@@ -57,12 +57,12 @@ import { useCategoriaStore } from '../../stores/categoriaStore'
 const emit = defineEmits(['open-edit', 'open-view'])
 const store = useCategoriaStore()
 
+
 // Cargar primera página al montar
 store.cargarCategorias(1, store.perPage)
 
-// Manejar cambio de página
 const onPageChange = (event) => {
-  const page = event.page + 1  // PrimeVue usa base 0
+  const page = event.page + 1  
   store.cargarCategorias(page, event.rows)
 }
 </script>

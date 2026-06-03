@@ -98,7 +98,6 @@ const resetForm = () => {
   guardando.value       = false
 }
 
-// Busca la función dispararGuardar 
 const dispararGuardar = async () => {
   if (!nombreCategoria.value.trim()) {
     error.value = 'El nombre de la categoría es obligatorio.'
@@ -109,10 +108,9 @@ const dispararGuardar = async () => {
   guardando.value = true
   const nombreAEnviar = nombreCategoria.value.trim()
 
-  // Cierra el modal antes para evitar bloqueos visuales
   localVisible.value = false
 
-  // Ya no enviamos el campo estado, solo el nombre
+ 
   const resultado = await store.crearCategoria({ 
     nombre: nombreAEnviar 
   })
@@ -120,7 +118,7 @@ const dispararGuardar = async () => {
   guardando.value = false
 
   if (!resultado.ok && resultado.error) {
-    error.value        = resultado.error
+    error.value  = resultado.error
     localVisible.value = true
     
     Swal.fire({

@@ -57,6 +57,8 @@ export const useCategoriaStore = defineStore('categoria', () => {
     cargando.value = true
     try {
       const response = await getCategorias(page, rows)
+      
+console.log('RESPONSE:', response) 
       categorias.value   = response.data.data
       totalRecords.value = response.data.total
       currentPage.value  = response.data.current_page
