@@ -10,8 +10,10 @@ import CompraView      from '@/views/CompraView.vue'
 import UsuariosView    from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
+
 import { all } from 'axios'
 import RegistroComprasView from '@/views/RegistroComprasView.vue'
+import AlertsTable from '@/components/Alertas/AlertsTable.vue'
 
 const routes = [
   {
@@ -27,6 +29,12 @@ const routes = [
     path: '/compras-Realizadas',
     name: 'comprasRealizadas',
     component: ComprasRealizadasView,
+  },
+
+   {
+    path: '/alertas',
+    name: 'alertas',
+    component: AlertsTable,
   },
 
   {
@@ -94,14 +102,13 @@ const routes = [
       },
       
      
-      /*
+      
       {
-        path: 'venta/turno-caja',
-        name: 'turno-caja',
-        component: () => import('@/views/TurnoCajaView.vue'), // créala cuando la necesites
+        path: 'venta/movimientos-de-caja',
+        name: 'movimientos-caja',
+        component: () => import('@/views/MovimientosCajaView.vue'), // créala cuando la necesites
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
-      */
     
       // ── ADMIN + CONTADOR ───────────────────────────────────────────────────
       {

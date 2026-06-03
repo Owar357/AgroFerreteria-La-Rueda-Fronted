@@ -1,6 +1,5 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
         <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de Productos</h1>
@@ -22,7 +21,7 @@
           />
         </IconField>
 
-        <Dropdown
+        <Select
           v-model="filters['categoria'].value"
           :options="uniqueCategories"
           showClear
@@ -40,29 +39,38 @@
         responsiveLayout="scroll"
         :paginator="true"
         :rows="5"
-        :rowsPerPageOptions="[5, 15, 25]"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
         class="p-datatable-custom text-[14px]"
       >
-        <Column field="name"       header="Nombre"      class="font-semibold text-[#1a2e1f]" />
-        <Column field="categoria"  header="Categoría"   class="text-[#4b5563]" />
-        <Column field="fabricante" header="Fabricante"  class="text-[#4b5563]" />
-        <Column field="codigo"     header="Código"      class="text-[#6b7280]" />
+        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
+        <Column field="categoria" header="Categoría" class="text-[#4b5563]" />
+        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
+        <Column field="codigo" header="Código" class="text-[#6b7280]" />
 
-        <Column header="Acciones" class="text-center w-[140px]">
+        <Column header="Acciones" class="w-[200px]">
           <template #body="slotProps">
-            <div class="flex gap-2 justify-center">
+            <div class="flex gap-2">
               <!-- Editar -->
               <Button
                 icon="pi pi-pencil"
-                class="!bg-[#e0b354] hover:!bg-[#cda03f] border-none text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+                label="Editar"
+                severity="secondary"
+                text
+                rounded
+                size="small"
+                v-tooltip="'Editar producto'"
                 @click="handleEdit(slotProps.data)"
               />
               <!-- Ver Detalles -->
               <Button
                 icon="pi pi-eye"
-                class="bg-[#eef2e9] hover:bg-[#e2e8dd] border border-[#cbd5e1] text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors"
+                label="Ver"
+                severity="secondary"
+                text
+                rounded
+                size="small"
+                v-tooltip="'Ver presentaciones'"
                 @click="handleDetail(slotProps.data)"
               />
             </div>
@@ -75,37 +83,85 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import IconField  from 'primevue/iconfield'
-import InputIcon  from 'primevue/inputicon'
-import InputText  from 'primevue/inputtext'
-import Dropdown   from 'primevue/dropdown'
-import Button     from 'primevue/button'
-import DataTable  from 'primevue/datatable'
-import Column     from 'primevue/column'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import { Select } from 'primevue'
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 
 const products = ref([
-  { id: 1, name: 'Maíz Híbrido',         categoria: 'Semilla',      fabricante: 'Agrosem',     codigo: 'PRN-908-789' },
-  { id: 2, name: 'Fertilizante 20-20-20', categoria: 'Fertilizante', fabricante: 'NutriGreen',  codigo: 'FER-234-567' },
-  { id: 3, name: 'Herbicida Total',        categoria: 'Herbicida',    fabricante: 'CropCare',    codigo: 'HER-876-543' },
-  { id: 4, name: 'Maíz Tolerant',          categoria: 'Semilla',      fabricante: 'Biosem',      codigo: 'PRN-345-123' },
-  { id: 5, name: 'Fungicida Protector',    categoria: 'Fungicida',    fabricante: 'AgroProtect', codigo: 'FUN-654-321' },
-  { id: 6, name: 'Insecticida Natural',    categoria: 'Insecticida',  fabricante: 'BioProtect',  codigo: 'INS-123-456' },
-  { id: 7, name: 'Insecticida Natural',    categoria: 'Insecticida',  fabricante: 'BioProtect',  codigo: 'INS-123-457' },
-  { id: 8, name: 'Insecticida Natural',    categoria: 'Insecticida',  fabricante: 'BioProtect',  codigo: 'INS-123-458' },
+  {
+    id: 1,
+    name: 'Maíz Híbrido',
+    categoria: 'Semilla',
+    fabricante: 'Agrosem',
+    codigo: 'PRN-908-789',
+  },
+  {
+    id: 2,
+    name: 'Fertilizante 20-20-20',
+    categoria: 'Fertilizante',
+    fabricante: 'NutriGreen',
+    codigo: 'FER-234-567',
+  },
+  {
+    id: 3,
+    name: 'Herbicida Total',
+    categoria: 'Herbicida',
+    fabricante: 'CropCare',
+    codigo: 'HER-876-543',
+  },
+  {
+    id: 4,
+    name: 'Maíz Tolerant',
+    categoria: 'Semilla',
+    fabricante: 'Biosem',
+    codigo: 'PRN-345-123',
+  },
+  {
+    id: 5,
+    name: 'Fungicida Protector',
+    categoria: 'Fungicida',
+    fabricante: 'AgroProtect',
+    codigo: 'FUN-654-321',
+  },
+  {
+    id: 6,
+    name: 'Insecticida Natural',
+    categoria: 'Insecticida',
+    fabricante: 'BioProtect',
+    codigo: 'INS-123-456',
+  },
+  {
+    id: 7,
+    name: 'Insecticida Natural',
+    categoria: 'Insecticida',
+    fabricante: 'BioProtect',
+    codigo: 'INS-123-457',
+  },
+  {
+    id: 8,
+    name: 'Insecticida Natural',
+    categoria: 'Insecticida',
+    fabricante: 'BioProtect',
+    codigo: 'INS-123-458',
+  },
 ])
 
 const uniqueCategories = computed(() => {
-  return [...new Set(products.value.map(p => p.categoria))].sort()
+  return [...new Set(products.value.map((p) => p.categoria))].sort()
 })
 
 const filters = ref({
-  global:    { value: null, matchMode: 'contains' },
-  categoria: { value: null, matchMode: 'equals'   }
+  global: { value: null, matchMode: 'contains' },
+  categoria: { value: null, matchMode: 'equals' },
 })
 
-const handleEdit   = (product) => emit('open-edit',   product)
+const handleEdit = (product) => emit('open-edit', product)
 const handleDetail = (product) => emit('open-detail', product)
 </script>
 
@@ -131,7 +187,8 @@ const handleDetail = (product) => emit('open-detail', product)
   background-color: #f4f7f2 !important;
 }
 
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
+.p-inputtext:enabled:focus,
+.p-dropdown:not(.p-disabled).p-focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
