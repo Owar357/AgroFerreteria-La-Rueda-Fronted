@@ -144,7 +144,7 @@ const comprasRealizadas = ref([
   { id: 12, fechaEmision: '04-03-2025', proveedor: 'Fertilizantes del Norte', tipoDocumento: 'Crédito Fiscal', numDocumento: 'CF-9945', precioFactura: '1,430.00', estadoPago: 'VENCIDO' }
 ])
 
-// Modificado: Estructura de filtros nativos para PrimeVue 4
+//  Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
   estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
   fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM}
@@ -152,7 +152,6 @@ const filtros = ref({
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
 
-//cdispara el filtro golobal de la columna  mandando una señar reativa al atbla
 const actualizarFiltroFecha = () => {
   // este es un objeto personal para a fprzar a prume vue a realizar la funcion
   //falta hacer todo el procesos en los stores

@@ -67,11 +67,18 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
        {
+        path: 'Procesos/Historial-Ventas',
+        name: 'HistorialVenta',
+        component: () => import('@/views/HistorialVentaView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
+       {
         path: 'Gestion/POS',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+    
       //aqui va  lo de la caja
       {
         path: 'venta/venta',
@@ -176,6 +183,12 @@ const router = createRouter({
              name: 'Compra',
              component: () => import('../views/CompraView.vue'),
         }, 
+         {
+             path: 'Venta/Historial Ventas',
+             name: 'HistorialVenta',
+             component: () => import('../views/HistorialVentaView.vue'),
+        }, 
+        
         
       ]
     },

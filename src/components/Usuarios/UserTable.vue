@@ -131,8 +131,8 @@ const toggleVisibility = (user) => {
 }
 </script>
 
-<style>
-/* Tabla headers configurados a 13px / 600 con el color Verde Oscuro #1e3a2f y sin itálica */
+<style
+
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
@@ -154,7 +154,7 @@ const toggleVisibility = (user) => {
   background-color: #f4f7f2 !important;
 }
 
-/* Enfoques y variables de PrimeVue alineados con #2b5e3b */
+
 .p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;

@@ -7,7 +7,7 @@
             <p style="font-size: 14px; color: #6b7280; margin: 6px 0 0;">Completa la información para registrar la venta</p>
         </div>
 
-        <!-- ✅ Layout dos columnas -->
+        <!-- Layout dos columnas -->
         <div class="rounded-2xl overflow-hidden" style="background-color: #ffffff; border: 1px solid #e2e8dd; display: grid; grid-template-columns: 1fr 1px 1fr;">
 
             <!-- ══ COLUMNA IZQUIERDA: Punto de Venta ══ -->
