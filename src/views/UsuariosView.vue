@@ -18,7 +18,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+<<<<<<< HEAD
 import { useUserStore } from '../stores/userStore'
+=======
+import { useUserStore } from '../stores/usuarioStore'
+>>>>>>> rama_prueba
 
 import UserTable     from '../components/Usuarios/UserTable.vue'
 import AddUserDialog from '../components/Usuarios/AddUserDialog.vue'

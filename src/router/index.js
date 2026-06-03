@@ -13,6 +13,7 @@ import ProductosView from '@/views/productosView.vue'
 
 import { all } from 'axios'
 import RegistroComprasView from '@/views/RegistroComprasView.vue'
+import AlertsTable from '@/components/Alertas/AlertsTable.vue'
 
 const routes = [
   {
@@ -28,6 +29,12 @@ const routes = [
     path: '/compras-Realizadas',
     name: 'comprasRealizadas',
     component: ComprasRealizadasView,
+  },
+
+   {
+    path: '/alertas',
+    name: 'alertas',
+    component: AlertsTable,
   },
 
   {
