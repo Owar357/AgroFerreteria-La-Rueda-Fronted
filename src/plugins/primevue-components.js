@@ -6,10 +6,15 @@ import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import Rating from 'primevue/rating';
 import SelectButton from 'primevue/selectbutton';
-// Añade aquí cualquier otro que uses de Sakai...
+import DataTable  from 'primevue/datatable';
+import Column from 'primevue/column'
+import  Tooltip  from 'primevue/tooltip';
+
 
 export default {
     install: (app) => {
+        app.component('Column', Column);
+        app.component('DataTable', DataTable);
         app.component('DataView', DataView);
         app.component('PickList', PickList);
         app.component('OrderList', OrderList);
@@ -17,5 +22,6 @@ export default {
         app.component('Tag', Tag);
         app.component('Rating', Rating);
         app.component('SelectButton', SelectButton);
+        app.directive('tooltip', Tooltip);
     }
 }
