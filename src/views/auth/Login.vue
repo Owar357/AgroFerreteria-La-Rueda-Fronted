@@ -49,7 +49,7 @@
                 <InputIcon class="pi pi-envelope text-[#9ca3af] text-[14px]" />
                 <InputText
                   v-model="form.identity"
-                  placeholder="correo o usuario"
+                  placeholder="correo@gmail.com"
                   class="w-full custom-login-input text-[14px]"
                   :disabled="loading"
                 />
