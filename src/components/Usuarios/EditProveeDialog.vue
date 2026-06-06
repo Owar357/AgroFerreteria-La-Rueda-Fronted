@@ -28,8 +28,8 @@
     </div>
 
     <!-- Body / Formulario -->
-    <div class="px-6 py-5 bg-white font-inter flex flex-col gap-4">
-      
+  
+      <div class="px-6 py-5 bg-[#eef2e9] font-inter flex flex-col gap-4">
       <!-- Campo Nombre -->
       <div class="flex flex-col gap-1">
         <label class="text-[12.5px] font-medium text-[#1a2e1f] font-inter">Nombre</label>

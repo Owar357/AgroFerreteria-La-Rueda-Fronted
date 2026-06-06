@@ -17,7 +17,6 @@
     <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f;">
       <div class="flex items-center gap-3">
         <i class="pi pi-info-circle text-white text-base" />
-        <!-- Título principal cambiado a MAYÚSCULAS -->
         <h2 class="text-white text-base font-semibold m-0 font-inter uppercase tracking-wide">DETALLES DEL PROVEEDOR</h2>
       </div>
       <button
@@ -29,104 +28,83 @@
     </div>
 
     <!-- Body -->
-    <div class="px-6 py-5 bg-white font-inter flex flex-col gap-4">
+    <div class="px-6 py-5 bg-[#eef2e9] font-inter flex flex-col gap-4">
 
-      <!-- Encabezado de sección con Estado separado a la derecha -->
-      <div class="flex items-center justify-between border-b border-gray-100 pb-2 m-0">
-        <p class="text-[11px] font-semibold tracking-normal text-gray-400 font-inter uppercase m-0">
-          Información general
+      <!-- Badge de estado flotante arriba -->
+      <div class="flex items-center justify-between">
+        <p class="text-[11px] font-semibold tracking-wider text-[#2b5e3b] uppercase m-0 flex items-center gap-1.5">
+          <i class="pi pi-user text-[11px]" />
+          Información General
         </p>
-        <!-- Estado fuera de los inputs, ordenado a la derecha -->
-        <span 
+        <span
           :class="[
-            'inline-flex items-center px-3 py-0.5 rounded-[40px] text-[11px] font-semibold font-inter tracking-wide uppercase', 
+            'inline-flex items-center px-3 py-0.5 rounded-[40px] text-[11px] font-semibold tracking-wide uppercase',
             proveedor?.estado === 'Activo' ? 'bg-[#e0b354] text-[#1e3a2f]' : 'bg-[#f2f5ef] text-[#2f573b]'
           ]"
         >
           {{ proveedor?.estado || 'Inactivo' }}
         </span>
       </div>
-      
-      <div class="grid grid-cols-2 gap-2.5">
-        <!-- Nombre completo -->
-        <div class="col-span-2 bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">Nombre</p>
-          <span class="text-[14px] font-normal text-[#1a2e1f] font-inter block">{{ proveedor?.nombre }}</span>
-        </div>
 
-        <!-- Tipo de persona -->
-        <div class="bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">Tipo de persona</p>
-          <span class="text-[14px] font-normal text-[#1a2e1f] font-inter block">{{ proveedor?.tipo_persona || '—' }}</span>
+      <!-- Grupo: Información General -->
+      <div class="bg-white rounded-xl border border-[#e2e8dd] overflow-hidden shadow-sm">
+        <!-- Nombre -->
+        <div class="px-4 py-3 border-b border-[#e2e8dd]">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Nombre</p>
+          <span class="text-[14px] text-[#1a2e1f] font-medium">{{ proveedor?.nombre }}</span>
         </div>
-
-        <!-- Teléfono -->
-        <div class="bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">Teléfono</p>
-          <span class="font-mono text-[13.5px] text-[#1a2e1f] block">{{ proveedor?.telefono }}</span>
+        <!-- Tipo persona + Teléfono -->
+        <div class="grid grid-cols-2">
+          <div class="px-4 py-3 border-r border-[#e2e8dd]">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Tipo de persona</p>
+            <span class="text-[14px] text-[#1a2e1f]">{{ proveedor?.tipo_persona || '—' }}</span>
+          </div>
+          <div class="px-4 py-3">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Teléfono</p>
+            <span class="font-mono text-[14px] text-[#1a2e1f]">{{ proveedor?.telefono }}</span>
+          </div>
         </div>
-
-        <!-- Correo electrónico -->
-        <div class="col-span-2 bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">Correo electrónico</p>
-          <span 
-            :class="[
-              'text-[14px] block font-inter', 
-              !proveedor?.correo ? 'text-gray-400 italic text-[13.5px]' : 'text-[#4b5563]'
-            ]"
-          >
+        <!-- Correo -->
+        <div class="px-4 py-3 border-t border-[#e2e8dd]">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Correo electrónico</p>
+          <span :class="!proveedor?.correo ? 'text-gray-400 italic text-[13px]' : 'text-[14px] text-[#4b5563]'">
             {{ proveedor?.correo || '— no registrado' }}
           </span>
         </div>
-
         <!-- Dirección -->
-        <div class="col-span-2 bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">Dirección</p>
-          <span class="text-[14px] font-normal text-[#1a2e1f] font-inter block">{{ proveedor?.direccion }}</span>
+        <div class="px-4 py-3 border-t border-[#e2e8dd]">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Dirección</p>
+          <span class="text-[14px] text-[#1a2e1f]">{{ proveedor?.direccion }}</span>
         </div>
       </div>
 
-      <!-- Datos fiscales -->
-      <p class="text-[11px] font-semibold tracking-normal text-gray-400 flex items-center gap-2 m-0 font-inter after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100">
-        Datos fiscales
+      <!-- Título grupo fiscal -->
+      <p class="text-[11px] font-semibold tracking-wider text-[#2b5e3b] uppercase m-0 flex items-center gap-1.5">
+        <i class="pi pi-file text-[11px]" />
+        Datos Fiscales
       </p>
-      
-      <div class="grid grid-cols-2 gap-2.5">
-        <!-- NRC -->
-        <div class="bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">NRC</p>
-          <span 
-            :class="[
-              'font-mono block', 
-              !proveedor?.nrc ? 'text-gray-400 italic text-[13.5px]' : 'text-[13.5px] text-[#1a2e1f]'
-            ]"
-          >
-            {{ proveedor?.nrc || '— no registrado' }}
-          </span>
-        </div>
 
-        <!-- NIT -->
-        <div class="bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">NIT</p>
-          <span 
-            :class="[
-              'font-mono block', 
-              !proveedor?.nit ? 'text-gray-400 italic text-[13.5px]' : 'text-[13.5px] text-[#1a2e1f]'
-            ]"
-          >
-            {{ proveedor?.nit || '— no registrado' }}
-          </span>
+      <!-- Grupo: Datos Fiscales -->
+      <div class="bg-white rounded-xl border border-[#e2e8dd] overflow-hidden shadow-sm">
+        <!-- NRC + NIT -->
+        <div class="grid grid-cols-2">
+          <div class="px-4 py-3 border-r border-[#e2e8dd]">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">NRC</p>
+            <span :class="!proveedor?.nrc ? 'text-gray-400 italic text-[13px]' : 'font-mono text-[14px] text-[#1a2e1f]'">
+              {{ proveedor?.nrc || '— no registrado' }}
+            </span>
+          </div>
+          <div class="px-4 py-3">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">NIT</p>
+            <span :class="!proveedor?.nit ? 'text-gray-400 italic text-[13px]' : 'font-mono text-[14px] text-[#1a2e1f]'">
+              {{ proveedor?.nit || '— no registrado' }}
+            </span>
+          </div>
         </div>
-
         <!-- DUI -->
-        <div class="col-span-2 bg-white border border-gray-200 shadow-sm rounded-lg px-3.5 py-2.5">
-          <p class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight mb-1.5 font-inter">DUI</p>
-          <span 
-            :class="[
-              'font-mono block', 
-              !proveedor?.dui ? 'text-gray-400 italic text-[13.5px]' : 'text-[13.5px] text-[#1a2e1f]'
-            ]"
-          >
+        <div class="px-4 py-3 border-t border-[#e2e8dd]">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">DUI</p>
+          <span :class="!proveedor?.dui ? 'text-gray-400 italic text-[13px]' : 'font-mono text-[14px] text-[#1a2e1f]'">
             {{ proveedor?.dui || '— no registrado' }}
           </span>
         </div>
@@ -134,8 +112,8 @@
 
     </div>
 
-    <!-- Footer (Botones centrados, fondo blanco y borde limpio) -->
-    <div class="flex justify-center gap-2.5 px-6 py-5 border-t border-gray-100 bg-white">
+    <!-- Footer -->
+    <div class="flex justify-center gap-2.5 px-6 py-5 border-t border-[#e2e8dd] bg-[#eef2e9]">
       <Button
         label="Cerrar"
         @click="visible = false"

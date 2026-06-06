@@ -75,6 +75,13 @@
             @click="navigate('/admin/procesos/historial-ventas')"
             sub
           />
+          <SidebarItem
+               icon="pi pi-address-book"
+              label="Clientes"
+              :active="activeItem === 'clientes'"
+             @click="navigate('/admin/procesos/clientes')"  sub
+             />
+          
         </SidebarDropdown>
         <hr class="border-none border-t my-3" style="border-color: #162e1e;" />
       </template>
@@ -156,6 +163,7 @@ const activeItem = computed(() => {
   if (route.path.includes('proveedores'))     return 'proveedores'
   if (route.path.includes('compra'))          return 'compra'
   if (route.path.includes('historial-ventas')) return 'historial-ventas'
+  if (route.path.includes('clientes')) return 'clientes'
   if (route.path.includes('movimientos-de-caja')) return 'movimientos-caja'
   if (route.path.includes('caja'))            return 'caja'
   if (route.path.includes('pos'))             return 'pos'
@@ -168,7 +176,7 @@ const inventarioActive = computed(() =>
   ['productos', 'categorias', 'proveedores'].includes(activeItem.value)
 )
 const procesosActive = computed(() =>
-  ['compra', 'historial-ventas'].includes(activeItem.value)
+  ['compra', 'historial-ventas', 'clientes'].includes(activeItem.value)
 )
 const gestionActive = computed(() =>
   ['caja', 'movimiento-caja', 'pos'].includes(activeItem.value)
