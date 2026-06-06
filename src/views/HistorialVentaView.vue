@@ -31,7 +31,7 @@ const sales = ref([
     id: 1, soldBy: 'Daniel Melgar', Numberfact: 'FAC-001-2025',
     paymentType: 'Efectivo', status: 'Procesado', date: '10/02/2025', total: 90.50,
     items: [
-      { product: 'Fertilizante  ',  cantidad: 2,unidad: 'libra', price: 85.00 },
+      { product: 'Fertilizante  ',  cantidad: 1,unidad: 'libra', price: 85.00 },
       { product: ' Semillas',  cantidad: 1, unidad: 'libra', price: 5.50 }
     ]
   },
@@ -39,7 +39,7 @@ const sales = ref([
     id: 2, soldBy: 'Maria Lopez', Numberfact: 'FAC-002-2025',
     paymentType: 'Transferencia', status: 'Procesado', date: '11/02/2025', total: 68.00,
     items: [
-      { product: 'Herbicida Roundup ', cantidad: 4, unidad: 'libra', price: 48.00 },
+      { product: 'Herbicida Roundup ', cantidad: 1, unidad: 'libra', price: 48.00 },
       { product: 'conecntrado ',    cantidad: 1, unidad: 'libra', price: 20.00 }
     ]
   },
