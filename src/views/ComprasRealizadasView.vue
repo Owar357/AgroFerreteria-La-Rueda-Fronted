@@ -246,7 +246,7 @@ const comprasRealizadas = ref([
   },
 ])
 
-// Modificado: Estructura de filtros nativos para PrimeVue 4
+//  Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
   estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
   fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM },
@@ -254,7 +254,6 @@ const filtros = ref({
 
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
 
-//cdispara el filtro golobal de la columna  mandando una señar reativa al atbla
 const actualizarFiltroFecha = () => {
   // este es un objeto personal para a fprzar a prume vue a realizar la funcion
   //falta hacer todo el procesos en los stores

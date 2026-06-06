@@ -3,7 +3,8 @@
 
         <!-- Botón Regresar -->
         <Button label="Regresar" icon="pi pi-arrow-left"
-            style="font-size: 22px; padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;"
+            style="font-size: 22px; 
+            padding: 16px 40px; background-color: #2b5e3b; border-color: #2b5e3b; color: #ffffff; font-family: 'Inter', sans-serif;"
             @click="$emit('close')" />
 
         <!-- Header -->

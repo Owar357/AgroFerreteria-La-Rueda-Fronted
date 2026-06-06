@@ -234,7 +234,7 @@ const handleUpdate = async () => {
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
 }
-
+ /* Modal tarjetas/fondo interno blanco */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 1.5rem !important;

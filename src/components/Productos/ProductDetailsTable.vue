@@ -138,7 +138,7 @@ import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vu
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 
-// ========== PROPS ==========
+
 const props = defineProps({
   productoId: {
     type: [String, Number],
@@ -146,7 +146,6 @@ const props = defineProps({
   },
 })
 
-// ========== EMITS ==========
 const emit = defineEmits(['volver'])
 
 const editarVisible = ref(false)

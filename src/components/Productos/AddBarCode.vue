@@ -1,7 +1,10 @@
 <template>
-  <Dialog v-model:visible="localVisible" modal :header="`Códigos de barra - ${presentacion?.nombre ?? ''}`"
-    :style="{ width: '480px' }" :draggable="false" class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }">
+  <Dialog v-model:visible="localVisible" modal 
+    :header="`Códigos de barra - ${presentacion?.nombre ?? ''}`"
+    :style="{ width: '480px' }" 
+    :draggable="false" class="custom-dialog"
+    :pt="
+    { root: { class: 'rounded-2xl overflow-hidden' } }">
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <!-- Tabla de códigos -->
@@ -32,7 +35,7 @@
         </table>
       </div>
 
-      <!-- Input + botón agregar -->
+      <!----> Input + botón agregar 
       <div class="flex gap-2">
         <InputText v-model="nuevoCodigo" placeholder="Ej: 7501234567890"
           class="flex-1 bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
