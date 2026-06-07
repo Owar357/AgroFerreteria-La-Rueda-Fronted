@@ -9,6 +9,7 @@ import SelectButton from 'primevue/selectbutton';
 import DataTable  from 'primevue/datatable';
 import Column from 'primevue/column'
 import  Tooltip  from 'primevue/tooltip';
+import { AutoComplete } from 'primevue';
 
 
 export default {
@@ -23,5 +24,6 @@ export default {
         app.component('Rating', Rating);
         app.component('SelectButton', SelectButton);
         app.directive('tooltip', Tooltip);
+        app.component('AutoComplete',AutoComplete);
     }
 }
