@@ -23,7 +23,7 @@
           />
         </IconField>
 
-        <Dropdown
+        <Select
           v-model="filters['estado'].value"
           :options="estadoOptions"
           showClear

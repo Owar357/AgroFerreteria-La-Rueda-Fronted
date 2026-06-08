@@ -4,59 +4,59 @@
     <!-- Header -->
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
-        <h1 class="text-[26px] font-semibold tracking-tight !text-black">Historial de ventas</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-black">Historial de ventas</h1>
       </div>
 
       <!-- Filtros -->
       <div class="flex flex-wrap justify-start items-center w-full gap-4">
+        <!-- buscador -->
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
             v-model="filters['global'].value"
             placeholder="Buscar factura, vendedor..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
+            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-10"
           />
         </IconField>
-
-        <Dropdown
+        <!--selecionar el estado -->
+        <Select
           v-model="filters['status'].value"
           :options="statusOptions"
           showClear
           placeholder="Todos los estados"
-          class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2"
+          class="w-52 bg-white border-gray-300 text-sm rounded-lg  h-10"
         />
-
-        <Dropdown
+        <!--select de  pago -->
+        <Select
           v-model="filters['paymentType'].value"
           :options="paymentOptions"
           showClear
           placeholder="Tipo de pago"
-          class="w-48 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2"
+          class="w-48 bg-white border-gray-300 text-sm rounded-lg h-10"
         />
 
-        <Calendar
+        <DatePicker
           v-model="dateRange"
           selectionMode="range"
           placeholder="Filtrar por fecha"
           dateFormat="dd/mm/yy"
           showIcon
           showButtonBar
-          class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px]"
+          class="w-64 bg-white border-gray-300 text-sm rounded-lg h-10"
         />
       </div>
     </div>
 
     <!-- Tabla -->
-    <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+    <div class="bg-white rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
         :value="filteredSales"
         v-model:filters="filters"
         :globalFilterFields="['soldBy', 'Numberfact']"
         responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
+        class="p-datatable-custom text-sm"
         :paginator="true"
         :rows="5"
-        :rowsPerPageOptions="[5, 10, 20]"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       >
@@ -111,8 +111,8 @@
                 v-tooltip.top="'Anular venta'"
                 :disabled="data.status === 'Anulado'"
                 :class="data.status === 'Anulado'
-                  ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
-                  : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'"
+                  ? '!bg-gray-200 !text-gray-400 cursor-not-allowed'
+                  : '!bg-red-100 hover:!bg-red-200 !text-red-700'"
                 class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
                 @click="$emit('void-sale', data)"
               />
@@ -129,11 +129,11 @@ import { ref, computed } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Calendar from 'primevue/calendar'
+import DatePicker from 'primevue/datepicker'
 
 // ── Props
 const props = defineProps({
@@ -159,8 +159,11 @@ const filters = ref({
 
 // Filtro de rango de fechas 
 const filteredSales = computed(() => {
-  if (!dateRange.value?.[0]) return props.sales
+  if (!dateRange.value || !dateRange.value[0]) return props.sales
+
+
   const [from, to] = dateRange.value
+
   return props.sales.filter(s => {
     const [d, m, y] = s.date.split('/')
     const saleDate  = new Date(`${y}-${m}-${d}`)
@@ -168,7 +171,7 @@ const filteredSales = computed(() => {
   })
 })
 
-// ── Helpers visuales 
+
 const paymentClass = (type) => ({
   'bg-[#fef9c3] text-[#854d0e]': type === 'Efectivo',
   'bg-[#dbeafe] text-[#1d4ed8]': type === 'Transferencia',
@@ -180,6 +183,7 @@ const paymentIcon = (type) => ({
 
 const formatCurrency = (v) => {
   const num = parseFloat(String(v).replace(/,/g, ''))
+  
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 

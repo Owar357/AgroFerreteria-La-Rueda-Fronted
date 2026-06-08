@@ -24,7 +24,7 @@
 
           <div class="flex flex-col gap-1.5">
             <label class="text-[14px] font-medium text-[#1a2e1f]">Proveedor</label>
-            <Dropdown
+            <Select
               v-model="documentoForm.proveedor"
               :options="proveedoresOptions"
               placeholder="Seleccionar proveedor"
@@ -189,7 +189,7 @@
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento</label>
-              <Calendar
+              <DatePicker
                 v-model="loteForm.fechaVencimientoLote"
                 dateFormat="dd/mm/yy"
                 showIcon
