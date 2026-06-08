@@ -77,6 +77,13 @@
                   ${{ parseFloat(slotProps.data.subtotal).toFixed(2) }}
                 </template>
               </Column>
+
+              <Column header="" style="width: 40px;">
+                <template #body="slotProps">
+                  <Button icon="pi pi-trash" severity="danger" text rounded size="small"
+                    @click="eliminarProducto(slotProps.index)" />
+                </template>
+              </Column>
             </DataTable>
           </div>
 
@@ -98,19 +105,16 @@
         <div class="flex flex-col gap-4 flex-1">
 
           <!-- Cliente -->
-          <div class="flex flex-col gap-1.5">
-            <label style="font-size: 13px; font-weight: 500; color: #4b5563;">Cliente</label>
-            <div class="flex gap-2 items-center">
-              <InputText v-model="busquedaCliente" placeholder="DUI, NRC u otro número..." class="flex-1"
-                style="font-size: 13px; padding: 8px 14px;" />
-              <Button icon="pi pi-search" @click="buscarCliente"
-                style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 10px; color: #1a2e1f; padding: 8px 12px;" />
-            </div>
-            <p style="font-size: 12px; color: #2b5e3b; margin: 0;">
-              Nombre: <span style="color: #6b7280; font-style: italic;">{{ nombreCliente || '—' }}</span>
-            </p>
+          <div class="flex gap-2 items-center">
+            <InputText v-model="busquedaCliente" placeholder="DUI, NRC u otro número..."
+              class="flex-1 text-[13px] px-3.5 py-2" @keypress="(e) => { if (!/[0-9]/.test(e.key)) e.preventDefault() }"
+              @keyup.enter="buscarCliente" />
+            <Button icon="pi pi-search" @click="buscarCliente"
+              style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 10px; color: #1a2e1f; padding: 8px 12px;" />
           </div>
-
+          <p class="text-[12px] text-[#2b5e3b] m-0">
+            Nombre: <span class="text-[#6b7280] italic">{{ nombreCliente || '—' }}</span>
+          </p>
           <!-- Forma de pago -->
           <div class="flex flex-col gap-1.5">
             <label style="font-size: 13px; font-weight: 500; color: #4b5563;">Forma de pago</label>
@@ -142,8 +146,8 @@
             <div class="flex justify-between items-center gap-4">
               <div class="flex items-center gap-2 flex-1">
                 <span style="font-size: 13px; color: #4b5563; white-space: nowrap;">Recibido</span>
-                <InputNumber v-model="efectivoRecibido" :min="0" :minFractionDigits="2" :maxFractionDigits="2"
-                  inputStyle="font-size: 13px; padding: 8px 12px; width: 120px;" />
+                <InputNumber v-model="efectivoRecibido" :min="0" locale="en-US" :minFractionDigits="2"
+                  :maxFractionDigits="2" inputStyle="font-size: 13px; padding: 8px 12px; width: 120px;" />
               </div>
               <div class="flex items-center gap-2">
                 <span style="font-size: 13px; color: #4b5563;">Cambio:</span>
@@ -174,7 +178,7 @@ import { ref, computed, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
-import { buscarProductos, buscarClientePorDocumento,registerVenta } from '@/services/ventaService'
+import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/services/ventaService'
 import DialogAddCliente from '@/components/Clientes/DialogAddCliente.vue'
 import Swal from 'sweetalert2'
 
@@ -265,7 +269,7 @@ const agregarProducto = () => {
     descuento: 0.00,
     subtotal: precio,
     aplica_iva: productoSeleccionado.value.aplica_iva,
-    presentacion_id:presentacionSeleccionada.value.id
+    presentacion_id: presentacionSeleccionada.value.id
   });
 
   productoSeleccionado.value = null,
@@ -284,7 +288,7 @@ const buscarCliente = async () => {
 
   if (!busquedaCliente.value.trim()) return
   try {
-    const response = await buscarClientePorDocumento(busquedaCliente.value.trim())
+    const response = await buscarClientePorDocumento(String(busquedaCliente.value))
     const cliente = response.data.data
     nombreCliente.value = cliente.nombre || cliente.razon_social
     clienteId.value = cliente.id
@@ -344,7 +348,7 @@ const registrarVenta = async () => {
       presentacion_id: p.presentacion_id
     }))
   }
-   console.log('DETALLES:', productosVenta.value.map(p => ({ nombre: p.nombre, presentacion_id: p.presentacion_id })))
+
   try {
     await registerVenta(payload)
     Swal.fire({ icon: 'success', title: '¡Venta registrada!', confirmButtonColor: '#2b5e3b', timer: 3000, timerProgressBar: true })
@@ -360,8 +364,6 @@ const registrarVenta = async () => {
   }
 }
 
-
-
 const anularVenta = () => {
   productosVenta.value = []
   busquedaCliente.value = ''
@@ -369,5 +371,9 @@ const anularVenta = () => {
   efectivoRecibido.value = 0
   tipoFactura.value = ''
   tipoPago.value = 'efectivo'
+}
+
+const eliminarProducto = (index) => {
+  productosVenta.value.splice(index, 1)
 }
 </script>

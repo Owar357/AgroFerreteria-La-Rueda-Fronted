@@ -73,20 +73,20 @@ const routes = [
         component: () => import('@/views/ProveedoresView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-       {
+      {
         path: 'Procesos/Historial-Ventas',
         name: 'HistorialVenta',
         component: () => import('@/views/HistorialVentaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-     
-       {
-        path: 'Gestion/POS',
+
+      {
+        path: 'gestion/POS',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-    
+
       //aqui va  lo de la caja
       {
         path: 'venta/venta',
@@ -166,43 +166,62 @@ const router = createRouter({
           component: () => import('../views/FromVenta.vue'),
         },
         {
+          path: 'alertas',
+          name: 'alertas',
+          component: () => import('../components/Alertas/AlertsTable.vue'),
+        },
+        
+        {
           path: 'usuarios',
           name: 'Usuarios',
           component: () => import('../views/UsuariosView.vue'),
         },
         {
-             path: 'inventario/proveedores',
-             name: 'proveedor',
-             component: () => import('../views/ProveedoresView.vue'),
-        }, 
-         {
-             path: 'inventario/Categorias',
-             name: 'categorias',
-             component: () => import('../views/CategoriasView.vue'),
-        }, 
-         {
-             path: 'Venta/Compra',
-             name: 'Compra',
-             component: () => import('../views/CompraView.vue'),
+          path: 'inventario/proveedores',
+          name: 'proveedor',
+          component: () => import('../views/ProveedoresView.vue'),
         },
         {
-            path: 'procesos/historial-ventas', 
-           name: 'HistorialVenta',
-           component: () => import('../views/HistorialVentaView.vue'),
-        }, 
+          path: 'inventario/Categorias',
+          name: 'categorias',
+          component: () => import('../views/CategoriasView.vue'),
+        },
         {
-           path: 'procesos/clientes', 
-            name: 'Clientes',
-           component: () => import('../views/ClientesView.vue')
-
-        } ,
+          path: 'caja',
+          name: 'caja',
+          component: () => import('../views/CajaView.vue'),
+        },
+         {
+          path: 'venta/movimientos-de-caja',
+          name: 'movcaja',
+          component: () => import('../views/MovimientosCajaView.vue'),
+        },
         {
-           path: 'procesos/clientes/historial',
-             name: 'ClienteHistorial',
-           component: () => import('../components/Clientes/ClienteHistorialDialogo.vue')
-          },
-        
-      ]
+          path: 'Venta/Compra',
+          name: 'Compra',
+          component: () => import('../views/CompraView.vue'),
+        },
+        {
+          path: 'gestion/POS',
+          name: 'POS',
+          component: () => import('../views/FromVenta.vue'),
+        },
+        {
+          path: 'procesos/historial-ventas',
+          name: 'HistorialVenta',
+          component: () => import('../views/HistorialVentaView.vue'),
+        },
+        {
+          path: 'procesos/clientes',
+          name: 'Clientes',
+          component: () => import('../views/ClientesView.vue'),
+        },
+        {
+          path: 'procesos/clientes/historial',
+          name: 'ClienteHistorial',
+          component: () => import('../components/Clientes/ClienteHistorialDialogo.vue'),
+        },
+      ],
     },
   ],
 })
