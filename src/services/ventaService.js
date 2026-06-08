@@ -1,3 +1,4 @@
+import { data } from "autoprefixer";
 import {api} from "./authService";
 
 export const buscarProductos = (q) => 
@@ -11,4 +12,8 @@ export const buscarClientePorDocumento = (documento) => {
 
 export const crearCliente = (data) => {
     return api.post('/clientes', data);
+}
+
+export const registerVenta = (data) => {
+    return api.post('/ventas', data)
 }
