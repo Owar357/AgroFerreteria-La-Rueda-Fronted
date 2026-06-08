@@ -195,6 +195,11 @@
 
     </div>
   </div>
+
+  <DialogAddCliente
+  v-model="mostrarModalCliente"
+  @cliente-registrado="onClienteRegistrado"
+/>
 </template>
 
 <script setup>
@@ -202,7 +207,10 @@ import { ref, computed, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
-import { buscarProductos } from '@/services/ventaService'
+import { buscarProductos, buscarClientePorDocumento } from '@/services/ventaService'
+import DialogAddCliente from '@/components/Clientes/DialogAddCliente.vue'
+import Swal from 'sweetalert2'
+
 
 
 const fechaActual = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -210,14 +218,18 @@ const fechaActual = new Date().toLocaleDateString('es-ES', { day: '2-digit', mon
 const tipoFactura = ref('consumidor_final')
 const presentacionSeleccionada = ref('')
 const presentaciones = ref([])
+const mostrarModalCliente = ref(false)
+
 
 const productosVenta = ref([])
 const busquedaCliente = ref('')
+const clienteId = ref(null)    
 const nombreCliente = ref('')
 const tipoPago = ref('efectivo')
 const efectivoRecibido = ref(0)
 const productoSeleccionado = ref(null)
 const sugerencias = ref([])
+
 
 const subtotalGravado = computed(() =>
   productosVenta.value.reduce((acc, p) => {
@@ -270,7 +282,7 @@ const agregarProducto = () => {
   const precio = parseFloat(presentacionSeleccionada.value.precio_venta)
 
   productosVenta.value.push({
-     nombre: `${productoSeleccionado.value.nombre} - ${presentacionSeleccionada.value.nombre}`,
+    nombre: `${productoSeleccionado.value.nombre} - ${presentacionSeleccionada.value.nombre}`,
     cantidad: 1,
     precio: precio,
     descuento: 0.00,
@@ -290,7 +302,38 @@ watch(productosVenta, () => {
   })
 }, { deep: true })
 
-const buscarCliente = () => { }
+  const buscarCliente = async () => {
+
+    if (!busquedaCliente.value.trim()) return
+    try {
+      const response = await buscarClientePorDocumento(busquedaCliente.value.trim())
+      const cliente = response.data.data
+      nombreCliente.value = cliente.nombre || cliente.razon_social
+      clienteId.value = cliente.id
+    } catch (error) {
+      if (error.response?.status === 404) {
+        const resultado = await  Swal.fire({
+          icon: 'question',
+          title: 'Cliente no encontrado',
+          text: '¿Desea registrar un nuevo cliente?',
+          showCancelButton: true,
+          confirmButtonText: 'Registrar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#2b5e3b',
+        })
+
+        if(resultado.isConfirmed) mostrarModalCliente.value = true
+
+      }
+    }
+  }
+
+const onClienteRegistrado = (cliente) => {
+  nombreCliente.value = cliente.nombre || cliente.razon_social
+  clienteId.value = cliente.id
+  mostrarModalCliente.value = false
+}
+
 const registrarVenta = () => { }
 const anularVenta = () => {
   productosVenta.value = []
