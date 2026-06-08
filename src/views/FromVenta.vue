@@ -77,6 +77,13 @@
                   ${{ parseFloat(slotProps.data.subtotal).toFixed(2) }}
                 </template>
               </Column>
+
+              <Column header="" style="width: 40px;">
+                <template #body="slotProps">
+                  <Button icon="pi pi-trash" severity="danger" text rounded size="small"
+                    @click="eliminarProducto(slotProps.index)" />
+                </template>
+              </Column>
             </DataTable>
           </div>
 
@@ -174,7 +181,7 @@ import { ref, computed, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
-import { buscarProductos, buscarClientePorDocumento,registerVenta } from '@/services/ventaService'
+import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/services/ventaService'
 import DialogAddCliente from '@/components/Clientes/DialogAddCliente.vue'
 import Swal from 'sweetalert2'
 
@@ -265,7 +272,7 @@ const agregarProducto = () => {
     descuento: 0.00,
     subtotal: precio,
     aplica_iva: productoSeleccionado.value.aplica_iva,
-    presentacion_id:presentacionSeleccionada.value.id
+    presentacion_id: presentacionSeleccionada.value.id
   });
 
   productoSeleccionado.value = null,
@@ -344,7 +351,7 @@ const registrarVenta = async () => {
       presentacion_id: p.presentacion_id
     }))
   }
-   console.log('DETALLES:', productosVenta.value.map(p => ({ nombre: p.nombre, presentacion_id: p.presentacion_id })))
+  console.log('DETALLES:', productosVenta.value.map(p => ({ nombre: p.nombre, presentacion_id: p.presentacion_id })))
   try {
     await registerVenta(payload)
     Swal.fire({ icon: 'success', title: '¡Venta registrada!', confirmButtonColor: '#2b5e3b', timer: 3000, timerProgressBar: true })
@@ -360,8 +367,6 @@ const registrarVenta = async () => {
   }
 }
 
-
-
 const anularVenta = () => {
   productosVenta.value = []
   busquedaCliente.value = ''
@@ -369,5 +374,9 @@ const anularVenta = () => {
   efectivoRecibido.value = 0
   tipoFactura.value = ''
   tipoPago.value = 'efectivo'
+}
+
+const eliminarProducto = (index) => {
+  productosVenta.value.splice(index, 1)
 }
 </script>
