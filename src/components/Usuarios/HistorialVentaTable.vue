@@ -178,8 +178,12 @@ const paymentClass = (type) => ({
 const paymentIcon = (type) => ({
 })
 
-const formatCurrency = (v) =>
-  Number(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+const formatCurrency = (v) => {
+  const num = parseFloat(String(v).replace(/,/g, ''))
+  return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+
 </script>
 
 <style>

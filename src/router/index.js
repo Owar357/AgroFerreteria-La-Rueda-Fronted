@@ -79,6 +79,7 @@ const routes = [
         component: () => import('@/views/HistorialVentaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+     
        {
         path: 'Gestion/POS',
         name: 'FromVenta',
@@ -183,18 +184,27 @@ const router = createRouter({
              path: 'Venta/Compra',
              name: 'Compra',
              component: () => import('../views/CompraView.vue'),
+        },
+        {
+            path: 'procesos/historial-ventas', 
+           name: 'HistorialVenta',
+           component: () => import('../views/HistorialVentaView.vue'),
         }, 
-         {
-             path: 'Venta/Historial Ventas',
-             name: 'HistorialVenta',
-             component: () => import('../views/HistorialVentaView.vue'),
-        }, 
-        
+        {
+           path: 'procesos/clientes', 
+            name: 'Clientes',
+           component: () => import('../views/ClientesView.vue')
+
+        } ,
+        {
+           path: 'procesos/clientes/historial',
+             name: 'ClienteHistorial',
+           component: () => import('../components/Clientes/ClienteHistorialDialogo.vue')
+          },
         
       ]
     },
   ],
-  routes,
 })
 
 // ── Guard global ──────────────────────────────────────────────────────────────

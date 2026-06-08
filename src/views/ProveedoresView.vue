@@ -39,7 +39,7 @@ import DetallesProve from '@/components/Usuarios/DetallesProve.vue'
 
 const showAddForm  = ref(false)
 const showEditForm = ref(false)
-const detalleVisible = ref(false)          // ← faltaba
+const detalleVisible = ref(false)          
 const proveedorSeleccionado = ref(null)
 
 function abrirModalEditar(proveedor) {
@@ -47,12 +47,12 @@ function abrirModalEditar(proveedor) {
   showEditForm.value = true
 }
 
-function abrirModalDetalle(proveedor) {    // ← faltaba
+function abrirModalDetalle(proveedor) {    
   proveedorSeleccionado.value = { ...proveedor }
   detalleVisible.value = true
 }
 
-function handleEdit(proveedor) {           // ← faltaba
+function handleEdit(proveedor) {           
   detalleVisible.value = false
   proveedorSeleccionado.value = { ...proveedor }
   showEditForm.value = true
