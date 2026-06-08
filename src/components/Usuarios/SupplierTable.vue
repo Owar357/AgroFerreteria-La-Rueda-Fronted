@@ -112,7 +112,7 @@ import { ref } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
+import { Select } from 'primevue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -191,6 +191,8 @@ const proveedores = ref([
     estado: 'inactivo',
   },
 ])
+
+const totalProveedores = ref(4)
 
 const estadoOptions = ref(['Activo', 'Inactivo'])
 

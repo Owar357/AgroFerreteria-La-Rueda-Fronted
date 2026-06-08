@@ -114,13 +114,13 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'actualizar'])
 
-// Control bidireccional de visibilidad del Dialog
+// visibilidad del Dialog
 const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
 
-// Formulario limpio reactivo solo con los 3 campos + ID de control
+// Formulario limpio
 const form = reactive({
   id: null,
   nombre: '',
@@ -128,14 +128,14 @@ const form = reactive({
   telefono: '',
 })
 
-// Passthrough de estilos idéntico al de tus inputs originales
+//  inputs originales
 const inputPt = {
   root: { 
     class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] transition-all font-inter' 
   }
 }
 
-// Escucha cuando el modal se abre para cargar los datos del proveedor seleccionado
+// cargar los datos del proveedor 
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.proveedor) {
     form.id = props.proveedor.id || null

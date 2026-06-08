@@ -73,12 +73,20 @@ const routes = [
         component: () => import('@/views/ProveedoresView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-      {
+       {
+        path: 'Procesos/Historial-Ventas',
+        name: 'HistorialVenta',
+        component: () => import('@/views/HistorialVentaView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
+       {
         path: 'Gestion/POS',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+    
+      //aqui va  lo de la caja
       {
         path: 'venta/venta',
         name: 'venta',
@@ -162,21 +170,28 @@ const router = createRouter({
           component: () => import('../views/UsuariosView.vue'),
         },
         {
-          path: 'inventario/proveedores',
-          name: 'proveedor',
-          component: () => import('../views/ProveedoresView.vue'),
-        },
-        {
-          path: 'inventario/Categorias',
-          name: 'categorias',
-          component: () => import('../views/CategoriasView.vue'),
-        },
-        {
-          path: 'Venta/Compra',
-          name: 'Compra',
-          component: () => import('../views/CompraView.vue'),
-        },
-      ],
+             path: 'inventario/proveedores',
+             name: 'proveedor',
+             component: () => import('../views/ProveedoresView.vue'),
+        }, 
+         {
+             path: 'inventario/Categorias',
+             name: 'categorias',
+             component: () => import('../views/CategoriasView.vue'),
+        }, 
+         {
+             path: 'Venta/Compra',
+             name: 'Compra',
+             component: () => import('../views/CompraView.vue'),
+        }, 
+         {
+             path: 'Venta/Historial Ventas',
+             name: 'HistorialVenta',
+             component: () => import('../views/HistorialVentaView.vue'),
+        }, 
+        
+        
+      ]
     },
   ],
   routes,

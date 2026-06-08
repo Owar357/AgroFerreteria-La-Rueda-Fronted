@@ -16,7 +16,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f;">
       <div class="flex items-center gap-3">
-        <!-- Título principal cambiado a MAYÚSCULAS -->
+        
         <h2 class="text-white text-base font-semibold m-0 font-inter uppercase tracking-wide">AGREGAR PROVEEDOR</h2>
         <span class="text-[11px] px-3 py-0.5 rounded-[40px] font-semibold font-inter tracking-wide bg-[#e0b354] text-[#1e3a2f]">
           {{ tipoPersona === 'natural' ? 'Persona natural' : 'Persona jurídica' }}
@@ -155,7 +155,7 @@
       </div>
     </div>
 
-    <!-- Footer (Botones centrados, fondo blanco y sin color gris) -->
+    <!-- Footer -->
     <div class="flex justify-center gap-2.5 px-6 py-5 border-t border-gray-100 bg-white">
       <Button
         label="Cancelar"
@@ -219,11 +219,6 @@ const form = reactive({
   estado: 'activo',
 })
 
-const inputPt = {
-  root: {
-    class: 'w-full h-[42px] px-3.5 rounded-lg border border-gray-200 bg-white text-[14px] text-[#1a2e1f] font-inter placeholder-gray-300 focus:border-[#2b5e3b] focus:ring-1 focus:ring-[#2b5e3b] focus:outline-none transition-all shadow-sm',
-  },
-}
 
 function guardar() {
   const payload = {

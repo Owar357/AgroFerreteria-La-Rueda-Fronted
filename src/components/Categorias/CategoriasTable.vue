@@ -50,8 +50,8 @@
 
 <script setup>
 import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
+import Column    from 'primevue/column'
+import Button    from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 
 const emit = defineEmits(['open-edit', 'open-view'])
@@ -72,13 +72,10 @@ const onPageChange = (event) => {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
   border-bottom: 2px solid #e2e8dd !important;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
   padding: 1.25rem 1rem;
 }
-
 .p-datatable-custom .p-datatable-tbody > tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
