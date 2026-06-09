@@ -25,11 +25,7 @@
           ]"
         />
         <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{ errors.cashKey }}</small>
-<<<<<<< HEAD
-        <small class="text-[13px] text-[#6b7280]">(solo si el usuario apertura caja)</small>
-=======
         <small class="text-[13px] text-[#6b7280]">(Opcional — solo si el usuario apertura caja)</small>
->>>>>>> rama_prueba
       </div>
 
       <!-- Contraseña nueva -->

@@ -139,6 +139,10 @@ const router = createRouter({
       name: 'login',
       component: Login,
     },
+    {
+      path: '/', // ← esto es lo que falta
+      redirect: '/Login',
+    },
 
     {
       path: '/ComprasRealizadas',
@@ -170,7 +174,7 @@ const router = createRouter({
           name: 'alertas',
           component: () => import('../components/Alertas/AlertsTable.vue'),
         },
-        
+
         {
           path: 'usuarios',
           name: 'Usuarios',
@@ -191,7 +195,7 @@ const router = createRouter({
           name: 'caja',
           component: () => import('../views/CajaView.vue'),
         },
-         {
+        {
           path: 'venta/movimientos-de-caja',
           name: 'movcaja',
           component: () => import('../views/MovimientosCajaView.vue'),
