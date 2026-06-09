@@ -20,3 +20,7 @@ export const registerVenta = (data) => {
 export const getVentas = (params = {} ) => {
     return api.get('/ventas', {params})
 }
+
+export const getDetallesVenta = ($id) => {
+    return api.get (`/ventas/${id}`);
+} 

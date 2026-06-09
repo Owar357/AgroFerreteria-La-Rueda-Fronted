@@ -114,7 +114,7 @@ defineEmits(['view-detail', 'void-sale'])
 
 
 // Opciones de filtros
-const statusOptions = ref(['PROCESADO', 'ANULADO'])
+const statusOptions = ref(['PROCESADA', 'ANULADA'])
 const paymentOptions = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 const dateRange = ref(null)
 

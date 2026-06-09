@@ -32,7 +32,7 @@ const cargarVentas = async () => {
     const ventas = response.data.data || response.data || []
     sales.value = ventas.map(v => ({
       id:            v.id,
-      vendidoPor:    v.vendido_por,
+      vendidoPor:    v.vendido_por.name,
       numeroFactura: v.numero_factura,
       tipoPago:      v.tipo_pago,
       estado:        v.estado,
