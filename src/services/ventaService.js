@@ -21,6 +21,6 @@ export const getVentas = (params = {} ) => {
     return api.get('/ventas', {params})
 }
 
-export const getDetallesVenta = ($id) => {
+export const getDetallesVenta = (id) => {
     return api.get (`/ventas/${id}`);
 } 
