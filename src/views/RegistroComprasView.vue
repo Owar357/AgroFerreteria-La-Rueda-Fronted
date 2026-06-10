@@ -24,7 +24,7 @@
 
           <div class="flex flex-col gap-1.5">
             <label class="text-[14px] font-medium text-[#1a2e1f]">Proveedor</label>
-            <Dropdown
+            <Select
               v-model="documentoForm.proveedor"
               :options="proveedoresOptions"
               placeholder="Seleccionar proveedor"
@@ -58,7 +58,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col gap-1.5">
               <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de emisión</label>
-              <DatePicker
+              <Calendar
                 v-model="documentoForm.fechaEmision"
                 dateFormat="dd/mm/yy"
                 showIcon
@@ -68,7 +68,7 @@
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-[14px] font-medium text-[#1a2e1f]">Estado de pago</label>
-              <Dropdown
+              <Select
                 v-model="documentoForm.estadoPago"
                 :options="estadosPagoOptions"
                 placeholder="Seleccionar"
@@ -93,7 +93,7 @@
               <label class="text-[14px] font-medium text-[#1a2e1f]"
                 >Fecha de vencimiento del crédito</label
               >
-              <DatePicker
+              <Calendar
                 v-model="documentoForm.fechaVencimiento"
                 dateFormat="dd/mm/yy"
                 showIcon
@@ -126,7 +126,7 @@
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de unidad que entra</label>
-              <Dropdown
+              <Select
                 v-model="loteForm.tipoUnidad"
                 :options="unidadesOptions"
                 placeholder="Seleccionar unidad"
