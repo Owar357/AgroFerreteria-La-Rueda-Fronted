@@ -53,7 +53,6 @@
         </template>
 
         <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
         <Column field="codigo" header="Código" class="text-[#6b7280]" />
 
         <Column header="Categoría" class="text-[#4b5563]">

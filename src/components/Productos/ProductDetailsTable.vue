@@ -138,7 +138,6 @@ import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vu
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 
-
 const props = defineProps({
   productoId: {
     type: [String, Number],
