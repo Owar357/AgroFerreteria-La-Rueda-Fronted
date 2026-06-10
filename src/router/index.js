@@ -4,10 +4,10 @@ import authService from '@/services/authService'
 import Login from '@/views/auth/Login.vue'
 import home from '@/views/home.vue'
 
-import CategoriasView  from '@/views/CategoriasView.vue'
-import FromVenta       from '@/views/FromVenta.vue'
-import CompraView      from '@/views/CompraView.vue'
-import UsuariosView    from '@/views/UsuariosView.vue'
+import CategoriasView from '@/views/CategoriasView.vue'
+import FromVenta from '@/views/FromVenta.vue'
+import CompraView from '@/views/CompraView.vue'
+import UsuariosView from '@/views/UsuariosView.vue'
 import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
 import ProductosView from '@/views/productosView.vue'
 
@@ -30,13 +30,6 @@ const routes = [
     name: 'comprasRealizadas',
     component: ComprasRealizadasView,
   },
-
-   {
-    path: '/alertas',
-    name: 'alertas',
-    component: AlertsTable,
-  },
-
   {
     // Layout padre — todas las rutas protegidas van aquí
     path: '/admin',
@@ -57,6 +50,12 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
+        path: 'alertas',
+        name: 'alertas',
+        component: () => import('../components/Alertas/AlertsTable.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+      },
+      {
         path: 'inventario/categorias',
         name: 'categorias',
         component: CategoriasView,
@@ -74,20 +73,20 @@ const routes = [
         component: () => import('@/views/ProveedoresView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-       {
+      {
         path: 'Procesos/Historial-Ventas',
         name: 'HistorialVenta',
         component: () => import('@/views/HistorialVentaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-     
-       {
-        path: 'Gestion/POS',
+
+      {
+        path: 'gestion/POS',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-    
+
       //aqui va  lo de la caja
       {
         path: 'venta/venta',
@@ -101,16 +100,14 @@ const routes = [
         component: () => import('@/views/CajaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
-      
-     
-      
+
       {
         path: 'venta/movimientos-de-caja',
         name: 'movimientos-caja',
         component: () => import('@/views/MovimientosCajaView.vue'), // créala cuando la necesites
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
-    
+
       // ── ADMIN + CONTADOR ───────────────────────────────────────────────────
       {
         path: 'venta/compra',
@@ -134,29 +131,26 @@ const routes = [
   },
 ]
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-   
-  
     {
       path: '/Login',
-      name:'login',
-      component: Login
+      name: 'login',
+      component: Login,
     },
-    
+
     {
       path: '/ComprasRealizadas',
-      name:'comprasRealizadas',
-      component: ComprasRealizadasView
+      name: 'comprasRealizadas',
+      component: ComprasRealizadasView,
     },
-     {
+    {
       path: '/RegistroCompras',
-      name:'registroCompras',
-      component: RegistroComprasView
+      name: 'registroCompras',
+      component: RegistroComprasView,
     },
-   
+
     {
       path: '/admin',
       component: () => import('../views/home.vue'),
@@ -164,7 +158,7 @@ const router = createRouter({
         {
           path: 'inventario/productos',
           name: 'Producto',
-          component: () => import('../views/productosView.vue')
+          component: () => import('../views/productosView.vue'),
         },
         {
           path: 'venta/venta',
@@ -172,43 +166,62 @@ const router = createRouter({
           component: () => import('../views/FromVenta.vue'),
         },
         {
-             path: 'usuarios',
-             name: 'Usuarios',
-             component: () => import('../views/UsuariosView.vue'),
+          path: 'alertas',
+          name: 'alertas',
+          component: () => import('../components/Alertas/AlertsTable.vue'),
         },
-        {
-             path: 'inventario/proveedores',
-             name: 'proveedor',
-             component: () => import('../views/ProveedoresView.vue'),
-        }, 
-         {
-             path: 'inventario/Categorias',
-             name: 'categorias',
-             component: () => import('../views/CategoriasView.vue'),
-        }, 
-         {
-             path: 'Venta/Compra',
-             name: 'Compra',
-             component: () => import('../views/CompraView.vue'),
-        },
-        {
-            path: 'procesos/historial-ventas', 
-           name: 'HistorialVenta',
-           component: () => import('../views/HistorialVentaView.vue'),
-        }, 
-        {
-           path: 'procesos/clientes', 
-            name: 'Clientes',
-           component: () => import('../views/ClientesView.vue')
-
-        } ,
-        {
-           path: 'procesos/clientes/historial',
-             name: 'ClienteHistorial',
-           component: () => import('../components/Clientes/ClienteHistorialDialogo.vue')
-          },
         
-      ]
+        {
+          path: 'usuarios',
+          name: 'Usuarios',
+          component: () => import('../views/UsuariosView.vue'),
+        },
+        {
+          path: 'inventario/proveedores',
+          name: 'proveedor',
+          component: () => import('../views/ProveedoresView.vue'),
+        },
+        {
+          path: 'inventario/Categorias',
+          name: 'categorias',
+          component: () => import('../views/CategoriasView.vue'),
+        },
+        {
+          path: 'caja',
+          name: 'caja',
+          component: () => import('../views/CajaView.vue'),
+        },
+         {
+          path: 'venta/movimientos-de-caja',
+          name: 'movcaja',
+          component: () => import('../views/MovimientosCajaView.vue'),
+        },
+        {
+          path: 'Venta/Compra',
+          name: 'Compra',
+          component: () => import('../views/CompraView.vue'),
+        },
+        {
+          path: 'gestion/POS',
+          name: 'POS',
+          component: () => import('../views/FromVenta.vue'),
+        },
+        {
+          path: 'procesos/historial-ventas',
+          name: 'HistorialVenta',
+          component: () => import('../views/HistorialVentaView.vue'),
+        },
+        {
+          path: 'procesos/clientes',
+          name: 'Clientes',
+          component: () => import('../views/ClientesView.vue'),
+        },
+        {
+          path: 'procesos/clientes/historial',
+          name: 'ClienteHistorial',
+          component: () => import('../components/Clientes/ClienteHistorialDialogo.vue'),
+        },
+      ],
     },
   ],
 })
@@ -216,7 +229,7 @@ const router = createRouter({
 // ── Guard global ──────────────────────────────────────────────────────────────
 router.beforeEach((to) => {
   const isLoggedIn = authService.isAuthenticated()
-  const userRole   = authService.getUserRole()  // 'admin' | 'cajero' | 'contador' | null
+  const userRole = authService.getUserRole() // 'admin' | 'cajero' | 'contador' | null
 
   // 1. Ruta protegida sin sesión → login
   if (to.matched.some((r) => r.meta.requiresAuth) && !isLoggedIn) {
@@ -234,7 +247,6 @@ router.beforeEach((to) => {
   }
 
   return true
-  
 })
 
 export default router

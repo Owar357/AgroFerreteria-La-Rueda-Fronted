@@ -114,7 +114,7 @@ import { ref, onMounted } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
+import { Select } from 'primevue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -126,6 +126,8 @@ const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 
 const store = useProveedorStore()
 const { proveedores, cargando: loading, totalRecords: totalProveedores } = storeToRefs(store)
+
+const totalProveedores = ref(4)
 
 const estadoOptions = ref(['Activo', 'Inactivo'])
 
