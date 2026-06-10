@@ -14,6 +14,9 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+
 
 
 export default {
@@ -33,5 +36,7 @@ export default {
     app.component('InputText', InputText)
     app.component('Select', Select)
     app.component('DatePicker', DatePicker)
+    app.component('IconField', IconField)
+    app.component('InputIcon',InputIcon)
   },
 }

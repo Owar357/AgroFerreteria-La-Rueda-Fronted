@@ -15,10 +15,10 @@
             class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]" />
         </IconField>
 
-        <Dropdown v-model="filtros.estado.value" :options="opcionesEstado" showClear placeholder="Todos los estados"
+        <Select v-model="filtros.estado.value" :options="opcionesEstado" showClear placeholder="Todos los estados"
           class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2" />
 
-        <Dropdown v-model="filtros.tipoPago.value" :options="opcionesPago" showClear placeholder="Tipo de pago"
+        <Select v-model="filtros.tipoPago.value" :options="opcionesPago" showClear placeholder="Tipo de pago"
           class="w-48 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2" />
 
         <DatePicker v-model="rangoDeFechas" selectionMode="range" placeholder="Filtrar por fecha" dateFormat="dd/mm/yy"
@@ -91,14 +91,9 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch } from 'vue'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
+import { ref, computed, reactive } from 'vue'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
+
 
 
 // Props
