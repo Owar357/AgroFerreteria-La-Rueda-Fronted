@@ -1,72 +1,99 @@
 <template>
   <div>
+<<<<<<< HEAD
     <!-- Tabla -->
     <HistorialVentaTable :sales="sales" @view-detail="openDetail" @void-sale="confirmVoid" />
 
     <!-- Modal detalle -->
     <DetallVentaDialogo v-model:visible="showDetail" :sale="selectedSale" />
+=======
+    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
+
+    <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
+>>>>>>> 3bde7be56338bc89d959c4445071d0099a5aa97e
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Swal from 'sweetalert2'
 import HistorialVentaTable from '../components/Usuarios/HistorialVentaTable.vue'
 import DetallVentaDialogo from '@/components/Usuarios/DetallVentaDialogo.vue'
+import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
 
-// ── Estado del modal
-const showDetail = ref(false)
-const selectedSale = ref(null)
+const mostrarDetalle = ref(false)
+const ventaSeleccionada = ref(null)
+const ventas = ref([])
+const cargando = ref(false)
 
-// ── Datos centralizados en el padre
-const sales = ref([
-  {
-    id: 1,
-    soldBy: 'Daniel Melgar',
-    Numberfact: 'FAC-001-2025',
-    paymentType: 'Efectivo',
-    status: 'Procesado',
-    date: '10/02/2025',
-    total: 90.5,
-    items: [
-      { product: 'Fertilizante  ', cantidad: 1, unidad: 'libra', price: 85.0 },
-      { product: ' Semillas', cantidad: 1, unidad: 'libra', price: 5.5 },
-    ],
-  },
-  {
-    id: 2,
-    soldBy: 'Maria Lopez',
-    Numberfact: 'FAC-002-2025',
-    paymentType: 'Transferencia',
-    status: 'Procesado',
-    date: '11/02/2025',
-    total: 68.0,
-    items: [
-      { product: 'Herbicida Roundup ', cantidad: 1, unidad: 'libra', price: 48.0 },
-      { product: 'conecntrado ', cantidad: 1, unidad: 'libra', price: 20.0 },
-    ],
-  },
-  {
-    id: 3,
-    soldBy: 'Carlos Ruiz',
-    Numberfact: 'FAC-003-2025',
-    paymentType: 'Tarjeta',
-    status: 'Anulado',
-    date: '12/02/2025',
-    total: 26.15,
-    items: [{ product: 'Semillas de maíz híbrido', cantidad: 5, unidad: 'libra', price: 26.15 }],
-  },
-])
-
-// ── Abrir detalle
-const openDetail = (sale) => {
-  selectedSale.value = sale
-  showDetail.value = true
+const cargarVentas = async () => {
+  cargando.value = true
+  try {
+    const response = await getVentas()
+    const data = response.data.data || response.data || []
+    ventas.value = data.map(v => ({
+      id: v.id,
+      vendidoPor: v.vendido_por.name,
+      numeroFactura: v.numero_factura,
+      tipoPago: v.tipo_pago,
+      estado: v.estado,
+      fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      }),
+      total: v.total,
+    }))
+  } catch (error) {
+    console.error(error)
+    Swal.fire({
+      toast: true, position: 'top-end', icon: 'error',
+      title: 'Error al cargar el historial',
+      showConfirmButton: false, timer: 2000
+    })
+  } finally {
+    cargando.value = false
+  }
 }
 
-// ── Anular venta con SweetAlert2
-const confirmVoid = (sale) => {
-  if (sale.status === 'Anulado') return
+const abrirDetalle = async (venta) => {
+  try {
+
+    const response = await getDetallesVenta(venta.id)
+    const detalles = response.data.data || response.data
+
+    ventaSeleccionada.value = {
+      // Datos de la venta (cabecera)
+      vendidoPor: venta.vendidoPor,              // o venta.vendidoPor
+      numeroFactura: venta.numeroFactura,
+      fechaEmision: venta.fecha,
+      tipoPago: venta.tipoPago,
+      estado: venta.estado,
+      total: venta.total,
+      // Productos (items)
+      items: detalles.map(d => ({
+        nombreProducto: d.nombre_producto,
+        cantidad: parseFloat(d.cantidad),
+        precio: parseFloat(d.precio_unitario),
+        unidad: d.presentacion || d.unidad_medida,
+        subtotal: parseFloat(d.subtotal) || (parseFloat(d.cantidad) * parseFloat(d.precio_unitario))
+      }))
+
+    }
+    mostrarDetalle.value = true
+
+
+
+  } catch (error) {
+    console.error(error)
+    Swal.fire({
+      toast: true, position: 'top-end', icon: 'error',
+      title: 'Error al cargar el detalle',
+      showConfirmButton: false, timer: 2000
+    })
+  }
+}
+
+const confirmarAnulacion = (venta) => {       // ← llave que cerraba antes de tiempo, fix
+  if (venta.estado === 'ANULADA') return
 
   Swal.fire({
     title: '¿Anular esta venta?',
@@ -74,9 +101,9 @@ const confirmVoid = (sale) => {
       <div style="text-align:left;font-size:14px;color:#374151">
         <p style="margin:0 0 8px 0">Esta acción <strong>no se puede deshacer</strong>.</p>
         <div style="background:#f9fafb;border:1px solid #e2e8dd;border-radius:8px;padding:12px;margin-top:8px">
-          <p style="margin:0 0 4px 0"><strong>Factura:</strong> ${sale.invoiceNumber}</p>
-          <p style="margin:0 0 4px 0"><strong>Vendido por:</strong> ${sale.soldBy}</p>
-          <p style="margin:0"><strong>Total:</strong> $${formatCurrency(sale.total)}</p>
+          <p style="margin:0 0 4px 0"><strong>Factura:</strong> ${venta.numeroFactura}</p>
+          <p style="margin:0 0 4px 0"><strong>Vendido por:</strong> ${venta.vendidoPor}</p>
+          <p style="margin:0"><strong>Total:</strong> $${formatearMoneda(venta.total)}</p>
         </div>
       </div>`,
     icon: 'warning',
@@ -86,29 +113,24 @@ const confirmVoid = (sale) => {
     confirmButtonColor: '#b91c1c',
     cancelButtonColor: '#6b7280',
     reverseButtons: true,
-    customClass: { popup: 'swal-custom-popup', title: 'swal-custom-title' },
   }).then((result) => {
     if (!result.isConfirmed) return
 
-    const idx = sales.value.findIndex((s) => s.id === sale.id)
-    if (idx !== -1) sales.value[idx].status = 'Anulado'
+    const idx = ventas.value.findIndex(v => v.id === venta.id)
+    if (idx !== -1) ventas.value[idx].estado = 'ANULADA'
 
     Swal.fire({
-      title: '¡Venta anulada!',
-      text: `La factura ${sale.invoiceNumber} fue anulada exitosamente.`,
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
+      title: '¡Venta anulada!', icon: 'success',
+      text: `La factura ${venta.numeroFactura} fue anulada.`,
+      confirmButtonColor: '#2b5e3b', timer: 3000, timerProgressBar: true
     })
   })
 }
 
-const formatCurrency = (v) =>
-  Number(v)
-    .toFixed(2)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+onMounted(() => cargarVentas())
+
+const formatearMoneda = (valor) =>
+  Number(valor).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 </script>
 
 <style>
