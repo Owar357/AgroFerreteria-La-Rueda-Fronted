@@ -13,6 +13,8 @@ import { AutoComplete } from 'primevue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import DatePicker from 'primevue/datepicker'
+
 
 export default {
   install: (app) => {
@@ -30,5 +32,6 @@ export default {
     app.component('Dialog', Dialog)
     app.component('InputText', InputText)
     app.component('Select', Select)
+    app.component('DatePicker', DatePicker)
   },
 }

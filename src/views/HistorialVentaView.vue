@@ -1,6 +1,7 @@
 <template>
   <div>
-    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
+    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion"
+      @filtrar-fechas="aplicarFiltroFechas" />
 
     <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
   </div>
@@ -17,6 +18,33 @@ const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
+
+
+
+
+
+const aplicarFiltroFechas = async (fechas) => {
+  cargando.value = true
+  try {
+    const response = await getVentas(fechas || {})
+    const data = response.data.data || []
+    ventas.value = data.map(v => ({
+      id: v.id,
+      vendidoPor: v.vendido_por.name,
+      numeroFactura: v.numero_factura,
+      tipoPago: v.tipo_pago,
+      estado: v.estado,
+      fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      }),
+      total: v.total,
+    }))
+  } catch {
+    ventas.value = []
+  } finally {
+    cargando.value = false
+  }
+}
 
 const cargarVentas = async () => {
   cargando.value = true
