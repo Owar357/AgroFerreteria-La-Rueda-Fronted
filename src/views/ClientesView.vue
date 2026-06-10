@@ -9,6 +9,7 @@
       v-model:visible="detailVisible"
       :client="selectedClient"
     />
+    
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import { useRouter } from 'vue-router'
 
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
 import ClienteDetalleDialogo from '@/components/Clientes/ClienteDetalleDialogo.vue'
+
 
 const router = useRouter()
 

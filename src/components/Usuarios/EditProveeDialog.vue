@@ -102,52 +102,59 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-  proveedor: {
-    type: Object,
-    default: null,
-  }
+  modelValue: { type: Boolean, default: false },
+  proveedor:  { type: Object, default: null },
 })
 
 const emit = defineEmits(['update:modelValue', 'actualizar'])
 
-// visibilidad del Dialog
 const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
 
-// Formulario limpio
 const form = reactive({
-  id: null,
-  nombre: '',
-  correo: '',
-  telefono: '',
+  id:           null,
+  nombre:       '',
+  correo:       '',
+  telefono:     '',
+  direccion:    '',
+  tipo_persona: '',
+  nit:          '',
+  nrc:          '',
+  dui:          null,
+  activo:       true,
 })
 
-//  inputs originales
 const inputPt = {
-  root: { 
-    class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] transition-all font-inter' 
-  }
+  root: {
+    class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] transition-all font-inter',
+  },
 }
 
-// cargar los datos del proveedor 
+// Carga TODOS los campos al abrir el modal
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.proveedor) {
-    form.id = props.proveedor.id || null
-    form.nombre = props.proveedor.nombre || ''
-    form.correo = props.proveedor.correo || ''
-    form.telefono = props.proveedor.telefono || ''
+    const p = props.proveedor
+    form.id           = p.id           ?? null
+    form.nombre       = p.nombre       ?? ''
+    form.correo       = p.correo       ?? ''
+    form.telefono     = p.telefono     ?? ''
+    form.direccion    = p.direccion    ?? ''
+    form.tipo_persona = p.tipo_persona ?? ''
+    form.nit          = p.nit          ?? ''
+    form.nrc          = p.nrc          ?? ''
+    form.dui          = p.dui          ?? null
+    form.activo       = p.activo       ?? true
   }
 })
 
-// Emite los datos limpios al componente padre
 function guardar() {
+  console.log('emitiendo actualizar:', { ...form })
   emit('actualizar', { ...form })
   visible.value = false
 }
+
+  
+
 </script>
