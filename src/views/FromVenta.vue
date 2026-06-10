@@ -7,21 +7,24 @@
       style="background-color: #ffffff; border: 1px solid #e2e8dd; display: grid; grid-template-columns: 1fr 1px 1fr;">
 
       <!-- COLUMNA IZQUIERDA -->
-      <div class="flex flex-col overflow-hidden" style="padding: 20px;">
-
+      <div class="flex flex-col overflow-hidden" style="padding: 20px">
         <!-- Header izquierdo -->
-        <div class="flex items-center justify-between mb-4 pb-4" style="border-bottom: 1px solid #e2e8dd;">
+        <div
+          class="flex items-center justify-between mb-4 pb-4"
+          style="border-bottom: 1px solid #e2e8dd"
+        >
           <div class="flex items-center gap-3">
-            <i class="pi pi-shopping-cart" style="color: #e0b354; font-size: 20px;"></i>
+            <i class="pi pi-shopping-cart" style="color: #e0b354; font-size: 20px"></i>
             <div>
-              <span style="font-size: 18px; font-weight: 600; color: #1a2e1f; display: block;">Punto de Venta</span>
-              <span style="font-size: 12px; color: #6b7280;">{{ fechaActual }}</span>
+              <span style="font-size: 18px; font-weight: 600; color: #1a2e1f; display: block"
+                >Punto de Venta</span
+              >
+              <span style="font-size: 12px; color: #6b7280">{{ fechaActual }}</span>
             </div>
           </div>
         </div>
 
         <div class="flex flex-col gap-4 flex-1 overflow-y-auto">
-
           <!-- Tipo de factura -->
           <div class="flex flex-col gap-1.5">
             <label style="font-size: 13px; font-weight: 500; color: #4b5563;">Tipo de factura</label>
@@ -86,24 +89,21 @@
               </Column>
             </DataTable>
           </div>
-
         </div>
       </div>
 
       <!-- LÍNEA DIVISORIA -->
-      <div style="background-color: #e2e8dd;"></div>
+      <div style="background-color: #e2e8dd"></div>
 
       <!-- COLUMNA DERECHA -->
-      <div class="flex flex-col overflow-hidden" style="padding: 20px;">
-
+      <div class="flex flex-col overflow-hidden" style="padding: 20px">
         <!-- Header derecho -->
-        <div class="flex items-center gap-3 mb-4 pb-4" style="border-bottom: 1px solid #e2e8dd;">
-          <i class="pi pi-credit-card" style="color: #e0b354; font-size: 20px;"></i>
-          <span style="font-size: 18px; font-weight: 600; color: #1a2e1f;">Cobro y Pago</span>
+        <div class="flex items-center gap-3 mb-4 pb-4" style="border-bottom: 1px solid #e2e8dd">
+          <i class="pi pi-credit-card" style="color: #e0b354; font-size: 20px"></i>
+          <span style="font-size: 18px; font-weight: 600; color: #1a2e1f">Cobro y Pago</span>
         </div>
 
         <div class="flex flex-col gap-4 flex-1">
-
           <!-- Cliente -->
           <div class="flex gap-2 items-center">
             <InputText v-model="busquedaCliente" placeholder="DUI, NRC u otro número..."
@@ -142,7 +142,9 @@
 
           <!-- Efectivo recibido -->
           <div v-if="tipoPago === 'efectivo'" class="flex flex-col gap-1.5">
-            <label style="font-size: 13px; font-weight: 500; color: #4b5563;">Efectivo entregado</label>
+            <label style="font-size: 13px; font-weight: 500; color: #4b5563"
+              >Efectivo entregado</label
+            >
             <div class="flex justify-between items-center gap-4">
               <div class="flex items-center gap-2 flex-1">
                 <span style="font-size: 13px; color: #4b5563; white-space: nowrap;">Recibido</span>
@@ -150,23 +152,49 @@
                   :maxFractionDigits="2" inputStyle="font-size: 13px; padding: 8px 12px; width: 120px;" />
               </div>
               <div class="flex items-center gap-2">
-                <span style="font-size: 13px; color: #4b5563;">Cambio:</span>
-                <span style="font-size: 15px; font-weight: 700; color: #2b5e3b;">${{ cambio.toFixed(2) }}</span>
+                <span style="font-size: 13px; color: #4b5563">Cambio:</span>
+                <span style="font-size: 15px; font-weight: 700; color: #2b5e3b"
+                  >${{ cambio.toFixed(2) }}</span
+                >
               </div>
             </div>
           </div>
 
           <!-- Botones al fondo -->
           <div class="flex flex-col gap-2 mt-auto">
-            <Button label="Registrar venta" icon="pi pi-check" @click="registrarVenta"
-              style="background-color: #2b5e3b; border: 1px solid #2b5e3b; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 600; padding: 12px 24px; width: 100%;" />
-            <Button label="Anular venta" icon="pi pi-times" @click="anularVenta"
-              style="background-color: #eef2e9; border: 1px solid #e2e8dd; border-radius: 10px; color: #1a2e1f; font-size: 14px; font-weight: 600; padding: 12px 24px; width: 100%;" />
+            <Button
+              label="Registrar venta"
+              icon="pi pi-check"
+              @click="registrarVenta"
+              style="
+                background-color: #2b5e3b;
+                border: 1px solid #2b5e3b;
+                border-radius: 10px;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 600;
+                padding: 12px 24px;
+                width: 100%;
+              "
+            />
+            <Button
+              label="Anular venta"
+              icon="pi pi-times"
+              @click="anularVenta"
+              style="
+                background-color: #eef2e9;
+                border: 1px solid #e2e8dd;
+                border-radius: 10px;
+                color: #1a2e1f;
+                font-size: 14px;
+                font-weight: 600;
+                padding: 12px 24px;
+                width: 100%;
+              "
+            />
           </div>
-
         </div>
       </div>
-
     </div>
   </div>
 
@@ -184,7 +212,11 @@ import Swal from 'sweetalert2'
 
 
 
-const fechaActual = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
+const fechaActual = new Date().toLocaleDateString('es-ES', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+})
 
 const tipoFactura = ref('01')
 const presentacionSeleccionada = ref('')

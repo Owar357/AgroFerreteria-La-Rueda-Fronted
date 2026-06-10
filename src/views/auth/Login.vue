@@ -94,7 +94,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import authService from '@/services/authService'
 
-// Componentes de PrimeVue con rutas individuales correctas
+
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'

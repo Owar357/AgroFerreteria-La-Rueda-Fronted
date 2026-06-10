@@ -1,4 +1,3 @@
-import { data } from "autoprefixer";
 import {api} from "./authService";
 
 export const buscarProductos = (q) => 
@@ -17,3 +16,11 @@ export const crearCliente = (data) => {
 export const registerVenta = (data) => {
     return api.post('/ventas', data)
 }
+
+export const getVentas = (params = {} ) => {
+    return api.get('/ventas', {params})
+}
+
+export const getDetallesVenta = (id) => {
+    return api.get (`/ventas/${id}`);
+} 

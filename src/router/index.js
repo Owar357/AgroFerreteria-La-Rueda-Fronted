@@ -1,70 +1,60 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import authService from '@/services/authService'
+import authService from '@/services/authService.js'
 
+// 1. Vistas principales (Carga directa)
 import Login from '@/views/auth/Login.vue'
-import home from '@/views/home.vue'
-
-import CategoriasView from '@/views/CategoriasView.vue'
-import FromVenta from '@/views/FromVenta.vue'
-import CompraView from '@/views/CompraView.vue'
-import UsuariosView from '@/views/UsuariosView.vue'
-import ComprasRealizadasView from '@/views/ComprasRealizadasView.vue'
-import ProductosView from '@/views/productosView.vue'
-
-import { all } from 'axios'
-import RegistroComprasView from '@/views/RegistroComprasView.vue'
-import AlertsTable from '@/components/Alertas/AlertsTable.vue'
+import HomeLayout from '@/views/home.vue'
 
 const routes = [
+  // Redirección inicial
   {
     path: '/',
     redirect: '/login',
   },
+  
+  // Login
   {
     path: '/login',
     name: 'login',
     component: Login,
+    meta: { requiresAuth: false }
   },
+
+  // Layout Padre protegido ('/admin')
   {
-    path: '/compras-Realizadas',
-    name: 'comprasRealizadas',
-    component: ComprasRealizadasView,
-  },
-  {
-    // Layout padre — todas las rutas protegidas van aquí
     path: '/admin',
-    component: home,
+    component: HomeLayout,
     meta: { requiresAuth: true },
     children: [
+      // Redirección por defecto al entrar a /admin
       {
-        // Redirige al home correcto según el rol al entrar a /admin
         path: '',
-        redirect: () => authService.getHomeRoute(),
+        redirect: { name: 'usuarios' },
       },
 
-      // ── ADMIN ──────────────────────────────────────────────────────────────
+      // --- EXCLUSIVOS ADMIN ---
       {
         path: 'usuarios',
         name: 'usuarios',
-        component: UsuariosView,
+        component: () => import('@/views/UsuariosView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
         path: 'alertas',
         name: 'alertas',
-        component: () => import('../components/Alertas/AlertsTable.vue'),
+        component: () => import('@/components/Alertas/AlertsTable.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
         path: 'inventario/categorias',
         name: 'categorias',
-        component: CategoriasView,
+        component: () => import('@/views/CategoriasView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
         path: 'inventario/productos',
         name: 'productos',
-        component: ProductosView,
+        component: () => import('@/views/productosView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
@@ -74,24 +64,23 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
       {
-        path: 'Procesos/Historial-Ventas',
+        path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
         component: () => import('@/views/HistorialVentaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
-
       {
-        path: 'gestion/POS',
+        path: 'gestion/pos',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
 
-      //aqui va  lo de la caja
+      // --- ADMIN Y CAJERO ---
       {
         path: 'venta/venta',
         name: 'venta',
-        component: FromVenta,
+        component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
       {
@@ -100,31 +89,56 @@ const routes = [
         component: () => import('@/views/CajaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
-
       {
         path: 'venta/movimientos-de-caja',
         name: 'movimientos-caja',
-        component: () => import('@/views/MovimientosCajaView.vue'), // créala cuando la necesites
+        component: () => import('@/views/MovimientosCajaView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
       },
 
-      // ── ADMIN + CONTADOR ───────────────────────────────────────────────────
+      // --- ADMIN Y CONTADOR ---
       {
         path: 'venta/compra',
         name: 'compra',
-        component: CompraView,
+        component: () => import('@/views/CompraView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+      },
+      {
+        path: 'compras-realizadas',
+        name: 'comprasRealizadas',
+        component: () => import('@/views/ComprasRealizadasView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+      },
+      {
+        path: 'registro-compras',
+        name: 'registroCompras',
+        component: () => import('@/views/RegistroComprasView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
       },
       {
         path: 'reportes',
         name: 'reportes',
-        component: ComprasRealizadasView,
+        component: () => import('@/views/ComprasRealizadasView.vue'), 
         meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
       },
-    ],
+
+      // --- TODOS LOS ROLES (ADMIN, CAJERO, CONTADOR) ---
+      {
+        path: 'procesos/clientes',
+        name: 'Clientes',
+        component: () => import('@/views/ClientesView.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
+      },
+      {
+        path: 'procesos/clientes/historial',
+        name: 'ClientesHistorial',
+        component: () => import('@/components/Clientes/ClienteHistorialDialogo.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
+      }
+    ]
   },
 
-  // Captura cualquier ruta no encontrada
+  // Captura cualquier ruta no encontrada  y manda al Login
   {
     path: '/:pathMatch(.*)*',
     redirect: '/login',
@@ -133,120 +147,33 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/Login',
-      name: 'login',
-      component: Login,
-    },
-
-    {
-      path: '/ComprasRealizadas',
-      name: 'comprasRealizadas',
-      component: ComprasRealizadasView,
-    },
-    {
-      path: '/RegistroCompras',
-      name: 'registroCompras',
-      component: RegistroComprasView,
-    },
-
-    {
-      path: '/admin',
-      component: () => import('../views/home.vue'),
-      children: [
-        {
-          path: 'inventario/productos',
-          name: 'Producto',
-          component: () => import('../views/productosView.vue'),
-        },
-        {
-          path: 'venta/venta',
-          name: 'Venta',
-          component: () => import('../views/FromVenta.vue'),
-        },
-        {
-          path: 'alertas',
-          name: 'alertas',
-          component: () => import('../components/Alertas/AlertsTable.vue'),
-        },
-        
-        {
-          path: 'usuarios',
-          name: 'Usuarios',
-          component: () => import('../views/UsuariosView.vue'),
-        },
-        {
-          path: 'inventario/proveedores',
-          name: 'proveedor',
-          component: () => import('../views/ProveedoresView.vue'),
-        },
-        {
-          path: 'inventario/Categorias',
-          name: 'categorias',
-          component: () => import('../views/CategoriasView.vue'),
-        },
-        {
-          path: 'caja',
-          name: 'caja',
-          component: () => import('../views/CajaView.vue'),
-        },
-         {
-          path: 'venta/movimientos-de-caja',
-          name: 'movcaja',
-          component: () => import('../views/MovimientosCajaView.vue'),
-        },
-        {
-          path: 'Venta/Compra',
-          name: 'Compra',
-          component: () => import('../views/CompraView.vue'),
-        },
-        {
-          path: 'gestion/POS',
-          name: 'POS',
-          component: () => import('../views/FromVenta.vue'),
-        },
-        {
-          path: 'procesos/historial-ventas',
-          name: 'HistorialVenta',
-          component: () => import('../views/HistorialVentaView.vue'),
-        },
-        {
-          path: 'procesos/clientes',
-          name: 'Clientes',
-          component: () => import('../views/ClientesView.vue'),
-        },
-        {
-          path: 'procesos/clientes/historial',
-          name: 'ClienteHistorial',
-          component: () => import('../components/Clientes/ClienteHistorialDialogo.vue'),
-        },
-      ],
-    },
-  ],
+  routes // Aquí se  inyecta el array 
 })
 
-// ── Guard global ──────────────────────────────────────────────────────────────
-router.beforeEach((to) => {
+
+router.beforeEach((to, from, next) => {
   const isLoggedIn = authService.isAuthenticated()
-  const userRole = authService.getUserRole() // 'admin' | 'cajero' | 'contador' | null
+  const userRole = authService.getUserRole()
 
-  // 1. Ruta protegida sin sesión → login
+  //aqui se hace que requiere autenticacion si no esta logueado
   if (to.matched.some((r) => r.meta.requiresAuth) && !isLoggedIn) {
-    return { name: 'login' }
+    return next({ name: 'login' })
   }
 
-  // 2. Ya logueado intenta ir al login → su home
+  // y aqui su  está logueado e intenta ir al login
   if (to.name === 'login' && isLoggedIn) {
-    return authService.getHomeRoute()
+    const homeRoute = authService.getHomeRoute()
+    return next(homeRoute)
   }
 
-  // 3. Rol no permitido → su home (no al login para no perder sesión)
+  //  Control de Roles (Si la ruta tiene roles asignados y el usuario no lo incluye)
   if (isLoggedIn && to.meta.allowedRoles && !to.meta.allowedRoles.includes(userRole)) {
-    return authService.getHomeRoute()
+    const homeRoute = authService.getHomeRoute()
+    return next(homeRoute) // aqui lo manda  ala seccion permitidad
   }
 
-  return true
+  // Si todo todo lo anerior esta bien sigue
+  next()
 })
 
 export default router
