@@ -22,6 +22,7 @@ import StepPanels from 'primevue/steppanels'
 import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
 import RadioButton from 'primevue/radiobutton'
+import Checkbox from 'primevue/checkbox'
 
 export default {
   install: (app) => {
@@ -48,5 +49,6 @@ export default {
     app.component('Step', Step)
     app.component('StepPanel', StepPanel)
     app.component('RadioButton', RadioButton)
+    app.component('Checkbox', Checkbox)
   },
 }
