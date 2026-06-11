@@ -189,6 +189,8 @@
 
 <script setup>
 import { buscarProductoCompra } from '@/services/compraService'
+import { proveedores } from '@/services/proveedorService'
+
 import { ref, reactive } from 'vue'
 
 
