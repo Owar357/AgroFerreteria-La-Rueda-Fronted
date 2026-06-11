@@ -9,6 +9,7 @@
       v-model:visible="detailVisible"
       :client="selectedClient"
     />
+    
   </div>
 </template>
 
@@ -19,21 +20,24 @@ import { useRouter } from 'vue-router'
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
 import ClienteDetalleDialogo from '@/components/Clientes/ClienteDetalleDialogo.vue'
 
+
+
 const router = useRouter()
 
 const detailVisible  = ref(false)
 const selectedClient = ref(null)
 
-const onViewDetail = (client) => {
-  selectedClient.value = client
-  detailVisible.value  = true
+const onViewHistory = (cliente) => {
+  router.push({
+    name:   'ClienteHistorial',        
+    params: { id: cliente.id },
+    query:  { nombre: cliente.nombre, doc: cliente.numero_documento }
+  })
 }
 
-const onViewHistory = (client) => {
-  router.push({
-    name: 'ClienteHistorial',
-    params: { id: client.documentNumber },
-    query:  { name: client.name, doc: client.documentNumber }
-  })
+
+const onViewDetail = (cliente) => {
+  selectedClient.value = cliente
+  detailVisible.value  = true
 }
 </script>

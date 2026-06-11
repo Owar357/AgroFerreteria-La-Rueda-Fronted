@@ -75,6 +75,8 @@ const routes = [
         component: () => import('@/views/FromVenta.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin'] },
       },
+      
+ 
 
       // --- ADMIN Y CAJERO ---
       {
@@ -129,12 +131,13 @@ const routes = [
         component: () => import('@/views/ClientesView.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
       },
-      {
-        path: 'procesos/clientes/historial',
-        name: 'ClientesHistorial',
+      
+       {
+       path: 'procesos/clientes/:id/historial',  
+        name: 'ClienteHistorial',               
         component: () => import('@/components/Clientes/ClienteHistorialDialogo.vue'),
         meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
-      }
+       }
     ]
   },
 
