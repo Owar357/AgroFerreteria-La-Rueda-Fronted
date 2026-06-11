@@ -4,6 +4,7 @@
       @filtrar-fechas="aplicarFiltroFechas" />
 
     <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
+
   </div>
 </template>
 
@@ -158,7 +159,6 @@ const formatearMoneda = (valor) =>
   border-radius: 16px !important;
   font-family: 'Inter', sans-serif !important;
 }
-
 .swal-custom-title {
   font-size: 18px !important;
   color: #1a2e1f !important;

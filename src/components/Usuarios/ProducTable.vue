@@ -3,7 +3,6 @@
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
         <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de Productos</h1>
-
         <Button
           label="+ Agregar"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
@@ -16,42 +15,70 @@
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
             v-model="filters['global'].value"
-            placeholder="Buscar por nombre..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] focus:ring-1 focus:ring-[#2b5e3b]"
+            placeholder="Buscar por nombre, código..."
+            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
           />
         </IconField>
 
         <Select
-          v-model="filters['categoria'].value"
+          v-model="filtroCategoria"
           :options="uniqueCategories"
           showClear
           placeholder="Todas las categorías"
-          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]"
+          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2"
         />
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
-        :value="products"
-        v-model:filters="filters"
-        :globalFilterFields="['name', 'fabricante', 'codigo']"
-        responsiveLayout="scroll"
+        :value="productosFiltrados"
+        :loading="store.cargando"
+        lazy
         :paginator="true"
-        :rows="5"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+        :rows="store.perPage"
+        :totalRecords="store.totalRecords"
+        v-model:filters="filters"
+        :globalFilterFields="['nombre', 'fabricante', 'codigo']"
+        responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+        @page="onPageChange"
       >
-        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-        <Column field="categoria" header="Categoría" class="text-[#4b5563]" />
-        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
+        <template #empty>
+          <div class="text-center py-6 text-[#6b7280] text-[14px]">
+            No hay productos registrados.
+          </div>
+        </template>
+
+        <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
         <Column field="codigo" header="Código" class="text-[#6b7280]" />
+
+        <Column header="Categoría" class="text-[#4b5563]">
+          <template #body="slotProps">
+            {{ slotProps.data.categoria?.nombre ?? '—' }}
+          </template>
+        </Column>
+
+        <Column header="Tipo" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <span
+              :class="[
+                'px-2 py-1 rounded text-[12px] font-semibold uppercase',
+                slotProps.data.tipo_producto === 'GRANEL'
+                  ? 'bg-[#fef9c3] text-[#854d0e]'
+                  : 'bg-[#dff0e0] text-[#2b5e3b]',
+              ]"
+            >
+              {{ slotProps.data.tipo_producto }}
+            </span>
+          </template>
+        </Column>
 
         <Column header="Acciones" class="w-[200px]">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <!-- Editar -->
               <Button
                 icon="pi pi-pencil"
                 label="Editar"
@@ -62,7 +89,6 @@
                 v-tooltip="'Editar producto'"
                 @click="handleEdit(slotProps.data)"
               />
-              <!-- Ver Detalles -->
               <Button
                 icon="pi pi-eye"
                 label="Ver"
@@ -82,84 +108,52 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import { Select } from 'primevue'
+import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { FilterMatchMode } from '@primevue/core/api'
+import { useproductoStore } from '@/stores/productoStore'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
+const store = useproductoStore()
 
-const products = ref([
-  {
-    id: 1,
-    name: 'Maíz Híbrido',
-    categoria: 'Semilla',
-    fabricante: 'Agrosem',
-    codigo: 'PRN-908-789',
-  },
-  {
-    id: 2,
-    name: 'Fertilizante 20-20-20',
-    categoria: 'Fertilizante',
-    fabricante: 'NutriGreen',
-    codigo: 'FER-234-567',
-  },
-  {
-    id: 3,
-    name: 'Herbicida Total',
-    categoria: 'Herbicida',
-    fabricante: 'CropCare',
-    codigo: 'HER-876-543',
-  },
-  {
-    id: 4,
-    name: 'Maíz Tolerant',
-    categoria: 'Semilla',
-    fabricante: 'Biosem',
-    codigo: 'PRN-345-123',
-  },
-  {
-    id: 5,
-    name: 'Fungicida Protector',
-    categoria: 'Fungicida',
-    fabricante: 'AgroProtect',
-    codigo: 'FUN-654-321',
-  },
-  {
-    id: 6,
-    name: 'Insecticida Natural',
-    categoria: 'Insecticida',
-    fabricante: 'BioProtect',
-    codigo: 'INS-123-456',
-  },
-  {
-    id: 7,
-    name: 'Insecticida Natural',
-    categoria: 'Insecticida',
-    fabricante: 'BioProtect',
-    codigo: 'INS-123-457',
-  },
-  {
-    id: 8,
-    name: 'Insecticida Natural',
-    categoria: 'Insecticida',
-    fabricante: 'BioProtect',
-    codigo: 'INS-123-458',
-  },
-])
+onMounted(() => store.cargarProductos())
 
-const uniqueCategories = computed(() => {
-  return [...new Set(products.value.map((p) => p.categoria))].sort()
-})
+const filtroCategoria = ref(null)
 
 const filters = ref({
-  global: { value: null, matchMode: 'contains' },
-  categoria: { value: null, matchMode: 'equals' },
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
+
+// Categorías únicas de la página actual
+const uniqueCategories = computed(() => {
+  return [...new Set(store.productos.map((p) => p.categoria?.nombre).filter(Boolean))].sort()
+})
+
+// Filtro local sobre la página actual
+const productosFiltrados = computed(() => {
+  return store.productos.filter((p) => {
+    const coincideBusqueda =
+      !filters.value.global.value ||
+      p.nombre?.toLowerCase().includes(filters.value.global.value.toLowerCase()) ||
+      p.codigo?.toLowerCase().includes(filters.value.global.value.toLowerCase()) ||
+      p.fabricante?.toLowerCase().includes(filters.value.global.value.toLowerCase())
+
+    const coincideCategoria =
+      !filtroCategoria.value || p.categoria?.nombre === filtroCategoria.value
+
+    return coincideBusqueda && coincideCategoria
+  })
+})
+
+const onPageChange = (event) => {
+  store.cargarProductos(event.page + 1, event.rows)
+}
 
 const handleEdit = (product) => emit('open-edit', product)
 const handleDetail = (product) => emit('open-detail', product)
@@ -176,42 +170,16 @@ const handleDetail = (product) => emit('open-detail', product)
   letter-spacing: 0.05em;
   padding: 1.25rem 1rem;
 }
-
 .p-datatable-custom .p-datatable-tbody > tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
   border-bottom: 1px solid #e2e8dd !important;
 }
-
 .p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f7f2 !important;
 }
-
-.p-inputtext:enabled:focus,
-.p-dropdown:not(.p-disabled).p-focus {
+.p-inputtext:enabled:focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
-}
-
-.p-dropdown {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-}
-
-.p-dropdown-label {
-  color: #1a2e1f !important;
-}
-
-.p-dropdown-overlay {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-}
-
-.p-dropdown-item {
-  color: #1a2e1f !important;
-}
-
-.p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
-  background-color: #eef2e9 !important;
 }
 </style>

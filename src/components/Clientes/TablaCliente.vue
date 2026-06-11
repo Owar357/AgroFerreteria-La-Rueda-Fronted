@@ -11,14 +11,14 @@
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
             v-model="filters['global'].value"
-            placeholder="Buscar por nombre o N° DUI..."
+            placeholder="Buscar por nombre o N° documento..."
             class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
           />
         </IconField>
 
         <Dropdown
-          v-model="filters['personType'].value"
-          :options="personTypeOptions"
+          v-model="filters['tipo_persona'].value"
+          :options="tipoPersonaOpciones"
           showClear
           placeholder="Tipo de persona"
           class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2"
@@ -28,47 +28,48 @@
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
-        :value="clients"
+        :value="clientes"
+        :loading="cargando"
         v-model:filters="filters"
-        :globalFilterFields="['name', 'documentNumber']"
+        :globalFilterFields="['nombre', 'numero_documento']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
         :paginator="true"
-        :rows="5"
+        :rows="porPagina"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} clientes"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
       >
-        <Column field="personType" header="Tipo de persona">
+        <Column field="tipo_persona" header="Tipo de persona">
           <template #body="{ data }">
             <span
-              :class="data.personType === 'Natural'
+              :class="data.tipo_persona === 'Natural'
                 ? 'bg-[#dbeafe] text-[#1d4ed8]'
-                : 'bg-[#fef9ec] text-[#cda03f]'" 
+                : 'bg-[#fef9ec] text-[#cda03f]'"
               class="px-3 py-1 rounded text-[12px] font-semibold uppercase tracking-wide inline-flex items-center gap-1"
             >
-              <i :class="data.personType === 'Natural' ? 'pi pi-user' : 'pi pi-building'" class="text-[11px]" />
-              {{ data.personType }}
+              <i :class="data.tipo_persona === 'Natural' ? 'pi pi-user' : 'pi pi-building'" class="text-[11px]" />
+              {{ data.tipo_persona }}
             </span>
           </template>
         </Column>
 
-        <Column field="name" header="Nombre">
+        <Column field="nombre" header="Nombre">
           <template #body="{ data }">
-            <span class="font-semibold text-[#1a2e1f]">{{ data.name }}</span>
+            <span class="font-semibold text-[#1a2e1f]">{{ data.nombre }}</span>
           </template>
         </Column>
 
-        <Column field="documentNumber" header="N° Documento">
+        <Column field="numero_documento" header="N° Documento">
           <template #body="{ data }">
-            <span class="font-mono text-[13px] text-[#2b5e3b] font-semibold">{{ data.documentNumber }}</span>
+            <span class="font-mono text-[13px] text-[#2b5e3b] font-semibold">{{ data.numero_documento }}</span>
           </template>
         </Column>
 
-        <Column field="phone" header="Teléfono">
+        <Column field="telefono" header="Teléfono">
           <template #body="{ data }">
             <span class="inline-flex items-center gap-1 text-[#6b7280]">
               <i class="pi pi-phone text-[12px]" />
-              {{ data.phone }}
+              {{ data.telefono }}
             </span>
           </template>
         </Column>
@@ -93,70 +94,34 @@
         </Column>
       </DataTable>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import IconField    from 'primevue/iconfield'
-import InputIcon    from 'primevue/inputicon'
-import InputText    from 'primevue/inputtext'
-import Dropdown     from 'primevue/dropdown'
-import Button       from 'primevue/button'
-import DataTable    from 'primevue/datatable'
-import Column       from 'primevue/column'
+import { ref, onMounted }   from 'vue'
+import IconField             from 'primevue/iconfield'
+import InputIcon             from 'primevue/inputicon'
+import InputText             from 'primevue/inputtext'
+import Dropdown              from 'primevue/dropdown'
+import Button                from 'primevue/button'
+import DataTable             from 'primevue/datatable'
+import Column                from 'primevue/column'
+import { useClienteStore }   from '@/stores/clienteStore'
+import { storeToRefs }       from 'pinia'
 
-// ── Emits
 defineEmits(['view-detail', 'view-history'])
 
-// ── Filtros
-const personTypeOptions = ref(['Natural', 'Jurídica'])
+const store = useClienteStore()
+const { clientes, cargando, porPagina } = storeToRefs(store)
+
+const tipoPersonaOpciones = ref(['Natural', 'Jurídica'])
 
 const filters = ref({
-  global:     { value: null, matchMode: 'contains' },
-  personType: { value: null, matchMode: 'equals'   }
+  global:       { value: null, matchMode: 'contains' },
+  tipo_persona: { value: null, matchMode: 'equals'   },
 })
 
-
-const clients = ref([
-  {
-    personType:     'Natural',
-    name:           'Carlos Ramírez',
-    documentNumber: '04567890-1',
-    phone:          '7890-1234',
-    email:          'carlos.ramirez@email.com',
-    nrc:            '12345-6',
-    clientName:     'Carlos Eduardo Ramírez López'
-  },
-  {
-    personType:     'Jurídica',
-    name:           'Distribuidora El Sol S.A.',
-    documentNumber: '0614-120390-101-5',
-    phone:          '2222-3344',
-    email:          'contacto@elsol.com.sv',
-    nrc:            '98765-4',
-    businessName:   'Distribuidora El Sol Sociedad Anónima de Capital Variable'
-  },
-  {
-    personType:     'Natural',
-    name:           'Ana Martínez',
-    documentNumber: '01234567-8',
-    phone:          '6655-4433',
-    email:          'ana.martinez@gmail.com',
-    nrc:            '54321-0',
-    clientName:     'Ana Beatriz Martínez de García'
-  },
-  {
-    personType:     'Jurídica',
-    name:           'Inversiones Norte S.A. de C.V.',
-    documentNumber: '0614-010180-104-3',
-    phone:          '2100-5566',
-    email:          'info@inversiones-norte.com',
-    nrc:            '11223-3',
-    businessName:   'Inversiones Norte Sociedad Anónima de Capital Variable'
-  }
-])
+onMounted(() => store.cargarClientes())
 </script>
 
 <style>

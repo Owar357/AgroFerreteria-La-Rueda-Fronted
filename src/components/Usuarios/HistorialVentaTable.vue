@@ -4,11 +4,12 @@
     <!-- Encabezado -->
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
-        <h1 class="text-[26px] font-semibold tracking-tight !text-black">Historial de ventas</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-black">Historial de ventas</h1>
       </div>
 
       <!-- Filtros -->
       <div class="flex flex-wrap justify-start items-center w-full gap-4">
+        <!-- buscador -->
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText v-model="filtros.global.value" placeholder="Buscar factura, vendedor..."

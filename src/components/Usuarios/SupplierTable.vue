@@ -23,7 +23,7 @@
           />
         </IconField>
 
-        <Dropdown
+        <Select
           v-model="filters['estado'].value"
           :options="estadoOptions"
           showClear
@@ -35,7 +35,8 @@
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
-        :value="proveedores"
+  
+        :value="proveedores" :loading="loading"
         :lazy="false"
         :totalRecords="totalProveedores"
         v-model:filters="filters"
@@ -108,7 +109,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+
+import { ref, onMounted } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
@@ -116,83 +118,16 @@ import { Select } from 'primevue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Tag from 'primevue/tag'
+import { useProveedorStore } from '@/stores/proveedorStore'
+import { storeToRefs } from 'pinia'
 
-const emit = defineEmits(['open-add', 'open-edit', 'open-detail', 'update-estado'])
+const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 
-const proveedores = ref([
-  {
-    id: 1,
-    nombre: 'Proveedor Alfa',
-    correo: 'alfa@mail.com',
-    telefono: '7777-7777',
-    estado: 'Activo',
-  },
-  {
-    id: 2,
-    nombre: 'Proveedor Beta',
-    correo: 'beta@mail.com',
-    telefono: '2222-2222',
-    estado: 'Inactivo',
-  },
-  {
-    id: 3,
-    nombre: 'Proveedor Gamma',
-    correo: 'gamma@mail.com',
-    telefono: '3333-3333',
-    estado: 'Activo',
-  },
-  {
-    id: 4,
-    nombre: 'Proveedor Delta',
-    correo: 'delta@mail.com',
-    telefono: '4444-4444',
-    estado: 'Activo',
-  },
-   {
-    id: 5,
-    nombre: 'Proveedor Alianza',
-    correo: 'Alianza@mail.com',
-    telefono: '5678-0089',
-    estado: 'Activo',
-  },
-  {
-    id: 6,
-    nombre: 'Proveedor Gamma',
-    correo: 'gamma@mail.com',
-    telefono: '3333-3333',
-    estado: 'Activo',
-  },
-  {
-    id: 7,
-    nombre: 'Proveedor Gamma',
-    correo: 'gamma@mail.com',
-    telefono: '3333-3333',
-    estado: 'Activo',
-  },
-  {
-    id: 8,
-    nombre: 'Proveedor Gamma',
-    correo: 'gamma@mail.com',
-    telefono: '3333-3333',
-    estado: 'Activo',
-  },
-   {
-    id: 9,
-    nombre: 'Proveedor Barzil',
-    correo: 'Barzil@mail.com',
-    telefono: '7809-6654',
-    estado: 'inactivo',
-  },
-   {
-    id: 10,
-    nombre: 'Proveedor ALianza',
-    correo: 'Alianza@mail.com',
-    telefono: '1276-5467',
-    estado: 'inactivo',
-  },
-])
+const store = useProveedorStore()
+const { proveedores, cargando: loading, totalRecords: totalProveedores } = storeToRefs(store)
 
-const totalProveedores = ref(4)
+
 
 const estadoOptions = ref(['Activo', 'Inactivo'])
 
@@ -201,13 +136,11 @@ const filters = ref({
   estado: { value: null, matchMode: 'equals' },
 })
 
-const handleEdit = (proveedor) => emit('open-edit', proveedor)
-const handleDetail = (proveedor) => emit('open-detail', proveedor)
+onMounted(() => store.cargarProveedores())
 
-const toggleEstado = (proveedor) => {
-  proveedor.estado = proveedor.estado === 'Activo' ? 'Inactivo' : 'Activo'
-  emit('update-estado', proveedor)
-}
+const handleEdit   = (proveedor) => emit('open-edit', proveedor)
+const handleDetail = (proveedor) => emit('open-detail', proveedor)
+const toggleEstado = (proveedor) => store.toggleEstado(proveedor)
 </script>
 
 <style>

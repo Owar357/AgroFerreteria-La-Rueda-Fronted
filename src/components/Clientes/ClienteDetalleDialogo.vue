@@ -2,7 +2,7 @@
   <Dialog
     :visible="visible"
     @update:visible="$emit('update:visible', $event)"
-    :header="client?.personType === 'Natural' ? 'Detalle del cliente natural' : 'Detalle del cliente jurídico'"
+    :header="client?.personType === 'Natural' ? 'Detalle del cliente ' : 'Detalle del cliente '"
     :style="{ width: '580px', maxWidth: '90vw' }"
     modal
     :draggable="false"

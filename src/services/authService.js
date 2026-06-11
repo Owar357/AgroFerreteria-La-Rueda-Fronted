@@ -7,7 +7,7 @@ const TOKEN_KEY = 'auth_token'
 const USER_KEY  = 'auth_user'
 const ROLE_KEY  = 'auth_role'
 
-// ── Instancia personalizada de Axios (Exportada para los demás servicios) ────
+
 export const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -29,7 +29,7 @@ api.interceptors.request.use(
   }
 )
 
-// Interceptor de respuesta: Captura de forma global sesiones expiradas (401)
+// aqio se Capturan de forma global sesiones que expriran
 api.interceptors.response.use(
   (response) => response, 
   (error) => {
@@ -43,7 +43,7 @@ api.interceptors.response.use(
   }
 )
 
-// ── Helpers internos ──────────────────────────────────────────────────────────
+
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
   return roles[0].toLowerCase()
@@ -65,11 +65,12 @@ function getHomeRouteByRole(role) {
   switch (role) {
     case 'admin':    return '/admin/usuarios'
     case 'contador': return '/admin/reportes'
+    //case 'cajero':   return 'admin/venta/venta'
     default:         return '/login'
   }
 }
 
-// ── API pública del servicio ──────────────────────────────────────────────────
+//  API pública 
 const authService = {
   async login(identity, password) {
     try {

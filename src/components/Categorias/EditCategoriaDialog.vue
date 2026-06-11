@@ -67,14 +67,12 @@ const form         = reactive({ id: null, nombre: '', estado: '' })
 const error        = ref('')
 const guardando    = ref(false)
 
-// ── Sync visible prop → localVisible ────────────────────────────────────────
 watch(() => props.visible, (val) => { localVisible.value = val })
 
-// ── Sync localVisible → emit para v-model ───────────────────────────────────
+
 watch(localVisible, (val) => { emit('update:visible', val) })
 
-// ── Cargar datos de la categoría seleccionada ────────────────────────────────
-// SIN immediate:true para evitar que se dispare al montar con null
+
 watch(
   () => props.categoria,
   (val) => {

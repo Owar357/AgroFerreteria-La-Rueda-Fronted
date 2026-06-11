@@ -4,8 +4,16 @@
     class="flex items-center rounded-lg cursor-pointer mb-1 transition-colors duration-150"
     :class="sub ? 'p-2 ml-3' : 'p-3'"
     :style="active ? activeStyle : inactiveStyle"
-    @mouseenter="e => { if (!active) e.currentTarget.style.backgroundColor = '#b8cfaa20' }"
-    @mouseleave="e => { if (!active) e.currentTarget.style.backgroundColor = 'transparent' }"
+    @mouseenter="
+      (e) => {
+        if (!active) e.currentTarget.style.backgroundColor = '#b8cfaa20'
+      }
+    "
+    @mouseleave="
+      (e) => {
+        if (!active) e.currentTarget.style.backgroundColor = 'transparent'
+      }
+    "
   >
     <i :class="icon + ' mr-2'"></i>
     <span>{{ label }}</span>
@@ -14,10 +22,10 @@
 
 <script setup>
 defineProps({
-  icon:   String,
-  label:  String,
+  icon: String,
+  label: String,
   active: Boolean,
-  sub:    { type: Boolean, default: false },
+  sub: { type: Boolean, default: false },
 })
 defineEmits(['click'])
 

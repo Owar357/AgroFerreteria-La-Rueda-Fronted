@@ -90,12 +90,12 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import Dialog    from 'primevue/dialog'
+import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import Password  from 'primevue/password'
-import Select    from 'primevue/select'
-import Button    from 'primevue/button'
-import Swal      from 'sweetalert2'
+import Password from 'primevue/password'
+import Select from 'primevue/select'
+import Button from 'primevue/button'
+import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/usuarioStore'
 
 const props = defineProps({
@@ -108,12 +108,12 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible'])
 
-const store        = useUserStore()
+const store  = useUserStore()
 const localVisible = ref(false)
-const loading      = ref(false)
+const loading  = ref(false)
 
 watch(() => props.visible, (val) => (localVisible.value = val))
-watch(localVisible,        (val) => emit('update:visible', val))
+watch(localVisible, (val) => emit('update:visible', val))
 
 const form = reactive({
   name: '', email: '', password: '', role: null, cashKey: ''

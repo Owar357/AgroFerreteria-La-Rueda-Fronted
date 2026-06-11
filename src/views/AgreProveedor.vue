@@ -1,4 +1,4 @@
-<!-- ModalAgregarProveedor.vue -->
+
 <template>
   <Dialog
     v-model:visible="visible"
@@ -186,6 +186,7 @@
   </Dialog>
 </template>
 
+
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import Dialog from 'primevue/dialog'
@@ -193,10 +194,7 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
+  modelValue: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'guardar'])
@@ -209,26 +207,38 @@ const visible = computed({
 const tipoPersona = ref('natural')
 
 const form = reactive({
-  nombre: '',
-  direccion: '',
-  correo: '',
-  telefono: '',
-  dui: '',
-  nit: '',
-  nrc: '',
-  estado: 'activo',
+  nombre: '', direccion: '', correo: '',
+  telefono: '', dui: '', nit: '', nrc: '',
 })
 
+function resetForm() {
+  Object.assign(form, {
+    nombre: '', direccion: '', correo: '',
+    telefono: '', dui: '', nit: '', nrc: '',
+  })
+  tipoPersona.value = 'natural'
+}
 
 function guardar() {
-  const payload = {
-    tipoPersona: tipoPersona.value,
-    ...form,
-  }
-  if (tipoPersona.value === 'juridica') {
-    delete payload.dui
-  }
-  emit('guardar', payload)
+  emit('guardar', {
+    nombre:       form.nombre,
+    direccion:    form.direccion,
+    correo:       form.correo,
+    telefono:     form.telefono,
+    tipo_persona: tipoPersona.value === 'natural' ? 'NATURAL' : 'JURIDICA',
+    nit:          form.nit,
+    nrc:          form.nrc,
+    dui:          tipoPersona.value === 'natural' ? form.dui : null,
+    activo:       true,
+  })
+  resetForm()
   visible.value = false
 }
+
+const inputPt = {
+  root: {
+    class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] transition-all font-inter',
+  },
+}
+
 </script>
