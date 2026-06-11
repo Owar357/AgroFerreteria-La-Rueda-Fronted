@@ -266,9 +266,12 @@
 </template>
 
 <script setup>
-import { buscarProductoCompra } from '@/services/compraService'
+import { buscarProductoCompra, registrarCompra } from '@/services/compraService'
 import { proveedores } from '@/services/proveedorService'
+import Swal from 'sweetalert2'
 import { ref, reactive, onMounted, watch, computed } from 'vue'
+
+
 
 const sugerenciasProductos = ref([])
 const presentacionesLote = ref([])
@@ -348,6 +351,16 @@ const buscarProductoLote = async (event) => {
     sugerenciasProductos.value = []
   }
 }
+
+const formatearFecha = (fecha) => {
+  if (!fecha) return null
+  const d = new Date(fecha)
+  const dia = String(d.getDate()).padStart(2, '0')
+  const mes = String(d.getMonth() + 1).padStart(2, '0')
+  const anio = d.getFullYear()
+  return `${anio}-${mes}-${dia}`
+}
+
 
 const alSeleccionarProductoLote = (event) => {
   presentacionesLote.value = event.value.presentaciones
@@ -438,11 +451,78 @@ const eliminarItemDeTabla = (index) => {
   itemsAgregados.value.splice(index, 1)
 }
 
-const registrarCompraFinal = () => {
-  console.log('Enviando toda la información al backend...', {
-    documento: { ...documentoForm },
-    items: itemsAgregados.value,
-  })
+const registrarCompraFinal = async () => {
+  if (!documentoForm.proveedor || !documentoForm.estadoPago) {
+    Swal.fire({ icon: 'warning', title: 'Campos incompletos', text: 'Completa los datos del documento.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (itemsAgregados.value.length === 0) {
+    Swal.fire({ icon: 'warning', title: 'Sin items', text: 'Agrega al menos un lote.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  const numeroDocumento = prefijoComprobante.value
+    ? `${prefijoComprobante.value}${documentoForm.numComprobante}`
+    : documentoForm.numComprobante
+
+  const payload = {
+    tipo_dte: documentoForm.tipoComprobante,
+    numero_documento: numeroDocumento || null,
+    fecha_emision: formatearFecha(documentoForm.fechaEmision),
+    descuento_global: null,
+    iva_total: null,
+    monto_total: documentoForm.montoTotal ? Number(documentoForm.montoTotal) : null,
+    estado_pago: documentoForm.estadoPago,
+    fecha_vencimiento_pago: formatearFecha(documentoForm.fechaVencimiento),
+    proveedor_id: documentoForm.proveedor.id,
+    detalles: itemsAgregados.value.map(item => ({
+      cantidad_facturada: item.cantidad_facturada,
+      cantidad_bonificada: item.cantidad_bonificada,
+      precio_unitario_factura: item.precio_unitario_factura,
+      iva_linea: null,
+      descuento_linea: item.descuento_linea,
+      sub_total: item.sub_total,
+      lote: {
+        lote_fabricante: item.lote_fabricante,
+        fecha_vencimiento: formatearFecha(item.fecha_vencimiento),
+        cantidad_inicial: item.cantidad_inicial,
+        costo_unitario_compra: item.costo_unitario_compra,
+        porcentaje_descuento: null,
+        presentacion_id: item.presentacion_id,
+      }
+    }))
+  }
+
+  try {
+    await registrarCompra(payload)
+    Swal.fire({
+      icon: 'success',
+      title: '¡Compra registrada!',
+      confirmButtonColor: '#2b5e3b',
+      timer: 3000,
+      timerProgressBar: true
+    })
+    // limpiar todo
+    itemsAgregados.value = []
+    Object.assign(documentoForm, {
+      proveedor: null,
+      tipoComprobante: '03',
+      numComprobante: '',
+      fechaEmision: null,
+      estadoPago: null,
+      montoTotal: '',
+      fechaVencimiento: null,
+    })
+  } catch (error) {
+    const status = error.response?.status
+    if (status === 422) {
+      const mensajes = Object.values(error.response.data.errors).flat()
+      Swal.fire({ icon: 'warning', title: 'Error de validación', text: mensajes[0], confirmButtonColor: '#2b5e3b' })
+    } else {
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo registrar la compra.', confirmButtonColor: '#2b5e3b' })
+    }
+  }
 }
 
 onMounted(async () => {
