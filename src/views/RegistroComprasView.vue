@@ -206,7 +206,7 @@ const comprobantesOptions = ref([
   'Factura de Consumidor Final',
   'Crédito Fiscal',
 ])
-const estadosPagoOptions = ref(['Pagado', 'Crédito 30 días', 'Crédito 60 días'])
+const estadosPagoOptions = ref(['Pagado', 'Pendiente', 'Abonado', ])
 
 
 const documentoForm = reactive({
