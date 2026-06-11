@@ -126,7 +126,6 @@ import Select from 'primevue/select'
 // Modificado: Importación obligatoria del modo de filtrado nativo
 import { DatePicker } from 'primevue'
 import { FilterMatchMode } from '@primevue/core/api'
-import { resolveUserAgent } from '@primeuix/utils'
 
 const irARegistroCompra = () => emit('open-add')
 const emit = defineEmits(['open-add'])

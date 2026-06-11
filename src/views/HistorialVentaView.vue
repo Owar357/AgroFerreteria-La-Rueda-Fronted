@@ -88,12 +88,12 @@ const abrirDetalle = async (venta) => {
       tipoPago: venta.tipoPago,
       estado: venta.estado,
       total: venta.total,
-     
+
       items: detalles.map(d => ({
         nombreProducto: d.nombre_producto,
         cantidad: parseFloat(d.cantidad),
         precio: parseFloat(d.precio_unitario),
-        unidad: d.unidad_medida,
+        unidad: d.unidad_base,
         subtotal: parseFloat(d.subtotal) || (parseFloat(d.cantidad) * parseFloat(d.precio_unitario))
       }))
 
