@@ -9,12 +9,11 @@
         <Button
           label="+ Agregar compra"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="irARegistroCompra"
+          @click="emit('open-add')"
         />
       </div>
 
       <div class="flex justify-start items-center w-full gap-8">
-        <!-- Modificado: Ahora el v-model apunta directo al valor del filtro interno -->
         <Select
           v-model="filtros['estadoPago'].value"
           :options="estadosPago"
@@ -48,9 +47,8 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- Modificado: Vinculamos la propiedad :filters con nuestro objeto reactivo -->
       <DataTable
-        :value="comprasRealizadas"
+        :value="compras"
         :filters="filtros"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
@@ -59,6 +57,10 @@
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       >
+        <template #empty>
+          <div class="text-center py-6 text-gray-400">No se encontraron compras.</div>
+        </template>
+
         <Column field="fechaEmision" header="Fecha Emisión" />
         <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
         <Column field="tipoDocumento" header="Tipo Documento" />
@@ -123,129 +125,25 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Select from 'primevue/select'
-// Modificado: Importación obligatoria del modo de filtrado nativo
 import { DatePicker } from 'primevue'
 import { FilterMatchMode } from '@primevue/core/api'
 
-const irARegistroCompra = () => emit('open-add')
+const props = defineProps({
+  compras: {
+    type: Array,
+    default: () => [],
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 const emit = defineEmits(['open-add'])
 
-//variables para fecjas inicio y fin individuales
 const fechaInicio = ref(null)
-const fechsFin = ref(null)
+const fechaFin = ref(null)
 
-const comprasRealizadas = ref([
-  {
-    id: 1,
-    fechaEmision: '10-02-2025',
-    proveedor: 'Distribuidora San Carlos',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00124',
-    precioFactura: '1,250.00',
-    estadoPago: 'PAGADO',
-  },
-  {
-    id: 2,
-    fechaEmision: '12-02-2025',
-    proveedor: 'Distribuidora San Carlos',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-9902',
-    precioFactura: '3,420.50',
-    estadoPago: 'PENDIENTE',
-  },
-  {
-    id: 3,
-    fechaEmision: '14-02-2025',
-    proveedor: 'Distribuidora San Carlos',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00125',
-    precioFactura: '850.00',
-    estadoPago: 'ABONADO',
-  },
-  {
-    id: 4,
-    fechaEmision: '16-02-2025',
-    proveedor: 'Distribuidora San Carlos',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-9903',
-    precioFactura: '2,100.00',
-    estadoPago: 'VENCIDO',
-  },
-  {
-    id: 5,
-    fechaEmision: '05-05-2024',
-    proveedor: 'Distribuidora San Carlos',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00841',
-    precioFactura: '920.00',
-    estadoPago: 'PAGADO',
-  },
-  {
-    id: 6,
-    fechaEmision: '20-11-2024',
-    proveedor: 'NutriGreen S.A.',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-1024',
-    precioFactura: '4,150.00',
-    estadoPago: 'PAGADO',
-  },
-  {
-    id: 7,
-    fechaEmision: '15-01-2025',
-    proveedor: 'Agroservicios del Centro',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00210',
-    precioFactura: '600.00',
-    estadoPago: 'PAGADO',
-  },
-  {
-    id: 8,
-    fechaEmision: '18-05-2026',
-    proveedor: 'TecnoAgro Global',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-4412',
-    precioFactura: '1,850.00',
-    estadoPago: 'PENDIENTE',
-  },
-  {
-    id: 9,
-    fechaEmision: '22-05-2026',
-    proveedor: 'Semillas del Pacífico',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00302',
-    precioFactura: '1,100.00',
-    estadoPago: 'ABONADO',
-  },
-  {
-    id: 10,
-    fechaEmision: '25-05-2026',
-    proveedor: 'Importaciones InterAgro',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-8819',
-    precioFactura: '2,750.40',
-    estadoPago: 'PENDIENTE',
-  },
-  {
-    id: 11,
-    fechaEmision: '12-08-2023',
-    proveedor: 'BioProtect S.A.',
-    tipoDocumento: 'Factura',
-    numDocumento: 'F-00912',
-    precioFactura: '320.00',
-    estadoPago: 'PAGADO',
-  },
-  {
-    id: 12,
-    fechaEmision: '04-03-2025',
-    proveedor: 'Fertilizantes del Norte',
-    tipoDocumento: 'Crédito Fiscal',
-    numDocumento: 'CF-9945',
-    precioFactura: '1,430.00',
-    estadoPago: 'VENCIDO',
-  },
-])
-
-//  Estructura de filtros nativos para PrimeVue 4
 const filtros = ref({
   estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
   fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM },
@@ -254,29 +152,23 @@ const filtros = ref({
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
 
 const actualizarFiltroFecha = () => {
-  // este es un objeto personal para a fprzar a prume vue a realizar la funcion
-  //falta hacer todo el procesos en los stores
-  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechsFin.value }
+  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechaFin.value }
 }
 
-//Reisttro de ña ficion personalizada d efiltado en el objeto
-//filtros de la yabla
 filtros.value.fechaEmision.constraits = (value, filter) => {
-  if (!filter || !filter[0] || !filter[1]) return true
+  if (!filter || (!filter.inicio && !filter.fin)) return true
   if (!value) return false
 
   const [dia, mes, anio] = value.split('-').map(Number)
   const fechaRegistro = new Date(anio, mes - 1, dia)
   fechaRegistro.setHours(0, 0, 0, 0)
 
-  //valisdamos si la fecha de inicio existe
   if (filter.inicio) {
     const inicio = new Date(filter.inicio)
     inicio.setHours(0, 0, 0, 0)
     if (fechaRegistro < inicio) return false
   }
 
-  //Validamos que la fecha fin ingresada exista
   if (filter.fin) {
     const fin = new Date(filter.fin)
     fin.setHours(23, 59, 59, 999)
@@ -296,7 +188,6 @@ const anularCompra = (compra) => {
 </script>
 
 <style>
-/* Se mantienen tus estilos CSS globales exactamente idénticos */
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;

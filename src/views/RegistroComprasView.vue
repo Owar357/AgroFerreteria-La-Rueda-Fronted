@@ -80,7 +80,14 @@
                   </div>
                 </div>
 
-                <div class="flex justify-end pt-4 border-t border-[#e2e8dd]">
+                <!-- Footer paso 1 -->
+                <div class="flex justify-between items-center pt-4 border-t border-[#e2e8dd]">
+                  <Button
+                    label="Regresar"
+                    icon="pi pi-arrow-left"
+                    class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-4 py-3 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                    @click="emit('close')"
+                  />
                   <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
                     class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
                     @click="activateCallback('2')" />
@@ -95,7 +102,6 @@
 
                 <div class="flex flex-col gap-4">
 
-                  <!-- Producto + presentación facturada + cantidad facturada + tipo producto -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col w-7 gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre del producto</label>
@@ -136,7 +142,6 @@
                     </div>
                   </div>
 
-                  <!-- Checkbox bonificación -->
                   <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-2">
                       <Checkbox v-model="incluyeBonificacion" inputId="bonificacion" binary />
@@ -150,7 +155,6 @@
                     </small>
                   </div>
 
-                  <!-- Sección bonificación condicional -->
                   <div v-if="incluyeBonificacion" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
                     <div class="flex flex-col gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">Presentación bonificada</label>
@@ -170,7 +174,6 @@
                     </div>
                   </div>
 
-                  <!-- Lote perecedero + costo + descuento -->
                   <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">Número de lote</label>
@@ -197,7 +200,6 @@
                     </div>
                   </div>
 
-                  <!-- Resumen calculado -->
                   <div v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada && loteForm.costoUnitario"
                     class="bg-[#eef2e9] border border-[#d1d5db] rounded-lg p-4 flex flex-col gap-1 text-[13px]">
                     <div class="flex justify-between">
@@ -271,7 +273,7 @@ import { proveedores } from '@/services/proveedorService'
 import Swal from 'sweetalert2'
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 
-
+const emit = defineEmits(['close'])
 
 const sugerenciasProductos = ref([])
 const presentacionesLote = ref([])
@@ -361,7 +363,6 @@ const formatearFecha = (fecha) => {
   return `${anio}-${mes}-${dia}`
 }
 
-
 const alSeleccionarProductoLote = (event) => {
   presentacionesLote.value = event.value.presentaciones
   loteForm.presentacionFacturada = null
@@ -414,7 +415,6 @@ const agregarItemsATabla = () => {
   if (!loteForm.producto || !loteForm.presentacionFacturada || !loteForm.cantidadFacturada || !loteForm.costoUnitario) return
 
   let vencimientoTexto = 'N/A'
-
   if (loteForm.tipoProducto === 'Perecedero' && loteForm.fechaVencimientoLote) {
     const fecha = new Date(loteForm.fechaVencimientoLote)
     const dia = String(fecha.getDate()).padStart(2, '0')
@@ -430,8 +430,6 @@ const agregarItemsATabla = () => {
     costoUnit: `$${costoUnitarioReal.value.toFixed(4)}`,
     vencimiento: vencimientoTexto,
     subtotal: `$${totalPagado.value.toFixed(2)}`,
-
-    // datos crudos para el payload final
     presentacion_id: loteForm.presentacionFacturada.id,
     cantidad_facturada: Number(loteForm.cantidadFacturada),
     cantidad_bonificada: unidadesBonificadas.value,
@@ -503,7 +501,6 @@ const registrarCompraFinal = async () => {
       timer: 3000,
       timerProgressBar: true
     })
-    // limpiar todo
     itemsAgregados.value = []
     Object.assign(documentoForm, {
       proveedor: null,
@@ -514,6 +511,7 @@ const registrarCompraFinal = async () => {
       montoTotal: '',
       fechaVencimiento: null,
     })
+    emit('close')
   } catch (error) {
     const status = error.response?.status
     if (status === 422) {
