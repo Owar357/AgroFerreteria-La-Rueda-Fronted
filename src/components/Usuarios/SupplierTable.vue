@@ -127,7 +127,7 @@ const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 const store = useProveedorStore()
 const { proveedores, cargando: loading, totalRecords: totalProveedores } = storeToRefs(store)
 
-const totalProveedores = ref(4)
+
 
 const estadoOptions = ref(['Activo', 'Inactivo'])
 

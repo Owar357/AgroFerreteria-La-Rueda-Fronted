@@ -113,18 +113,60 @@ export const useProveedorStore = defineStore('proveedor', () => {
   }
 
   const toggleEstado = async (proveedor) => {
-    const nuevoEstado = proveedor.estado === 'Activo' ? 'Inactivo' : 'Activo'
-    try {
-      await updateProveedor(proveedor.id, { ...proveedor, estado: nuevoEstado })
-      const index = proveedores.value.findIndex((p) => p.id === proveedor.id)
-      if (index !== -1) proveedores.value[index].estado = nuevoEstado
-    } catch (error) {
-      await handleApiError(error, 'Error al cambiar estado')
-    }
-  }
+  const esActivo = proveedor.estado === 'Activo'
+  const nuevoEstado = esActivo ? 'Inactivo' : 'Activo'
 
+  // ── Confirmación 
+  const { isConfirmed } = await Swal.fire({
+    html: `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+        <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dcfce7'}; display:flex; align-items:center; justify-content:center;">
+          <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#15803d'};"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">
+          ${esActivo ? 'Desactivar proveedor' : 'Activar proveedor'}
+        </h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">
+          ¿Estás seguro de que deseas ${esActivo ? 'desactivar' : 'activar'} a
+          <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>?
+        </p>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonColor: esActivo ? '#b91c1c' : '#2b5e3b',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
+    cancelButtonText: 'Cancelar',
+    customClass: {
+      confirmButton: '!rounded-lg !font-semibold !text-sm',
+      cancelButton: '!rounded-lg !font-semibold !text-sm',
+      popup: '!rounded-2xl',
+    },
+  })
+
+  if (!isConfirmed) return
+  
+
+  try {
+    await updateProveedor(proveedor.id, { ...proveedor, estado: nuevoEstado })
+    const index = proveedores.value.findIndex((p) => p.id === proveedor.id)
+    if (index !== -1) proveedores.value[index].estado = nuevoEstado
+
+    await Swal.fire({
+      icon: 'success',
+      title: `Proveedor ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'}`,
+      text: `"${proveedor.nombre}" ahora está ${nuevoEstado.toLowerCase()}.`,
+      confirmButtonColor: '#2b5e3b',
+      timer: 2500,
+      timerProgressBar: true,
+    })
+  } catch (error) {
+    await handleApiError(error, 'Error al cambiar estado')
+  }
+}
   return {
     proveedores, cargando, totalRecords, currentPage, perPage,
     cargarProveedores, crearProveedor, actualizarProveedor, toggleEstado,
   }
+  
 })
