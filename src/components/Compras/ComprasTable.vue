@@ -5,7 +5,6 @@
         <h1 class="text-[26px] font-semibold tracking-tigh !text-black">
           Registro de Compras Realizadas
         </h1>
-
         <Button
           label="+ Agregar compra"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-all"
@@ -13,47 +12,72 @@
         />
       </div>
 
-      <div class="flex justify-start items-center w-full gap-8">
+      <div class="flex justify-start items-center w-full gap-8 flex-wrap">
+
+        <!-- Filtro estado -->
         <Select
-          v-model="filtros['estadoPago'].value"
+          v-model="estadoSeleccionado"
           :options="estadosPago"
           placeholder="Filtrar por Estado..."
-          class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
+          class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg"
           showClear
+          @change="emitirFiltros"
+          @clear="emitirFiltros"
         />
+
+        <!-- Filtro proveedor -->
+        <AutoComplete
+          v-model="proveedorSeleccionado"
+          optionLabel="nombre"
+          :suggestions="proveedoresFiltrados"
+          @complete="buscarProveedor"
+          @item-select="emitirFiltros"
+          @clear="emitirFiltros"
+          placeholder="Buscar proveedor..."
+          class="w-56"
+          fluid
+        />
+
+        <!-- Fecha inicio -->
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Inicio:</span>
           <DatePicker
             v-model="fechaInicio"
             placeholder="dd-mm-aaaa"
             dateFormat="dd-mm-yy"
-            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
+            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg"
             showClear
-            @update:modelValue="actualizarFiltroFecha"
+            @update:modelValue="emitirFiltros"
           />
         </div>
+
+        <!-- Fecha fin -->
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium text-[#4b5563]">Fecha Fin:</span>
           <DatePicker
             v-model="fechaFin"
             placeholder="dd-mm-aaaa"
             dateFormat="dd-mm-yy"
-            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg focus:ring-1 focus:ring-[#2b5e3b]"
+            class="w-44 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg"
             showClear
-            @update:modelValue="actualizarFiltroFecha"
+            @update:modelValue="emitirFiltros"
           />
         </div>
+
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
         :value="compras"
-        :filters="filtros"
+        :loading="loading"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
         :paginator="true"
         :rows="5"
+        :totalRecords="paginacion.total"
+        :lazy="true"
+        @page="(e) => emit('cambiar-pagina', e.page + 1)"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       >
@@ -120,71 +144,80 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Select from 'primevue/select'
+import AutoComplete from 'primevue/autocomplete'
 import { DatePicker } from 'primevue'
-import { FilterMatchMode } from '@primevue/core/api'
+import { proveedores as getProveedores } from '@/services/proveedorService'
 
 const props = defineProps({
-  compras: {
-    type: Array,
-    default: () => [],
-  },
-  loading: {
-    type: Boolean,
-    default: false,
+  compras: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
+  paginacion: {
+    type: Object,
+    default: () => ({ currentPage: 1, lastPage: 1, perPage: 5, total: 0 }),
   },
 })
 
-const emit = defineEmits(['open-add'])
+const emit = defineEmits(['open-add', 'cambiar-pagina', 'filtrar'])
 
+const estadoSeleccionado = ref(null)
+const proveedorSeleccionado = ref(null)
 const fechaInicio = ref(null)
 const fechaFin = ref(null)
-
-const filtros = ref({
-  estadoPago: { value: null, matchMode: FilterMatchMode.EQUALS },
-  fechaEmision: { value: null, matchMode: FilterMatchMode.CUSTOM },
-})
-
 const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO'])
+const proveedoresOptions = ref([])
+const proveedoresFiltrados = ref([])
 
-const actualizarFiltroFecha = () => {
-  filtros.value.fechaEmision.value = { inicio: fechaInicio.value, fin: fechaFin.value }
+const buscarProveedor = (event) => {
+  const q = event.query.toLowerCase().trim()
+  if (!q) {
+    proveedoresFiltrados.value = [...proveedoresOptions.value]
+  } else {
+    proveedoresFiltrados.value = proveedoresOptions.value.filter(p =>
+      p.nombre.toLowerCase().includes(q)
+    )
+  }
 }
 
-filtros.value.fechaEmision.constraits = (value, filter) => {
-  if (!filter || (!filter.inicio && !filter.fin)) return true
-  if (!value) return false
+const formatearFecha = (fecha) => {
+  if (!fecha) return null
+  const d = new Date(fecha)
+  const dia = String(d.getDate()).padStart(2, '0')
+  const mes = String(d.getMonth() + 1).padStart(2, '0')
+  const anio = d.getFullYear()
+  return `${anio}-${mes}-${dia}`
+}
 
-  const [dia, mes, anio] = value.split('-').map(Number)
-  const fechaRegistro = new Date(anio, mes - 1, dia)
-  fechaRegistro.setHours(0, 0, 0, 0)
-
-  if (filter.inicio) {
-    const inicio = new Date(filter.inicio)
-    inicio.setHours(0, 0, 0, 0)
-    if (fechaRegistro < inicio) return false
-  }
-
-  if (filter.fin) {
-    const fin = new Date(filter.fin)
-    fin.setHours(23, 59, 59, 999)
-    if (fechaRegistro > fin) return false
-  }
-
-  return true
+const emitirFiltros = () => {
+  emit('filtrar', {
+    estado_pago: estadoSeleccionado.value ?? null,
+    proveedor: proveedorSeleccionado.value?.id ?? null,
+    fecha_desde: formatearFecha(fechaInicio.value),
+    fecha_hasta: formatearFecha(fechaFin.value),
+  })
 }
 
 const verDetalles = (compra) => {
-  console.log('Viendo detalles de:', compra.numDocumento)
+  emit('ver-detalle', compra)
 }
+
 
 const anularCompra = (compra) => {
   console.log('Anulando compra:', compra.numDocumento)
 }
+
+onMounted(async () => {
+  try {
+    const response = await getProveedores()
+    proveedoresOptions.value = response.data.data
+  } catch {
+    proveedoresOptions.value = []
+  }
+})
 </script>
 
 <style>
