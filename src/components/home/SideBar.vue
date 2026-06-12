@@ -200,9 +200,9 @@ const showGestion = ref(false)
 
 // Mapeo dinámico y control de Roles
 const userRole = authService.getUserRole()
-const isAdmin = userRole === 'admin'
-const isCajero = userRole === 'cajero'
-const isContador = userRole === 'contador'
+const isAdmin = userRole === 'ADMIN'
+const isCajero = userRole === 'CAJERO'
+const isContador = userRole === 'CONTADOR'
 
 // Determinar el ítem activo evaluando la URL actual del navegador
 const activeItem = computed(() => {

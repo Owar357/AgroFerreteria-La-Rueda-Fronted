@@ -37,43 +37,43 @@ const routes = [
         path: 'usuarios',
         name: 'usuarios',
         component: () => import('@/views/UsuariosView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'alertas',
         name: 'alertas',
         component: () => import('@/components/Alertas/AlertsTable.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'inventario/categorias',
         name: 'categorias',
         component: () => import('@/views/CategoriasView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'inventario/productos',
         name: 'productos',
         component: () => import('@/views/productosView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'inventario/proveedores',
         name: 'proveedores',
         component: () => import('@/views/ProveedoresView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
         component: () => import('@/views/HistorialVentaView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'gestion/pos',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       
  
@@ -83,19 +83,19 @@ const routes = [
         path: 'venta/venta',
         name: 'venta',
         component: () => import('@/views/FromVenta.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'caja',
         name: 'caja',
         component: () => import('@/views/CajaView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'venta/movimientos-de-caja',
         name: 'movimientos-caja',
         component: () => import('@/views/MovimientosCajaView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
 
       // --- ADMIN Y CONTADOR ---
@@ -103,25 +103,25 @@ const routes = [
         path: 'venta/compra',
         name: 'compra',
         component: () => import('@/views/CompraView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
       {
         path: 'compras-realizadas',
         name: 'comprasRealizadas',
-        component: () => import('@/views/ComprasRealizadasView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+        component: () => import('@/components/Compras/ComprasTable.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
       {
         path: 'registro-compras',
         name: 'registroCompras',
         component: () => import('@/views/RegistroComprasView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
       {
         path: 'reportes',
         name: 'reportes',
-        component: () => import('@/views/ComprasRealizadasView.vue'), 
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'contador'] },
+        component: () => import('@/views/home.vue'), 
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
 
       // --- TODOS LOS ROLES (ADMIN, CAJERO, CONTADOR) ---
@@ -129,14 +129,14 @@ const routes = [
         path: 'procesos/clientes',
         name: 'Clientes',
         component: () => import('@/views/ClientesView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
       },
       
        {
        path: 'procesos/clientes/:id/historial',  
         name: 'ClienteHistorial',               
         component: () => import('@/components/Clientes/ClienteHistorialDialogo.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['admin', 'cajero', 'contador'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
        }
     ]
   },
@@ -154,29 +154,27 @@ const router = createRouter({
 })
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const isLoggedIn = authService.isAuthenticated()
   const userRole = authService.getUserRole()
 
-  //aqui se hace que requiere autenticacion si no esta logueado
+  
   if (to.matched.some((r) => r.meta.requiresAuth) && !isLoggedIn) {
-    return next({ name: 'login' })
+    return ({ name: 'login' })
   }
-
-  // y aqui su  está logueado e intenta ir al login
+  
   if (to.name === 'login' && isLoggedIn) {
     const homeRoute = authService.getHomeRoute()
-    return next(homeRoute)
+    return  (homeRoute)
   }
 
   //  Control de Roles (Si la ruta tiene roles asignados y el usuario no lo incluye)
   if (isLoggedIn && to.meta.allowedRoles && !to.meta.allowedRoles.includes(userRole)) {
     const homeRoute = authService.getHomeRoute()
-    return next(homeRoute) // aqui lo manda  ala seccion permitidad
+    return (homeRoute) 
   }
 
-  // Si todo todo lo anerior esta bien sigue
-  next()
+  return true
 })
 
 export default router

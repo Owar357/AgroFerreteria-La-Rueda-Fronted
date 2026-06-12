@@ -46,7 +46,7 @@ api.interceptors.response.use(
 
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
-  return roles[0].toLowerCase()
+  return roles[0]
 }
 
 function saveSession(token, user, role) {
@@ -63,8 +63,8 @@ function clearSession() {
 
 function getHomeRouteByRole(role) {
   switch (role) {
-    case 'admin':    return '/admin/usuarios'
-    case 'contador': return '/admin/reportes'
+    case 'ADMIN':    return '/admin/usuarios'
+    case 'CONTADOR': return '/admin/reportes'
     //case 'cajero':   return 'admin/venta/venta'
     default:         return '/login'
   }
