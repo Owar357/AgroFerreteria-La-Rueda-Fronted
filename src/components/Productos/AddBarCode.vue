@@ -28,7 +28,7 @@
               :key="codigo.id"
               :class="['border-t border-[#f0f5ea]', index % 2 === 0 ? 'bg-white' : 'bg-[#fafdf7]']"
             >
-              <td class="px-4 py-3 text-sm text-[#1a2e1f] font-mono">{{ codigo.valor }}</td>
+              <td class="px-4 py-3 text-sm text-[#1a2e1f] font-mono">{{ codigo.codigo }}</td>
               <td class="px-4 py-3 text-right">
                 <Button
                   icon="pi pi-trash"
@@ -52,8 +52,8 @@
         </table>
       </div>
 
-      <!---->
-      Input + botón agregar
+      <!-- Input + botón agregar -->
+
       <div class="flex gap-2">
         <InputText
           v-model="nuevoCodigo"
@@ -81,13 +81,17 @@
     </template>
   </Dialog>
 </template>
-
 <script setup>
 import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
+import {
+  getCodigosByPresentacion,
+  createCodigoBarra,
+  deleteCodigoBarra,
+} from '@/services/productoService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -98,80 +102,126 @@ const emit = defineEmits(['update:visible'])
 
 const localVisible = ref(false)
 const nuevoCodigo = ref('')
-
-const codigos = ref([
-  { id: 1, valor: '7501234567890' },
-  { id: 2, valor: '7501234567891' },
-])
+const codigos = ref([])
+const cargando = ref(false)
 
 watch(
   () => props.visible,
-  (val) => {
+  async (val) => {
     localVisible.value = val
+    if (val && props.presentacion?.id) {
+      await cargarCodigos()
+    }
   },
 )
-watch(localVisible, (val) => {
-  emit('update:visible', val)
-})
 
-const agregarCodigo = () => {
+watch(localVisible, (val) => emit('update:visible', val))
+
+const cargarCodigos = async () => {
+  cargando.value = true
+  try {
+    const res = await getCodigosByPresentacion(props.presentacion.id)
+    codigos.value = res.data.data ?? []
+  } catch {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudieron cargar los códigos.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    cargando.value = false
+  }
+}
+
+const agregarCodigo = async () => {
   const valor = nuevoCodigo.value.trim()
   if (!valor) return
-  codigos.value.push({ id: Date.now(), valor })
-  nuevoCodigo.value = ''
 
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: '¡Código de barra agregado !',
-    showConfirmButton: false,
-    timer: 1500,
-    timerProgressBar: true,
-    background: '#ffffff',
-    color: '#1e3a2f',
-    iconColor: '#2b5e3b',
-  })
+  try {
+    const res = await createCodigoBarra({
+      codigo: valor,
+      presentacion_id: props.presentacion.id,
+    })
+
+    codigos.value.unshift({
+      id: res.data.codigo_barra.id,
+      codigo: res.data.codigo_barra.codigo,
+    })
+
+    nuevoCodigo.value = ''
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: '¡Código de barra agregado!',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      background: '#ffffff',
+      color: '#1e3a2f',
+      iconColor: '#2b5e3b',
+    })
+  } catch (error) {
+    const msg =
+      error.response?.data?.errors?.codigo?.[0] ??
+      error.response?.data?.message ??
+      'Error al agregar el código.'
+    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#2b5e3b' })
+  }
 }
 
 const eliminarCodigo = (id) => {
   Swal.fire({
     html: `
-    <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-      <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-        <i class="pi pi-trash" style="font-size:24px; color:#b91c1c;"></i>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+        <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
+          <i class="pi pi-trash" style="font-size:24px; color:#b91c1c;"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">¿Eliminar código de barra?</h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">Esta acción no se puede deshacer.</p>
       </div>
-      <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">¿Eliminar código de barra?</h3>
-      <p style="font-size:14px; color:#6b7280; margin:0;">Esta acción no se puede deshacer.</p>
-    </div>
-  `,
+    `,
     showCancelButton: true,
     confirmButtonColor: '#b91c1c',
     cancelButtonColor: '#e2e8dd',
     confirmButtonText: 'Sí, eliminar',
     cancelButtonText: 'Cancelar',
     customClass: {
-      container: '!z-[9999]',
+      container: '!z-[9999]', // ← encima del Dialog
       confirmButton: '!rounded-lg !font-semibold !text-sm',
       cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
       popup: '!rounded-2xl',
     },
-    buttonsStyling: true,
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      codigos.value = codigos.value.filter((c) => c.id !== id)
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: '¡Código eliminado!',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        background: '#ffffff',
-        color: '#1e3a2f',
-        iconColor: '#2b5e3b',
-      })
+      try {
+        await deleteCodigoBarra(id)
+        codigos.value = codigos.value.filter((c) => c.id !== id)
+
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: '¡Código eliminado!',
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+          background: '#ffffff',
+          color: '#1e3a2f',
+          iconColor: '#2b5e3b',
+          customClass: { container: '!z-[9999]' }, // ← también en el toast
+        })
+      } catch {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo eliminar el código.',
+          confirmButtonColor: '#2b5e3b',
+          customClass: { container: '!z-[9999]' }, // ← encima del Dialog
+        })
+      }
     }
   })
 }
