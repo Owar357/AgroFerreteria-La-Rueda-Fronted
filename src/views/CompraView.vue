@@ -9,6 +9,7 @@
       @cambiar-pagina="cargarCompras"
       @filtrar="aplicarFiltros"
       @ver-detalle="verDetalleCompra"
+      @anular-compra="marcarCompraComoAnulada"
     />
 
     <RegistroComprasView
@@ -92,5 +93,11 @@ const verDetalleCompra = async (compraRow) => {
   }
 }
 
+const marcarCompraComoAnulada = (compraId) => {
+  const compra = compras.value.find(c => c.id === compraId)
+  if (compra) {
+    compra.estadoPago = 'ANULADA'
+  }
+}
 onMounted(() => cargarCompras())
 </script>
