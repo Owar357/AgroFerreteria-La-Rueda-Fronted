@@ -10,7 +10,6 @@
     @hide="resetForm"
   >
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-
       <!-- Nombre -->
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">
@@ -30,6 +29,7 @@
         </label>
         <InputText
           v-model="form.unidadMedida"
+          
           placeholder="Ej: kg, unidad, litro"
           class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
         />
@@ -51,8 +51,6 @@
         />
       </div>
 
-
-
       <!-- Botones -->
       <div class="flex justify-between gap-4 mt-2">
         <Button
@@ -67,7 +65,6 @@
           @click="guardar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
@@ -82,7 +79,7 @@ import Swal from 'sweetalert2'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  presentacion: { type: Object, default: null }
+  presentacion: { type: Object, default: null },
 })
 
 const emit = defineEmits(['update:visible', 'guardar'])
@@ -94,18 +91,29 @@ const form = ref({
   nombre: '',
   unidadMedida: '',
   precio: null,
-  estado: 'ACTIVO'
+  estado: 'ACTIVO',
 })
 
-watch(() => props.visible, (val) => { localVisible.value = val })
-watch(localVisible, (val) => { emit('update:visible', val) })
+watch(
+  () => props.visible,
+  (val) => {
+    localVisible.value = val
+  },
+)
+watch(localVisible, (val) => {
+  emit('update:visible', val)
+})
 
 // Cuando llega la presentación a editar, llena el form
-watch(() => props.presentacion, (val) => {
-  if (val) {
-    form.value = { ...val }
-  }
-}, { immediate: true })
+watch(
+  () => props.presentacion,
+  (val) => {
+    if (val) {
+      form.value = { ...val }
+    }
+  },
+  { immediate: true },
+)
 
 const resetForm = () => {
   form.value = { nombre: '', unidadMedida: '', precio: null, estado: 'ACTIVO' }
@@ -118,7 +126,7 @@ const guardar = () => {
   localVisible.value = false
   guardando.value = false
 
-   Swal.fire({
+  Swal.fire({
     toast: true,
     position: 'top-end',
     icon: 'success',
@@ -130,7 +138,6 @@ const guardar = () => {
     color: '#1e3a2f',
     iconColor: '#2b5e3b',
   })
-  
 }
 </script>
 

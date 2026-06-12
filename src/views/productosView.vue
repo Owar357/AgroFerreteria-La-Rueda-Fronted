@@ -18,6 +18,12 @@
           @close="cerrarFormulario"
         />
 
+        <EditProduct
+          v-else-if="vistaActual === 'editar'"
+          :producto="productoSeleccionado"
+          @close="cerrarFormulario"
+        />
+        
         <!-- Vista 3: Detalle del producto con las presentaciones -->
         <DetalleProducto 
           v-else-if="vistaActual === 'detalle'"
@@ -36,6 +42,7 @@ import ProducTable from '../components/Usuarios/ProducTable.vue'
 import Producto from '../views/Producto.vue'
 import { useproductoStore } from '../stores/productoStore.js'
 import DetalleProducto from '../components/Productos/ProductDetailsTable.vue'
+import EditProduct from '@/components/Productos/EditProduct.vue'
 
 
 const store = useproductoStore()
@@ -58,7 +65,7 @@ const abrirFormularioCrear = () => {
 const abrirFormularioEditar = (producto) => {
   transitionName.value = 'slide-forward'
   productoSeleccionado.value = producto
-  vistaActual.value = 'formulario'
+  vistaActual.value = 'editar'
 }
 
 const abrirDetalle = (producto) => {

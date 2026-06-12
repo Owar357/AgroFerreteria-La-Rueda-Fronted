@@ -1,8 +1,10 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <div class="flex flex-col mb-8 gap-4">
-      <div class="flex justify-between items-center w-full">
+
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-3 md:gap-0">
         <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de Productos</h1>
+        
         <Button
           label="+ Agregar"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
@@ -10,7 +12,7 @@
         />
       </div>
 
-      <div class="flex justify-start items-center w-full gap-8">
+      <div class="flex justify-start items-center w-full gap-8 sm:gap-6">
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
@@ -53,7 +55,9 @@
         </template>
 
         <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
+        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
         <Column field="codigo" header="Código" class="text-[#6b7280]" />
+         
 
         <Column header="Categoría" class="text-[#4b5563]">
           <template #body="slotProps">

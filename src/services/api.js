@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // <- Corregido a 'baseURL' con U mayúscula
+  baseURL: 'http://localhost:8000/api', 
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json' // <- Corregido typo 'aplication'
+    'Accept': 'application/json' 
   }
 })
 
@@ -15,7 +15,7 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token')
 
     if (token) {
-      // CORREGIDO: Usamos comillas invertidas (backticks) para que inyecte la variable real
+      
       config.headers.Authorization = `Bearer ${token}`
     }
 
