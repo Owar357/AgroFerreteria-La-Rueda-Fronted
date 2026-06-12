@@ -16,12 +16,6 @@
           <span :class="['text-xs px-1.5 py-0.5 rounded-full', filtroActivo === f.value ? 'bg-white text-[#1a2e1f]' : 'bg-[#eef2e9] text-[#2b5e3b]']">{{ f.count }}</span>
         </button>
       </div>
-      <button
-        @click="marcarTodoLeido"
-        class="flex items-center gap-2 text-sm text-[#2b5e3b] hover:text-[#1a2e1f] transition-all mt-2"
-      >
-        <i class="pi pi-check-circle text-sm"></i> Marcar todo como leído
-      </button>
     </div>
 
     <!-- Contenido principal -->
@@ -154,8 +148,7 @@ const gruposFiltrados = computed(() => {
 })
 
 const toggleLeida = (alerta) => { alerta.leida = !alerta.leida }
-const marcarTodoLeido = () => { alertas.value.forEach(a => a.leida = true) }
-
+  
 
 // Colores de la línea izquierda (más representativos)
 const colorLinea = (prioridad) => {
