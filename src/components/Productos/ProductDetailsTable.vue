@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -137,55 +137,75 @@ import AñadirPresentacionDialog from '@/components/Productos/AddPresentation.vu
 import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
+import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
 
 const props = defineProps({
-  productoId: {
-    type: [String, Number],
-    default: null,
-  },
+  producto: { type: Object, required: true }
 })
 
 const emit = defineEmits(['volver'])
 
-const editarVisible = ref(false)
+const editarVisible           = ref(false)
 const presentacionSeleccionada = ref(null)
-const codigosVisible = ref(false)
-const presentacionCodigos = ref(null)
+const codigosVisible          = ref(false)
+const presentacionCodigos     = ref(null)
+const AgregarVisible          = ref(false)
+const cargando                = ref(false)
+const presentaciones          = ref([])
 
-// ========== DATOS DEL PRODUCTO==========
+// Los datos de la tarjeta vienen directo del prop (ya los tiene la tabla)
 const producto = ref({
-  id: 1,
-  nombre: 'Maíz Híbrido',
-  codigo: 'PRN-908-789',
-  categoria: 'Semilla',
-  fabricante: 'Agrosem',
+  id:         props.producto.id,
+  nombre:     props.producto.nombre,
+  codigo:     props.producto.codigo,
+  categoria:  props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
+  fabricante: props.producto.fabricante,
 })
 
-// ========== PRESENTACIONES==========
-const presentaciones = ref([
-  { id: 1, nombre: 'Bolsa 1kg', unidadMedida: 'kg', precio: 5.0, stock: 120, estado: 'ACTIVO' },
-  { id: 2, nombre: 'Saco 25kg', unidadMedida: 'kg', precio: 95.0, stock: 40, estado: 'ACTIVO' },
-  { id: 3, nombre: 'Saco 50kg', unidadMedida: 'kg', precio: 180.0, stock: 15, estado: 'INACTIVO' },
-  {
-    id: 4,
-    nombre: 'Caja 10uds',
-    unidadMedida: 'unidad',
-    precio: 45.0,
-    stock: 80,
-    estado: 'ACTIVO',
-  },
-])
+onMounted(async () => {
+  await cargarPresentaciones()
+})
 
-const AgregarVisible = ref(false)
+const cargarPresentaciones = async () => {
+  cargando.value = true
+  try {
+    const res = await getPresentacionesByProducto(props.producto.id)
+     const data = res.data.data ?? []
 
-// ========== MÉTODOS ==========
-const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
+    console.log('RAW presentaciones:', data) // SE VA HA QUITAR LUEGO
 
-const volver = () => {
-  emit('volver')
+    
+
+    presentaciones.value = data.map((p) => ({
+      id:           p.id,
+      nombre:       p.nombre,
+      unidadMedida: props.producto.unidad_base ?? '—',
+      precio:       parseFloat(p.precio_venta ?? 0), //SE VA HA QUIATR EL CERO
+      stock:        p.stock !== null && p.stock !== undefined ? Number(p.stock) : 0,
+      estado:       p.activo ? 'ACTIVO' : 'INACTIVO',
+    }))
+
+  } catch (error) {
+    // Si es 404 simplemente no hay presentaciones, no mostramos error
+    if (error.response?.status === 404 || error.response?.status === 200) {
+      presentaciones.value = []
+      return
+    }
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudieron cargar las presentaciones.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    cargando.value = false
+  }
 }
 
-// Botón dual: activar/desactivar
+const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
+
+const volver = () => emit('volver')
+
 const toggleEstadoPresentacion = (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
 
@@ -195,8 +215,12 @@ const toggleEstadoPresentacion = (pres) => {
         <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dff0e0'}; display:flex; align-items:center; justify-content:center;">
           <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#2b5e3b'};"></i>
         </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}</p>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">
+          ${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}
+        </h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">
+          ${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}
+        </p>
       </div>
     `,
     showCancelButton: true,
@@ -210,40 +234,39 @@ const toggleEstadoPresentacion = (pres) => {
       cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
       popup: '!rounded-2xl',
     },
-    buttonsStyling: true,
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      const nuevoEstado = esActivo ? 'INACTIVO' : 'ACTIVO'
-      const index = presentaciones.value.findIndex((p) => p.id === pres.id)
-      if (index !== -1) {
-        presentaciones.value[index].estado = nuevoEstado
-      }
+      try {
+        const res = await togglePresentacion(pres.id)
 
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        background: '#ffffff',
-        color: '#1e3a2f',
-        iconColor: '#2b5e3b',
-      })
+        const index = presentaciones.value.findIndex((p) => p.id === pres.id)
+        if (index !== -1) {
+          presentaciones.value[index].estado = res.data.activo ? 'ACTIVO' : 'INACTIVO'
+        }
+
+        Swal.fire({
+          toast: true, position: 'top-end', icon: 'success',
+          title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
+          showConfirmButton: false, timer: 1500, timerProgressBar: true,
+          background: '#ffffff', color: '#1e3a2f', iconColor: '#2b5e3b',
+        })
+      } catch {
+        Swal.fire({
+          icon: 'error', title: 'Error',
+          text: 'No se pudo cambiar el estado.',
+          confirmButtonColor: '#2b5e3b',
+        })
+      }
     }
   })
 }
-// ========== Abrir modal para AÑADIR presentación==========
-const abrirAñadir = () => {
-  AgregarVisible.value = true
-}
+
+const abrirAñadir = () => { AgregarVisible.value = true }
 
 const onGuardar = (nuevaPresentacion) => {
   presentaciones.value.push(nuevaPresentacion)
 }
 
-// ========== Abrir modal para EDITAR presentación==========
 const abrirEditar = (presentacion) => {
   presentacionSeleccionada.value = { ...presentacion }
   editarVisible.value = true
@@ -256,7 +279,6 @@ const onGuardarEdicion = (presentacionEditada) => {
   }
 }
 
-// ========== Abrir modal para VER y AÑADIR código  de barra ==========
 const abrirCodigos = (presentacion) => {
   presentacionCodigos.value = { ...presentacion }
   codigosVisible.value = true
