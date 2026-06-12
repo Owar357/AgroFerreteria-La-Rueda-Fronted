@@ -16,22 +16,23 @@
             class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]" />
         </IconField>
 
-        <Dropdown v-model="filtros.estado.value" :options="opcionesEstado" showClear placeholder="Todos los estados"
+        <Select v-model="filtros.estado.value" :options="opcionesEstado" showClear placeholder="Todos los estados"
           class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2" />
 
-        <Dropdown v-model="filtros.tipoPago.value" :options="opcionesPago" showClear placeholder="Tipo de pago"
+        <Select v-model="filtros.tipoPago.value" :options="opcionesPago" showClear placeholder="Tipo de pago"
           class="w-48 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2" />
 
-        <Calendar v-model="rangoDeFechas" selectionMode="range" placeholder="Filtrar por fecha" dateFormat="dd/mm/yy"
-          showIcon showButtonBar class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px]" />
+        <DatePicker v-model="rangoDeFechas" selectionMode="range" placeholder="Filtrar por fecha" dateFormat="dd/mm/yy"
+          showIcon showButtonBar class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px]"
+          @date-select="onFechaSeleccionada" />
       </div>
     </div>
 
     <!-- Tabla -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <DataTable :value="ventasFiltradas" v-model:filters="filtros" :globalFilterFields="['vendidoPor', 'numeroFactura']"
-        responsiveLayout="scroll" class="p-datatable-custom text-[14px]" :paginator="true" :rows="5"
-        :rowsPerPageOptions="[5, 10, 20]"
+      <DataTable :value="ventasFiltradas" v-model:filters="filtros"
+        :globalFilterFields="['vendidoPor', 'numeroFactura']" responsiveLayout="scroll"
+        class="p-datatable-custom text-[14px]" :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 20]"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport">
 
@@ -76,10 +77,9 @@
               <Button icon="pi pi-eye" v-tooltip.top="'Ver detalle'"
                 class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
                 @click="$emit('ver-detalle', data)" />
-              <Button icon="pi pi-ban" v-tooltip.top="'Anular venta'" :disabled="data.estado === 'ANULADA'"
-                :class="data.estado === 'ANULADA'
-                  ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
-                  : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'"
+              <Button icon="pi pi-ban" v-tooltip.top="'Anular venta'" :disabled="data.estado === 'ANULADA'" :class="data.estado === 'ANULADA'
+                ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
+                : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'"
                 class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
                 @click="$emit('anular-venta', data)" />
             </div>
@@ -93,14 +93,9 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
-import Select from 'primevue/select'
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import DatePicker from 'primevue/datepicker'
+
+
+
 
 // Props
 const props = defineProps({           // ← fix: faltaba guardar en variable
@@ -112,26 +107,41 @@ const props = defineProps({           // ← fix: faltaba guardar en variable
 })
 
 // Emits
-defineEmits(['ver-detalle', 'anular-venta'])
+const emit = defineEmits(['ver-detalle', 'anular-venta', 'filtrar-fechas'])
 
 // Opciones de filtros
 const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
-const opcionesPago   = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
-const rangoDeFechas  = ref(null)
+const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
+const rangoDeFechas = ref(null)
 
 // Filtros reactivos
 const filtros = reactive({
-  global:   { value: null, matchMode: 'contains' },
-  estado:   { value: null, matchMode: 'equals' },
+  global: { value: null, matchMode: 'contains' },
+  estado: { value: null, matchMode: 'equals' },
   tipoPago: { value: null, matchMode: 'equals' }
 })
+
+
+
+const onFechaSeleccionada = () => {
+  const rango = rangoDeFechas.value
+  if (!rango) return
+  
+  const desde = rango[0]
+  const hasta = rango[1] || rango[0]
+  
+  emit('filtrar-fechas', {
+    fecha_desde: desde.toISOString().split('T')[0],
+    fecha_hasta: hasta.toISOString().split('T')[0],
+  })
+}
 
 // Filtro por rango de fechas
 const ventasFiltradas = computed(() => {
   if (!props.ventas) return []
-  if (!rangoDeFechas.value?.[0]) return props.ventas   // ← fix: era props.sales
+  if (!rangoDeFechas.value?.[0]) return props.ventas
   const [desde, hasta] = rangoDeFechas.value
-  return props.ventas.filter(venta => {                // ← fix: era props.sales
+  return props.ventas.filter(venta => {
     if (!venta.fecha) return false
     const [d, m, a] = venta.fecha.split('/')
     const fechaVenta = new Date(`${a}-${m}-${d}`)
@@ -141,16 +151,16 @@ const ventasFiltradas = computed(() => {
 
 // Helpers visuales
 const estiloPago = (tipo) => {
-  if (tipo === 'EFECTIVO')      return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
+  if (tipo === 'EFECTIVO') return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
   if (tipo === 'TRANSFERENCIA') return 'bg-[#dbeafe] text-[#1d4ed8] px-2 py-1 rounded-full text-xs font-medium'
-  if (tipo === 'TARJETA')       return 'bg-[#f3e8ff] text-[#6b21a8] px-2 py-1 rounded-full text-xs font-medium'
+  if (tipo === 'TARJETA') return 'bg-[#f3e8ff] text-[#6b21a8] px-2 py-1 rounded-full text-xs font-medium'
   return ''
 }
 
 const iconoPago = (tipo) => {
-  if (tipo === 'EFECTIVO')      return 'pi pi-money-bill'
+  if (tipo === 'EFECTIVO') return 'pi pi-money-bill'
   if (tipo === 'TRANSFERENCIA') return 'pi pi-mobile'
-  if (tipo === 'TARJETA')       return 'pi pi-credit-card'
+  if (tipo === 'TARJETA') return 'pi pi-credit-card'
   return ''
 }
 

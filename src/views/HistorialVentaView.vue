@@ -1,16 +1,10 @@
 <template>
   <div>
-<<<<<<< HEAD
-    <!-- Tabla -->
-    <HistorialVentaTable :sales="sales" @view-detail="openDetail" @void-sale="confirmVoid" />
-
-    <!-- Modal detalle -->
-    <DetallVentaDialogo v-model:visible="showDetail" :sale="selectedSale" />
-=======
-    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
+    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion"
+      @filtrar-fechas="aplicarFiltroFechas" />
 
     <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
->>>>>>> 3bde7be56338bc89d959c4445071d0099a5aa97e
+
   </div>
 </template>
 
@@ -25,6 +19,33 @@ const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
+
+
+
+
+
+const aplicarFiltroFechas = async (fechas) => {
+  cargando.value = true
+  try {
+    const response = await getVentas(fechas || {})
+    const data = response.data.data || []
+    ventas.value = data.map(v => ({
+      id: v.id,
+      vendidoPor: v.vendido_por.name,
+      numeroFactura: v.numero_factura,
+      tipoPago: v.tipo_pago,
+      estado: v.estado,
+      fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      }),
+      total: v.total,
+    }))
+  } catch {
+    ventas.value = []
+  } finally {
+    cargando.value = false
+  }
+}
 
 const cargarVentas = async () => {
   cargando.value = true
@@ -68,12 +89,12 @@ const abrirDetalle = async (venta) => {
       tipoPago: venta.tipoPago,
       estado: venta.estado,
       total: venta.total,
-      // Productos (items)
+
       items: detalles.map(d => ({
         nombreProducto: d.nombre_producto,
         cantidad: parseFloat(d.cantidad),
         precio: parseFloat(d.precio_unitario),
-        unidad: d.presentacion || d.unidad_medida,
+        unidad: d.unidad_base,
         subtotal: parseFloat(d.subtotal) || (parseFloat(d.cantidad) * parseFloat(d.precio_unitario))
       }))
 
