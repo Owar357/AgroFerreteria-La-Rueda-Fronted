@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <!-- Encabezado Presentaciones + botón Agregar -->
+
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold text-[#1e3a2f] flex items-center gap-2">
         <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
@@ -31,11 +31,16 @@
         label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
     </div>
 
-    <!-- Tabla de presentaciones con botones mejorados -->
+    <!-- Tabla de presentaciones con botones -->
     <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
       <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-sm">
         <Column field="nombre" header="Nombre" class="text-sm"></Column>
-        <Column field="unidadMedida" header="Unidad medida" class="text-sm"></Column>
+
+        <Column header="Equivalencia" class="text-sm">
+          <template #body="{ data }">
+          {{ data.factor_conversion }} {{ data.unidadMedida }}
+          </template>
+        </Column>
         <Column field="precio" header="Precio" class="text-sm">
           <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
         </Column>
@@ -76,7 +81,7 @@
       </DataTable>
 
       <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
-        @guardar="onGuardar" />
+        :productoId="producto.id" @guardar="onGuardar" />
 
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
         :unidadBase="producto.unidad_base" @guardar="onGuardarEdicion" />

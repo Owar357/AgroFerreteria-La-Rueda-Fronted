@@ -52,68 +52,112 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
+import InputText from 'primevue/inputtext'        // ⬅️ te faltaba importar
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
+import { añadirPresentacion } from '@/services/productoService'
 import Swal from 'sweetalert2'
-
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   presentacion: { type: Object, default: null },
-  unidadBase: { type: String, default: '' }
+  unidadBase: { type: String, default: '' },
+  productoId: { type: [Number, String], required: true }
 })
-
 
 const emit = defineEmits(['update:visible', 'guardar'])
 
 const localVisible = ref(false)
 const guardando = ref(false)
-
-
 const form = ref({
   nombre: '',
-  unidadMedida: '',
   factor_conversion: null,
   precio: null,
-  estado: 'ACTIVO'
 })
 
 watch(() => props.visible, (val) => { localVisible.value = val })
 watch(localVisible, (val) => { emit('update:visible', val) })
-
-// Cuando llega la presentación a editar, llena el form
 watch(() => props.presentacion, (val) => {
-  if (val) {
-    form.value = { ...val }
-  }
+  if (val) form.value = { ...val }
 }, { immediate: true })
 
-
 const resetForm = () => {
-  form.value = { nombre: '', unidadMedida: '', factor_conversion: null, precio: null, estado: 'ACTIVO' }
+  form.value = { nombre: '', factor_conversion: null, precio: null }
   guardando.value = false
 }
 
-const guardar = () => {
-  guardando.value = true
-  emit('guardar', { ...form.value })
-  localVisible.value = false
-  guardando.value = false
 
+const mostrarAlerta = (tipo, titulo, texto) => {
   Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: '¡Presentación creada con éxito!',
-    showConfirmButton: false,
-    timer: 1500,
-    timerProgressBar: true,
-    background: '#ffffff',
-    color: '#1e3a2f',
-    iconColor: '#2b5e3b',
+    icon: tipo,
+    title: titulo,
+    text: texto,
+    confirmButtonColor: '#2b5e3b',
+    customClass: {
+      container: '!z-[9999]',
+    },
   })
+}
+
+const guardar = async () => {
+  if (!form.value.nombre || !form.value.factor_conversion || !form.value.precio) {
+    mostrarAlerta('warning', 'Campos incompletos', 'Completa todos los campos requeridos.')
+    return
+  }
+
+  guardando.value = true
+
+  const payload = {
+    nombre: form.value.nombre,
+    factor_conversion: form.value.factor_conversion,
+    precio_venta: form.value.precio,
+    producto_id: props.productoId
+  }
+
+  try {
+
+    const response = await añadirPresentacion(payload)
+    console.log('respuesta backend:', JSON.stringify(response.data, null, 2))
+    const nueva = response.data.data ?? response.data
+    console.log('nueva:', JSON.stringify(nueva, null, 2))
+
+    emit('guardar', {
+      id: nueva.id,
+      nombre: nueva.nombre,
+      unidadMedida: props.unidadBase,
+      factor_conversion: Number(nueva.factor_conversion),
+      precio: parseFloat(nueva.precio_venta),
+      stock: 0,
+      estado: 'ACTIVO',
+    })
+
+    localVisible.value = false
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: '¡Presentación creada con éxito!',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      background: '#ffffff',
+      color: '#1e3a2f',
+      iconColor: '#2b5e3b',
+      customClass: {
+        container: '!z-[9999]',
+      },
+    })
+  } catch (error) {
+    const status = error.response?.status
+    if (status === 422) {
+      mostrarAlerta('warning', 'Error de validación', 'Revisa los datos enviados e intenta nuevamente.')
+    } else {
+      mostrarAlerta('error', 'Error', 'No se pudo crear la presentación.')
+    }
+  } finally {
+    guardando.value = false
+  }
 }
 </script>
 
