@@ -75,10 +75,11 @@
         </template>
       </DataTable>
 
-      <AñadirPresentacionDialog v-model:visible="AgregarVisible" @guardar="onGuardar" />
+      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
+        @guardar="onGuardar" />
 
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
-        @guardar="onGuardarEdicion" />
+        :unidadBase="producto.unidad_base" @guardar="onGuardarEdicion" />
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
@@ -118,6 +119,7 @@ const producto = ref({
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
+  unidad_base: props.producto.unidad_base ?? '—',
 })
 
 onMounted(async () => {
@@ -130,21 +132,22 @@ const cargarPresentaciones = async () => {
     const res = await getPresentacionesByProducto(props.producto.id)
     const data = res.data.data ?? []
 
-    console.log('RAW presentaciones:', data) // SE VA HA QUITAR LUEGO
-
-
+    // Fallback: sacar unidad_base desde la presentación
+    if (data.length > 0 && data[0].producto?.unidad_base) {
+      producto.value.unidad_base = data[0].producto.unidad_base
+    }
 
     presentaciones.value = data.map((p) => ({
       id: p.id,
       nombre: p.nombre,
-      unidadMedida: props.producto.unidad_base ?? '—',
-      precio: parseFloat(p.precio_venta ?? 0), //SE VA HA QUIATR EL CERO
+      unidadMedida: p.producto?.unidad_base ?? '—',
+      factor_conversion: Number(p.factor_conversion) || 0,
+      precio: parseFloat(p.precio_venta ?? 0),
       stock: p.stock !== null && p.stock !== undefined ? Number(p.stock) : 0,
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
     }))
 
   } catch (error) {
-    // Si es 404 simplemente no hay presentaciones, no mostramos error
     if (error.response?.status === 404 || error.response?.status === 200) {
       presentaciones.value = []
       return
