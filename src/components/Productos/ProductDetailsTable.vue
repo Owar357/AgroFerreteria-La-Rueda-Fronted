@@ -38,7 +38,7 @@
 
         <Column header="Equivalencia" class="text-sm">
           <template #body="{ data }">
-          {{ data.factor_conversion }} {{ data.unidadMedida }}
+            {{ data.factor_conversion }} {{ data.unidadMedida }}
           </template>
         </Column>
         <Column field="precio" header="Precio" class="text-sm">
@@ -84,7 +84,7 @@
         :productoId="producto.id" @guardar="onGuardar" />
 
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
-        :unidadBase="producto.unidad_base" @guardar="onGuardarEdicion" />
+        :unidadBase="producto.unidad_base" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
