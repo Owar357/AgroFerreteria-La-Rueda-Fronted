@@ -4,7 +4,7 @@
 
       <!-- dos columnas ocupando toda la altura -->
       <div class="rounded-2xl overflow-hidden flex-1 min-h-0"
-        style="background-color: #ffffff; border: 1px solid #e2e8dd; display: grid; grid-template-columns: 1fr 1px 1fr;">
+        style="background-color: #ffffff; border: 1px solid #e2e8dd; display: grid; grid-template-columns:2.5fr 2px 1fr;">
 
         <!-- COLUMNA IZQUIERDA -->
         <div class="flex flex-col overflow-hidden" style="padding: 20px;">
@@ -146,8 +146,9 @@
               <div class="flex justify-between items-center gap-4">
                 <div class="flex items-center gap-2 flex-1">
                   <span style="font-size: 13px; color: #4b5563; white-space: nowrap;">Recibido</span>
-                  <InputNumber v-model="efectivoRecibido" :min="0" locale="en-US" :minFractionDigits="2"
-                    :maxFractionDigits="2" inputStyle="font-size: 13px; padding: 8px 12px; width: 120px;" />
+                  <InputNumber v-model="efectivoRecibido" mode="currency" currency="USD" locale="en-US" :min="0"
+                    :minFractionDigits="2" :maxFractionDigits="2"
+                    inputStyle="font-size: 13px; padding: 8px 12px; width: 120px;" />
                 </div>
                 <div class="flex items-center gap-2">
                   <span style="font-size: 13px; color: #4b5563;">Cambio:</span>
@@ -156,8 +157,7 @@
               </div>
             </div>
 
-            <!-- Botones al fondo -->
-            <div class="flex flex-col gap-2 mt-auto">
+            <div class="flex flex-col gap-2" style="margin-top: 24px;">
               <Button label="Registrar venta" icon="pi pi-check" @click="registrarVenta"
                 style="background-color: #2b5e3b; border: 1px solid #2b5e3b; border-radius: 10px; color: #ffffff; font-size: 14px; font-weight: 600; padding: 12px 24px; width: 100%;" />
               <Button label="Anular venta" icon="pi pi-times" @click="anularVenta"
