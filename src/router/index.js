@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import authService from '@/services/authService.js'
 
-// 1. Vistas principales (Carga directa)
+
 import Login from '@/views/auth/Login.vue'
 import HomeLayout from '@/views/home.vue'
 
@@ -67,13 +67,13 @@ const routes = [
         path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
         component: () => import('@/views/HistorialVentaView.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'gestion/pos',
         name: 'FromVenta',
         component: () => import('@/views/FromVenta.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       
  
@@ -120,7 +120,7 @@ const routes = [
       {
         path: 'reportes',
         name: 'reportes',
-        component: () => import('@/views/home.vue'), 
+        component: () => import('@/views/Reportes/ReportesView.vue'), 
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
 

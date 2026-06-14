@@ -65,7 +65,7 @@ function getHomeRouteByRole(role) {
   switch (role) {
     case 'ADMIN':    return '/admin/usuarios'
     case 'CONTADOR': return '/admin/reportes'
-    //case 'cajero':   return 'admin/venta/venta'
+    case 'CAJERO':   return 'admin/venta/venta'
     default:         return '/login'
   }
 }
