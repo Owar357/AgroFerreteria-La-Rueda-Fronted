@@ -54,41 +54,36 @@
       <div class="grid grid-cols-2 gap-x-4 gap-y-4">
 
         <!-- Nombre-->
-        <div v-if="tipoPersona === 'NATURAL'" class="col-span-2 flex flex-col gap-1.5 w-2xl ">
+        <div v-if="tipoPersona === 'NATURAL'" class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]">Nombre</label>
-          <InputText v-model="form.nombre" placeholder="Nombre completo" :pt="inputPt" />
+          <InputText v-model="form.nombre" placeholder="Nombre completo" :pt="inputPt" class="w-full" />
         </div>
 
         <!-- Razón social (JURIDICA) -->
-        <div v-if="tipoPersona === 'JURIDICA'" class="col-span-2 flex flex-col gap-1.5 w-2xl ">
+        <div v-if="tipoPersona === 'JURIDICA'" class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]">Razón social</label>
-          <InputText v-model="form.razon_social" placeholder="Nombre de la empresa" :pt="inputPt" />
+          <InputText v-model="form.razon_social" placeholder="Nombre de la empresa" :pt="inputPt" class="w-full" />
         </div>
 
         <!-- Giro de actividad -->
-        <div v-if="tipoPersona === 'JURIDICA'" class="col-span-2 flex flex-col gap-1.5 w-2xl">
+        <div v-if="tipoPersona === 'JURIDICA'" class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]">Giro o actividad</label>
-          <InputText v-model="form.giro_actividad" placeholder="Ej: Venta de productos agrícolas" :pt="inputPt" />
+          <InputText v-model="form.giro_actividad" placeholder="Ej: Venta de productos agrícolas" :pt="inputPt"
+            class="w-full" />
         </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
-            Teléfono
-            <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
-          </label>
-          <InputText v-model="form.telefono" placeholder="7777-8888" :pt="inputPt" />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
+        <!-- Correo -->
+        <div class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
             Correo
             <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
           </label>
-          <InputText v-model="form.correo" type="email" placeholder="correo@ejemplo.com" :pt="inputPt" />
+          <InputText v-model="form.correo" type="email" placeholder="correo@ejemplo.com" :pt="inputPt" class="w-full" />
         </div>
 
       </div>
 
+      <!-- Documentos -->
       <!-- Documentos -->
       <p
         class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-300 ">
@@ -97,38 +92,75 @@
 
       <div class="grid grid-cols-2 gap-x-4 gap-y-4 mb-1">
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
-            Tipo de documento
-            <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
-          </label>
-          <select v-model="form.tipo_documento_receptor"
-            class="w-full rounded-lg outline-none appearance-none cursor-pointer"
-            style="border: 1px solid #e5e7eb; color: #1a2e1f; font-size: 13px; padding: 10px 14px;">
-            <option value="">Sin documento</option>
-            <option value="13">DUI</option>
-            <option value="36">NIT</option>
-            <option value="02">Pasaporte</option>
-            <option value="03">Carnet de residente</option>
-          </select>
-        </div>
+        <!-- NATURAL: Tipo + Número de documento -->
+        <template v-if="tipoPersona === 'NATURAL'">
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
+              Tipo de documento
+              <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
+            </label>
+            <Select v-model="form.tipo_documento_receptor" :options="tiposDocumento" optionLabel="label"
+              optionValue="value" placeholder="Sin documento" class="w-full" :pt="selectPt" />
+          </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
-            Número de documento
-            <span class="text-[11px] font-normal text-gray-400 ml-1"></span>
-          </label>
-          <InputText v-model="form.numero_documento" placeholder="Número..." :disabled="!form.tipo_documento_receptor"
-            :pt="inputPt" />
-        </div>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
+              Número de documento
+            </label>
+            <InputText v-model="form.numero_documento" placeholder="Número..." :disabled="!form.tipo_documento_receptor"
+              :pt="inputPt" class="w-full" />
+          </div>
+        </template>
 
-        <!-- NRC -->
-        <div v-if="tipoPersona === 'JURIDICA'" class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">NRC</label>
-          <InputText v-model="form.nrc" placeholder="000000-0" :pt="inputPt" />
-        </div>
+        <!-- JURIDICA: NIT + NRC -->
+        <template v-else>
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[12.5px] font-semibold text-[#1a2e1f]">NIT</label>
+            <InputText v-model="form.nit" placeholder="0000-000000-000-0" :pt="inputPt" class="w-full" />
+          </div>
+
+          <div class="col-span-2 flex flex-col gap-1.5">
+            <label class="text-[12.5px] font-semibold text-[#1a2e1f]">NRC</label>
+            <InputText v-model="form.nrc" placeholder="000000-0" :pt="inputPt" class="w-full" />
+          </div>
+        </template>
 
       </div>
+      <!-- Dirección -->
+      <p
+        class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-300 ">
+        Dirección
+      </p>
+
+      <div class="grid grid-cols-2 gap-x-4 gap-y-4 mb-1">
+
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
+            Departamento
+          </label>
+          <Select v-model="departamentoSeleccionado" :options="departamentos" optionLabel="label"
+            placeholder="Seleccionar departamento" @change="onDepartamentoSeleccionado" class="w-full" :pt="selectPt" />
+        </div>
+
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
+            Municipio
+          </label>
+          <Select v-model="municipioSeleccionado" :options="municipiosDisponibles" optionLabel="label"
+            placeholder="Seleccionar municipio" :disabled="!departamentoSeleccionado" class="w-full" :pt="selectPt" />
+        </div>
+      </div>
+
+      <div class="   flex flex-col gap-1.5">
+        <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
+          Dirección complementaria
+        </label>
+        <InputText v-model="form.direccion_complemento" placeholder="Calle, avenida, número de casa..." :pt="inputPt"
+          class="w-full" />
+      </div>
+
 
     </div>
 
@@ -153,6 +185,7 @@
 import { ref, reactive, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
+import Select from 'primevue/select'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
 import { crearCliente } from '@/services/ventaService'
@@ -170,26 +203,80 @@ const visible = computed({
 
 const tipoPersona = ref('NATURAL')
 
+
+const tiposDocumento = [
+  { label: 'Sin documento', value: '' },
+  { label: 'DUI', value: '13' },
+  { label: 'NIT', value: '36' },
+  { label: 'Pasaporte', value: '02' },
+  { label: 'Carnet de residente', value: '03' },
+]
+
+const departamentos = [
+  { label: 'Chalatenango', value: '04' },
+  { label: 'San Salvador', value: '06' },
+  { label: 'Cuscatlán', value: '07' },
+]
+
+const departamentoSeleccionado = ref(departamentos[1]) // San Salvador por defecto
+const municipioSeleccionado = ref(null)
+
+const onDepartamentoSeleccionado = () => {
+  municipioSeleccionado.value = null
+}
+
+
+const municipios = {
+  // SAN SALVADOR
+  '06': [
+    { label: 'San Salvador Centro', value: '0601' },
+    { label: 'San Salvador Oeste', value: '0602' },
+    { label: 'San Salvador Este', value: '0603' },
+    { label: 'San Salvador Norte', value: '0604' }, // Aguilares
+    { label: 'San Salvador Sur', value: '0605' },
+  ],
+  // CHALATENANGO
+  '04': [
+    { label: 'Chalatenango Centro', value: '0401' },
+    { label: 'Chalatenango Norte', value: '0402' },
+    { label: 'Chalatenango Sur', value: '0403' },
+  ],
+  // CUSCATLÁN
+  '07': [
+    { label: 'Cuscatlán Norte', value: '0701' }, // Suchitoto
+    { label: 'Cuscatlán Sur', value: '0702' },
+  ],
+}
+
+const municipiosDisponibles = computed(() => {
+  if (!departamentoSeleccionado.value) return []
+  return municipios[departamentoSeleccionado.value.value] || []
+})
+
 const form = reactive({
   nombre: '',
   razon_social: '',
   giro_actividad: '',
-  telefono: '',
   correo: '',
   tipo_documento_receptor: '',
   numero_documento: '',
+  nit: '',
   nrc: '',
+  direccion_complemento: '',
 })
 
 const inputPt = {
   root: { class: 'w-full h-[42px] px-3.5 rounded-lg border border-gray-200 bg-white text-[14px] text-[#1a2e1f] placeholder-gray-300 focus:border-[#2b5e3b] focus:outline-none transition-all shadow-sm' }
 }
 
+const selectPt = {
+  root: { class: 'w-full h-[42px] rounded-lg border border-gray-200 bg-white text-[14px] text-[#1a2e1f] flex items-center px-1 focus:border-[#2b5e3b] focus:outline-none transition-all shadow-sm' }
+}
+
 const guardar = async () => {
   try {
     const payload = {
       tipo_persona: tipoPersona.value,
-      telefono: form.telefono || null,
       correo: form.correo || null,
       tipo_documento_receptor: form.tipo_documento_receptor || null,
       numero_documento: form.numero_documento || null,
@@ -203,9 +290,9 @@ const guardar = async () => {
       payload.giro_actividad = form.giro_actividad
     }
 
-    console.log('PAYLOAD COMPLETO:', payload)  
+    console.log('PAYLOAD COMPLETO:', payload)
 
-     const response =  await crearCliente(payload)
+    const response = await crearCliente(payload)
     const cliente = response.data.data
 
     emit('cliente-registrado', cliente)
