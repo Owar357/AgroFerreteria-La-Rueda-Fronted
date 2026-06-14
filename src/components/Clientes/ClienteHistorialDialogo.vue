@@ -51,22 +51,23 @@
 
     <!-- Tabla -->
     <div class="border border-[#e2e8dd] rounded-xl overflow-hidden shadow-sm">
-      <DataTable
-        :value="purchasesFiltradas"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
-        :rows="10"
-        :paginator="purchasesFiltradas.length > 10"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
-        :rowsPerPageOptions="[10, 20, 50]"
-      >
-        <template #empty>
-          <div class="flex flex-col items-center justify-center py-10 text-[#6b7280]">
-            <i class="pi pi-search text-[32px] mb-3 text-[#c8d8c0]" />
-            <span class="text-[14px]">No se encontraron facturas con ese número.</span>
-          </div>
-        </template>
+    <DataTable
+  :value="purchasesFiltradas"
+  :loading="cargando"
+  responsiveLayout="scroll"
+  class="p-datatable-custom text-[14px]"
+  :rows="10"
+  :paginator="purchasesFiltradas.length > 10"
+  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
+  :rowsPerPageOptions="[10, 20, 50]"
+>
+  <template #empty>
+    <div v-if="!cargando" class="flex flex-col items-center justify-center py-10 text-[#6b7280]">
+      <i class="pi pi-search text-[32px] mb-3 text-[#c8d8c0]" />
+      <span class="text-[14px]">No se encontraron facturas con ese número.</span>
+    </div>
+  </template>
 
         <Column field="factura" header="N° Factura">
           <template #body="{ data }">
@@ -111,7 +112,7 @@
         </Column>
       </DataTable>
     </div>
-    <!-- Al final del template, antes del </div> de cierre -->
+   
 <DetalleFacturaDialogo
   v-model:visible="mostrarDetalleCompra"
   :compra="compraSeleccionada"
@@ -120,37 +121,71 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
-
 import DetalleFacturaDialogo from '../Clientes/DetallFacturaDialogo.vue'
+import { getVentas, getDetallesVenta } from '@/services/ventaService'
 
-const mostrarDetalleCompra = ref(false)
-const compraSeleccionada   = ref(null)
-
-function abrirDetalleCompra(compra) {
-  compraSeleccionada.value = compra
-  mostrarDetalleCompra.value = true
-}
 const route  = useRoute()
 const router = useRouter()
 
-const clientName = route.query.name || '—'
-const clientDoc  = route.query.doc  || '—'
+const clientName = route.query.nombre || '—'
+const clientId   = route.params.id || route.query.clienteId
 
-// ── Filtro 
+const mostrarDetalleCompra = ref(false)
+const compraSeleccionada   = ref(null)
+const purchases = ref([])
+const cargando  = ref(false)
 const filtroFactura = ref('')
 
-const purchases = ref([
-  { factura: 'FAC-00124', date: '2026-05-10', total: 350.75, status: 'Pagado',    estado: 'Pagado'    },
-  { factura: 'FAC-00139', date: '2026-05-24', total: 12.00,  status: 'Pagado',    estado: 'Pagado'    },
-  { factura: 'FAC-00155', date: '2026-06-02', total: 35.00,  status: 'Pendiente', estado: 'Pendiente' },
-])
+const cargarHistorial = async () => {
+  cargando.value = true
+  try {
+    console.log('clientId:', clientId)
+    const { data } = await getVentas({ cliente: clientId, per_page: 50 })
+    console.log('RESPUESTA:', data)
+    const lista = data.data || data
+    console.log('LISTA:', lista)
 
-defineEmits(['view-history'])
+    purchases.value = lista.map(venta => ({
+      id: venta.id,
+      factura: venta.numero_factura,
+      date: new Date(venta.created_at).toLocaleDateString('es-ES', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      }),
+      total: parseFloat(venta.total),
+      estado: venta.estado,
+      status: venta.estado,
+    }))
+  } catch (error) {
+    console.error('Error al cargar historial:', error)
+  } finally {
+    cargando.value = false
+  }
+}
+
+async function abrirDetalleCompra(compra) {
+  try {
+    const { data } = await getDetallesVenta(compra.id)
+    const detalles = data.data || data
+
+    compraSeleccionada.value = {
+      ...compra,
+      detalles: detalles.map(d => ({
+        nombre: d.nombre_producto,
+        cantidad: parseFloat(d.cantidad),
+        precio: parseFloat(d.precio_unitario)
+      }))
+    }
+    mostrarDetalleCompra.value = true
+  } catch (error) {
+    console.error('Error al cargar detalle:', error)
+  }
+}
 
 const purchasesFiltradas = computed(() => {
   if (!filtroFactura.value.trim()) return purchases.value
@@ -159,6 +194,8 @@ const purchasesFiltradas = computed(() => {
     p.factura.toLowerCase().includes(query)
   )
 })
+
+onMounted(cargarHistorial)
 </script>
 
 <style>

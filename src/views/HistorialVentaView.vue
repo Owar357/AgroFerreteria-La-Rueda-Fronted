@@ -1,16 +1,8 @@
 <template>
   <div>
-<<<<<<< HEAD
-    <!-- Tabla -->
-    <HistorialVentaTable :sales="sales" @view-detail="openDetail" @void-sale="confirmVoid" />
-
-    <!-- Modal detalle -->
-    <DetallVentaDialogo v-model:visible="showDetail" :sale="selectedSale" />
-=======
     <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
 
     <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
->>>>>>> 3bde7be56338bc89d959c4445071d0099a5aa97e
   </div>
 </template>
 
@@ -20,16 +12,20 @@ import Swal from 'sweetalert2'
 import HistorialVentaTable from '../components/Usuarios/HistorialVentaTable.vue'
 import DetallVentaDialogo from '@/components/Usuarios/DetallVentaDialogo.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
-
+import { useRoute } from 'vue-router'
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
+ const route = useRoute()
+
+const clienteId = route.query.clienteId
 
 const cargarVentas = async () => {
   cargando.value = true
   try {
-    const response = await getVentas()
+   const params = clienteId ? { cliente: clienteId, per_page: 50 } : {}
+      const response = await getVentas(params)
     const data = response.data.data || response.data || []
     ventas.value = data.map(v => ({
       id: v.id,
