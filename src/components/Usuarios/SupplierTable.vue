@@ -1,4 +1,7 @@
 <template>
+
+
+
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
@@ -29,6 +32,14 @@
         class="p-datatable-custom text-[14px]" :paginator="true" :rows="7" @page="onPage($event)"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport">
+
+        <template #empty>
+          <div class="flex flex-col items-center justify-center py-12 text-[#6b7280]">
+            <i class="pi pi-inbox text-[48px] mb-3 text-[#cbd5e1]" />
+            <span class="text-[15px] font-medium">No hay proveedores registrados</span>
+          </div>
+        </template>
+
         <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] capitalize" />
 
         <Column field="correo" header="Correo" class="text-[#4b5563]" />
