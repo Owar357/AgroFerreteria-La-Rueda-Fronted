@@ -101,11 +101,6 @@ const tipoMovimiento = ref('ENTRADA')
 const monto = ref(null)
 const concepto = ref('')
 
-// Opciones para SelectButton
-const opcionesTipo = [
-    { label: ' ENTRADA ', value: 'ENTRADA' },
-    { label: ' SALIDA ', value: 'SALIDA' }
-]
 
 // ========== COMPUTADAS ==========
 const visible = computed({
@@ -119,12 +114,6 @@ const formularioValido = computed(() => {
     return monto.value !== null && monto.value > 0 && concepto.value.trim().length >= 3
 })
 
-const fechaHoraActual = computed(() => {
-    const now = new Date()
-    const fecha = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    const hora = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-    return `${fecha} - ${hora}`
-})
 
 // ========== MÉTODOS ==========
 const registrarMovimiento = () => {
@@ -137,7 +126,7 @@ const registrarMovimiento = () => {
         concepto: concepto.value.trim(),
         usuario: props.usuarioActual,
         turno: props.turnoActual,
-        fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        fecha: new Date().toISOString().split('T')[0], 
         hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     }
 

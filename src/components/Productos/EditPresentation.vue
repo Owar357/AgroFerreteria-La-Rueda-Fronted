@@ -1,38 +1,29 @@
 <template>
-  <Dialog
-    v-model:visible="localVisible"
-    modal
-    header="EDITAR PRESENTACIÓN"
-    :style="{ width: '450px' }"
-    :draggable="false"
-    class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
-    @hide="resetForm"
-  >
+  <Dialog v-model:visible="localVisible" modal header="EDITAR PRESENTACIÓN" :style="{ width: '450px' }"
+    :draggable="false" class="custom-dialog" :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }" @hide="resetForm">
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- Nombre -->
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">
           Nombre <span class="text-red-500">*</span>
         </label>
-        <InputText
-          v-model="form.nombre"
-          placeholder="Ej: Bolsa 1kg"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-        />
+        <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
       </div>
 
-      <!-- Unidad de medida -->
+
+
       <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Unidad de medida <span class="text-red-500">*</span>
+        <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
+          ¿Cuántos
+          <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
+            {{ unidadBase || '—' }}
+          </span>
+          contiene tu presentación? <span class="text-red-500">*</span>
         </label>
-        <InputText
-          v-model="form.unidadMedida"
-          
-          placeholder="Ej: kg, unidad, litro"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-        />
+        <InputNumber v-model="form.factor_conversion" :min="1" :useGrouping="false"
+          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          class="w-full" />
       </div>
 
       <!-- Precio -->
@@ -40,30 +31,19 @@
         <label class="text-[14px] font-medium text-[#1a2e1f]">
           Precio <span class="text-red-500">*</span>
         </label>
-        <InputNumber
-          v-model="form.precio"
-          mode="currency"
-          currency="USD"
-          locale="es-US"
-          :min="0.01"
+        <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
           inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full"
-        />
+          class="w-full" />
       </div>
 
       <!-- Botones -->
       <div class="flex justify-between gap-4 mt-2">
-        <Button
-          label="Cancelar"
+        <Button label="Cancelar"
           class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          @click="localVisible = false"
-        />
-        <Button
-          label="Guardar"
-          :loading="guardando"
+          @click="localVisible = false" />
+        <Button label="Guardar" :loading="guardando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
-          @click="guardar"
-        />
+          @click="guardar" />
       </div>
     </div>
   </Dialog>
@@ -80,6 +60,8 @@ import Swal from 'sweetalert2'
 const props = defineProps({
   visible: { type: Boolean, default: false },
   presentacion: { type: Object, default: null },
+  unidadBase: { type: String, default: '' },
+  presentacionesExistentes: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['update:visible', 'guardar'])
@@ -104,23 +86,42 @@ watch(localVisible, (val) => {
   emit('update:visible', val)
 })
 
-// Cuando llega la presentación a editar, llena el form
+
 watch(
   () => props.presentacion,
   (val) => {
     if (val) {
-      form.value = { ...val }
+      form.value = {
+        ...val,
+        factor_conversion: Number(val.factor_conversion) || null,
+      }
     }
   },
   { immediate: true },
 )
 
 const resetForm = () => {
-  form.value = { nombre: '', unidadMedida: '', precio: null, estado: 'ACTIVO' }
+  form.value = { nombre: '', unidadMedida: '', factor_conversion: null, precio: null, estado: 'ACTIVO' }
   guardando.value = false
 }
 
+
 const guardar = () => {
+  const nombreDuplicado = props.presentacionesExistentes.some(
+    (p) => p.nombre.trim().toLowerCase() === form.value.nombre.trim().toLowerCase() && p.id !== props.presentacion?.id
+  )
+
+  if (nombreDuplicado) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'No se puede editar la presentación',
+      text: 'Ya existe una presentación con este nombre',
+      confirmButtonColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
+    return
+  }
+
   guardando.value = true
   emit('guardar', { ...form.value })
   localVisible.value = false
@@ -137,6 +138,9 @@ const guardar = () => {
     background: '#ffffff',
     color: '#1e3a2f',
     iconColor: '#2b5e3b',
+    customClass: {
+      container: '!z-[9999]',
+    },
   })
 }
 </script>
