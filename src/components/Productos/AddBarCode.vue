@@ -1,13 +1,7 @@
 <template>
-  <Dialog
-    v-model:visible="localVisible"
-    modal
-    :header="`Códigos de barra - ${presentacion?.nombre ?? ''}`"
-    :style="{ width: '480px' }"
-    :draggable="false"
-    class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
-  >
+  <Dialog v-model:visible="localVisible" modal :header="`Códigos de barra - ${presentacion?.nombre ?? ''}`"
+    :style="{ width: '480px' }" :draggable="false" class="custom-dialog"
+    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }">
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- Tabla de códigos -->
       <div class="rounded-xl overflow-hidden border border-[#e8efe1]">
@@ -23,23 +17,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(codigo, index) in codigos"
-              :key="codigo.id"
-              :class="['border-t border-[#f0f5ea]', index % 2 === 0 ? 'bg-white' : 'bg-[#fafdf7]']"
-            >
+            <tr v-for="(codigo, index) in codigos" :key="codigo.id"
+              :class="['border-t border-[#f0f5ea]', index % 2 === 0 ? 'bg-white' : 'bg-[#fafdf7]']">
               <td class="px-4 py-3 text-sm text-[#1a2e1f] font-mono">{{ codigo.codigo }}</td>
               <td class="px-4 py-3 text-right">
-                <Button
-                  icon="pi pi-trash"
-                  label="Eliminar"
-                  severity="danger"
-                  text
-                  rounded
-                  size="small"
-                  v-tooltip="'Eliminar código'"
-                  @click="eliminarCodigo(codigo.id)"
-                />
+                <Button icon="pi pi-trash" label="Eliminar" severity="danger" text rounded size="small"
+                  v-tooltip="'Eliminar código'" @click="eliminarCodigo(codigo.id)" />
               </td>
             </tr>
             <tr v-if="codigos.length === 0">
@@ -55,28 +38,19 @@
       <!-- Input + botón agregar -->
 
       <div class="flex gap-2">
-        <InputText
-          v-model="nuevoCodigo"
-          placeholder="Ej: 7501234567890"
+        <InputText v-model="nuevoCodigo" placeholder="Ej: 7501234567890"
           class="flex-1 bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          @keyup.enter="agregarCodigo"
-        />
-        <Button
-          label="Agregar"
-          icon="pi pi-plus"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none !rounded-lg !px-4"
-          @click="agregarCodigo"
-        />
+          @keyup.enter="agregarCodigo" />
+        <Button label="Agregar" icon="pi pi-plus"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none !rounded-lg !px-4" @click="agregarCodigo" />
       </div>
     </div>
 
     <template #footer>
       <div class="flex justify-end">
-        <Button
-          label="Cerrar"
+        <Button label="Cerrar"
           class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] !border !border-[#cbd5e1] !rounded-lg !px-4 !py-2"
-          @click="localVisible = false"
-        />
+          @click="localVisible = false" />
       </div>
     </template>
   </Dialog>
@@ -168,7 +142,7 @@ const agregarCodigo = async () => {
       error.response?.data?.errors?.codigo?.[0] ??
       error.response?.data?.message ??
       'Error al agregar el código.'
-    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#2b5e3b' })
+    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#2b5e3b', customClass: { container: '!z-[9999]' } })
   }
 }
 
