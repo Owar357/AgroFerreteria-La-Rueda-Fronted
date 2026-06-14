@@ -13,7 +13,8 @@
 
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Email</label>
-        <InputText v-model="form.email"  autocomplete="off" placeholder="correo@ejemplo.com" @input="validateField('email')"
+        <InputText v-model="form.email" autocomplete="off" placeholder="correo@ejemplo.com"
+          @input="validateField('email')"
           class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
           :class="{ 'border-red-500 focus:border-red-500': errors.email }" />
         <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{ errors.email }}</small>
@@ -38,8 +39,13 @@
 
       <div class="flex flex-col gap-1">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
-        <InputText v-model="form.cashKey" placeholder="Código de apertura"
-          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg" />
+        <InputText v-model="form.cashKey" placeholder="Código de apertura" maxlength="6" autocomplete="off"
+          inputmode="numeric" pattern="[0-9]*"
+          @keydown="(e) => { if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) e.preventDefault() }"
+          @input="form.cashKey = form.cashKey.replace(/\D/g, '').slice(0, 6); validateField('cashKey')"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
+          :class="errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]'" />
+        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{ errors.cashKey }}</small>
         <small class="text-[13px] text-[#6b7280] font-normal mt-1">
           (Si el usuario podrá aperturar caja, ingresar código)
         </small>
@@ -69,7 +75,7 @@ const props = defineProps({
   visible: { type: Boolean, default: false },
   roles: {
     type: Array,
-    default: () => ['Administrador', 'Contador', 'Cajero']
+    default: () => ['Administrador', 'Contador', 'Cajero',]
   }
 })
 
@@ -87,7 +93,7 @@ const form = reactive({
 })
 
 const errors = reactive({
-  name: '', email: '', password: '', role: ''
+  name: '', email: '', password: '', role: '', cashKey: ''
 })
 
 const resetForm = () => {
@@ -112,6 +118,13 @@ const validateField = (field) => {
       errors.email = 'Formato de correo inválido.'
     else
       errors.email = ''
+  }
+
+  if (field === 'cashKey') {
+    const v = form.cashKey.trim()
+    if (!v) { errors.cashKey = ''; return } // es opcional
+    if (v.length !== 6) errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'
+    else errors.cashKey = ''
   }
 
   if (field === 'password') {
@@ -145,13 +158,15 @@ const handleSave = async () => {
     return
   }
 
+
+
   // Validar todos los campos
   validateField('name')
   validateField('email')
   validateField('password')
   validateField('role')
 
-  if (errors.name || errors.email || errors.password || errors.role) return
+  if (errors.name || errors.email || errors.password || errors.role || errors.cashKey) return
 
   // Cerrar modal antes del SweetAlert para que no quede detrás
   localVisible.value = false
@@ -177,6 +192,9 @@ const handleSave = async () => {
     localVisible.value = true
   }
 }
+
+
+
 </script>
 
 <style>
