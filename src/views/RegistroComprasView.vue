@@ -1,6 +1,7 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-4 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <div class="w-full max-w-[1200px] mx-auto bg-[#ffffff] rounded-3xl border border-[#e2e8dd] shadow-xl overflow-hidden">
+    <div
+      class="w-full max-w-[1200px] mx-auto bg-[#ffffff] rounded-3xl border border-[#e2e8dd] shadow-xl overflow-hidden">
       <div class="bg-[#2b5e3b] p-6 border-b border-[#e2e8dd]">
         <div class="flex items-center gap-3">
           <div>
@@ -82,12 +83,9 @@
 
                 <!-- Footer paso 1 -->
                 <div class="flex justify-between items-center pt-4 border-t border-[#e2e8dd]">
-                  <Button
-                    label="Regresar"
-                    icon="pi pi-arrow-left"
+                  <Button label="Regresar" icon="pi pi-arrow-left"
                     class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-4 py-3 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                    @click="emit('close')"
-                  />
+                    @click="emit('close')" />
                   <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
                     class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
                     @click="activateCallback('2')" />
@@ -111,12 +109,14 @@
                     </div>
                     <div class="flex flex-col w-4 gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de presentación que entra</label>
-                      <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote" optionLabel="nombre"
-                        placeholder="Seleccionar presentación" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
+                        optionLabel="nombre" placeholder="Seleccionar presentación"
+                        class="w-full bg-[#f9fafb] border-[#d1d5db]" />
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">
-                        Cantidad facturada {{ loteForm.presentacionFacturada ? `(en ${loteForm.presentacionFacturada.nombre})` : '' }}
+                        Cantidad facturada {{ loteForm.presentacionFacturada ? `(en
+                        ${loteForm.presentacionFacturada.nombre})` : '' }}
                       </label>
                       <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
                         class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
@@ -136,7 +136,8 @@
                         <div class="flex items-center gap-2">
                           <RadioButton v-model="loteForm.tipoProducto" inputId="noPerecedero" name="tipo"
                             value="No perecedero" class="p-radiobutton-custom" />
-                          <label for="noPerecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">No perecedero</label>
+                          <label for="noPerecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">No
+                            perecedero</label>
                         </div>
                       </div>
                     </div>
@@ -150,20 +151,24 @@
                       </label>
                     </div>
                     <small class="text-[13px] text-[#6b7280] font-normal">
-                      Marca esta opción si recibiste unidades extra de regalo o bonificación (ej: "compra 10 lleva 1 gratis"),
+                      Marca esta opción si recibiste unidades extra de regalo o bonificación (ej: "compra 10 lleva 1
+                      gratis"),
                       sin que se refleje en el precio facturado.
                     </small>
                   </div>
 
-                  <div v-if="incluyeBonificacion" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
+                  <div v-if="incluyeBonificacion"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
                     <div class="flex flex-col gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">Presentación bonificada</label>
-                      <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote" optionLabel="nombre"
-                        placeholder="Seleccionar presentación" class="w-full bg-[#ffffff] border-[#d1d5db]" />
+                      <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote"
+                        optionLabel="nombre" placeholder="Seleccionar presentación"
+                        class="w-full bg-[#ffffff] border-[#d1d5db]" />
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <label class="text-[14px] font-medium text-[#1a2e1f]">
-                        Cantidad bonificada {{ loteForm.presentacionBonificada ? `(en ${loteForm.presentacionBonificada.nombre})` : '' }}
+                        Cantidad bonificada {{ loteForm.presentacionBonificada ? `(en
+                        ${loteForm.presentacionBonificada.nombre})` : '' }}
                       </label>
                       <InputText v-model="loteForm.cantidadBonificada" placeholder="0"
                         class="w-full bg-[#ffffff] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
@@ -212,7 +217,8 @@
                     </div>
                     <div class="flex justify-between">
                       <span class="text-[#4b5563]">Unidades reales que entran a bodega</span>
-                      <span class="font-semibold text-[#1a2e1f]">{{ cantidadInicialLote }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
+                      <span class="font-semibold text-[#1a2e1f]">{{ cantidadInicialLote }} {{
+                        loteForm.producto?.unidad_base?.toLowerCase() }}</span>
                     </div>
                     <div class="flex justify-between border-t border-[#d1d5db] pt-1 mt-1">
                       <span class="text-[#2b5e3b] font-semibold">Costo unitario real (lote)</span>
@@ -379,9 +385,11 @@ const unidadesBonificadas = computed(() => {
   return Number(loteForm.cantidadBonificada) * Number(loteForm.presentacionBonificada.factor_conversion)
 })
 
-const subTotal = computed(() =>
-  Number(loteForm.cantidadFacturada || 0) * Number(loteForm.costoUnitario || 0)
-)
+const subTotal = computed(() => {
+  const cant = parseFloat(loteForm.cantidadFacturada) || 0
+  const costo = parseFloat(String(loteForm.costoUnitario).replace(/[^0-9.]/g, '')) || 0
+  return cant * costo
+})  
 
 const totalPagado = computed(() =>
   subTotal.value - Number(loteForm.descuentoLinea || 0)

@@ -270,7 +270,7 @@ const agregarProducto = () => {
     subtotal: precio,
     aplica_iva: productoSeleccionado.value.aplica_iva,
     presentacion_id: presentacionSeleccionada.value.id,
-    unidad_bae: productoSeleccionado.value.unidad_base
+    unidad_base: productoSeleccionado.value.unidad_base 
   });
 
   productoSeleccionado.value = null,
