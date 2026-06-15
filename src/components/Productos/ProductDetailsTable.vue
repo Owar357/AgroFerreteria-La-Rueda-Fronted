@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <!-- Encabezado Presentaciones + botón Agregar -->
+
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold text-[#1e3a2f] flex items-center gap-2">
         <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
@@ -31,11 +31,16 @@
         label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
     </div>
 
-    <!-- Tabla de presentaciones con botones mejorados -->
+    <!-- Tabla de presentaciones con botones -->
     <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
       <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-sm">
         <Column field="nombre" header="Nombre" class="text-sm"></Column>
-        <Column field="unidadMedida" header="Unidad medida" class="text-sm"></Column>
+
+        <Column header="Equivalencia" class="text-sm">
+          <template #body="{ data }">
+            {{ data.factor_conversion }} {{ data.unidadMedida }}
+          </template>
+        </Column>
         <Column field="precio" header="Precio" class="text-sm">
           <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
         </Column>
@@ -75,10 +80,11 @@
         </template>
       </DataTable>
 
-      <AñadirPresentacionDialog v-model:visible="AgregarVisible" @guardar="onGuardar" />
+      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
+        :productoId="producto.id" @guardar="onGuardar" />
 
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
-        @guardar="onGuardarEdicion" />
+        :unidadBase="producto.unidad_base" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
@@ -117,6 +123,7 @@ const producto = ref({
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
+  unidad_base: props.producto.unidad_base ?? '—',
 })
 
 onMounted(async () => {
@@ -129,21 +136,22 @@ const cargarPresentaciones = async () => {
     const res = await getPresentacionesByProducto(props.producto.id)
     const data = res.data.data ?? []
 
-     
-
-
+    // Fallback: sacar unidad_base desde la presentación
+    if (data.length > 0 && data[0].producto?.unidad_base) {
+      producto.value.unidad_base = data[0].producto.unidad_base
+    }
 
     presentaciones.value = data.map((p) => ({
       id: p.id,
       nombre: p.nombre,
-      unidadMedida: props.producto.unidad_base ?? '—',
-      precio: parseFloat(p.precio_venta ?? 0), //SE VA HA QUIATR EL CERO
+      unidadMedida: p.producto?.unidad_base ?? '—',
+      factor_conversion: Number(p.factor_conversion) || 0,
+      precio: parseFloat(p.precio_venta ?? 0),
       stock: p.stock !== null && p.stock !== undefined ? Number(p.stock) : 0,
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
     }))
 
   } catch (error) {
-    
     if (error.response?.status === 404 || error.response?.status === 200) {
       presentaciones.value = []
       return

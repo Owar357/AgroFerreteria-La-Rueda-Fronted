@@ -1,11 +1,8 @@
 <template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
-    <Button
-      label="Regresar"
-      icon="pi pi-arrow-left"
+    <Button label="Regresar" icon="pi pi-arrow-left"
       class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] mb-8"
-      @click="$emit('close')"
-    />
+      @click="$emit('close')" />
 
     <div class="flex justify-between items-start mb-8">
       <div>
@@ -19,59 +16,37 @@
     <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
       <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
         <i class="pi pi-box text-[#e0b354] text-[22px]"></i>
-        <span class="text-[32px] font-semibold text-[#1a2e1f]"
-          >1. Información General del Producto</span
-        >
+        <span class="text-[32px] font-semibold text-[#1a2e1f]">1. Información General del Producto</span>
       </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div class="col-span-2 flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600"
-            >Nombre del Producto <span class="text-red-500">*</span></label
-          >
-          <InputText
-            v-model="nombre"
+          <label class="text-[20px] font-medium text-gray-600">Nombre del Producto <span
+              class="text-red-500">*</span></label>
+          <InputText v-model="nombre"
             class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px]"
-            :class="{ '!border-red-500': errores.nombre }"
-          />
+            :class="{ '!border-red-500': errores.nombre }" />
           <small v-if="errores.nombre" class="text-red-500 text-[14px]">{{ errores.nombre }}</small>
         </div>
 
         <div class="col-span-2 flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600"
-            >Fabricante <span class="text-red-500">*</span></label
-          >
-          <InputText
-            v-model="fabricante"
-            placeholder="Escriba el nombre del fabricante..."
+          <label class="text-[20px] font-medium text-gray-600">Fabricante <span class="text-red-500">*</span></label>
+          <InputText v-model="fabricante" placeholder="Escriba el nombre del fabricante..."
             class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px]"
-            :class="{ '!border-red-500': errores.fabricante }"
-          />
+            :class="{ '!border-red-500': errores.fabricante }" />
           <small v-if="errores.fabricante" class="text-red-500 text-[14px]">{{
             errores.fabricante
-          }}</small>
+            }}</small>
         </div>
 
         <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600"
-            >Categoría <span class="text-red-500">*</span></label
-          >
-          <AutoComplete
-            v-model="categoria"
-            :suggestions="categoriasFiltradas"
-            optionLabel="nombre"
-            dropdown
-            fluid
-            placeholder="Buscar categoría..."
-            @complete="buscarCategorias"
-            :class="{ '!border-red-500': errores.categoria }"
-          >
+          <label class="text-[20px] font-medium text-gray-600">Categoría <span class="text-red-500">*</span></label>
+          <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
+            placeholder="Buscar categoría..." @complete="buscarCategorias"
+            :class="{ '!border-red-500': errores.categoria }">
             <template #footer>
-              <div
-                v-if="textoBusquedaCategoria"
-                class="px-3 py-3 border-t cursor-pointer hover:bg-gray-100"
-                @click="abrirModalCategoria"
-              >
+              <div v-if="textoBusquedaCategoria" class="px-3 py-3 border-t cursor-pointer hover:bg-gray-100"
+                @click="abrirModalCategoria">
                 <i class="pi pi-plus mr-2"></i>
                 Crear nueva categoría <strong>{{ textoBusquedaCategoria }}</strong>
               </div>
@@ -79,82 +54,52 @@
           </AutoComplete>
           <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{
             errores.categoria
-          }}</small>
+            }}</small>
         </div>
 
         <div class="col-span-2 flex flex-col gap-2">
           <label class="text-[20px] font-medium text-gray-600">Código del Producto</label>
-          <InputText
-            v-model="codigoGenerado"
-            readonly
-            fluid
-            class="w-full !bg-gray-50 !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] !cursor-not-allowed"
-          />
-          <small class="text-[14px] text-gray-500"
-            >Se genera automáticamente al completar Categoría, Nombre y Fabricante.</small
-          >
+          <InputText v-model="codigoGenerado" readonly fluid
+            class="w-full !bg-gray-50 !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] !cursor-not-allowed" />
+          <small class="text-[14px] text-gray-500">Se genera automáticamente al completar Categoría, Nombre y
+            Fabricante.</small>
         </div>
 
         <div class="col-span-2 flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600"
-            >Unidad Base <span class="text-red-500">*</span></label
-          >
-          <InputText
-            v-model="unidadBase"
-            placeholder="Ej: libra, gramo, semilla, unidad..."
+          <label class="text-[20px] font-medium text-gray-600">Unidad Base <span class="text-red-500">*</span></label>
+          <InputText v-model="unidadBase" placeholder="Ej: libra, gramo, semilla, unidad..."
             class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px]"
-            :class="{ '!border-red-500': errores.unidadBase }"
-          />
+            :class="{ '!border-red-500': errores.unidadBase }" />
           <small v-if="errores.unidadBase" class="text-red-500 text-[14px]">{{
             errores.unidadBase
-          }}</small>
+            }}</small>
           <p class="text-base text-gray-500 mt-1">
             Es la unidad mínima de almacenamiento de stock.
           </p>
         </div>
 
         <div class="col-span-2 flex flex-col gap-3">
-          <label class="text-[20px] font-medium text-gray-600"
-            >Tipo de Venta <span class="text-red-500">*</span></label
-          >
+          <label class="text-[20px] font-medium text-gray-600">Tipo de Venta <span class="text-red-500">*</span></label>
           <div class="flex flex-wrap gap-6">
             <div class="flex items-center gap-2">
-              <RadioButton
-                v-model="tipoProducto"
-                inputId="venta1"
-                name="tipoProducto"
-                value="UNIDAD FIJA"
-              />
-              <label for="venta1" class="text-[20px] text-[#1a2e1f] cursor-pointer"
-                >Unidad Fija</label
-              >
+              <RadioButton v-model="tipoProducto" inputId="venta1" name="tipoProducto" value="UNIDAD FIJA" />
+              <label for="venta1" class="text-[20px] text-[#1a2e1f] cursor-pointer">Unidad Fija</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton
-                v-model="tipoProducto"
-                inputId="venta2"
-                name="tipoProducto"
-                value="GRANEL"
-              />
+              <RadioButton v-model="tipoProducto" inputId="venta2" name="tipoProducto" value="GRANEL" />
               <label for="venta2" class="text-[20px] text-[#1a2e1f] cursor-pointer">Granel</label>
             </div>
           </div>
           <small v-if="errores.tipoProducto" class="text-red-500 text-[14px]">{{
             errores.tipoProducto
-          }}</small>
+            }}</small>
         </div>
 
         <div class="col-span-2 flex flex-col justify-end">
           <div class="flex items-center gap-3 py-[14px]">
-            <Checkbox
-              v-model="aplicaIva"
-              :binary="true"
-              inputId="ivaGeneral"
-              class="!w-[22px] !h-[22px]"
-            />
-            <label for="ivaGeneral" class="text-[20px] text-[#1a2e1f] cursor-pointer"
-              >Aplica IVA 13% (para todas las presentaciones)</label
-            >
+            <Checkbox v-model="aplicaIva" :binary="true" inputId="ivaGeneral" class="!w-[22px] !h-[22px]" />
+            <label for="ivaGeneral" class="text-[20px] text-[#1a2e1f] cursor-pointer">Aplica IVA 13% (para todas las
+              presentaciones)</label>
           </div>
         </div>
       </div>
@@ -163,51 +108,35 @@
     <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
       <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
         <i class="pi pi-tags text-[#e0b354] text-[22px]"></i>
-        <span class="text-[32px] font-semibold text-[#1a2e1f]"
-          >2. Información de las Presentaciones del Producto</span
-        >
+        <span class="text-[32px] font-semibold text-[#1a2e1f]">2. Información de las Presentaciones del Producto</span>
       </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div class="flex flex-col gap-2">
           <label class="text-[20px] font-medium text-gray-600">Nombre de la presentación</label>
-          <InputText
-            v-model="presentacionActual.nombre"
-            placeholder="Ej: Quintal, Arroba, Libra, 50ml..."
-            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
-          />
+          <InputText v-model="presentacionActual.nombre" placeholder="Ej: Quintal, Arroba, Libra, 50ml..."
+            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]" />
         </div>
 
         <div class="flex flex-col gap-2">
           <label class="text-[20px] font-medium text-gray-600">Código de barra</label>
-          <InputText
-            v-model="presentacionActual.codigoBarra"
-            placeholder="Ej: 7501234567890"
-            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
-          />
+          <InputText v-model="presentacionActual.codigoBarra" placeholder="Ej: 7501234567890"
+            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]" />
         </div>
 
-        <div class="flex flex-col gap-2">
+        <!-- Fila: Equivalencia -->
+        <div class="col-span-2 flex flex-col gap-2">
           <label class="text-[20px] font-medium text-gray-600">
             ¿Cuántas
-            <span class="bg-[#dff0e0] text-[#1e3a2f] px-2 py-0.5 rounded-full"
-              >[{{ unidadBase || 'unidad base' }}]</span
-            >
+            <span class="bg-[#dff0e0] text-[#1e3a2f] px-2 py-0.5 rounded-full">
+              [{{ unidadBase || 'unidad base' }}]
+            </span>
             equivale esta presentación?
           </label>
           <div class="flex items-center gap-4">
-            <InputNumber
-              v-model="presentacionActual.equivalencia"
-              placeholder="0"
-              :min="0"
-              :inputProps="{
-                class:
-                  '!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] !w-full',
-              }"
-            />
-            <span
-              class="bg-[#dff0e0] text-[#1e3a2f] text-[20px] font-medium whitespace-nowrap rounded-full px-5 py-3"
-            >
+            <InputNumber v-model="presentacionActual.equivalencia" fluid placeholder="0" :min="0"
+              inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full" />
+            <span class="bg-[#dff0e0] text-[#1e3a2f] text-[20px] font-medium whitespace-nowrap rounded-full px-5 py-3">
               {{ unidadBase || 'unidad base' }}
             </span>
           </div>
@@ -216,69 +145,39 @@
           </p>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">Precio Neto</label>
-          <InputNumber
-            v-model="presentacionActual.precioNeto"
-            placeholder="0.00"
-            :min="0"
-            :minFractionDigits="2"
-            :maxFractionDigits="2"
-            mode="currency"
-            currency="USD"
-            locale="es-SV"
-            :inputProps="{
-              class:
-                '!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] !w-full',
-            }"
-            class="w-full"
-          />
-        </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">IVA Aplicado (13%)</label>
-          <InputNumber
-            :modelValue="ivaCalculado"
-            disabled
-            :minFractionDigits="2"
-            :maxFractionDigits="2"
-            mode="currency"
-            currency="USD"
-            locale="es-SV"
-            inputClass="!bg-[#f2f5ef] !border-gray-300 !text-gray-500 !text-[20px] !py-[14px] !px-[18px] !w-full !cursor-not-allowed"
-            class="w-full"
-          />
-        </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">Precio Total</label>
-          <InputNumber
-            :modelValue="precioTotal"
-            disabled
-            :minFractionDigits="2"
-            :maxFractionDigits="2"
-            mode="currency"
-            currency="USD"
-            locale="es-SV"
-            inputClass="!bg-[#f2f5ef] !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] !w-full !cursor-not-allowed"
-            class="w-full"
-          />
+        <div class="col-span-2 grid grid-cols-3 gap-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">Precio Neto</label>
+            <InputNumber v-model="presentacionActual.precioNeto" fluid placeholder="0.00" :min="0"
+              :minFractionDigits="2" :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
+              inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">IVA Aplicado (13%)</label>
+            <InputNumber :modelValue="ivaCalculado" fluid disabled :minFractionDigits="2" :maxFractionDigits="2"
+              mode="currency" currency="USD" locale="es-SV"
+              inputClass="!bg-[#f2f5ef] !border-gray-300 !text-gray-500 !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">Precio Total</label>
+            <InputNumber :modelValue="precioTotal" fluid disabled :minFractionDigits="2" :maxFractionDigits="2"
+              mode="currency" currency="USD" locale="es-SV"
+              inputClass="!bg-[#f2f5ef] !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed" />
+          </div>
         </div>
       </div>
 
       <div class="flex gap-4 mt-8">
-        <Button
-          label="Añadir Nueva Presentación"
-          icon="pi pi-plus"
+        <Button label="Añadir Nueva Presentación" icon="pi pi-plus"
           class="flex-1 !text-[20px] !py-4 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-          @click="agregarPresentacion"
-        />
-        <Button
-          label="Limpiar Formulario"
-          icon="pi pi-trash"
+          @click="agregarPresentacion" />
+        <Button label="Limpiar Formulario" icon="pi pi-trash"
           class="flex-1 !text-[20px] !py-4 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] !font-['Inter',sans-serif]"
-          @click="limpiarFormularioPresentacion"
-        />
+          @click="limpiarFormularioPresentacion" />
       </div>
     </div>
 
@@ -288,13 +187,8 @@
         <span class="text-[32px] font-semibold text-[#1a2e1f]">Presentaciones Agregadas</span>
       </div>
 
-      <DataTable
-        :value="presentaciones"
-        :paginator="presentaciones.length > 5"
-        :rows="5"
-        class="font-['Inter',sans-serif] text-[20px]"
-        emptyMessage="No hay presentaciones agregadas aún"
-      >
+      <DataTable :value="presentaciones" :paginator="presentaciones.length > 5" :rows="5"
+        class="font-['Inter',sans-serif] text-[20px]" emptyMessage="No hay presentaciones agregadas aún">
         <Column field="nombre" header="Nombre" class="!text-[20px]" />
         <Column field="fabricante" header="Fabricante" class="!text-[20px]" />
         <Column field="codigoBarra" header="Código Barra" class="!text-[20px]" />
@@ -311,33 +205,20 @@
         </Column>
         <Column header="Acciones" class="!text-[20px]">
           <template #body="slotProps">
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              @click="eliminarPresentacion(slotProps.index)"
-            />
+            <Button icon="pi pi-trash" severity="danger" text rounded @click="eliminarPresentacion(slotProps.index)" />
           </template>
         </Column>
       </DataTable>
     </div>
 
     <div class="flex justify-end">
-      <Button
-        label="Guardar Producto"
-        icon="pi pi-save"
-        :loading="guardando"
+      <Button label="Guardar Producto" icon="pi pi-save" :loading="guardando"
         class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-        @click="guardarProducto"
-      />
+        @click="guardarProducto" />
     </div>
   </div>
 
-  <AddCategoriaDialog
-    v-model:visible="mostrarModalCategoria"
-    @categoria-creada="actualizarCategorias"
-  />
+  <AddCategoriaDialog v-model:visible="mostrarModalCategoria" @categoria-creada="actualizarCategorias" />
 </template>
 
 <script setup>
@@ -522,7 +403,7 @@ const agregarPresentacion = () => {
     unidadBase: unidadBase.value,
     aplicaIva: aplicaIva.value,
     precioSinIva: Number(presentacionActual.value.precioNeto),
-    ivaAplicado:  Number(ivaCalculado.value),
+    ivaAplicado: Number(ivaCalculado.value),
     precioConIva: Number(precioTotal.value),
   })
 
@@ -654,6 +535,7 @@ const resetFormularioCompleto = () => {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
 }
+
 :deep(.p-select:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;

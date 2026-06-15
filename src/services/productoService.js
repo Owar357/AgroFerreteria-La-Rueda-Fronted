@@ -23,5 +23,7 @@ export const togglePresentacion = (id) => api.delete(`/presentaciones/${id}`)
 export const getCodigosByPresentacion = (presentacionId) =>
   api.get(`/codigosBarra/${presentacionId}`)
 
+export const añadirPresentacion = (data) => api.post('/presentaciones', data )
+
 export const createCodigoBarra = (data) => api.post('/codigosBarra', data)
 export const deleteCodigoBarra = (id) => api.delete(`/codigosBarra/${id}`)

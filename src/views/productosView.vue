@@ -45,6 +45,7 @@ import DetalleProducto from '../components/Productos/ProductDetailsTable.vue'
 import EditProduct from '@/components/Productos/EditProduct.vue'
 
 
+
 const store = useproductoStore()
 
 // Control de vista actual

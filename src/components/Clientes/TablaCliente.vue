@@ -65,14 +65,6 @@
           </template>
         </Column>
 
-        <Column field="telefono" header="Teléfono">
-          <template #body="{ data }">
-            <span class="inline-flex items-center gap-1 text-[#6b7280]">
-              <i class="pi pi-phone text-[12px]" />
-              {{ data.telefono }}
-            </span>
-          </template>
-        </Column>
 
         <Column header="Acciones" class="text-center w-[130px]">
           <template #body="{ data }">
