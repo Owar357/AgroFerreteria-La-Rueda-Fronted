@@ -104,7 +104,6 @@ watch(localVisible, (val) => {
   emit('update:visible', val)
 })
 
-// Cuando llega la presentación a editar, llena el form
 watch(
   () => props.presentacion,
   (val) => {

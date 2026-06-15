@@ -3,7 +3,7 @@
     <transition :name="transitionName" mode="out-in">
       <div :key="vistaActual" class="w-full">
         
-        <!-- Vista 1: Lista de productos (CRUD) -->
+      
         <ProducTable 
           v-if="vistaActual === 'lista'"
           @open-add="abrirFormularioCrear"
@@ -11,7 +11,7 @@
           @open-detail="abrirDetalle"
         />
 
-        <!-- Vista 2 Formulario de producto (crear/editar) -->
+      
         <Producto 
           v-else-if="vistaActual === 'formulario'"
           :producto="productoSeleccionado"
@@ -24,7 +24,7 @@
           @close="cerrarFormulario"
         />
         
-        <!-- Vista 3: Detalle del producto con las presentaciones -->
+       
         <DetalleProducto 
           v-else-if="vistaActual === 'detalle'"
           :producto="productoSeleccionado"

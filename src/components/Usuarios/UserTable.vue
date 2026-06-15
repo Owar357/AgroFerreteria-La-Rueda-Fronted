@@ -117,9 +117,9 @@ const usuariosFiltrados = computed(() => {
   })
 })
 
-// Cuando PrimeVue cambia de página llama al backend
+
 const onPageChange = (event) => {
-  const page = event.page + 1        // PrimeVue empieza en 0
+  const page = event.page + 1      
   const perPage = event.rows
   store.fetchUsers(page, perPage)
 }

@@ -4,7 +4,6 @@
             :style="{ borderRadius: '1rem' }" @hide="cerrarDialog">
             <div class="space-y-5 p-1">
 
-                <!-- ===== SELECTOR TIPO MOVIMIENTO (Entrada / Salida) ===== -->
                 <div class="flex w-full rounded-xl overflow-hidden border border-[#dee6d6]">
                     <button @click="tipoMovimiento = 'ENTRADA'"
                         :class="['flex-1 py-2.5 text-sm font-semibold transition-all', tipoMovimiento === 'ENTRADA' ? 'bg-green-600 text-white' : 'bg-white text-[#6d8f60]']">
@@ -19,7 +18,7 @@
                     <i class="pi pi-question-circle mr-1"></i>
                     {{ tipoMovimiento === 'ENTRADA' ? 'Dinero que INGRESA a la caja (depósitos, o más dinero para dar cambio.) ' : 'Dinero que SALE de la caja(pagos a proveedores, otros pagos, o gastos menores etc.)' }}
                 </p>
-                <!-- ===== MONTO ===== -->
+                
                 <div>
                     <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
                         <i class="pi pi-dollar mr-1 text-[#e0b354]"></i> Monto
@@ -35,7 +34,7 @@
                     </p>
                 </div>
 
-                <!-- ===== CONCEPTO / DESCRIPCIÓN ===== -->
+              
                 <div>
                     <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
                         <i class="pi pi-file-edit mr-1 text-[#e0b354]"></i> Concepto / Descripción
@@ -55,7 +54,7 @@
                 </div>
             </div>
 
-            <!-- ===== FOOTER CON BOTONES ===== -->
+         
             <template #footer>
                 <div class="flex gap-3 justify-end">
                     <Button label="Cancelar" icon="pi pi-times" severity="secondary" text @click="cerrarDialog"
@@ -77,7 +76,7 @@ import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 
-// ========== PROPS ==========
+
 const props = defineProps({
     visible: {
         type: Boolean,
@@ -93,21 +92,20 @@ const props = defineProps({
     }
 })
 
-// ========== EMITS ==========
+
 const emit = defineEmits(['update:visible', 'movimientoRegistrado'])
 
-// ========== ESTADO LOCAL ==========
+
 const tipoMovimiento = ref('ENTRADA')
 const monto = ref(null)
 const concepto = ref('')
 
-// Opciones para SelectButton
 const opcionesTipo = [
     { label: ' ENTRADA ', value: 'ENTRADA' },
     { label: ' SALIDA ', value: 'SALIDA' }
 ]
 
-// ========== COMPUTADAS ==========
+
 const visible = computed({
     get: () => props.visible,
     set: (val) => emit('update:visible', val)
@@ -126,7 +124,7 @@ const fechaHoraActual = computed(() => {
     return `${fecha} - ${hora}`
 })
 
-// ========== MÉTODOS ==========
+
 const registrarMovimiento = () => {
     if (!formularioValido.value) return
 
@@ -153,7 +151,7 @@ const cerrarDialog = () => {
     visible.value = false
 }
 
-// Resetear cuando se abre el diálogo
+
 watch(visible, (nuevoValor) => {
     if (!nuevoValor) {
         tipoMovimiento.value = 'ENTRADA'

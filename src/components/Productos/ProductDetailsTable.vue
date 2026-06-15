@@ -111,7 +111,6 @@ const AgregarVisible = ref(false)
 const cargando = ref(false)
 const presentaciones = ref([])
 
-// Los datos de la tarjeta vienen directo del prop (ya los tiene la tabla)
 const producto = ref({
   id: props.producto.id,
   nombre: props.producto.nombre,
@@ -130,7 +129,7 @@ const cargarPresentaciones = async () => {
     const res = await getPresentacionesByProducto(props.producto.id)
     const data = res.data.data ?? []
 
-    console.log('RAW presentaciones:', data) // SE VA HA QUITAR LUEGO
+     
 
 
 
@@ -144,7 +143,7 @@ const cargarPresentaciones = async () => {
     }))
 
   } catch (error) {
-    // Si es 404 simplemente no hay presentaciones, no mostramos error
+    
     if (error.response?.status === 404 || error.response?.status === 200) {
       presentaciones.value = []
       return

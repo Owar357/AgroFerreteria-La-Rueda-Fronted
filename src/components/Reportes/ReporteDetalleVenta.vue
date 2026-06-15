@@ -163,7 +163,6 @@ const fechaHasta = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
 
-// Formatea Date a string YYYY-MM-DD para el backend
 const formatFechaParam = (date) => {
   if (!date) return null
   const d = new Date(date)
@@ -182,7 +181,7 @@ const formatFecha = (val) => {
 const formatCurrency = (val) =>
   new Intl.NumberFormat('es-SV', { style: 'currency', currency: 'USD' }).format(val || 0)
 
-// Trae las ventas del backend con los parámetros de fecha
+
 const filtrarVentas = async () => {
   if (!fechaDesde.value || !fechaHasta.value) {
     Swal.fire({
@@ -225,15 +224,14 @@ const filtrarVentas = async () => {
   }
 }
 
-// Abre el PDF generado por el backend en una nueva pestaña
+
 const generarPDF = async () => {
   if (!fechaDesde.value || !fechaHasta.value) return
 
   const desde = formatFechaParam(fechaDesde.value)
   const hasta = formatFechaParam(fechaHasta.value)
 
-  // El backend devuelve el PDF directamente con stream()
-  // Abrimos la URL directamente en una nueva pestaña
+
   const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
   const url = `${baseUrl}/api/reportes/ventas?fecha_desde=${desde}&fecha_hasta=${hasta}`
   window.open(url, '_blank')
