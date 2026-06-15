@@ -117,7 +117,6 @@ const AgregarVisible = ref(false)
 const cargando = ref(false)
 const presentaciones = ref([])
 
-// Los datos de la tarjeta vienen directo del prop (ya los tiene la tabla)
 const producto = ref({
   id: props.producto.id,
   nombre: props.producto.nombre,

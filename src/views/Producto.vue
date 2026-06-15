@@ -239,12 +239,12 @@ import { useproductoStore } from '@/stores/productoStore'
 const emit = defineEmits(['close'])
 const store = useproductoStore()
 
-// en esta parte hacemos lacarga de los selcts
+
 onMounted(async () => {
   await store.cargarCategorias()
 })
 
-// esta son las variables d estado para la eccion 1
+
 const nombre = ref('')
 const fabricante = ref('')
 const categoria = ref(null)

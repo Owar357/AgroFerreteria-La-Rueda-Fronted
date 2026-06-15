@@ -1,10 +1,8 @@
 <template>
   <div>
-    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion"
-      @filtrar-fechas="aplicarFiltroFechas" />
+    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
 
     <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
-
   </div>
 </template>
 
@@ -14,11 +12,14 @@ import Swal from 'sweetalert2'
 import HistorialVentaTable from '../components/Usuarios/HistorialVentaTable.vue'
 import DetallVentaDialogo from '@/components/Usuarios/DetallVentaDialogo.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
-
+import { useRoute } from 'vue-router'
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
+ const route = useRoute()
+
+const clienteId = route.query.clienteId
 
 
 
@@ -50,7 +51,8 @@ const aplicarFiltroFechas = async (fechas) => {
 const cargarVentas = async () => {
   cargando.value = true
   try {
-    const response = await getVentas()
+   const params = clienteId ? { cliente: clienteId, per_page: 50 } : {}
+      const response = await getVentas(params)
     const data = response.data.data || response.data || []
     ventas.value = data.map(v => ({
       id: v.id,

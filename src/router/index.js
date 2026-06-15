@@ -20,7 +20,7 @@ const routes = [
     meta: { requiresAuth: false }
   },
 
-  // Layout Padre protegido ('/admin')
+
   {
     path: '/admin',
     component: HomeLayout,
@@ -78,7 +78,7 @@ const routes = [
       
  
 
-      // --- ADMIN Y CAJERO ---
+      
       {
         path: 'venta/venta',
         name: 'venta',
@@ -98,7 +98,6 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
 
-      // --- ADMIN Y CONTADOR ---
       {
         path: 'venta/compra',
         name: 'compra',
@@ -124,7 +123,7 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
 
-      // --- TODOS LOS ROLES (ADMIN, CAJERO, CONTADOR) ---
+      
       {
         path: 'procesos/clientes',
         name: 'Clientes',
@@ -141,7 +140,7 @@ const routes = [
     ]
   },
 
-  // Captura cualquier ruta no encontrada  y manda al Login
+ 
   {
     path: '/:pathMatch(.*)*',
     redirect: '/login',
