@@ -221,7 +221,7 @@ const diferencia = computed(() => montoEnCaja.value - montoEsperado.value)
 
 const formatNumber = (value) => (value || 0).toFixed(2)
 
-// Función para recalcular los acumuladores a partir de los movimientos fijos
+
 const calcularResumenDesdeMovimientos = (montoInicialApertura) => {
   let ventasContadoSum = 0
   let ventasTarjetaSum = 0
@@ -233,7 +233,7 @@ const calcularResumenDesdeMovimientos = (montoInicialApertura) => {
     else if (mov.concepto.includes('Transferencia recibida')) ventasTransferenciaSum += parseFloat(mov.monto.replace('+$', ''))
     else if (mov.tipo === 'Egreso') retirosSum += parseFloat(mov.monto.replace('-$', ''))
   }
-  // Asignar a las refs
+
   ventasContado.value = ventasContadoSum
   ventasTarjeta.value = ventasTarjetaSum
   ventasTransferencia.value = ventasTransferenciaSum
@@ -244,10 +244,10 @@ const calcularResumenDesdeMovimientos = (montoInicialApertura) => {
 const onTurnoAbierto = (monto) => {
   montoInicial.value = monto
   turnoAbierto.value = true
+
   // Calcular los acumuladores a partir de los movimientos fijos
   calcularResumenDesdeMovimientos(monto)
-  // Agregar el movimiento de apertura a la tabla (aunque ya existe uno fijo, lo duplicamos intencionalmente?)
-  // Para evitar duplicados, puedes comentar el push si el fijo ya está. Pero lo dejamos para mostrar el registro.
+
   todosMovimientos.value.push({
     hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
     concepto: 'Apertura de turno',

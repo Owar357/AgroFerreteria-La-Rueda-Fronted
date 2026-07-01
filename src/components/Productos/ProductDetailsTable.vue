@@ -1,14 +1,9 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
     <!-- Botón volver -->
-    <Button
-      icon="pi pi-arrow-left"
-      label="Volver a productos"
-      severity="secondary"
-      text
+    <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
       class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-      @click="volver"
-    />
+      @click="volver" />
 
     <!-- Tarjeta del producto -->
     <div class="bg-white rounded-2xl border border-[#e8efe1] shadow-sm p-6 mb-6">
@@ -16,95 +11,66 @@
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f]">{{ producto.nombre }}</h1>
           <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 mt-2">
-            <span
-              ><span class="font-medium text-[#3c674b]">Código:</span> {{ producto.codigo }}</span
-            >
-            <span
-              ><span class="font-medium text-[#3c674b]">Categoría:</span>
-              {{ producto.categoria }}</span
-            >
-            <span
-              ><span class="font-medium text-[#3c674b]">Fabricante:</span>
-              {{ producto.fabricante }}</span
-            >
+            <span><span class="font-medium text-[#3c674b]">Código:</span> {{ producto.codigo }}</span>
+            <span><span class="font-medium text-[#3c674b]">Categoría:</span>
+              {{ producto.categoria }}</span>
+            <span><span class="font-medium text-[#3c674b]">Fabricante:</span>
+              {{ producto.fabricante }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Encabezado Presentaciones + botón Agregar -->
+
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold text-[#1e3a2f] flex items-center gap-2">
         <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
       </h2>
       <Button
         class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-[14px] font-semibold !px-4 !py-3 !rounded-lg !border-none shadow-md transition-all duration-200"
-        label="Agregar presentación"
-        icon="pi pi-plus"
-        @click="abrirAñadir()"
-      />
+        label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
     </div>
 
-    <!-- Tabla de presentaciones con botones mejorados -->
+    <!-- Tabla de presentaciones con botones -->
     <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
       <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-sm">
         <Column field="nombre" header="Nombre" class="text-sm"></Column>
-        <Column field="unidadMedida" header="Unidad medida" class="text-sm"></Column>
+
+        <Column header="Equivalencia" class="text-sm">
+          <template #body="{ data }">
+            {{ data.factor_conversion }} {{ data.unidadMedida }}
+          </template>
+        </Column>
         <Column field="precio" header="Precio" class="text-sm">
           <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
         </Column>
         <Column field="stock" header="Stock" class="text-sm"></Column>
         <Column field="estado" header="Estado" class="text-sm">
           <template #body="{ data }">
-            <Tag
-              :value="data.estado"
-              :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'"
-              rounded
-            />
+            <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded />
           </template>
         </Column>
 
-        <!-- ACCIONES: 3 botones claros -->
+
+        <!-- ACCIONES-->
         <Column header="Acciones" :exportable="false" class="text-sm">
           <template #body="{ data }">
-            <div class="flex flex-wrap gap-2">
-              <!-- Botón Editar -->
-              <Button
-                icon="pi pi-pencil"
-                label="Editar"
-                severity="secondary"
-                text
-                rounded
-                size="small"
-                v-tooltip="'Editar presentación'"
-                @click="abrirEditar(data)"
-              />
+            <div class="flex gap-2">
+              <Button icon="pi pi-pencil" label="Editar"
+                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Editar presentación'" @click="abrirEditar(data)" />
 
-              <!-- Botón Ver código de barras -->
-              <Button
-                icon="pi pi-qrcode"
-                label="Código"
-                severity="secondary"
-                text
-                rounded
-                size="small"
-                v-tooltip="'Ver códigos de barra'"
-                @click="abrirCodigos(data)"
-              />
+              <Button icon="pi pi-barcode" label="Código"
+                class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Ver códigos de barra'" @click="abrirCodigos(data)" />
 
-              <!-- Botón dual Activar/Desactivar -->
-              <Button
-                :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'"
-                :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
-                :severity="data.estado === 'ACTIVO' ? 'danger' : 'success'"
-                text
-                rounded
-                size="small"
-                @click="toggleEstadoPresentacion(data)"
-                v-tooltip="
-                  data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
-                "
-              />
+              <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
+                  ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
+                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
+                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'"
+                @click="toggleEstadoPresentacion(data)" />
             </div>
           </template>
         </Column>
@@ -114,13 +80,11 @@
         </template>
       </DataTable>
 
-      <AñadirPresentacionDialog v-model:visible="AgregarVisible" @guardar="onGuardar" />
+      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
+        :productoId="producto.id" @guardar="onGuardar" />
 
-      <EditarPresentacionDialog
-        v-model:visible="editarVisible"
-        :presentacion="presentacionSeleccionada"
-        @guardar="onGuardarEdicion"
-      />
+      <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
+        :unidadBase="producto.unidad_base" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
@@ -128,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -137,57 +101,76 @@ import AñadirPresentacionDialog from '@/components/Productos/AddPresentation.vu
 import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
+import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
 
-// ========== PROPS ==========
 const props = defineProps({
-  productoId: {
-    type: [String, Number],
-    default: null,
-  },
+  producto: { type: Object, required: true }
 })
 
-// ========== EMITS ==========
 const emit = defineEmits(['volver'])
 
 const editarVisible = ref(false)
 const presentacionSeleccionada = ref(null)
 const codigosVisible = ref(false)
 const presentacionCodigos = ref(null)
+const AgregarVisible = ref(false)
+const cargando = ref(false)
+const presentaciones = ref([])
 
-// ========== DATOS DEL PRODUCTO==========
 const producto = ref({
-  id: 1,
-  nombre: 'Maíz Híbrido',
-  codigo: 'PRN-908-789',
-  categoria: 'Semilla',
-  fabricante: 'Agrosem',
+  id: props.producto.id,
+  nombre: props.producto.nombre,
+  codigo: props.producto.codigo,
+  categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
+  fabricante: props.producto.fabricante,
+  unidad_base: props.producto.unidad_base ?? '—',
 })
 
-// ========== PRESENTACIONES==========
-const presentaciones = ref([
-  { id: 1, nombre: 'Bolsa 1kg', unidadMedida: 'kg', precio: 5.0, stock: 120, estado: 'ACTIVO' },
-  { id: 2, nombre: 'Saco 25kg', unidadMedida: 'kg', precio: 95.0, stock: 40, estado: 'ACTIVO' },
-  { id: 3, nombre: 'Saco 50kg', unidadMedida: 'kg', precio: 180.0, stock: 15, estado: 'INACTIVO' },
-  {
-    id: 4,
-    nombre: 'Caja 10uds',
-    unidadMedida: 'unidad',
-    precio: 45.0,
-    stock: 80,
-    estado: 'ACTIVO',
-  },
-])
+onMounted(async () => {
+  await cargarPresentaciones()
+})
 
-const AgregarVisible = ref(false)
+const cargarPresentaciones = async () => {
+  cargando.value = true
+  try {
+    const res = await getPresentacionesByProducto(props.producto.id)
+    const data = res.data.data ?? []
 
-// ========== MÉTODOS ==========
-const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
+    // Fallback: sacar unidad_base desde la presentación
+    if (data.length > 0 && data[0].producto?.unidad_base) {
+      producto.value.unidad_base = data[0].producto.unidad_base
+    }
 
-const volver = () => {
-  emit('volver')
+    presentaciones.value = data.map((p) => ({
+      id: p.id,
+      nombre: p.nombre,
+      unidadMedida: p.producto?.unidad_base ?? '—',
+      factor_conversion: Number(p.factor_conversion) || 0,
+      precio: parseFloat(p.precio_venta ?? 0),
+      stock: p.stock !== null && p.stock !== undefined ? Number(p.stock) : 0,
+      estado: p.activo ? 'ACTIVO' : 'INACTIVO',
+    }))
+
+  } catch (error) {
+    if (error.response?.status === 404 || error.response?.status === 200) {
+      presentaciones.value = []
+      return
+    }
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudieron cargar las presentaciones.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    cargando.value = false
+  }
 }
 
-// Botón dual: activar/desactivar
+const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
+
+const volver = () => emit('volver')
+
 const toggleEstadoPresentacion = (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
 
@@ -197,8 +180,12 @@ const toggleEstadoPresentacion = (pres) => {
         <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dff0e0'}; display:flex; align-items:center; justify-content:center;">
           <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#2b5e3b'};"></i>
         </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}</p>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">
+          ${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}
+        </h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">
+          ${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}
+        </p>
       </div>
     `,
     showCancelButton: true,
@@ -212,40 +199,39 @@ const toggleEstadoPresentacion = (pres) => {
       cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
       popup: '!rounded-2xl',
     },
-    buttonsStyling: true,
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      const nuevoEstado = esActivo ? 'INACTIVO' : 'ACTIVO'
-      const index = presentaciones.value.findIndex((p) => p.id === pres.id)
-      if (index !== -1) {
-        presentaciones.value[index].estado = nuevoEstado
-      }
+      try {
+        const res = await togglePresentacion(pres.id)
 
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        background: '#ffffff',
-        color: '#1e3a2f',
-        iconColor: '#2b5e3b',
-      })
+        const index = presentaciones.value.findIndex((p) => p.id === pres.id)
+        if (index !== -1) {
+          presentaciones.value[index].estado = res.data.activo ? 'ACTIVO' : 'INACTIVO'
+        }
+
+        Swal.fire({
+          toast: true, position: 'top-end', icon: 'success',
+          title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
+          showConfirmButton: false, timer: 1500, timerProgressBar: true,
+          background: '#ffffff', color: '#1e3a2f', iconColor: '#2b5e3b',
+        })
+      } catch {
+        Swal.fire({
+          icon: 'error', title: 'Error',
+          text: 'No se pudo cambiar el estado.',
+          confirmButtonColor: '#2b5e3b',
+        })
+      }
     }
   })
 }
-// ========== Abrir modal para AÑADIR presentación==========
-const abrirAñadir = () => {
-  AgregarVisible.value = true
-}
+
+const abrirAñadir = () => { AgregarVisible.value = true }
 
 const onGuardar = (nuevaPresentacion) => {
   presentaciones.value.push(nuevaPresentacion)
 }
 
-// ========== Abrir modal para EDITAR presentación==========
 const abrirEditar = (presentacion) => {
   presentacionSeleccionada.value = { ...presentacion }
   editarVisible.value = true
@@ -258,7 +244,6 @@ const onGuardarEdicion = (presentacionEditada) => {
   }
 }
 
-// ========== Abrir modal para VER y AÑADIR código  de barra ==========
 const abrirCodigos = (presentacion) => {
   presentacionCodigos.value = { ...presentacion }
   codigosVisible.value = true

@@ -67,10 +67,10 @@ const nombreCategoria = ref('')
 const error         = ref('')
 const guardando     = ref(false)
 
-// ── Sync visible prop → localVisible ────────────────────────────────────────
+
 watch(() => props.visible, (val) => { localVisible.value = val })
 
-// ── Sync localVisible → emit para v-model ───────────────────────────────────
+
 watch(localVisible, (val) => { emit('update:visible', val) })
 
 const validarInput = () => {

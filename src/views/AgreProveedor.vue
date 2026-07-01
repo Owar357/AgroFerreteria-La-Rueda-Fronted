@@ -1,4 +1,3 @@
-<!-- ModalAgregarProveedor.vue -->
 <template>
   <Dialog
     v-model:visible="visible"
@@ -16,7 +15,6 @@
     <!-- Header -->
     <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f;">
       <div class="flex items-center gap-3">
-        
         <h2 class="text-white text-base font-semibold m-0 font-inter uppercase tracking-wide">AGREGAR PROVEEDOR</h2>
         <span class="text-[11px] px-3 py-0.5 rounded-[40px] font-semibold font-inter tracking-wide bg-[#e0b354] text-[#1e3a2f]">
           {{ tipoPersona === 'natural' ? 'Persona natural' : 'Persona jurídica' }}
@@ -66,7 +64,7 @@
       <p class="text-[11px] font-semibold tracking-normal text-gray-400 flex items-center gap-2 m-0 font-inter after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100">
         Información general
       </p>
-      
+
       <div class="grid grid-cols-2 gap-x-4 gap-y-4">
 
         <div class="col-span-2 flex flex-col gap-1.5">
@@ -91,7 +89,10 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">Correo electrónico</label>
+          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">
+            Correo electrónico
+            <span class="text-[11px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+          </label>
           <InputText
             v-model="form.correo"
             type="email"
@@ -106,48 +107,6 @@
             v-model="form.telefono"
             type="tel"
             placeholder="2222-3333"
-            :pt="inputPt"
-          />
-        </div>
-
-      </div>
-
-      <!-- Documentos fiscales -->
-      <p class="text-[11px] font-semibold tracking-normal text-gray-400 flex items-center gap-2 m-0 font-inter after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100 mt-2">
-        Documentos fiscales
-      </p>
-      
-      <div class="grid grid-cols-2 gap-x-4 gap-y-4 mb-1">
-
-        <div v-if="tipoPersona === 'natural'" class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">DUI</label>
-          <InputText
-            v-model="form.dui"
-            placeholder="00000000-0"
-            :maxlength="10"
-            :pt="inputPt"
-          />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">NIT</label>
-          <InputText
-            v-model="form.nit"
-            placeholder="0000-000000-000-0"
-            :maxlength="17"
-            :pt="inputPt"
-          />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">
-            NRC
-            <span class="text-[11px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
-          </label>
-          <InputText
-            v-model="form.nrc"
-            placeholder="000000-0"
-            :maxlength="8"
             :pt="inputPt"
           />
         </div>
@@ -182,9 +141,10 @@
         <template #default>Guardar proveedor</template>
       </Button>
     </div>
-    
+
   </Dialog>
 </template>
+
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
@@ -193,10 +153,7 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
+  modelValue: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'guardar'])
@@ -209,26 +166,32 @@ const visible = computed({
 const tipoPersona = ref('natural')
 
 const form = reactive({
-  nombre: '',
-  direccion: '',
-  correo: '',
-  telefono: '',
-  dui: '',
-  nit: '',
-  nrc: '',
-  estado: 'activo',
+  nombre: '', direccion: '', correo: '', telefono: '',
 })
 
+function resetForm() {
+  Object.assign(form, {
+    nombre: '', direccion: '', correo: '', telefono: '',
+  })
+  tipoPersona.value = 'natural'
+}
 
 function guardar() {
-  const payload = {
-    tipoPersona: tipoPersona.value,
-    ...form,
-  }
-  if (tipoPersona.value === 'juridica') {
-    delete payload.dui
-  }
-  emit('guardar', payload)
+  emit('guardar', {
+    nombre:       form.nombre,
+    direccion:    form.direccion,
+    correo:       form.correo,
+    telefono:     form.telefono,
+    tipo_persona: tipoPersona.value === 'natural' ? 'NATURAL' : 'JURIDICA',
+    activo:       true,
+  })
+  resetForm()
   visible.value = false
+}
+
+const inputPt = {
+  root: {
+    class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] transition-all font-inter',
+  },
 }
 </script>

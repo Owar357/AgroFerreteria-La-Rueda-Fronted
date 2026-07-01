@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import Swal from 'sweetalert2'
 import { getCategorias, createCategoria, updateCategoria } from '../services/categoriaService'
 
-// manejar errores de la API y mostrar Swal adecuado
+// aqui manejo errores de la API y mostrar Swal adecuado
 const handleApiError = async (error, customTitle = 'Error') => {
   const status = error.response?.status
   const responseData = error.response?.data
@@ -45,27 +45,27 @@ const handleApiError = async (error, customTitle = 'Error') => {
 }
 
 export const useCategoriaStore = defineStore('categoria', () => {
-  // ── Estado ─────────────────────────────────────────────────────────────────
-  const categorias   = ref([])
-  const cargando     = ref(false)
+  
+  const categorias = ref([])
+  const cargando = ref(false)
   const totalRecords = ref(0)
-  const currentPage  = ref(1)
-  const perPage      = ref(5)
+  const currentPage = ref(1)
+  const perPage = ref(5)
 
-  // ── Cargar categorías con paginación del servidor ─────────────────────────
+  // Cargargamos categorías con paginación del servidor 
   const cargarCategorias = async (page = 1, rows = perPage.value) => {
     cargando.value = true
     try {
       const response = await getCategorias(page, rows)
-      
-console.log('RESPONSE:', response) 
-      categorias.value   = response.data.data
+
+      console.log('RESPONSE:', response)
+      categorias.value = response.data.data
       totalRecords.value = response.data.total
-      currentPage.value  = response.data.current_page
-      perPage.value      = response.data.per_page
+      currentPage.value = response.data.current_page
+      perPage.value = response.data.per_page
     } catch (error) {
       if (error.response?.status === 404) {
-        categorias.value   = []
+        categorias.value = []
         totalRecords.value = 0
         return
       }
@@ -74,8 +74,7 @@ console.log('RESPONSE:', response)
       cargando.value = false
     }
   }
-
-  // ── Crear categoría ───────────────────────────────────────────────────────
+ 
   const crearCategoria = async (data) => {
     try {
       const response = await createCategoria(data)
@@ -96,7 +95,7 @@ console.log('RESPONSE:', response)
     }
   }
 
-  // ── Actualizar categoría ──────────────────────────────────────────────────
+  
   const actualizarCategoria = async (id, data) => {
     try {
       const response = await updateCategoria(id, data)
@@ -118,7 +117,13 @@ console.log('RESPONSE:', response)
   }
 
   return {
-    categorias, cargando, totalRecords, currentPage, perPage,
-    cargarCategorias, crearCategoria, actualizarCategoria,
+    categorias,
+    cargando,
+    totalRecords,
+    currentPage,
+    perPage,
+    cargarCategorias,
+    crearCategoria,
+    actualizarCategoria,
   }
 })

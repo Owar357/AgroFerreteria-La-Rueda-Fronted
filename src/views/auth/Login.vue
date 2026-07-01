@@ -49,7 +49,7 @@
                 <InputIcon class="pi pi-envelope text-[#9ca3af] text-[14px]" />
                 <InputText
                   v-model="form.identity"
-                  placeholder="correo o usuario"
+                  placeholder="correo@gmail.com"
                   class="w-full custom-login-input text-[14px]"
                   :disabled="loading"
                 />
@@ -94,7 +94,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import authService from '@/services/authService'
 
-// Componentes de PrimeVue con rutas individuales correctas
+
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'

@@ -25,7 +25,7 @@
         </p>
       </div>
 
-      <!-- Monto esperado (solo lectura) -->
+    >
       <div class="flex flex-col gap-2">
         <label class="text-sm font-medium text-[#1a2e1f]">
           Monto esperado (según movimientos)

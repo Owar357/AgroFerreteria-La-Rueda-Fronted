@@ -29,7 +29,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import NavBar from '@/components/shared/navbar.vue'
 import SideBar from '@/components/home/SideBar.vue'
-import Footer from '@/components/shared/Footer.vue' // <-- Asegúrate de crear e importar tu footer aquí
+import Footer from '@/components/shared/Footer.vue'
 
 const sidebarOpen = ref(true)
 const windowWidth = ref(window.innerWidth)

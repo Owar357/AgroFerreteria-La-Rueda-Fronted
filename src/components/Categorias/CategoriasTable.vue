@@ -21,26 +21,13 @@
 
     <Column header="Acciones" class="text-right w-[150px]">
       <template #body="slotProps">
-        <div class="flex gap-2 justify-end">
+        <div class="flex gap-2">
           <Button
             icon="pi pi-pencil"
             label="Editar"
-            severity="secondary"
-            text
-            rounded
-            size="small"
-            v-tooltip="'Editar categoría'"
-            @click="$emit('open-edit', slotProps.data)"
-          />
-          <Button
-            icon="pi pi-eye"
-            label="Ver"
-            severity="secondary"
-            text
-            rounded
-            size="small"
-            v-tooltip="'Ver categoría'"
-            @click="$emit('open-view', slotProps.data)"
+            class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+            v-tooltip.top="'Editar categoría'"
+            @click="emit('open-edit', slotProps.data)"
           />
         </div>
       </template>
@@ -49,20 +36,16 @@
 </template>
 
 <script setup>
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 
 const emit = defineEmits(['open-edit', 'open-view'])
 const store = useCategoriaStore()
 
-
 // Cargar primera página al montar
 store.cargarCategorias(1, store.perPage)
 
 const onPageChange = (event) => {
-  const page = event.page + 1  
+  const page = event.page + 1
   store.cargarCategorias(page, event.rows)
 }
 </script>
