@@ -1,125 +1,125 @@
-<template>
-  <div class="overflow-hidden relative">
-    <transition :name="transitionName" mode="out-in">
-      <div :key="vistaActual" class="w-full">
+  <template>
+    <div class="overflow-hidden relative">
+      <transition :name="transitionName" mode="out-in">
+        <div :key="vistaActual" class="w-full">
+          
         
-      
-        <ProducTable 
-          v-if="vistaActual === 'lista'"
-          @open-add="abrirFormularioCrear"
-          @open-edit="abrirFormularioEditar"
-          @open-detail="abrirDetalle"
-        />
+          <ProducTable 
+            v-if="vistaActual === 'lista'"
+            @open-add="abrirFormularioCrear"
+            @open-edit="abrirFormularioEditar"
+            @open-detail="abrirDetalle"
+          />
 
-      
-        <Producto 
-          v-else-if="vistaActual === 'formulario'"
-          :producto="productoSeleccionado"
-          @close="cerrarFormulario"
-        />
-
-        <EditProduct
-          v-else-if="vistaActual === 'editar'"
-          :producto="productoSeleccionado"
-          @close="cerrarFormulario"
-        />
         
-       
-        <DetalleProducto 
-          v-else-if="vistaActual === 'detalle'"
-          :producto="productoSeleccionado"
-          @volver="cerrarDetalle"
-        />
+          <Producto 
+            v-else-if="vistaActual === 'formulario'"
+            :producto="productoSeleccionado"
+            @close="cerrarFormulario"
+          />
 
-      </div>
-    </transition>
-  </div>
-</template>
+          <EditProduct
+            v-else-if="vistaActual === 'editar'"
+            :producto="productoSeleccionado"
+            @close="cerrarFormulario"
+          />
+          
+        
+          <DetalleProducto 
+            v-else-if="vistaActual === 'detalle'"
+            :producto="productoSeleccionado"
+            @volver="cerrarDetalle"
+          />
 
-<script setup>
-import { ref } from 'vue'
-import ProducTable from '../components/Usuarios/ProducTable.vue'
-import Producto from '../views/Producto.vue'
-import { useproductoStore } from '../stores/productoStore.js'
-import DetalleProducto from '../components/Productos/ProductDetailsTable.vue'
-import EditProduct from '@/components/Productos/EditProduct.vue'
+        </div>
+      </transition>
+    </div>
+  </template>
 
-
-
-const store = useproductoStore()
-
-// Control de vista actual
-const vistaActual = ref('lista') 
-const productoSeleccionado = ref(null)
-
-
-// Control de dirección de la transición
-const transitionName = ref('slide-forward')
-
-// Navegación hacia adelante (abrir)
-const abrirFormularioCrear = () => {
-  transitionName.value = 'slide-forward'
-  productoSeleccionado.value = null
-  vistaActual.value = 'formulario'
-}
-
-const abrirFormularioEditar = (producto) => {
-  transitionName.value = 'slide-forward'
-  productoSeleccionado.value = producto
-  vistaActual.value = 'editar'
-}
-
-const abrirDetalle = (producto) => {
-  transitionName.value = 'slide-forward'
-  productoSeleccionado.value = producto
-  vistaActual.value = 'detalle'
-}
-
-// Navegación hacia atrás cerrar
-const cerrarFormulario = () => {
-  transitionName.value = 'slide-backward'
-  vistaActual.value = 'lista'
-  productoSeleccionado.value = null
-  store.cargarProductos(1, store.perPage)
-}
-
-const cerrarDetalle = () => {
-  transitionName.value = 'slide-backward'
-  vistaActual.value = 'lista'
-  productoSeleccionado.value = null
-}
-</script>
-
-<style scoped>
-
-.slide-forward-enter-active,
-.slide-forward-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.slide-forward-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-.slide-forward-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
-}
+  <script setup>
+  import { ref } from 'vue'
+  import ProducTable from '../components/Usuarios/ProducTable.vue'
+  import Producto from '../views/Producto.vue'
+  import { useproductoStore } from '../stores/productoStore.js'
+  import DetalleProducto from '../components/Productos/ProductDetailsTable.vue'
+  import EditProduct from '@/components/Productos/EditProduct.vue'
 
 
-.slide-backward-enter-active,
-.slide-backward-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.slide-backward-enter-from {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-.slide-backward-leave-to {
-  transform: translateX(100%);
-  opacity: 0;
-}
 
-.overflow-hidden {
-  overflow-x: hidden;
-}
-</style>
+  const store = useproductoStore()
+
+  // Control de vista actual
+  const vistaActual = ref('lista') 
+  const productoSeleccionado = ref(null)
+
+
+  // Control de dirección de la transición
+  const transitionName = ref('slide-forward')
+
+  // Navegación hacia adelante (abrir)
+  const abrirFormularioCrear = () => {
+    transitionName.value = 'slide-forward'
+    productoSeleccionado.value = null
+    vistaActual.value = 'formulario'
+  }
+
+  const abrirFormularioEditar = (producto) => {
+    transitionName.value = 'slide-forward'
+    productoSeleccionado.value = producto
+    vistaActual.value = 'editar'
+  }
+
+  const abrirDetalle = (producto) => {
+    transitionName.value = 'slide-forward'
+    productoSeleccionado.value = producto
+    vistaActual.value = 'detalle'
+  }
+
+  // Navegación hacia atrás cerrar
+  const cerrarFormulario = () => {
+    transitionName.value = 'slide-backward'
+    vistaActual.value = 'lista'
+    productoSeleccionado.value = null
+    store.cargarProductos(1, store.perPage)
+  }
+
+  const cerrarDetalle = () => {
+    transitionName.value = 'slide-backward'
+    vistaActual.value = 'lista'
+    productoSeleccionado.value = null
+  }
+  </script>
+
+  <style scoped>
+
+  .slide-forward-enter-active,
+  .slide-forward-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .slide-forward-enter-from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  .slide-forward-leave-to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+
+  .slide-backward-enter-active,
+  .slide-backward-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .slide-backward-enter-from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  .slide-backward-leave-to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .overflow-hidden {
+    overflow-x: hidden;
+  }
+  </style>
