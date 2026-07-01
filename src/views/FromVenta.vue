@@ -296,11 +296,9 @@ import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/ser
 import DialogAddCliente from '@/components/Clientes/DialogAddCliente.vue'
 import Swal from 'sweetalert2'
 
-const fechaActual = new Date().toLocaleDateString('es-ES', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-})
+
+ 
+const fechaActual = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
 const tipoFactura = ref('01')
 const presentacionSeleccionada = ref('')
