@@ -4,7 +4,7 @@
         <div :key="vistaActual" class="w-full">
           
         
-          <ProducTable 
+          <ProductoTable 
             v-if="vistaActual === 'lista'"
             @open-add="abrirFormularioCrear"
             @open-edit="abrirFormularioEditar"
@@ -12,20 +12,20 @@
           />
 
         
-          <Producto 
+          <AddProductos
             v-else-if="vistaActual === 'formulario'"
             :producto="productoSeleccionado"
             @close="cerrarFormulario"
           />
 
-          <EditProduct
+          <EditProducto
             v-else-if="vistaActual === 'editar'"
             :producto="productoSeleccionado"
             @close="cerrarFormulario"
           />
           
         
-          <DetalleProducto 
+          <DetalleProductosTable
             v-else-if="vistaActual === 'detalle'"
             :producto="productoSeleccionado"
             @volver="cerrarDetalle"
@@ -38,11 +38,11 @@
 
   <script setup>
   import { ref } from 'vue'
-  import ProducTable from '../components/Usuarios/ProducTable.vue'
-  import Producto from '../views/Producto.vue'
+  import ProductoTable from '../components/Productos/ProductoTable.vue'
+  import AddProductos from '../components/Productos/AddProductos.vue'
   import { useproductoStore } from '../stores/productoStore.js'
-  import DetalleProducto from '../components/Productos/ProductDetailsTable.vue'
-  import EditProduct from '@/components/Productos/EditProduct.vue'
+  import DetalleProductosTable from '../components/Productos/DetalleProductosTable.vue'
+import EditProducto from '@/components/Productos/EditProducto.vue'
 
 
 

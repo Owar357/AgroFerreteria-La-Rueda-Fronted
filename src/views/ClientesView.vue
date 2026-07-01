@@ -5,7 +5,7 @@
       @view-history="onViewHistory"
     />
 
-    <ClienteDetalleDialogo
+    <DetalleClientesDialogo
       v-model:visible="detailVisible"
       :client="selectedClient"
     />
@@ -18,7 +18,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
-import ClienteDetalleDialogo from '@/components/Clientes/ClienteDetalleDialogo.vue'
+import DetalleClientesDialogo from '@/components/Clientes/DetalleClientesDialogo.vue'
 
 const router = useRouter()
 
