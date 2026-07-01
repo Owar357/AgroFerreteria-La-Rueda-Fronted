@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <!-- ================= BLOQUE 2: ACCIONES + RESUMEN ================= -->
+    
     <div class="flex gap-6 mb-8">
       <div class="w-72 flex-shrink-0">
         <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">

@@ -127,7 +127,7 @@ import { useRoute, useRouter } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
-import DetalleFacturaDialogo from '../Clientes/DetallFacturaDialogo.vue'
+import DetalleFacturaDialogo from './DetalleFacturaDialogo.vue/index.js'
 import { getVentas, getDetallesVenta } from '@/services/ventaService'
 
 const route  = useRoute()

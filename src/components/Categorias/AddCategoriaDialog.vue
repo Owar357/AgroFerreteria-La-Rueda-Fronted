@@ -10,7 +10,6 @@
     @hide="resetForm"
   >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
-
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">
           Nombre: <span class="text-red-500">*</span>
@@ -20,7 +19,7 @@
           placeholder="Escriba el nombre..."
           :class="[
             'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            error ? 'border-red-500 border' : 'border-[#d1d5db]'
+            error ? 'border-red-500 border' : 'border-[#d1d5db]',
           ]"
           @input="validarInput"
           @keyup.enter="dispararGuardar"
@@ -42,7 +41,6 @@
           @click="dispararGuardar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
@@ -56,27 +54,35 @@ import Swal from 'sweetalert2'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 
 const props = defineProps({
-  visible: { type: Boolean, default: false }
+  visible: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:visible'])
 
-const store         = useCategoriaStore()
-const localVisible  = ref(false)
+const store = useCategoriaStore()
+const localVisible = ref(false)
 const nombreCategoria = ref('')
-const error         = ref('')
-const guardando     = ref(false)
+const error = ref('')
+const guardando = ref(false)
 
+watch(
+  () => props.visible,
+  (val) => {
+    localVisible.value = val
+  },
+)
 
-watch(() => props.visible, (val) => { localVisible.value = val })
-
-
-watch(localVisible, (val) => { emit('update:visible', val) })
+watch(localVisible, (val) => {
+  emit('update:visible', val)
+})
 
 const validarInput = () => {
   const valor = nombreCategoria.value
 
-  if (!valor) { error.value = ''; return false }
+  if (!valor) {
+    error.value = ''
+    return false
+  }
 
   if (/\d/.test(valor)) {
     error.value = 'El nombre no puede contener números.'
@@ -94,8 +100,8 @@ const validarInput = () => {
 
 const resetForm = () => {
   nombreCategoria.value = ''
-  error.value           = ''
-  guardando.value       = false
+  error.value = ''
+  guardando.value = false
 }
 
 const dispararGuardar = async () => {
@@ -110,17 +116,16 @@ const dispararGuardar = async () => {
 
   localVisible.value = false
 
- 
-  const resultado = await store.crearCategoria({ 
-    nombre: nombreAEnviar 
+  const resultado = await store.crearCategoria({
+    nombre: nombreAEnviar,
   })
-  
+
   guardando.value = false
 
   if (!resultado.ok && resultado.error) {
-    error.value  = resultado.error
+    error.value = resultado.error
     localVisible.value = true
-    
+
     Swal.fire({
       icon: 'error',
       title: 'No se pudo guardar',

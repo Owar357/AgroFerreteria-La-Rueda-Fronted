@@ -1,23 +1,23 @@
 <template>
   <div>
-    <SupplierTable
+    <ProveedoresTable
       @open-add="showAddForm = true"
       @open-edit="abrirModalEditar"
       @open-detail="abrirModalDetalle"
     />
 
-    <AgreProveedor
+    <AddProveedores
       v-model="showAddForm"
       @guardar="onGuardarNuevo"
     />
 
-    <EditProveedor
+    <EditProveedores
       v-model="showEditForm"
       :proveedor="proveedorSeleccionado"
       @actualizar="onActualizarExistente"
     />
 
-    <DetallesProve
+    <DetalleProveedores
       v-model="detalleVisible"
       :proveedor="proveedorSeleccionado"
       @open-edit="handleEdit"
@@ -28,10 +28,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useProveedorStore } from '@/stores/proveedorStore'
-import SupplierTable    from '../components/Usuarios/SupplierTable.vue'
-import AgreProveedor    from '../views/AgreProveedor.vue'
-import EditProveedor    from '../components/Usuarios/EditProveeDialog.vue'
-import DetallesProve    from '@/components/Usuarios/DetallesProve.vue'
+import ProveedoresTable    from '../components/Proveedores/ProveedoresTable.vue'
+import AddProveedores    from '../components/Proveedores/AddProveedores.vue'
+import EditProveedores    from '../components/Proveedores/EditProveedores.vue'
+import DetalleProveedores    from '@/components/Proveedores/DetalleProveedores.vue'
 
 const store = useProveedorStore()
 
