@@ -12,10 +12,8 @@
       </div>
     </div>
 
-    <!-- Grid de cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-
-      <!-- CARD VENTAS — funcional -->
+>
       <div class="bg-white rounded-2xl p-5 border border-[#e2e8dd] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer">
         <div class="flex items-start justify-between mb-3">
           <div class="bg-[#eef2e9] p-2 rounded-xl">
@@ -35,7 +33,7 @@
         </div>
       </div>
 
-      <!-- CARDS SOLO DISEÑO -->
+     
       <div
         v-for="card in cardsSoloDiseno"
         :key="card.titulo"

@@ -67,7 +67,7 @@ export const useAuthStore = defineStore('auth', {
                 console.error("error en cerra las sesión", error)
             }finally {
                 this.$reset();
-                router.push('/login') // se cambia a login para cerra la sesion
+                router.push('/login') 
             }
         }
     }

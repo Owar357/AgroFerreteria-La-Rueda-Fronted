@@ -5,14 +5,14 @@ import { getUsuarios, createUsuario, updateUsuario } from '../services/usuarioSe
 
 export const useUserStore = defineStore('userStore', () => {
 
-  // ── Estado ─────────────────────────────────────────────────────────────────
+  //  Estado 
   const users        = ref([])
   const loading      = ref(false)
   const totalRecords = ref(0)
   const currentPage  = ref(1)
   const perPage      = ref(5)
 
-  // ── Cargar usuarios con paginación del servidor ───────────────────────────
+  // Cargar usuarios con paginación del servidor
   const fetchUsers = async (page = 1, rows = perPage.value) => {
     loading.value = true
     try {

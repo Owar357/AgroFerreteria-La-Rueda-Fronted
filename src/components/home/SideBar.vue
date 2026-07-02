@@ -17,7 +17,7 @@
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- LOGÍSTICA — solo ADMIN -->
+      <!-- LOGÍSTICA  solo ADMIN -->
       <template v-if="isAdmin">
         <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em" class="mb-1.5 mx-1">
           LOGÍSTICA
@@ -30,13 +30,13 @@
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- OPERACIONES — ADMIN ve todo, CAJERO ve historial y clientes, CONTADOR ve compra -->
+      
       <template v-if="isAdmin || isCajero || isContador">
         <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em" class="mb-1.5 mx-1">
           OPERACIONES
         </p>
         <SidebarDropdown icon="pi pi-sync" label="Procesos" :open="showProcesos" :parentActive="procesosActive" @toggle="toggleProcesos">
-          <!-- Compra: solo ADMIN y CONTADOR -->
+          
           <SidebarItem
             v-if="isAdmin || isContador"
             icon="pi pi-shopping-bag"
@@ -45,7 +45,7 @@
             @click="navigate('/admin/venta/compra')"
             sub
           />
-          <!-- Historial ventas: solo ADMIN y CAJERO -->
+          >
           <SidebarItem
             v-if="isAdmin || isCajero"
             icon="pi pi-history"
@@ -54,7 +54,7 @@
             @click="navigate('/admin/procesos/historial-ventas')"
             sub
           />
-          <!-- Clientes: todos -->
+          
           <SidebarItem
             icon="pi pi-address-book"
             label="Clientes"
@@ -66,7 +66,7 @@
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- PUNTO DE VENTA — solo ADMIN y CAJERO -->
+   
       <template v-if="isAdmin || isCajero">
         <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em" class="mb-1.5 mx-1">
           PUNTO DE VENTA
@@ -79,7 +79,7 @@
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- ESTADÍSTICAS — solo ADMIN y CONTADOR -->
+   
       <template v-if="isAdmin || isContador">
         <p style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em" class="mb-1.5 mx-1">
           ESTADÍSTICAS
@@ -89,7 +89,7 @@
 
     </div>
 
-    <!-- CERRAR SESIÓN -->
+    
     <div class="mt-auto pt-4 pb-10 mb-4">
       <hr class="border-none border-t mb-3" style="border-color: #162e1e" />
       <SidebarItem icon="pi pi-sign-out" label="Cerrar sesión" :active="false" @click="handleLogout" />

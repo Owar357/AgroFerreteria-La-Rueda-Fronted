@@ -89,11 +89,13 @@
   </Dialog>
 </template>
 
+
 <script setup>
-import { computed } from 'vue'
+import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { getDetallesVenta } from '@/services/ventaService'
 
 const props = defineProps({
   visible: Boolean,
@@ -102,23 +104,27 @@ const props = defineProps({
 
 defineEmits(['update:visible'])
 
-const productosPorFactura = {
-  'FAC-00124': [
-    { nombre: 'Fertilizante NPK 20kg',    cantidad: 3, precio: 45.00 },
-    { nombre: 'Herbicida Glifosato 1L',   cantidad: 2, precio: 18.50 },
-  ],
-  'FAC-00139': [
-    { nombre: 'Insecticida Cipermetrina', cantidad: 1, precio: 12.00 },
-  ],
-  'FAC-00155': [
-    { nombre: 'Semillas de Maíz 5kg',     cantidad: 4, precio: 8.75  },
-    { nombre: 'Abono Orgánico 10kg',      cantidad: 2, precio: 9.00  },
-  ],
-}
+const productos = ref([])
+const cargando = ref(false)
 
-const productos = computed(() =>
-  props.compra ? (productosPorFactura[props.compra.factura] || []) : []
-)
+watch(() => props.visible, async (val) => {
+  if (val && props.compra?.id) {
+    cargando.value = true
+    try {
+      const { data } = await getDetallesVenta(props.compra.id)
+      productos.value = data.data.map(d => ({
+        nombre: d.nombre_producto,
+        cantidad: parseFloat(d.cantidad),
+        precio: parseFloat(d.precio_unitario)
+      }))
+    } catch (error) {
+      console.error('Error al cargar detalle:', error)
+      productos.value = []
+    } finally {
+      cargando.value = false
+    }
+  }
+})
 </script>
 
 <style>

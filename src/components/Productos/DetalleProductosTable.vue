@@ -97,8 +97,8 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
-import AñadirPresentacionDialog from '@/components/Productos/AddPresentation.vue'
-import EditarPresentacionDialog from '@/components/Productos/EditPresentation.vue'
+import AñadirPresentacionDialog from '@/components/Productos/AddPresentacion.vue'
+import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
@@ -117,7 +117,6 @@ const AgregarVisible = ref(false)
 const cargando = ref(false)
 const presentaciones = ref([])
 
-// Los datos de la tarjeta vienen directo del prop (ya los tiene la tabla)
 const producto = ref({
   id: props.producto.id,
   nombre: props.producto.nombre,
