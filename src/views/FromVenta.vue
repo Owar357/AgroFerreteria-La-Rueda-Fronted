@@ -293,7 +293,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/services/ventaService'
-import DialogAddCliente from '@/components/Clientes/DialogAddCliente.vue'
+import DialogAddCliente from '@/components/Clientes/AddClienteDialog.vue'
 
 import Swal from 'sweetalert2'
 

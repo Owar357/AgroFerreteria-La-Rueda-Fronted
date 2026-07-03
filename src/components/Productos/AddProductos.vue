@@ -356,7 +356,15 @@ const emit = defineEmits(['close'])
 const store = useproductoStore()
 
 onMounted(async () => {
-  await store.cargarCategorias()
+  const resultado = await store.cargarCategorias()
+    if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 })
 
 const nombre = ref('')
@@ -607,27 +615,46 @@ const guardarProducto = async () => {
   }
 
   guardando.value = true
-  const resultado = await store.crearProducto(payload)
-  guardando.value = false
+const resultado = await store.crearProducto(payload)
+guardando.value = false
 
-  if (resultado.ok) {
-    resetFormularioCompleto()
-    await Swal.fire({
-      icon: 'success',
-      title: '¡producto guardado!',
-      text: 'El producto fue guardado con éxito',
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Aceptar',
-    })
-    emit('close')
-  } else if (resultado.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de validación',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
-  }
+if (resultado.ok) {
+  resetFormularioCompleto()
+  await Swal.fire({
+    icon: 'success',
+    title: '¡Producto guardado!',
+    text: 'El producto fue guardado con éxito',
+    confirmButtonColor: '#2b5e3b',
+    confirmButtonText: 'Aceptar',
+  })
+  emit('close')
+} else if (resultado.status === 403) {
+  Swal.fire({
+    html: `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+        <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
+          <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
+        </div>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
+        <p style="font-size:14px; color:#6b7280; margin:0;">No tiene permisos para crear productos.</p>
+      </div>
+    `,
+    showConfirmButton: true,
+    confirmButtonColor: '#2b5e3b',
+    confirmButtonText: 'Entendido',
+    customClass: {
+      confirmButton: '!rounded-lg !font-semibold !text-sm',
+      popup: '!rounded-2xl',
+    },
+  })
+} else if (resultado.error) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error de validación',
+    text: resultado.error,
+    confirmButtonColor: '#2b5e3b',
+  })
+}
 }
 // aqui limpiamos por completo el formualrio al guadra el producto
 const resetFormularioCompleto = () => {

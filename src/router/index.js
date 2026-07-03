@@ -113,7 +113,7 @@ const routes = [
       {
         path: 'registro-compras',
         name: 'registroCompras',
-        component: () => import('@/views/RegistroComprasView.vue'),
+        component: () => import('@/components/Compras/DetalleCompraDialog.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
       {
@@ -134,7 +134,7 @@ const routes = [
        {
        path: 'procesos/clientes/:id/historial',  
         name: 'ClienteHistorial',               
-        component: () => import('@/components/Clientes/ClienteHistorialDialogo.vue'),
+        component: () => import('@/components/Clientes/HistorialClienteDialogo.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
        }
     ]

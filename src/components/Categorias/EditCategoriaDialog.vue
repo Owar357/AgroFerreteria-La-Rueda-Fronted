@@ -132,7 +132,6 @@ const dispararActualizar = async () => {
       cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
       popup: '!rounded-2xl',
     },
-    buttonsStyling: true,
   })
 
   if (!confirmacion.isConfirmed) return
@@ -141,12 +140,39 @@ const dispararActualizar = async () => {
   const resultado = await store.actualizarCategoria(form.id, { nombre: form.nombre.trim() })
   guardando.value = false
 
-  if (!resultado.ok && resultado.error) {
+  if (resultado.ok) {
+   
+    localVisible.value = false
+    Swal.fire({
+      icon: 'success',
+      title: '¡Categoría actualizada!',
+      text: 'La categoría fue actualizada exitosamente.',
+      confirmButtonColor: '#2b5e3b',
+      timerProgressBar: true,
+    })
+  } else if (resultado.status === 403) {
+    
+    Swal.fire({
+      html: `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
+            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
+          </div>
+          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
+          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
+        </div>
+      `,
+      showConfirmButton: true,
+      confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Entendido',
+      customClass: {
+        confirmButton: '!rounded-lg !font-semibold !text-sm',
+        popup: '!rounded-2xl',
+      },
+    })
+  } else if (resultado.error) {
     error.value = resultado.error
-    return
   }
-
-  localVisible.value = false
 }
 </script>
 

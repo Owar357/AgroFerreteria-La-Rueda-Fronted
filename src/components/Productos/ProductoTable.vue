@@ -112,6 +112,7 @@ import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
+import Swal from 'sweetalert2'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
@@ -120,7 +121,24 @@ import { useproductoStore } from '@/stores/productoStore'
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 const store = useproductoStore()
 
-onMounted(() => store.cargarProductos())
+onMounted(async () => {
+  const resultado = await store.cargarProductos()
+  if (resultado?.status === 403) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tiene los permisos para ver los productos.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
+})
 
 const filtroCategoria = ref(null)
 

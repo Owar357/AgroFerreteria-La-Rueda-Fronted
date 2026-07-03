@@ -113,27 +113,54 @@ const dispararGuardar = async () => {
 
   guardando.value = true
   const nombreAEnviar = nombreCategoria.value.trim()
-
   localVisible.value = false
 
-  const resultado = await store.crearCategoria({
-    nombre: nombreAEnviar,
-  })
+  const resultado = await store.crearCategoria({ nombre: nombreAEnviar })
 
   guardando.value = false
 
-  if (!resultado.ok && resultado.error) {
+  if (resultado.ok) {
+    resetForm()
+    
+    Swal.fire({
+      icon: 'success',
+      title: '¡Categoría creada!',
+      text: `La categoría "${resultado.categoria.nombre}" fue registrada exitosamente.`,
+      confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Aceptar',
+      timerProgressBar: true,
+    })
+  } else if (resultado.status === 403) {
+    
+    localVisible.value = true
+    Swal.fire({
+      html: `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
+          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
+            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
+          </div>
+          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
+          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
+        </div>
+      `,
+      showConfirmButton: true,
+      confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Entendido',
+      customClass: {
+        confirmButton: '!rounded-lg !font-semibold !text-sm',
+        popup: '!rounded-2xl',
+      },
+    })
+  } else if (resultado.error) {
+    // ✅ Swal de error de validación aquí en el componente
     error.value = resultado.error
     localVisible.value = true
-
     Swal.fire({
       icon: 'error',
       title: 'No se pudo guardar',
       text: resultado.error,
       confirmButtonColor: '#1e3a2f',
     })
-  } else if (resultado.ok) {
-    resetForm()
   }
 }
 </script>
