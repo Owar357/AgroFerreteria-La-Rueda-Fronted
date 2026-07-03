@@ -32,11 +32,11 @@ const routes = [
         redirect: { name: 'usuarios' },
       },
 
-      // --- EXCLUSIVOS ADMIN ---
+      //  EXCLUSIVOS ADMIN 
       {
         path: 'usuarios',
         name: 'usuarios',
-        component: () => import('@/views/UsuariosView.vue'),
+        component: () => import('@/views/UsuariosViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
@@ -48,25 +48,25 @@ const routes = [
       {
         path: 'inventario/categorias',
         name: 'categorias',
-        component: () => import('@/views/CategoriasView.vue'),
+        component: () => import('@/views/CategoriasViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'inventario/productos',
         name: 'productos',
-        component: () => import('@/views/productosView.vue'),
+        component: () => import('@/views/productosViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'inventario/proveedores',
         name: 'proveedores',
-        component: () => import('@/views/ProveedoresView.vue'),
+        component: () => import('@/views/ProveedoresViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
       },
       {
         path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
-        component: () => import('@/views/HistorialVentaView.vue'),
+        component: () => import('@/views/HistorialVentaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
@@ -88,20 +88,20 @@ const routes = [
       {
         path: 'caja',
         name: 'caja',
-        component: () => import('@/views/CajaView.vue'),
+        component: () => import('@/views/CajaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'venta/movimientos-de-caja',
         name: 'movimientos-caja',
-        component: () => import('@/views/MovimientosCajaView.vue'),
+        component: () => import('@/views/MovimientosCajaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
 
       {
         path: 'venta/compra',
         name: 'compra',
-        component: () => import('@/views/CompraView.vue'),
+        component: () => import('@/views/CompraViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
       {
@@ -119,7 +119,7 @@ const routes = [
       {
         path: 'reportes',
         name: 'reportes',
-        component: () => import('@/views/Reportes/ReportesView.vue'), 
+        component: () => import('@/views/Reportes/ReportesViews.vue'), 
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
 
@@ -127,7 +127,7 @@ const routes = [
       {
         path: 'procesos/clientes',
         name: 'Clientes',
-        component: () => import('@/views/ClientesView.vue'),
+        component: () => import('@/views/ClientesViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
       },
       
