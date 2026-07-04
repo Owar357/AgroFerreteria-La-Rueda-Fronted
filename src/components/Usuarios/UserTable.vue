@@ -1,81 +1,78 @@
 <template>
-  <div class="bg-[#111311] min-h-screen p-8 text-[#EAEAEA] font-[Poppins]">
+  <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
-        <h1 class="text-[32px] font-bold popins tracking-tight text-white">Registro de usuarios</h1>
-        
-        <Button
-          label="+ Agregar"
-          class="!bg-[#074e09] hover:bg-[#4A8C3F] text-white text-[20px] px-7 py-4 rounded-lg border-none popins font-bold cursor-pointer"
-          @click="$emit('open-add')"
-        />
+        <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de usuarios</h1>
+        <Button label="+ Agregar"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
+          @click="$emit('open-add')" />
       </div>
 
       <div class="flex justify-start items-center w-full gap-8">
-        
         <IconField class="w-80">
-          <InputIcon class="pi pi-search text-[#B0B0B0]" />
-          <InputText
-            v-model="filters['global'].value"
-            placeholder="Buscar usuario..."
-            class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] rounded-lg focus:ring-1 focus:ring-[#4A8C3F]"
-          />
+          <InputIcon class="pi pi-search text-[#6b7280]" />
+          <InputText v-model="busqueda" placeholder="Buscar usuario..."
+            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]" />
         </IconField>
 
-        <Dropdown
-          v-model="filters['status'].value"
-          :options="statusOptions"
-          showClear
+        <Select v-model="filtroEstado" :options="statusOptions" optionLabel="label" optionValue="value" showClear
           placeholder="Todos los estados"
-          class="w-56 bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] rounded-lg h-[46px] flex items-center px-2 focus:ring-1 focus:ring-[#4A8C3F]"
-        />
+          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center" />
       </div>
     </div>
 
-    <div class="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#333] shadow-2xl">
-      <DataTable
-        :value="users"
-        v-model:filters="filters"
-        :globalFilterFields="['name', 'role']"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[18px]"
-      >
-        <Column field="name" header="Nombre" class="popins font-semibold" />
-        <Column field="email" header="Email" />
+    <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+      <DataTable :value="usuariosFiltrados" :loading="store.loading" lazy :paginator="true" :rows="store.perPage"
+        :totalRecords="store.totalRecords" responsiveLayout="scroll" class="p-datatable-custom text-[14px]"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+        @page="onPageChange">
+        <template #empty>
+          <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay usuarios registrados.</div>
+        </template>
 
-        <Column field="status" header="Estado">
+        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
+        <Column field="email" header="Email" class="text-[#4b5563]" />
+
+        <Column field="activo" header="Estado">
           <template #body="slotProps">
             <span
-              :class="[
-                'px-4 py-1 rounded text-[14px] font-bold popins uppercase',
-                slotProps.data.status === 'Activo'
-                  ? 'bg-[#3e7a33] text-white'
-                  : 'bg-[#7a3333] text-white'
-              ]"
-            >
-              {{ slotProps.data.status }}
+              :class="['px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide', slotProps.data.activo ? 'bg-[#dff0e0] text-[#2b5e3b]' : 'bg-[#fee2e2] text-[#b91c1c]']">
+              {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </template>
         </Column>
 
-        <Column field="role" header="Rol" />
-        <Column field="createdBy" header="Creado por" />
-        <Column field="date" header="fecha" />
+        <Column header="Rol">
+          <template #body="slotProps">{{ slotProps.data.roles?.[0]?.name ?? '—' }}</template>
+        </Column>
 
-        <Column header="Aciones" class="text-center w-\[150px]">
+        <Column header="Creado por" class="text-[#4b5563]">
+          <template #body="slotProps">{{ slotProps.data.registrado_por?.name ?? '—' }}</template>
+        </Column>
+
+        <Column field="created_at" header="Fecha" class="text-[#6b7280]">
+          <template #body="slotProps">
+            {{ slotProps.data.created_at ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV') : '—' }}
+          </template>
+        </Column>
+
+
+        <Column header="Acciones" class="text-center w-[180px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-center">
-              <Button
-                icon="pi pi-pencil"
-                class="!bg-[#f59e0b] hover:bg-[#d97706] border-none text-white w-8 h-8 rounded-full p-0"
-                @click="editUser(slotProps.data)"
-              />
-              <Button
-                :icon="slotProps.data.visible ? 'pi pi-eye' : 'pi pi-eye-slash'"
-                class="bg-[#121212] hover:bg-[#222] border border-[#444] text-white w-8 h-8 rounded-full p-0"
-                @click="toggleVisibility(slotProps.data)"
-              />
+              <Button icon="pi pi-pencil" label="Editar"
+                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Editar categoría'" @click="$emit('open-edit', slotProps.data)" />
+
+              <Button :icon="slotProps.data.activo ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                :label="slotProps.data.activo ? 'Desactivar' : 'Activar'" :class="slotProps.data.activo
+                  ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
+                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
+                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="slotProps.data.activo ? 'Desactivar' : 'Activar'"
+                @click="toggleVisibility(slotProps.data)" />
             </div>
           </template>
         </Column>
@@ -85,63 +82,95 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import IconField from 'primevue/iconfield' // Requerido en v4
-import InputIcon from 'primevue/inputicon' // Requerido en v4
+import { ref, computed, onMounted } from 'vue'  // ← solo una vez
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown' // Corregido minúscula
+import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Swal from 'sweetalert2'  // ← solo una vez
+import { useUserStore } from '@/stores/usuarioStore'
 
-const users = ref([
-  { id: 1, name: 'Daniel Melgar', email: '@dniel.email.com', status: 'Activo', role: 'Administrador', createdBy: 'Samuel lara', date: '10-02-2025', visible: true },
-  { id: 2, name: 'Maria Lopez', email: '@mlopez.email.com', status: 'Activo', role: 'Cajero', createdBy: 'Samuel lara', date: '11-02-2025', visible: true },
-  { id: 3, name: 'Carlos Ruiz', email: '@cruiz.email.com', status: 'Inactivo', role: 'Administrador', createdBy: 'Daniel Melgar', date: '12-02-2025', visible: false },
-  { id: 4, name: 'Ana Beltrán', email: '@abeltran.email.com', status: 'Activo', role: 'Contador', createdBy: 'Samuel lara', date: '13-02-2025', visible: true },
-  { id: 5, name: 'Roberto Sosa', email: '@rsosa.email.com', status: 'Inactivo', role: 'Contador', createdBy: 'Daniel Melgar', date: '14-02-2025', visible: false }
-])
+const store = useUserStore()  // ← faltaba esta línea
 
-const statusOptions = ref(['Activo', 'Inactivo'])
-
-const filters = ref({
-  global: { value: null, matchMode: 'contains' },
-  status: { value: null, matchMode: 'equals' }
+onMounted(async () => {
+  const resultado = await store.fetchUsers()
+  if (resultado?.status === 403) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para ver los usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 })
 
-const emit = defineEmits(['open-add','open-edit'])
+const busqueda     = ref('')
+const filtroEstado = ref(null)
 
-const editUser = (user) => {
-  emit('open-edit', user)
+const statusOptions = ref([
+  { label: 'Activo',   value: true  },
+  { label: 'Inactivo', value: false },
+])
+
+const usuariosFiltrados = computed(() => {
+  return store.users.filter((u) => {
+    const coincideBusqueda =
+      !busqueda.value ||
+      u.name?.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      u.email?.toLowerCase().includes(busqueda.value.toLowerCase())
+
+    const coincideEstado =
+      filtroEstado.value === null || filtroEstado.value === undefined
+        ? true
+        : u.activo === filtroEstado.value
+
+    return coincideBusqueda && coincideEstado
+  })
+})
+
+const onPageChange = (event) => {
+  store.fetchUsers(event.page + 1, event.rows)
 }
 
-const toggleVisibility = (user) => {
-  user.visible = !user.visible
-}
+defineEmits(['open-add', 'open-edit'])
+
+const toggleVisibility = (user) => { user.activo = !user.activo }
 </script>
 
 <style>
-.p-datatable-custom .p-datatable-thead > tr > th {
-  background-color: #1a1a1a !important;
-  color: #fff !important;
-  border-bottom: 1px solid #333 !important;
-  font-style: italic;
+.p-datatable-custom .p-datatable-thead>tr>th {
+  background-color: #ffffff !important;
+  color: #1e3a2f !important;
+  border-bottom: 2px solid #e2e8dd !important;
+  font-size: 13px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr {
-  background-color: #1a1a1a !important;
-  color: #ccc !important;
-  border-bottom: 1px solid #222 !important;
+.p-datatable-custom .p-datatable-tbody>tr {
+  background-color: #ffffff !important;
+  color: #1a2e1f !important;
+  border-bottom: 1px solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr:hover {
-  background-color: #242424 !important;
+.p-datatable-custom .p-datatable-tbody>tr:hover {
+  background-color: #f4f7f2 !important;
 }
 
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
-  box-shadow: none !important;
-  border-color: #4A8C3F !important;
+.p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
 }
 </style>

@@ -1,0 +1,87 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { getProductos, createProducto, getAllCategorias } from '../services/productoService'
+
+export const useproductoStore = defineStore('productos', () => {
+  const productos     = ref([])
+  const cargando      = ref(false)
+  const totalRecords  = ref(0)
+  const currenPage    = ref(1)
+  const perPage       = ref(8)
+  const categorias    = ref([])
+
+  const cargarProductos = async (page = 1, rows = perPage.value) => {
+    cargando.value = true
+    try {
+      const response      = await getProductos(page, rows)
+      productos.value     = response.data.data
+      totalRecords.value  = response.data.total
+      currenPage.value    = response.data.curren_Page
+      perPage.value       = response.data.per_page
+    } catch (error) {
+      if (error.response?.status === 404) {
+        productos.value    = []
+        totalRecords.value = 0
+        return
+      }
+      return {
+        ok: false,
+        status: error.response?.status,
+        error: error.response?.data?.message || 'No se pudo cargar la lista de productos.'
+      }
+    } finally {
+      cargando.value = false
+    }
+  }
+
+  const cargarCategorias = async () => {
+    try {
+      const response      = await getAllCategorias()
+      categorias.value    = response.data.data ?? response.data
+    } catch (error) {
+      if (error.response?.status === 404) {
+        categorias.value = []
+        return
+      }
+      return {
+        ok: false,
+        status: error.response?.status,
+        error: error.response?.data?.message || 'No se pudieron cargar las categorías.'
+      }
+    }
+  }
+
+  const crearProducto = async (data) => {
+    try {
+      await createProducto(data)
+      await cargarProductos(1, perPage.value)
+      return { ok: true }
+    } catch (error) {
+      const status       = error.response?.status
+      const responseData = error.response?.data
+
+      if (status === 422) {
+        const mensaje = Object.values(responseData.errors).flat()
+        return { ok: false, status, error: mensaje[0] }
+      }
+      return {
+        ok: false,
+        status,
+        error: responseData?.message || 'Error del servidor.'
+      }
+    }
+  }
+
+  // Edición local 
+  const editarProductoLocal = (id, cambios) => {
+    const index = productos.value.findIndex((p) => p.id === id)
+    if (index !== -1) {
+      productos.value[index] = { ...productos.value[index], ...cambios }
+    }
+  }
+
+  return {
+    productos, cargando, totalRecords, currenPage, perPage, categorias,
+    cargarProductos, cargarCategorias, crearProducto, editarProductoLocal,
+  }
+})

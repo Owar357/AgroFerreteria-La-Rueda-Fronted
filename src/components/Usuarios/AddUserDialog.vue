@@ -6,60 +6,99 @@
     :style="{ width: '500px' }"
     :draggable="false"
     class="custom-dialog"
-    :pt="{
-      root: { class: 'rounded-2xl overflow-hidden' }
-    }"
+    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    @hide="resetForm"
   >
-    <div class="bg-[#101410] p-2 text-[#EAEAEA] flex flex-col gap-5 font-[Poppins]">
-      
+    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Nombre</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
         <InputText
           v-model="form.name"
           placeholder="Nombre completo"
-          class="w-full bg-[#0d0c0c] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg focus:border-[#4A8C3F]"
+          @input="validateField('name')"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
+          :class="{ 'border-red-500 focus:border-red-500': errors.name }"
         />
+        <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">{{
+          errors.name
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Email</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Email</label>
         <InputText
           v-model="form.email"
+          autocomplete="off"
           placeholder="correo@ejemplo.com"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg focus:border-[#4A8C3F]"
+          @input="validateField('email')"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
+          :class="{ 'border-red-500 focus:border-red-500': errors.email }"
         />
+        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{
+          errors.email
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Contraseña</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña</label>
         <Password
           v-model="form.password"
           toggleMask
           :feedback="false"
           placeholder="********"
+          @input="validateField('password')"
           class="w-full"
-          inputClass="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg"
+          inputClass="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
+          :class="{ 'border-red-500': errors.password }"
+          :inputProps="{ autocomplete: 'new-password' }"
         />
+        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
+          errors.password
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-[18px] font-medium popins">Rol</label>
-        <dropdown
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Rol</label>
+        <Select
           v-model="form.role"
           :options="roles"
           placeholder="Seleccionar rol"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 flex items-center px-2 rounded-lg"
+          @change="validateField('role')"
+          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 flex items-center px-2 rounded-lg"
+          :class="{ 'border-red-500': errors.role }"
         />
+        <small v-if="errors.role" class="text-red-600 text-[12px] font-medium">{{
+          errors.role
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
-        <label class="text-[18px] font-medium popins">Clave de caja</label>
+        <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
         <InputText
           v-model="form.cashKey"
           placeholder="Código de apertura"
-          class="w-full bg-[#323232] border-[#444] text-[#EAEAEA] text-[18px] h-12 px-4 rounded-lg"
+          maxlength="6"
+          autocomplete="off"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          @keydown="
+            (e) => {
+              if (
+                !/[0-9]/.test(e.key) &&
+                !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+              )
+                e.preventDefault()
+            }
+          "
+          @input="
+            form.cashKey = form.cashKey.replace(/\D/g, '').slice(0, 6);validateField('cashKey')"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
+          :class="errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]'"
         />
-        <small class="text-[13px] text-[#888] popins mt-1">
+        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{
+          errors.cashKey
+        }}</small>
+        <small class="text-[13px] text-[#6b7280] font-normal mt-1">
           (Si el usuario podrá aperturar caja, ingresar código)
         </small>
       </div>
@@ -67,7 +106,8 @@
       <div class="flex justify-center mt-4">
         <Button
           label="Guardar"
-          class="!bg-[#074e09] text-white text-[20px] px-7 py-3 rounded-lg border-none font-bold popins shadow-lg"
+          :loading="loading"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
           @click="handleSave"
         />
       </div>
@@ -80,22 +120,29 @@ import { reactive, ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
-import Dropdown from 'primevue/dropdown' // Corregido minúscula
+import Select from 'primevue/select'
 import Button from 'primevue/button'
+import Swal from 'sweetalert2'
+import { useUserStore } from '@/stores/usuarioStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   roles: {
     type: Array,
-    default: () => ['Administrador', 'Contador', 'Cajero']
-  }
+    default: () => ['Administrador', 'Contador', 'Cajero'],
+  },
 })
 
-const emit = defineEmits(['update:visible', 'save'])
+const emit = defineEmits(['update:visible'])
 
-const localVisible = ref(props.visible)
+const store = useUserStore()
+const localVisible = ref(false)
+const loading = ref(false)
 
-watch(() => props.visible, (val) => localVisible.value = val)
+watch(
+  () => props.visible,
+  (val) => (localVisible.value = val),
+)
 watch(localVisible, (val) => emit('update:visible', val))
 
 const form = reactive({
@@ -103,31 +150,182 @@ const form = reactive({
   email: '',
   password: '',
   role: null,
-  cashKey: ''
+  cashKey: '',
 })
 
-const handleSave = () => {
-  emit('save', { ...form })
-  localVisible.value = false 
+const errors = reactive({
+  name: '',
+  email: '',
+  password: '',
+  role: '',
+  cashKey: '',
+})
+
+const resetForm = () => {
+  form.name = ''
+  form.email = ''
+  form.password = ''
+  form.role = null
+  form.cashKey = ''
+  Object.keys(errors).forEach((k) => (errors[k] = ''))
+}
+
+const validateField = (field) => {
+  if (field === 'name') {
+    const v = form.name.trim()
+    if (!v) errors.name = 'El nombre es obligatorio.'
+    else if (v.length > 70) errors.name = 'El nombre no debe exceder los 70 caracteres.'
+    else if (!/^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(v))
+      errors.name = 'Solo se permiten letras (sin números ni caracteres especiales).'
+    else errors.name = ''
+  }
+
+  if (field === 'email') {
+    const v = form.email.trim()
+    if (!v) errors.email = 'El correo electrónico es obligatorio.'
+    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v))
+      errors.email = 'Formato de correo inválido.'
+    else errors.email = ''
+  }
+
+  if (field === 'cashKey') {
+    const v = form.cashKey.trim()
+    if (!v) {
+      errors.cashKey = ''
+      return
+    } // es opcional
+    if (v.length !== 6) errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'
+    else errors.cashKey = ''
+  }
+
+  if (field === 'password') {
+    const v = form.password
+    if (!v) errors.password = 'La contraseña es obligatoria.'
+    else if (v.length < 8) errors.password = 'Mínimo 8 caracteres.'
+    else if (/\s/.test(v)) errors.password = 'La contraseña no puede contener espacios.'
+    else if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v))
+      errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
+    else errors.password = ''
+  }
+
+  if (field === 'role') {
+    errors.role = form.role ? '' : 'Debe seleccionar un rol.'
+  }
+}
+
+const handleSave = async () => {
+  if (!form.name.trim() && !form.email.trim() && !form.password && !form.role) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Formulario vacío',
+      text: 'Complete los campos requeridos antes de guardar.',
+      confirmButtonColor: '#2b5e3b',
+    })
+    return
+  }
+
+  validateField('name')
+  validateField('email')
+  validateField('password')
+  validateField('role')
+
+  if (errors.name || errors.email || errors.password || errors.role || errors.cashKey) return
+
+  localVisible.value = false
+  loading.value = true
+
+  const resultado = await store.createUser({
+    name: form.name.trim(),
+    email: form.email.trim(),
+    password: form.password,
+    role: form.role,
+    cashKey: form.cashKey ? form.cashKey.trim() : null,
+  })
+
+  loading.value = false
+
+  if (resultado.ok) {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Usuario creado!',
+      text: `El usuario "${resultado.user.name}" fue registrado exitosamente.`,
+      confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Aceptar',
+      timer: 3000,
+      timerProgressBar: true,
+    })
+  } else if (resultado.status === 403) {
+    localVisible.value = true
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para crear usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado.error) {
+    const msg = resultado.error.toLowerCase()
+    if (msg.includes('correo') || msg.includes('email')) errors.email = resultado.error
+    else if (msg.includes('nombre') || msg.includes('name')) errors.name = resultado.error
+    else errors.email = resultado.error
+    localVisible.value = true
+  }
 }
 </script>
 
 <style>
-/* Estilos estructurales para el modal oscuro */
+.swal2-container {
+  z-index: 999999 !important;
+}
+
 .custom-dialog .p-dialog-header {
-  background-color: #0a5611 !important;
+  background-color: #1e3a2f !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #333;
-  font-style: italic;
+  border-bottom: 1px solid #e2e8dd;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 1.25rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
-  background-color: #151715 !important;
+  background-color: #ffffff !important;
   padding: 1.5rem !important;
 }
 
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
-  box-shadow: none !important;
-  border-color: #4A8C3F !important;
+.p-inputtext:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
+}
+
+.p-select {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+.p-select-label {
+  color: #1a2e1f !important;
+  font-size: 14px !important;
+}
+
+.p-select-overlay {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  z-index: 999992 !important;
+}
+
+.p-select-item {
+  color: #1a2e1f !important;
+  font-size: 14px !important;
+}
+
+.p-select-item:not(.p-highlight):not(.p-disabled):hover {
+  background-color: #eef2e9 !important;
+}
+
+.p-password-toggle-icon {
+  color: #6b7280 !important;
 }
 </style>
