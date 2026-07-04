@@ -305,3 +305,4 @@ const toggleEstado = async (proveedor) => {
   background-color: #eef2e9 !important;
 }
 </style>
+ 
