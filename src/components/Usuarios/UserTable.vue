@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'  // ← solo una vez
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
@@ -90,38 +90,56 @@ import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Swal from 'sweetalert2'  // ← solo una vez
 import { useUserStore } from '@/stores/usuarioStore'
 
-const store = useUserStore()
+const store = useUserStore()  // ← faltaba esta línea
 
-const busqueda = ref('')
+onMounted(async () => {
+  const resultado = await store.fetchUsers()
+  if (resultado?.status === 403) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para ver los usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
+})
+
+const busqueda     = ref('')
 const filtroEstado = ref(null)
 
 const statusOptions = ref([
-  { label: 'Activo', value: true },
-  { label: 'Inactivo', value: false }
+  { label: 'Activo',   value: true  },
+  { label: 'Inactivo', value: false },
 ])
 
-// Filtro local sobre los registros de la página actual
 const usuariosFiltrados = computed(() => {
-  return store.users.filter(u => {
-    const coincideBusqueda = !busqueda.value ||
+  return store.users.filter((u) => {
+    const coincideBusqueda =
+      !busqueda.value ||
       u.name?.toLowerCase().includes(busqueda.value.toLowerCase()) ||
       u.email?.toLowerCase().includes(busqueda.value.toLowerCase())
 
-    const coincideEstado = filtroEstado.value === null || filtroEstado.value === undefined
-      ? true
-      : u.activo === filtroEstado.value
+    const coincideEstado =
+      filtroEstado.value === null || filtroEstado.value === undefined
+        ? true
+        : u.activo === filtroEstado.value
 
     return coincideBusqueda && coincideEstado
   })
 })
 
-
 const onPageChange = (event) => {
-  const page = event.page + 1      
-  const perPage = event.rows
-  store.fetchUsers(page, perPage)
+  store.fetchUsers(event.page + 1, event.rows)
 }
 
 defineEmits(['open-add', 'open-edit'])

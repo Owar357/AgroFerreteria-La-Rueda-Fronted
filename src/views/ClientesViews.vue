@@ -20,6 +20,7 @@ import { useRouter } from 'vue-router'
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
 import DetalleClientesDialogo from '@/components/Clientes/DetalleClientesDialogo.vue'
 
+
 const router = useRouter()
 
 const detailVisible  = ref(false)

@@ -1,62 +1,116 @@
 <template>
-  <Dialog v-model:visible="localVisible" modal header="AGREGAR USUARIO" :style="{ width: '500px' }" :draggable="false"
-    class="custom-dialog" :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }" @hide="resetForm">
+  <Dialog
+    v-model:visible="localVisible"
+    modal
+    header="AGREGAR USUARIO"
+    :style="{ width: '500px' }"
+    :draggable="false"
+    class="custom-dialog"
+    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    @hide="resetForm"
+  >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
-        <InputText v-model="form.name" placeholder="Nombre completo" @input="validateField('name')"
+        <InputText
+          v-model="form.name"
+          placeholder="Nombre completo"
+          @input="validateField('name')"
           class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500 focus:border-red-500': errors.name }" />
-        <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">{{ errors.name }}</small>
+          :class="{ 'border-red-500 focus:border-red-500': errors.name }"
+        />
+        <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">{{
+          errors.name
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Email</label>
-        <InputText v-model="form.email" autocomplete="off" placeholder="correo@ejemplo.com"
+        <InputText
+          v-model="form.email"
+          autocomplete="off"
+          placeholder="correo@ejemplo.com"
           @input="validateField('email')"
           class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500 focus:border-red-500': errors.email }" />
-        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{ errors.email }}</small>
+          :class="{ 'border-red-500 focus:border-red-500': errors.email }"
+        />
+        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{
+          errors.email
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña</label>
-        <Password v-model="form.password" toggleMask :feedback="false" placeholder="********"
-          @input="validateField('password')" class="w-full"
+        <Password
+          v-model="form.password"
+          toggleMask
+          :feedback="false"
+          placeholder="********"
+          @input="validateField('password')"
+          class="w-full"
           inputClass="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500': errors.password }" :inputProps="{ autocomplete: 'new-password' }" />
-        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
+          :class="{ 'border-red-500': errors.password }"
+          :inputProps="{ autocomplete: 'new-password' }"
+        />
+        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
+          errors.password
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Rol</label>
-        <Select v-model="form.role" :options="roles" placeholder="Seleccionar rol" @change="validateField('role')"
+        <Select
+          v-model="form.role"
+          :options="roles"
+          placeholder="Seleccionar rol"
+          @change="validateField('role')"
           class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 flex items-center px-2 rounded-lg"
-          :class="{ 'border-red-500': errors.role }" />
-        <small v-if="errors.role" class="text-red-600 text-[12px] font-medium">{{ errors.role }}</small>
+          :class="{ 'border-red-500': errors.role }"
+        />
+        <small v-if="errors.role" class="text-red-600 text-[12px] font-medium">{{
+          errors.role
+        }}</small>
       </div>
 
       <div class="flex flex-col gap-1">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
-        <InputText v-model="form.cashKey" placeholder="Código de apertura" maxlength="6" autocomplete="off"
-          inputmode="numeric" pattern="[0-9]*"
-          @keydown="(e) => { if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) e.preventDefault() }"
-          @input="form.cashKey = form.cashKey.replace(/\D/g, '').slice(0, 6); validateField('cashKey')"
+        <InputText
+          v-model="form.cashKey"
+          placeholder="Código de apertura"
+          maxlength="6"
+          autocomplete="off"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          @keydown="
+            (e) => {
+              if (
+                !/[0-9]/.test(e.key) &&
+                !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+              )
+                e.preventDefault()
+            }
+          "
+          @input="
+            form.cashKey = form.cashKey.replace(/\D/g, '').slice(0, 6);validateField('cashKey')"
           class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]'" />
-        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{ errors.cashKey }}</small>
+          :class="errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]'"
+        />
+        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{
+          errors.cashKey
+        }}</small>
         <small class="text-[13px] text-[#6b7280] font-normal mt-1">
           (Si el usuario podrá aperturar caja, ingresar código)
         </small>
       </div>
 
       <div class="flex justify-center mt-4">
-        <Button label="Guardar" :loading="loading"
+        <Button
+          label="Guardar"
+          :loading="loading"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
-          @click="handleSave" />
+          @click="handleSave"
+        />
       </div>
-
     </div>
   </Dialog>
 </template>
@@ -75,8 +129,8 @@ const props = defineProps({
   visible: { type: Boolean, default: false },
   roles: {
     type: Array,
-    default: () => ['Administrador', 'Contador', 'Cajero',]
-  }
+    default: () => ['Administrador', 'Contador', 'Cajero'],
+  },
 })
 
 const emit = defineEmits(['update:visible'])
@@ -85,21 +139,35 @@ const store = useUserStore()
 const localVisible = ref(false)
 const loading = ref(false)
 
-watch(() => props.visible, (val) => (localVisible.value = val))
+watch(
+  () => props.visible,
+  (val) => (localVisible.value = val),
+)
 watch(localVisible, (val) => emit('update:visible', val))
 
 const form = reactive({
-  name: '', email: '', password: '', role: null, cashKey: ''
+  name: '',
+  email: '',
+  password: '',
+  role: null,
+  cashKey: '',
 })
 
 const errors = reactive({
-  name: '', email: '', password: '', role: '', cashKey: ''
+  name: '',
+  email: '',
+  password: '',
+  role: '',
+  cashKey: '',
 })
 
 const resetForm = () => {
-  form.name = ''; form.email = ''; form.password = ''
-  form.role = null; form.cashKey = ''
-  Object.keys(errors).forEach(k => (errors[k] = ''))
+  form.name = ''
+  form.email = ''
+  form.password = ''
+  form.role = null
+  form.cashKey = ''
+  Object.keys(errors).forEach((k) => (errors[k] = ''))
 }
 
 const validateField = (field) => {
@@ -107,7 +175,8 @@ const validateField = (field) => {
     const v = form.name.trim()
     if (!v) errors.name = 'El nombre es obligatorio.'
     else if (v.length > 70) errors.name = 'El nombre no debe exceder los 70 caracteres.'
-    else if (!/^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(v)) errors.name = 'Solo se permiten letras (sin números ni caracteres especiales).'
+    else if (!/^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(v))
+      errors.name = 'Solo se permiten letras (sin números ni caracteres especiales).'
     else errors.name = ''
   }
 
@@ -116,29 +185,27 @@ const validateField = (field) => {
     if (!v) errors.email = 'El correo electrónico es obligatorio.'
     else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v))
       errors.email = 'Formato de correo inválido.'
-    else
-      errors.email = ''
+    else errors.email = ''
   }
 
   if (field === 'cashKey') {
     const v = form.cashKey.trim()
-    if (!v) { errors.cashKey = ''; return } // es opcional
+    if (!v) {
+      errors.cashKey = ''
+      return
+    } // es opcional
     if (v.length !== 6) errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'
     else errors.cashKey = ''
   }
 
   if (field === 'password') {
     const v = form.password
-    if (!v)
-      errors.password = 'La contraseña es obligatoria.'
-    else if (v.length < 8)
-      errors.password = 'Mínimo 8 caracteres.'
-    else if (/\s/.test(v))
-      errors.password = 'La contraseña no puede contener espacios.'
+    if (!v) errors.password = 'La contraseña es obligatoria.'
+    else if (v.length < 8) errors.password = 'Mínimo 8 caracteres.'
+    else if (/\s/.test(v)) errors.password = 'La contraseña no puede contener espacios.'
     else if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v))
       errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
-    else
-      errors.password = ''
+    else errors.password = ''
   }
 
   if (field === 'role') {
@@ -147,20 +214,16 @@ const validateField = (field) => {
 }
 
 const handleSave = async () => {
-  // Validar formulario vacío
   if (!form.name.trim() && !form.email.trim() && !form.password && !form.role) {
     Swal.fire({
       icon: 'error',
       title: 'Formulario vacío',
       text: 'Complete los campos requeridos antes de guardar.',
-      confirmButtonColor: '#2b5e3b'
+      confirmButtonColor: '#2b5e3b',
     })
     return
   }
 
-
-
-  // Validar todos los campos
   validateField('name')
   validateField('email')
   validateField('password')
@@ -168,7 +231,6 @@ const handleSave = async () => {
 
   if (errors.name || errors.email || errors.password || errors.role || errors.cashKey) return
 
-  // Cerrar modal antes del SweetAlert para que no quede detrás
   localVisible.value = false
   loading.value = true
 
@@ -177,24 +239,37 @@ const handleSave = async () => {
     email: form.email.trim(),
     password: form.password,
     role: form.role,
-    cashKey: form.cashKey ? form.cashKey.trim() : null
+    cashKey: form.cashKey ? form.cashKey.trim() : null,
   })
 
   loading.value = false
 
-  // Si hubo error de validación del servidor, volvemos a abrir el modal con el error
-  if (!resultado.ok && resultado.error) {
-    // Detectamos a qué campo pertenece el error del servidor
+  if (resultado.ok) {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Usuario creado!',
+      text: `El usuario "${resultado.user.name}" fue registrado exitosamente.`,
+      confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Aceptar',
+      timer: 3000,
+      timerProgressBar: true,
+    })
+  } else if (resultado.status === 403) {
+    localVisible.value = true
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para crear usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado.error) {
     const msg = resultado.error.toLowerCase()
     if (msg.includes('correo') || msg.includes('email')) errors.email = resultado.error
     else if (msg.includes('nombre') || msg.includes('name')) errors.name = resultado.error
-    else errors.email = resultado.error // fallback
+    else errors.email = resultado.error
     localVisible.value = true
   }
 }
-
-
-
 </script>
 
 <style>
