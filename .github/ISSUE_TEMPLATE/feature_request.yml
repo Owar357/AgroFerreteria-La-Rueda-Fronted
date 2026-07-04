@@ -1,0 +1,63 @@
+name: "✨ Nueva Funcionalidad"
+description: Propuesta para añadir algo nuevo al sistema AgroFerretería Frontend.
+title: "[FEATURE] - <nombre del módulo>"
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: que_es
+    attributes:
+      label: "¿Qué se va a agregar?"
+      description: Explica brevemente la nueva funcionalidad.
+      placeholder: "Ej: Componente de reportes de ventas por rango de fechas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: por_que
+    attributes:
+      label: "¿Por qué es necesario?"
+      description: Justificación de por qué aporta valor al sistema.
+      placeholder: "Ej: Don Carlos necesita visualizar las ventas del mes."
+    validations:
+      required: true
+
+  - type: textarea
+    id: como_funciona
+    attributes:
+      label: "¿Cómo debería funcionar?"
+      description: Describe el comportamiento esperado del componente.
+      placeholder: "Ej: El usuario selecciona rango de fechas y la tabla muestra las ventas filtradas."
+    validations:
+      required: true
+
+  - type: input
+    id: rama
+    attributes:
+      label: "Rama donde se trabajará"
+      placeholder: "feature/nombre-del-modulo"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: criterios
+    attributes:
+      label: "Criterios de Aceptación"
+      description: Requisitos para considerar la funcionalidad completa.
+      options:
+        - label: "Componente implementado y funcional"
+        - label: "Conectado con el endpoint del backend"
+        - label: "Probado en el navegador"
+        - label: "Sin errores en consola"
+        - label: "Diseño alineado con el sistema"
+
+  - type: textarea
+    id: issues_relacionados
+    attributes:
+      label: "Issues o PRs relacionados"
+      placeholder: "Vincula con # + número. Ej: Relacionado con #42"
+
+  - type: textarea
+    id: comentarios
+    attributes:
+      label: "Otros comentarios"
+      placeholder: "Cualquier cosa extra que el equipo deba saber."  
