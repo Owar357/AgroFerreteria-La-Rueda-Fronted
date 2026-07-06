@@ -118,7 +118,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 
 defineProps({
-  venta: {           // ← cambiamos de 'sale' a 'venta'
+  venta: {          
     type: Object,
     default: null
   }
