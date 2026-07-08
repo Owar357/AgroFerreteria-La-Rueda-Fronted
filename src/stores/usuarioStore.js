@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getUsuarios, createUsuario, updateUsuario } from '../services/usuarioService'
+import { getUsuarios, createUsuario, updateUsuario, desactivarUsuario as desactivarUsuarioService } from '../services/usuarioService'
 
 export const useUserStore = defineStore('userStore', () => {
   const users = ref([])
@@ -62,7 +62,25 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  // Segunda fase — conectar al backend
+  const desactivarUsuario = async (id) => {
+    try {
+      await desactivarUsuarioService(id)
+
+      const index = users.value.findIndex((u) => u.id === id) 
+      if (index !== -1 ) users.value[index].activo = false
+
+      return { ok: true}
+    }catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
+
+      return {
+        ok: false,
+        status, 
+        error: responseData?.message || 'Error al desactivar el usuario.',
+      }
+    }
+  }
   const updateUser = async (id, payload) => {
     
 
@@ -88,6 +106,6 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   return {
-    users, loading, totalRecords, currentPage, perPage, fetchUsers, createUser, updateUser
+    users, loading, totalRecords, currentPage, perPage, fetchUsers, createUser, updateUser, desactivarUsuario,
   }
 })

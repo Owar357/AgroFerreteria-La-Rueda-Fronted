@@ -100,17 +100,14 @@
               />
 
               <Button
-                :icon="slotProps.data.activo ? 'pi pi-eye-slash' : 'pi pi-eye'"
-                :label="slotProps.data.activo ? 'Desactivar' : 'Activar'"
-                :class="
-                  slotProps.data.activo
-                    ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                    : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
-                "
-                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="slotProps.data.activo ? 'Desactivar' : 'Activar'"
-                @click="toggleVisibility(slotProps.data)"
-              />
+                  v-if="slotProps.data.activo"
+                  icon="pi pi-eye-slash"
+                  label="Desactivar"
+                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Desactivar usuario'"
+                  @click="confirmarDesactivar(slotProps.data)"
+                  />
+                  <span v-else class="text-[#9ca3af] text-sm italic">-</span>
             </div>
           </template>
         </Column>
@@ -129,8 +126,58 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Swal from 'sweetalert2'
+import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
 
+const usuarioActual = authService.getUser()
+
+const confirmarDesactivar = async (user) => {
+  if (usuarioActual?.id === user.id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Acción no permitida',
+      text: 'No puedes desactivar tu propio usuario.',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#2b5e3b',
+    })
+    return
+  }
+
+  const confirmacion = await Swal.fire({
+    icon: 'question',
+    title: '¿Desactivar usuario?',
+    text: `¿Deseas desactivar a ${user.name}? Esta acción no se puede revertir.`,
+    showCancelButton: true,
+    confirmButtonText: 'Confirmar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#9c2a2a',
+    cancelButtonColor: '#6b7280',
+    reverseButtons: true,
+  })
+
+  if (!confirmacion.isConfirmed) return
+
+  const resultado = await store.desactivarUsuario(user.id)
+
+  if (resultado?.ok) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Usuario desactivado correctamente',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+    })
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: resultado?.error || 'No se pudo desactivar el usuario.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
+}
 const store = useUserStore()
 
 onMounted(async () => {
@@ -182,9 +229,7 @@ const onPageChange = (event) => {
 
 defineEmits(['open-add', 'open-edit'])
 
-const toggleVisibility = (user) => {
-  user.activo = !user.activo
-}
+
 </script>
 
 <style>
