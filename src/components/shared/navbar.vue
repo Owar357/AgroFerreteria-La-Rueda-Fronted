@@ -2,7 +2,7 @@
   <header class="flex items-center justify-between px-5 h-25 bg-[#1C3A1A] border-b border-[#2a4a28] flex-shrink-0">
 
     <div class="flex items-center gap-4">
-      <!-- Botón hamburguesa -->
+      <!-- Boton hamburguesa -->
       <button @click="$emit('toggleSidebar')"
         class="bg-transparent border-none cursor-pointer text-[#EAEAEA] text-xl p-1.5 rounded-md flex items-center transition-colors duration-200 hover:bg-[#2a4a28]">
         <i class="pi pi-bars"></i>

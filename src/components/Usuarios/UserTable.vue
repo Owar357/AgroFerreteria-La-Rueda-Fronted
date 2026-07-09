@@ -1,10 +1,8 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
+  <div class="bg-[#eef2e9] min-h-full p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
         <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de usuarios</h1>
-        
         <Button
           label="+ Agregar"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
@@ -16,67 +14,100 @@
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
-            v-model="filters['global'].value"
+            v-model="busqueda"
             placeholder="Buscar usuario..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] focus:ring-1 focus:ring-[#2b5e3b]"
+            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
           />
         </IconField>
 
-        <Dropdown
-          v-model="filters['status'].value"
+        <Select
+          v-model="filtroEstado"
           :options="statusOptions"
+          optionLabel="label"
+          optionValue="value"
           showClear
           placeholder="Todos los estados"
-          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center px-2 focus:ring-1 focus:ring-[#2b5e3b]"
+          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center"
         />
       </div>
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <DataTable
-        :value="users"
-        v-model:filters="filters"
-        :globalFilterFields="['name', 'role']"
+        :value="usuariosFiltrados"
+        :loading="store.loading"
+        lazy
+        :paginator="true"
+        :rows="store.perPage"
+        :totalRecords="store.totalRecords"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+        @page="onPageChange"
       >
+        <template #empty>
+          <div class="text-center py-6 text-[#6b7280] text-[14px]">
+            No hay usuarios registrados.
+          </div>
+        </template>
+
         <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-        
         <Column field="email" header="Email" class="text-[#4b5563]" />
 
-        <Column field="status" header="Estado">
+        <Column field="activo" header="Estado">
           <template #body="slotProps">
             <span
               :class="[
                 'px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide',
-                slotProps.data.status === 'Activo'
+                slotProps.data.activo
                   ? 'bg-[#dff0e0] text-[#2b5e3b]'
-                  : 'bg-[#fee2e2] text-[#b91c1c]'
+                  : 'bg-[#fee2e2] text-[#b91c1c]',
               ]"
             >
-              {{ slotProps.data.status }}
+              {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </template>
         </Column>
 
-        <Column field="role" header="Rol" />
-        <Column field="createdBy" header="Creado por" class="text-[#4b5563]" />
-        
-        <Column field="date" header="fecha" class="text-[#6b7280]" />
+        <Column header="Rol">
+          <template #body="slotProps">{{ slotProps.data.roles?.[0]?.name ?? '—' }}</template>
+        </Column>
 
-        <Column header="Acciones" class="text-center w-[150px]">
+        <Column header="Creado por" class="text-[#4b5563]">
+          <template #body="slotProps">{{ slotProps.data.registrado_por?.name ?? '—' }}</template>
+        </Column>
+
+        <Column field="created_at" header="Fecha" class="text-[#6b7280]">
+          <template #body="slotProps">
+            {{
+              slotProps.data.created_at
+                ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                : '—'
+            }}
+          </template>
+        </Column>
+
+        <Column header="Acciones" class="text-center w-[180px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-center">
               <Button
                 icon="pi pi-pencil"
-                class="!bg-[#e0b354] hover:!bg-[#cda03f] border-none text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                @click="editUser(slotProps.data)"
+                label="Editar"
+                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Editar categoría'"
+                @click="$emit('open-edit', slotProps.data)"
               />
+
               <Button
-                :icon="slotProps.data.visible ? 'pi pi-eye' : 'pi pi-eye-slash'"
-                class="bg-[#eef2e9] hover:bg-[#e2e8dd] border border-[#cbd5e1] text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors"
-                @click="toggleVisibility(slotProps.data)"
-              />
+                  v-if="slotProps.data.activo"
+                  icon="pi pi-eye-slash"
+                  label="Desactivar"
+                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Desactivar usuario'"
+                  @click="confirmarDesactivar(slotProps.data)"
+                  />
+                  <span v-else class="text-[#9ca3af] text-sm italic">-</span>
             </div>
           </template>
         </Column>
@@ -86,43 +117,122 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import IconField from 'primevue/iconfield' 
-import InputIcon from 'primevue/inputicon' 
+import { ref, computed, onMounted } from 'vue'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown' 
+import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Swal from 'sweetalert2'
+import authService from '@/services/authService'
+import { useUserStore } from '@/stores/usuarioStore'
 
-const users = ref([
-  { id: 1, name: 'Daniel Melgar', email: '@dniel.email.com', status: 'Activo', role: 'Administrador', createdBy: 'Samuel lara', date: '10-02-2025', visible: true },
-  { id: 2, name: 'Maria Lopez', email: '@mlopez.email.com', status: 'Activo', role: 'Cajero', createdBy: 'Samuel lara', date: '11-02-2025', visible: true },
-  { id: 3, name: 'Carlos Ruiz', email: '@cruiz.email.com', status: 'Inactivo', role: 'Administrador', createdBy: 'Daniel Melgar', date: '12-02-2025', visible: false },
-  { id: 4, name: 'Ana Beltrán', email: '@abeltran.email.com', status: 'Activo', role: 'Contador', createdBy: 'Samuel lara', date: '13-02-2025', visible: true },
-  { id: 5, name: 'Roberto Sosa', email: '@rsosa.email.com', status: 'Inactivo', role: 'Contador', createdBy: 'Daniel Melgar', date: '14-02-2025', visible: false }
-])
+const usuarioActual = authService.getUser()
 
-const statusOptions = ref(['Activo', 'Inactivo'])
+const confirmarDesactivar = async (user) => {
+  if (usuarioActual?.id === user.id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Acción no permitida',
+      text: 'No puedes desactivar tu propio usuario.',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#2b5e3b',
+    })
+    return
+  }
 
-const filters = ref({
-  global: { value: null, matchMode: 'contains' },
-  status: { value: null, matchMode: 'equals' }
+  const confirmacion = await Swal.fire({
+    icon: 'question',
+    title: '¿Desactivar usuario?',
+    text: `¿Deseas desactivar a ${user.name}? Esta acción no se puede revertir.`,
+    showCancelButton: true,
+    confirmButtonText: 'Confirmar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#9c2a2a',
+    cancelButtonColor: '#6b7280',
+    reverseButtons: true,
+  })
+
+  if (!confirmacion.isConfirmed) return
+
+  const resultado = await store.desactivarUsuario(user.id)
+
+  if (resultado?.ok) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Usuario desactivado correctamente',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+    })
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: resultado?.error || 'No se pudo desactivar el usuario.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
+}
+const store = useUserStore()
+
+onMounted(async () => {
+  const resultado = await store.fetchUsers()
+  if (resultado?.status === 403) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para ver los usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 })
 
-const emit = defineEmits(['open-add','open-edit'])
+const busqueda = ref('')
+const filtroEstado = ref(null)
 
-const editUser = (user) => {
-  emit('open-edit', user)
+const statusOptions = ref([
+  { label: 'Activo', value: true },
+  { label: 'Inactivo', value: false },
+])
+
+const usuariosFiltrados = computed(() => {
+  return (store.users ?? []).filter((u) => {
+    const coincideBusqueda =
+      !busqueda.value ||
+      u.name?.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      u.email?.toLowerCase().includes(busqueda.value.toLowerCase())
+
+    const coincideEstado =
+      filtroEstado.value === null || filtroEstado.value === undefined
+        ? true
+        : u.activo === filtroEstado.value
+
+    return coincideBusqueda && coincideEstado
+  })
+})
+
+const onPageChange = (event) => {
+  store.fetchUsers(event.page + 1, event.rows)
 }
 
-const toggleVisibility = (user) => {
-  user.visible = !user.visible
-}
+defineEmits(['open-add', 'open-edit'])
+
+
 </script>
 
 <style>
-/* Tabla headers configurados a 13px / 600 con el color Verde Oscuro #1e3a2f y sin itálica */
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
@@ -144,31 +254,8 @@ const toggleVisibility = (user) => {
   background-color: #f4f7f2 !important;
 }
 
-/* Enfoques y variables de PrimeVue alineados con #2b5e3b */
-.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
+.p-inputtext:enabled:focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
-}
-
-.p-dropdown {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-}
-
-.p-dropdown-label {
-  color: #1a2e1f !important;
-}
-
-.p-dropdown-overlay {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-}
-
-.p-dropdown-item {
-  color: #1a2e1f !important;
-}
-
-.p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
-  background-color: #eef2e9 !important;
 }
 </style>

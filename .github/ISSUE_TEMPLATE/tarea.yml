@@ -1,0 +1,53 @@
+name: "✅ Asignación de Tarea"
+description: Tarea específica de desarrollo del proyecto AgroFerretería.
+title: "[TAREA] - <nombre de la tarea>"
+labels: ["todo"]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: "Descripción de la Tarea"
+      description: Qué se debe hacer exactamente.
+      placeholder: "Ej: Implementar componente de tabla de ventas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: por_que
+    attributes:
+      label: "¿Por qué es necesaria?"
+      description: Contexto de por qué se necesita esta tarea.
+      placeholder: "Ej: El cliente necesita ver el historial de ventas."
+    validations:
+      required: true
+
+  - type: input
+    id: rama
+    attributes:
+      label: "Rama donde se trabajará"
+      placeholder: "feature/nombre-de-la-rama"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: criterios
+    attributes:
+      label: "Criterios de Aceptación"
+      description: Requisitos para considerar la tarea completa.
+      options:
+        - label: "Componente implementado y funcional"
+        - label: "Conectado con el backend"
+        - label: "Probado en el navegador"
+        - label: "Sin errores en consola"
+
+  - type: textarea
+    id: issues_relacionados
+    attributes:
+      label: "Issues o PRs relacionados"
+      placeholder: "Vincula con # + número. Ej: Relacionado con #42"
+
+  - type: textarea
+    id: comentarios
+    attributes:
+      label: "Otros comentarios"
+      placeholder: "Cualquier cosa extra que el equipo deba saber."

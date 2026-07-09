@@ -1,38 +1,33 @@
 <template>
   <DataTable
-    :value="categoriasSimuladas"
+    :value="store.categorias"
+    :loading="store.cargando"
     responsiveLayout="scroll"
     class="p-datatable-custom text-[14px]"
+    :paginator="true"
+    :lazy="true"
+    :rows="store.perPage"
+    :totalRecords="store.totalRecords"
+    :first="(store.currentPage - 1) * store.perPage"
+    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
+    @page="onPageChange"
   >
-    <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-    
-    <Column field="estado" header="Estado">
-      <template #body="slotProps">
-        <span
-          :class="[
-            'px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide',
-            slotProps.data.estado === 'Activa'
-              ? 'bg-[#dff0e0] text-[#2b5e3b]'
-              : 'bg-[#fee2e2] text-[#b91c1c]'
-          ]"
-        >
-          {{ slotProps.data.estado }}
-        </span>
-      </template>
-    </Column>
+    <template #empty>
+      <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay categorías registradas.</div>
+    </template>
 
-    <Column header="Acciones" class="text-center w-[150px]">
+    <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
+
+    <Column header="Acciones" class="text-right w-[150px]">
       <template #body="slotProps">
-        <div class="flex gap-2 justify-center">
+        <div class="flex gap-2">
           <Button
             icon="pi pi-pencil"
-            class="!bg-[#e0b354] hover:!bg-[#cda03f] border-none text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors shadow-sm cursor-pointer"
-            @click="$emit('open-edit', slotProps.data)"
-          />
-          <Button
-            icon="pi pi-eye"
-            class="bg-[#eef2e9] hover:bg-[#e2e8dd] border border-[#cbd5e1] text-[#1a2e1f] w-8 h-8 rounded-full p-0 transition-colors cursor-pointer"
-            @click="$emit('open-view', slotProps.data)"
+            label="Editar"
+            class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+            v-tooltip.top="'Editar categoría'"
+            @click="emit('open-edit', slotProps.data)"
           />
         </div>
       </template>
@@ -41,23 +36,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
+import { useCategoriaStore } from '../../stores/categoriaStore'
 
-defineEmits(['open-edit', 'open-view'])
+const emit = defineEmits(['open-edit', 'open-view'])
+const store = useCategoriaStore()
 
+// Cargar primera página al montar
+store.cargarCategorias(1, store.perPage)
 
-const categoriasSimuladas = ref([
-  { id: 1, nombre: 'Herramientas', estado: 'Activa' },
-  { id: 2, nombre: 'Consendrados', estado: 'Inactiva' },
-  { id: 3, nombre: 'Granos básicos', estado: 'Activa' }
-])
+const onPageChange = (event) => {
+  const page = event.page + 1
+  store.cargarCategorias(page, event.rows)
+}
 </script>
 
 <style>
-/* Estilos e identidades de la tabla corporativa clara */
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
