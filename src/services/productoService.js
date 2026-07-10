@@ -16,10 +16,8 @@ export const getAllCategorias = () => api.get('/categorias', { params: { per_pag
 // Traer presentaciones de un producto
 export const getPresentacionesByProducto = (id) => api.get(`/productos/${id}`)
 
-// Toggle activo/inactivo de presentación
 export const togglePresentacion = (id) => api.delete(`/presentaciones/${id}`)
 
-// Códigos de barra
 export const getCodigosByPresentacion = (presentacionId) =>
   api.get(`/codigosBarra/${presentacionId}`)
 

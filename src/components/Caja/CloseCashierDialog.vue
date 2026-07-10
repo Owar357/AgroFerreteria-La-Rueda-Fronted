@@ -11,21 +11,21 @@
       title: { class: '!text-white !font-semibold !text-sm !tracking-widest' },
       closeButton: { class: '!text-white hover:!bg-[#2b5e3b]' },
       content: { class: '!bg-white !px-6 !py-5' },
-      footer: { class: '!bg-white !px-6 !py-4 !border-t !border-[#e8efe1]' }
+      footer: { class: '!bg-white !px-6 !py-4 !border-t !border-[#e8efe1]' },
     }"
     @hide="resetForm"
   >
     <div class="flex flex-col gap-5">
-
       <!-- Info -->
       <div class="flex items-start gap-3 bg-[#f0f7ee] rounded-xl p-4 border border-[#d4e6cc]">
         <i class="pi pi-info-circle text-[#2b5e3b] mt-0.5"></i>
         <p class="text-sm text-[#2b5e3b] m-0">
-          Ingrese el monto REAL que hay en caja después de contar el efectivo. La diferencia se calculará automáticamente.
+          Ingrese el monto REAL que hay en caja después de contar el efectivo. La diferencia se
+          calculará automáticamente.
         </p>
       </div>
 
-    >
+      >
       <div class="flex flex-col gap-2">
         <label class="text-sm font-medium text-[#1a2e1f]">
           Monto esperado (según movimientos)
@@ -37,7 +37,12 @@
           locale="es-US"
           disabled
           class="w-full"
-          :pt="{ input: { class: 'w-full !bg-[#f2f5ef] !text-[#6b7280] !text-sm !h-11 !px-4 !rounded-lg !border-[#d1d5db]' } }"
+          :pt="{
+            input: {
+              class:
+                'w-full !bg-[#f2f5ef] !text-[#6b7280] !text-sm !h-11 !px-4 !rounded-lg !border-[#d1d5db]',
+            },
+          }"
         />
       </div>
 
@@ -53,7 +58,12 @@
           locale="es-US"
           :min="0"
           class="w-full"
-          :pt="{ input: { class: 'w-full !bg-[#f9fafb] !text-[#1a2e1f] !text-sm !h-11 !px-4 !rounded-lg !border-[#d1d5db]' } }"
+          :pt="{
+            input: {
+              class:
+                'w-full !bg-[#f9fafb] !text-[#1a2e1f] !text-sm !h-11 !px-4 !rounded-lg !border-[#d1d5db]',
+            },
+          }"
           placeholder="$0.00"
         />
         <small v-if="errorMonto" class="text-red-500 text-xs">{{ errorMonto }}</small>
@@ -64,14 +74,32 @@
         <i class="pi pi-chart-line text-[#e0b354] mt-0.5"></i>
         <div class="flex-1">
           <p class="text-sm font-medium text-[#1a2e1f]">Diferencia calculada</p>
-          <p :class="['text-2xl font-bold', diferenciaCalculada === 0 ? 'text-gray-500' : (diferenciaCalculada > 0 ? 'text-green-700' : 'text-red-600')]">
+          <p
+            :class="[
+              'text-2xl font-bold',
+              diferenciaCalculada === 0
+                ? 'text-gray-500'
+                : diferenciaCalculada > 0
+                  ? 'text-green-700'
+                  : 'text-red-600',
+            ]"
+          >
             ${{ formatNumber(Math.abs(diferenciaCalculada)) }}
-            <span class="text-sm ml-1">{{ diferenciaCalculada < 0 ? '(Faltante)' : (diferenciaCalculada > 0 ? '(Sobrante)' : '') }}</span>
+            <span class="text-sm ml-1">{{
+              diferenciaCalculada < 0 ? '(Faltante)' : diferenciaCalculada > 0 ? '(Sobrante)' : ''
+            }}</span>
           </p>
-          <p class="text-xs text-gray-500 mt-1">{{ diferenciaCalculada === 0 ? 'Cuadra perfectamente' : (diferenciaCalculada < 0 ? 'Falta dinero' : 'Sobra dinero') }}</p>
+          <p class="text-xs text-gray-500 mt-1">
+            {{
+              diferenciaCalculada === 0
+                ? 'Cuadra perfectamente'
+                : diferenciaCalculada < 0
+                  ? 'Falta dinero'
+                  : 'Sobra dinero'
+            }}
+          </p>
         </div>
       </div>
-
     </div>
 
     <template #footer>
@@ -103,7 +131,7 @@ import Button from 'primevue/button'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  montoEsperado: { type: Number, default: 0 }
+  montoEsperado: { type: Number, default: 0 },
 })
 
 const emit = defineEmits(['update:visible', 'cerrar'])
@@ -113,8 +141,15 @@ const cerrando = ref(false)
 const montoReal = ref(null)
 const errorMonto = ref('')
 
-watch(() => props.visible, (val) => { localVisible.value = val })
-watch(localVisible, (val) => { emit('update:visible', val) })
+watch(
+  () => props.visible,
+  (val) => {
+    localVisible.value = val
+  },
+)
+watch(localVisible, (val) => {
+  emit('update:visible', val)
+})
 
 const resetForm = () => {
   montoReal.value = null

@@ -10,9 +10,7 @@
     <div class="flex justify-between items-start mb-8">
       <div>
         <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
-        <p class="text-[20px] text-gray-500 mt-2">
-          Modifica la información general del producto
-        </p>
+        <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
       </div>
     </div>
 
@@ -49,7 +47,9 @@
             class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px]"
             :class="{ '!border-red-500': errores.fabricante }"
           />
-          <small v-if="errores.fabricante" class="text-red-500 text-[14px]">{{ errores.fabricante }}</small>
+          <small v-if="errores.fabricante" class="text-red-500 text-[14px]">{{
+            errores.fabricante
+          }}</small>
         </div>
 
         <!-- Categoría -->
@@ -78,7 +78,9 @@
               </div>
             </template>
           </AutoComplete>
-          <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
+          <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{
+            errores.categoria
+          }}</small>
         </div>
 
         <!-- Código del Producto -->
@@ -124,26 +126,42 @@ import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import Swal from 'sweetalert2'
 
-
 //aqui recnibe el producto seleccionado dese el padre
 const props = defineProps({
-    producto: { type: Object, required: true}
+  producto: { type: Object, required: true },
 })
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
 
 onMounted(async () => {
-  await store.cargarCategorias()
+  const res = await store.cargarCategorias()
+  if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
+
+  nombre.value = props.producto.nombre || ''
+  fabricante.value = props.producto.fabricante || ''
+  categoria.value =
+    store.categorias.find((c) => c.id === props.producto.categoria?.id) ??
+    props.producto.categoria ??
+    null
 
   //aqui rellena,mos los datos con los datos del producto
   nombre.value = props.producto.nombre || ''
   fabricante.value = props.producto.fabricante || ''
 
   // y aqui busco el objecto categoria en el store para que lo autocomplete
-  categoria.value = store.categorias.find(c => c.id === props.producto.categoria?.id) ?? props.producto.categoria ?? null
+  categoria.value =
+    store.categorias.find((c) => c.id === props.producto.categoria?.id) ??
+    props.producto.categoria ??
+    null
 })
-
 
 const nombre = ref('')
 const fabricante = ref('')
@@ -192,7 +210,7 @@ const codigoGenerado = computed(() => {
 
 const guardarProducto = async () => {
   // limpiamos los errores
-  errores.value = { nombre: '', fabricante: '', categoria: '', }
+  errores.value = { nombre: '', fabricante: '', categoria: '' }
   let hayErrores = false
 
   if (!nombre.value.trim()) {
@@ -213,22 +231,22 @@ const guardarProducto = async () => {
 
   // Editamos solo en memoria local, sin llamar a la DB
   store.editarProductoLocal(props.producto.id, {
-    nombre:     nombre.value.trim().toLowerCase(),
+    nombre: nombre.value.trim().toLowerCase(),
     fabricante: fabricante.value.trim().toLowerCase(),
-    categoria:  categoria.value,
-    codigo:     codigoGenerado.value.toLowerCase(),
+    categoria: categoria.value,
+    codigo: codigoGenerado.value.toLowerCase(),
   })
 
-    guardando.value = false
+  guardando.value = false
 
-    await Swal.fire({
-        icon: 'success',
-        title: 'Producto editado',
-        text: 'Producto editado con éxito',
-        confirmButtonColor: '#2b5e3b',
-        confirmButtonText: 'Aceptar',
-    })
-    emit('close')
+  await Swal.fire({
+    icon: 'success',
+    title: 'Producto editado',
+    text: 'Producto editado con éxito',
+    confirmButtonColor: '#2b5e3b',
+    confirmButtonText: 'Aceptar',
+  })
+  emit('close')
 }
 </script>
 

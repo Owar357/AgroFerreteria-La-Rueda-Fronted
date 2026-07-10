@@ -12,7 +12,7 @@
       @anular-compra="marcarCompraComoAnulada"
     />
 
-    <RegistroComprasView
+    <AddCompra
       v-if="showForm"
       @close="cerrarFormulario"
     />
@@ -29,7 +29,7 @@
 import { ref, onMounted } from 'vue'
 import { compras as comprasService, VerDetallesCompra} from '@/services/compraService.js'
 import ComprasTable from '../components/Compras/ComprasTable.vue'
-import RegistroComprasView from './RegistroComprasView.vue'
+import AddCompra from '../components/Compras/AddCompra.vue'
 import DetalleCompraDialogo from '../components/Compras/DetalleCompraDialog.vue'
 
 const showForm = ref(false)
