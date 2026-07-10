@@ -1,7 +1,4 @@
 <template>
-
-
-
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <div class="flex flex-col mb-8 gap-4">
       <div class="flex justify-between items-center w-full">
