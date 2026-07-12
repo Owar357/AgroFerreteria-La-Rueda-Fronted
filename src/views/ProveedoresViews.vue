@@ -32,6 +32,7 @@ import ProveedoresTable    from '../components/Proveedores/ProveedoresTable.vue'
 import AddProveedores    from '../components/Proveedores/AddProveedores.vue'
 import EditProveedores    from '../components/Proveedores/EditProveedores.vue'
 import DetalleProveedores    from '@/components/Proveedores/DetalleProveedores.vue'
+import Swal from 'sweetalert2'
 
 const store = useProveedorStore()
 
@@ -65,8 +66,31 @@ async function onGuardarNuevo(payload) {
 
 
 async function onActualizarExistente(payload) {
-  console.log('>>> payload en vista:', payload)
   const result = await store.actualizarProveedor(payload.id, payload)
-  if (result?.ok) showEditForm.value = false
+  if (result?.ok) {
+    showEditForm.value = false
+    Swal.fire({
+      icon: 'success',
+      title: 'Proveedor actualizado',
+      text: 'Los datos se actualizaron correctamente.',
+      confirmButtonColor: '#2b5e3b',
+      timerProgressBar: true,
+    })
+  } else if (result?.status === 403) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para editar proveedores.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: result?.error || 'No se pudo actualizar el proveedor.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 }
+
 </script>

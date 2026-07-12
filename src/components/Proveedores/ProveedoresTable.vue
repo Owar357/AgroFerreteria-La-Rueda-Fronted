@@ -92,18 +92,15 @@
                 @click="handleDetail(slotProps.data)"
               />
 
-              <Button
-                :icon="slotProps.data.activo ? 'pi pi-ban' : 'pi pi-check-circle'"
-                :label="slotProps.data.activo ? 'Desactivar' : 'Activar'"
-                :class="
-                  slotProps.data.activo
-                    ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                    : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
-                "
-                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="slotProps.data.activo ? 'Desactivar proveedor' : 'Activar proveedor'"
-                @click="toggleEstado(slotProps.data)"
+               <Button
+                v-if="slotProps.data.activo"
+                icon="pi pi-ban"
+                label="Desactivar"
+                class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Desactivar proveedor'"
+                @click="confirmarDesactivar(slotProps.data)"
               />
+              <span v-else class="text-[#9ca3af] text-sm italic"></span>
             </div>
           </template>
         </Column>
@@ -181,29 +178,24 @@ onMounted(async () => {
 const handleEdit = (proveedor) => emit('open-edit', proveedor)
 const handleDetail = (proveedor) => emit('open-detail', proveedor)
 
-// toggleEstado conectado al store
-const toggleEstado = async (proveedor) => {
-  const esActivo = proveedor.activo
-
+const confirmarDesactivar = async (proveedor) => {
   const confirmacion = await Swal.fire({
     html: `
       <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-        <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dcfce7'}; display:flex; align-items:center; justify-content:center;">
-          <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#15803d'};"></i>
+        <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
+          <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
         </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">
-          ${esActivo ? 'Desactivar proveedor' : 'Activar proveedor'}
-        </h3>
+        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Desactivar proveedor</h3>
         <p style="font-size:14px; color:#6b7280; margin:0;">
-          ¿Estás seguro de que deseas ${esActivo ? 'desactivar' : 'activar'} a
-          <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>?
+          ¿Estás seguro de que deseas desactivar a
+          <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>? Esta acción no se puede revertir.
         </p>
       </div>
     `,
     showCancelButton: true,
-    confirmButtonColor: esActivo ? '#b91c1c' : '#2b5e3b',
+    confirmButtonColor: '#b91c1c',
     cancelButtonColor: '#6b7280',
-    confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
+    confirmButtonText: 'Sí, desactivar',
     cancelButtonText: 'Cancelar',
     customClass: {
       confirmButton: '!rounded-lg !font-semibold !text-sm',
@@ -214,15 +206,14 @@ const toggleEstado = async (proveedor) => {
 
   if (!confirmacion.isConfirmed) return
 
-  const resultado = await store.toggleEstado(proveedor)
+  const resultado = await store.desactivarProveedor(proveedor.id)
 
   if (resultado.ok) {
     Swal.fire({
       icon: 'success',
-      title: `Proveedor ${resultado.nuevoEstado === 'Activo' ? 'activado' : 'desactivado'}`,
-      text: `"${proveedor.nombre}" ahora está ${resultado.nuevoEstado.toLowerCase()}.`,
+      title: 'Proveedor desactivado',
+      text: `"${proveedor.nombre}" ha sido desactivado.`,
       confirmButtonColor: '#2b5e3b',
-      timer: 2500,
       timerProgressBar: true,
     })
   } else if (resultado.status === 403) {
