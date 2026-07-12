@@ -296,3 +296,4 @@ const confirmarDesactivar = async (proveedor) => {
   background-color: #eef2e9 !important;
 }
 </style>
+ 
