@@ -25,3 +25,5 @@ export const añadirPresentacion = (data) => api.post('/presentaciones', data )
 
 export const createCodigoBarra = (data) => api.post('/codigosBarra', data)
 export const deleteCodigoBarra = (id) => api.delete(`/codigosBarra/${id}`)
+
+export const updatePresentacion = (id, data) => api.put(`/presentaciones/${id}`, data)//agrege esteee para las presentaciones

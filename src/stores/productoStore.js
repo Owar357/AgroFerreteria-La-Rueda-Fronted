@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getProductos, createProducto, getAllCategorias } from '../services/productoService'
+import { getProductos, createProducto, updateProducto, getAllCategorias } from '../services/productoService'
+
 
 export const useproductoStore = defineStore('productos', () => {
   const productos     = ref([])
@@ -72,16 +73,37 @@ export const useproductoStore = defineStore('productos', () => {
     }
   }
 
-  // Edición local 
-  const editarProductoLocal = (id, cambios) => {
+//agregamos lo de editar productos para que ya no sea local//kathii lo modifique para que conecte con el backend
+const actualizarProducto = async (id, data) => {
+  try {
+    const response = await updateProducto(id, data)
+
     const index = productos.value.findIndex((p) => p.id === id)
     if (index !== -1) {
-      productos.value[index] = { ...productos.value[index], ...cambios }
+      productos.value[index] = { ...productos.value[index], ...response.data.data }
+    }
+
+    return { ok: true }
+  } catch (error) {
+    const status = error.response?.status
+    const responseData = error.response?.data
+
+    if (status === 422) {
+      const mensaje = Object.values(responseData.errors).flat()
+      return { ok: false, status, error: mensaje[0] }
+    }
+    return {
+      ok: false,
+      status,
+      error: responseData?.message || 'Error del servidor.'
     }
   }
+}
 
-  return {
-    productos, cargando, totalRecords, currenPage, perPage, categorias,
-    cargarProductos, cargarCategorias, crearProducto, editarProductoLocal,
-  }
+return {
+  productos, cargando, totalRecords, currenPage, perPage, categorias,
+  cargarProductos, cargarCategorias, crearProducto, actualizarProducto,
+}
+
+  
 })
