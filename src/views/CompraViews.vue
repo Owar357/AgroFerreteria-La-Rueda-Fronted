@@ -9,7 +9,10 @@
       @cambiar-pagina="cargarCompras"
       @filtrar="aplicarFiltros"
       @ver-detalle="verDetalleCompra"
-      @anular-compra="marcarCompraComoAnulada"
+      
+      
+
+      @anular-compra="anularCompra"
     />
 
     <AddCompra
@@ -27,10 +30,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { compras as comprasService, VerDetallesCompra} from '@/services/compraService.js'
 import ComprasTable from '../components/Compras/ComprasTable.vue'
 import AddCompra from '../components/Compras/AddCompra.vue'
 import DetalleCompraDialogo from '../components/Compras/DetalleCompraDialog.vue'
+import Swal from 'sweetalert2'
+import { compras as comprasService, VerDetallesCompra, anularCompra as anularCompraService } from '@/services/compraService.js'
+
 
 const showForm = ref(false)
 const loading = ref(false)
@@ -92,11 +97,33 @@ const verDetalleCompra = async (compraRow) => {
     console.error('Error al cargar detalle de compra:', error)
   }
 }
+// Funcion para el boton a amular la compra// kathi
+const anularCompra = async (compraId) => {
+  try {
+    await anularCompraService(compraId)
 
-const marcarCompraComoAnulada = (compraId) => {
-  const compra = compras.value.find(c => c.id === compraId)
-  if (compra) {
-    compra.estadoPago = 'ANULADA'
+    const compra = compras.value.find((c) => c.id === compraId)
+    if (compra) {
+      
+      compra.esAnulado = true
+    }
+
+    Swal.fire({
+      title: 'Anulación de la compra exitosa',
+      html: `La compra con el número de documento: <strong>${compra?.numDocumento ?? ''}</strong> se ha anulado.`,
+      icon: 'success',
+      confirmButtonColor: '#2b5e3b',
+      timer: 3000,
+      timerProgressBar: true,
+    })
+  } catch (error) {
+    const mensaje = error.response?.data?.message || 'No se pudo anular la compra'
+    Swal.fire({
+      title: 'No se pudo anular',
+      text: mensaje,
+      icon: 'error',
+      confirmButtonColor: '#b91c1c',
+    })
   }
 }
 onMounted(() => cargarCompras())

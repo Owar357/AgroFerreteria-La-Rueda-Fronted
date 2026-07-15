@@ -88,6 +88,8 @@
         <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
         <Column field="tipoDocumento" header="Tipo Documento" />
         <Column field="numDocumento" header="Nº Documento" />
+        
+
 
         <Column field="precioFactura" header="Precio Factura">
           <template #body="slotProps">
@@ -111,6 +113,20 @@
             </span>
           </template>
         </Column>
+        
+
+        <Column header="Estado de compra" class="text-center w-[150px]">
+     <template #body="slotProps">
+    <span
+      class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+      :class="slotProps.data.esAnulado
+        ? 'bg-gray-200 text-gray-800'
+        : 'bg-green-100 text-green-800'"
+    >
+            {{ slotProps.data.esAnulado ? 'Anulada' : 'Activa' }}
+        </span>
+        </template>
+         </Column>
 
         <Column header="Acciones" class="text-right w-[200px]">
           <template #body="slotProps">
@@ -122,14 +138,13 @@
                 v-tooltip.top="'Ver detalles'"
                 @click="verDetalles(slotProps.data)"
               />
-
               <Button
-                v-if="slotProps.data.estadoPago !== 'ANULADA'"
-                icon="pi pi-ban"
-                label="Anular"
-                class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !bogrder-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Anular compra'"
-                @click="anularCompra(slotProps.data)"
+                 v-if="!slotProps.data.esAnulado"
+                 icon="pi pi-ban"
+                 label="Anular"
+                 class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                 v-tooltip.top="'Anular compra'"
+                 @click="anularCompra(slotProps.data)"
               />
             </div>
           </template>
@@ -203,7 +218,7 @@ const emitirFiltros = () => {
 const verDetalles = (compra) => {
   emit('ver-detalle', compra)
 }
-
+// desde aquii hasta abajo
 const anularCompra = (compra) => {
   Swal.fire({
     title: 'Anular compra',
@@ -232,17 +247,10 @@ const anularCompra = (compra) => {
   }).then((result) => {
     if (result.isConfirmed) {
       emit('anular-compra', compra.id)
-      Swal.fire({
-        title: 'Anulación de la compra exitosa',
-        html: `La compra con el número de documento: <strong>${compra.numDocumento}</strong> se ha anulado.`,
-        icon: 'success',
-        confirmButtonColor: '#2b5e3b',
-        timer: 3000,
-        timerProgressBar: true,
-      })
     }
   })
 }
+// este agrege lo combie por el anterior
 
 onMounted(async () => {
   try {
