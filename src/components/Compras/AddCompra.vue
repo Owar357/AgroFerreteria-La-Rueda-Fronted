@@ -536,6 +536,13 @@ const formatearFecha = (fecha) => {
   return `${anio}-${mes}-${dia}`
 }
 
+//SOLUCCION DEL BUG
+const limpiarMonto = (valor) => {
+  if (valor === null || valor === undefined || valor === '') return null
+  const limpio = parseFloat(String(valor).replace(/[^0-9.]/g, ''))
+  return isNaN(limpio) ? null : limpio
+}
+
 const alSeleccionarProductoLote = (event) => {
   presentacionesLote.value = event.value.presentaciones
   loteForm.presentacionFacturada = null
@@ -666,7 +673,7 @@ const registrarCompraFinal = async () => {
     fecha_emision: formatearFecha(documentoForm.fechaEmision),
     descuento_global: null,
     iva_total: null,
-    monto_total: documentoForm.montoTotal ? Number(documentoForm.montoTotal) : null,
+    monto_total: limpiarMonto(documentoForm.montoTotal), //cambiado
     estado_pago: documentoForm.estadoPago,
     fecha_vencimiento_pago: formatearFecha(documentoForm.fechaVencimiento),
     proveedor_id: documentoForm.proveedor.id,
