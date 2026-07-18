@@ -34,7 +34,7 @@
 
     <!-- Body -->
     <div class="px-6 py-6 bg-white flex flex-col gap-5">
-      <!-- Tipo de persona -->
+    
       <div class="flex gap-3">
         <button
           @click="tipoPersona = 'NATURAL'"
@@ -120,7 +120,7 @@
       </div>
 
       <!-- Documentos -->
-      <!-- Documentos -->
+
       <p
         class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-300"
       >
@@ -128,7 +128,6 @@
       </p>
 
       <div class="grid grid-cols-2 gap-x-4 gap-y-4 mb-1">
-        <!-- NATURAL: Select completo -->
         <div v-if="tipoPersona === 'NATURAL'" class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]">
             Tipo de documento
@@ -145,7 +144,6 @@
           />
         </div>
 
-        <!-- JURIDICA: NIT fijo, no editable -->
         <div v-else class="col-span-2 flex flex-col gap-1.5">
           <label class="text-[12.5px] font-semibold text-[#1a2e1f]"> Tipo de documento </label>
           <Select
@@ -177,7 +175,7 @@
         </div>
       </div>
 
-      <!-- Dirección -->
+  
       <p
         class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-300"
       >
@@ -301,7 +299,7 @@ const departamentos = [
   { label: 'Cuscatlán', value: '07' },
 ]
 
-const departamentoSeleccionado = ref(departamentos[1]) // San Salvador por defecto
+const departamentoSeleccionado = ref(departamentos[1]) 
 const municipioSeleccionado = ref(null)
 
 const onDepartamentoSeleccionado = () => {
@@ -309,23 +307,23 @@ const onDepartamentoSeleccionado = () => {
 }
 
 const municipios = {
-  // SAN SALVADOR
+
   '06': [
     { label: 'San Salvador Centro', value: '0601' },
     { label: 'San Salvador Oeste', value: '0602' },
     { label: 'San Salvador Este', value: '0603' },
-    { label: 'San Salvador Norte', value: '0604' }, // Aguilares
+    { label: 'San Salvador Norte', value: '0604' }, 
     { label: 'San Salvador Sur', value: '0605' },
   ],
-  // CHALATENANGO
+
   '04': [
     { label: 'Chalatenango Centro', value: '0401' },
     { label: 'Chalatenango Norte', value: '0402' },
     { label: 'Chalatenango Sur', value: '0403' },
   ],
-  // CUSCATLÁN
+  
   '07': [
-    { label: 'Cuscatlán Norte', value: '0701' }, // Suchitoto
+    { label: 'Cuscatlán Norte', value: '0701' }, 
     { label: 'Cuscatlán Sur', value: '0702' },
   ],
 }
@@ -372,7 +370,6 @@ const guardar = async () => {
       emit('cliente-registrado', resultado.cliente)
       visible.value = false
 
-      // ✅ Swal de éxito aquí en el componente
       Swal.fire({
         icon: 'success',
         title: '¡Cliente registrado!',
@@ -383,7 +380,7 @@ const guardar = async () => {
       })
 
     } else if (resultado.status === 422) {
-      // ✅ Swal de validación aquí en el componente
+      
       Swal.fire({
         icon: 'warning',
         title: 'Error de validación',
@@ -392,7 +389,7 @@ const guardar = async () => {
       })
 
     } else if (resultado.status === 403) {
-      // ✅ Swal de 403 aquí en el componente
+    
       Swal.fire({
         html: `
           <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
@@ -413,7 +410,7 @@ const guardar = async () => {
       })
 
     } else {
-      // ✅ Swal de error genérico aquí en el componente
+      
       Swal.fire({
         icon: 'error',
         title: 'Error',
