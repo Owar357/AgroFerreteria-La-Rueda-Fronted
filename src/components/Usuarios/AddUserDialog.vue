@@ -251,7 +251,6 @@ const handleSave = async () => {
       text: `El usuario "${resultado.user.name}" fue registrado exitosamente.`,
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Aceptar',
-      timer: 3000,
       timerProgressBar: true,
     })
   } else if (resultado.status === 403) {
