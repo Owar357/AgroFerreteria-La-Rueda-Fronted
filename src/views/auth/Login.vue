@@ -1,22 +1,28 @@
 <template>
-  <div class="min-h-screen bg-[#839370] flex items-center justify-center p-4 md:p-8 font-['Inter',sans-serif]">
-    
-    <div class="w-full max-w-[850px] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[500px] border border-[#e2e8dd]">
-
-      <div class="w-full md:w-5/12 bg-[#1e3a2f] flex flex-col justify-between items-center p-8 text-center min-h-[250px] md:min-h-auto">
+  <div
+    class="min-h-screen bg-[#839370] flex items-center justify-center p-4 md:p-8 font-['Inter',sans-serif]"
+  >
+    <div
+      class="w-full max-w-[850px] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[500px] border border-[#e2e8dd]"
+    >
+      <div
+        class="w-full md:w-5/12 bg-[#1e3a2f] flex flex-col justify-between items-center p-8 text-center min-h-[250px] md:min-h-auto"
+      >
         <div class="hidden md:block"></div>
 
         <div class="flex flex-col items-center gap-4 my-auto">
-          <div class="bg-[#1e3a2f] p-2 rounded-2xl w-40 h-40 flex items-center justify-center shadow-md overflow-hidden">
-            <img 
-              src="/src/assets/logo.png" 
-              alt="Logo La Rueda" 
+          <div
+            class="bg-[#1e3a2f] p-2 rounded-2xl w-40 h-40 flex items-center justify-center shadow-md overflow-hidden"
+          >
+            <img
+              src="/src/assets/logo.png"
+              alt="Logo La Rueda"
               class="w-full h-full object-contain"
             />
           </div>
-          
+
           <h2 class="text-white text-[28px] md:text-[32px] font-bold leading-tight tracking-wide">
-            AgroFerretería<br>La Rueda
+            AgroFerretería<br />La Rueda
           </h2>
         </div>
 
@@ -31,7 +37,9 @@
         <div class="w-full max-w-[380px] flex flex-col gap-6 my-auto">
           <div class="text-center md:text-left">
             <h1 class="text-[#1a2e1f] text-[32px] font-bold tracking-tight">Inicio de sesión</h1>
-            <p class="text-[#6b7280] text-[15px] mt-1">Ingrese su correo y contraseña para continuar</p>
+            <p class="text-[#6b7280] text-[15px] mt-1">
+              Ingrese su correo y contraseña para continuar
+            </p>
           </div>
 
           <div
@@ -43,7 +51,6 @@
           </div>
 
           <form @submit.prevent="handleLogin" class="flex flex-col gap-5">
-            
             <div class="w-full">
               <IconField>
                 <InputIcon class="pi pi-envelope text-[#9ca3af] text-[14px]" />
@@ -84,7 +91,6 @@
 
         <div class="hidden md:block"></div>
       </div>
-
     </div>
   </div>
 </template>
@@ -93,7 +99,6 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import authService from '@/services/authService'
-
 
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
@@ -132,11 +137,7 @@ async function handleLogin() {
   loading.value = true
 
   try {
-
-    const response = await authService.login(
-      form.identity,
-      form.password
-    )
+    const response = await authService.login(form.identity, form.password)
 
     if (!response.success) {
       errorMessage.value = response.message
@@ -167,9 +168,7 @@ async function handleLogin() {
     setTimeout(() => {
       router.push(response.route)
     }, 1200)
-
   } catch (error) {
-
     console.error('Error en login:', error)
 
     errorMessage.value = 'Error de conexión con el servidor.'
@@ -180,7 +179,6 @@ async function handleLogin() {
       text: 'Hubo un inconveniente al conectar con el servidor backend.',
       confirmButtonColor: '#1e3a2f',
     })
-
   } finally {
     loading.value = false
   }

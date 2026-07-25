@@ -135,7 +135,7 @@ const emit = defineEmits(['close'])
 const store = useproductoStore()
 
 onMounted(async () => {
-  const res = await store.cargarCategorias()
+  const resultado = await store.cargarCategorias()
   if (resultado?.error) {
     Swal.fire({
       icon: 'error',
@@ -207,9 +207,8 @@ const codigoGenerado = computed(() => {
   if (!catNombre || !proNombre || !fabNombre) return ''
   return tresPrimeras(catNombre) + tresPrimeras(proNombre) + tresPrimeras(fabNombre)
 })
-
+// esto agrege para la logica de editar producto con el backen // kathii//
 const guardarProducto = async () => {
-  // limpiamos los errores
   errores.value = { nombre: '', fabricante: '', categoria: '' }
   let hayErrores = false
 
@@ -229,15 +228,24 @@ const guardarProducto = async () => {
 
   guardando.value = true
 
-  // Editamos solo en memoria local, sin llamar a la DB
-  store.editarProductoLocal(props.producto.id, {
+  const resultado = await store.actualizarProducto(props.producto.id, {
     nombre: nombre.value.trim().toLowerCase(),
     fabricante: fabricante.value.trim().toLowerCase(),
-    categoria: categoria.value,
+    categoria_id: categoria.value.id,
     codigo: codigoGenerado.value.toLowerCase(),
   })
 
   guardando.value = false
+
+  if (!resultado.ok) {
+    Swal.fire({
+      icon: 'error',
+      title: 'No se pudo guardar',
+      text: resultado.error,
+      confirmButtonColor: '#b91c1c',
+    })
+    return
+  }
 
   await Swal.fire({
     icon: 'success',
