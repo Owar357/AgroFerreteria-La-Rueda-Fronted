@@ -100,14 +100,14 @@
               />
 
               <Button
-                  v-if="slotProps.data.activo"
-                  icon="pi pi-eye-slash"
-                  label="Desactivar"
-                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Desactivar usuario'"
-                  @click="confirmarDesactivar(slotProps.data)"
-                  />
-                  <span v-else class="text-[#9ca3af] text-sm italic">-</span>
+                v-if="slotProps.data.activo"
+                icon="pi pi-eye-slash"
+                label="Desactivar"
+                class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Desactivar usuario'"
+                @click="confirmarDesactivar(slotProps.data)"
+              />
+              <span v-else class="text-[#9ca3af] text-sm italic">-</span>
             </div>
           </template>
         </Column>
@@ -228,8 +228,6 @@ const onPageChange = (event) => {
 }
 
 defineEmits(['open-add', 'open-edit'])
-
-
 </script>
 
 <style>

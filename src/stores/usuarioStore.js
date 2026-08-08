@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getUsuarios, createUsuario, updateUsuario, desactivarUsuario as desactivarUsuarioService } from '../services/usuarioService'
+import {
+  getUsuarios,
+  createUsuario,
+  updateUsuario,
+  desactivarUsuario as desactivarUsuarioService,
+} from '../services/usuarioService'
 
 export const useUserStore = defineStore('userStore', () => {
   const users = ref([])
@@ -38,7 +43,6 @@ export const useUserStore = defineStore('userStore', () => {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      pin_caja: formData.cashKey || null,
       rol: formData.role === 'Administrador' ? 'ADMIN' : formData.role?.toUpperCase(),
     }
 
@@ -66,24 +70,22 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       await desactivarUsuarioService(id)
 
-      const index = users.value.findIndex((u) => u.id === id) 
-      if (index !== -1 ) users.value[index].activo = false
+      const index = users.value.findIndex((u) => u.id === id)
+      if (index !== -1) users.value[index].activo = false
 
-      return { ok: true}
-    }catch (error) {
+      return { ok: true }
+    } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
 
       return {
         ok: false,
-        status, 
+        status,
         error: responseData?.message || 'Error al desactivar el usuario.',
       }
     }
   }
   const updateUser = async (id, payload) => {
-    
-
     try {
       const response = await updateUsuario(id, payload)
       const index = users.value.findIndex((u) => u.id === id)
@@ -106,6 +108,14 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   return {
-    users, loading, totalRecords, currentPage, perPage, fetchUsers, createUser, updateUser, desactivarUsuario,
+    users,
+    loading,
+    totalRecords,
+    currentPage,
+    perPage,
+    fetchUsers,
+    createUser,
+    updateUser,
+    desactivarUsuario,
   }
 })
