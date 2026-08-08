@@ -56,6 +56,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
+import { updatePresentacion } from '@/services/productoService'// agrege la importacion para conectarlo al backend
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -105,43 +106,73 @@ const resetForm = () => {
   guardando.value = false
 }
 
+// agrege lo de guardar para que conecte al backen los datoooss
+const mostrarAlerta = (tipo, titulo, texto) => {
+  Swal.fire({
+    icon: tipo,
+    title: titulo,
+    text: texto,
+    confirmButtonColor: '#2b5e3b',
+    customClass: { container: '!z-[9999]' },
+  })
+}
 
-const guardar = () => {
+const guardar = async () => {
   const nombreDuplicado = props.presentacionesExistentes.some(
     (p) => p.nombre.trim().toLowerCase() === form.value.nombre.trim().toLowerCase() && p.id !== props.presentacion?.id
   )
 
   if (nombreDuplicado) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'No se puede editar la presentación',
-      text: 'Ya existe una presentación con este nombre',
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
-    })
+    mostrarAlerta('warning', 'No se puede editar la presentación', 'Ya existe una presentación con este nombre')
     return
   }
 
   guardando.value = true
-  emit('guardar', { ...form.value })
-  localVisible.value = false
-  guardando.value = false
 
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: '¡Presentación actualizada con éxito!',
-    showConfirmButton: false,
-    timer: 1500,
-    timerProgressBar: true,
-    background: '#ffffff',
-    color: '#1e3a2f',
-    iconColor: '#2b5e3b',
-    customClass: {
-      container: '!z-[9999]',
-    },
-  })
+  const payload = {
+    nombre: form.value.nombre,
+    factor_conversion: form.value.factor_conversion,
+    precio_venta: form.value.precio,
+  }
+
+  try {
+    const response = await updatePresentacion(props.presentacion.id, payload)
+    const actualizada = response.data.presentación ?? response.data.data ?? response.data
+
+    emit('guardar', {
+      ...props.presentacion,
+      nombre: actualizada.nombre,
+      factor_conversion: Number(actualizada.factor_conversion),
+      precio: parseFloat(actualizada.precio_venta),
+    })
+
+    localVisible.value = false
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: '¡Presentación actualizada con éxito!',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      background: '#ffffff',
+      color: '#1e3a2f',
+      iconColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
+  } catch (error) {
+    const status = error.response?.status
+    if (status === 422) {
+      mostrarAlerta('warning', 'Error de validación', 'Revisa los datos enviados e intenta nuevamente.')
+    } else if (status === 404) {
+      mostrarAlerta('error', 'No encontrada', 'La presentación ya no existe.')
+    } else {
+      mostrarAlerta('error', 'Error', 'No se pudo actualizar la presentación.')
+    }
+  } finally {
+    guardando.value = false
+  }
 }
 </script>
 
