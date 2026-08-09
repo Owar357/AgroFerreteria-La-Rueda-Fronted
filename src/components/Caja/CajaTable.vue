@@ -295,43 +295,43 @@
       </div>
     </div>
 
-    <!-- ── Modales -->
+    <!-- Modal credenciales admin apertura de caja -->
+<AdminAuthDialog
+  ref="adminAuthRef"
+  v-model:visible="adminAuthVisible"
+  @credenciales-confirmadas="onCredencialesConfirmadas"
+/>
 
-    <!-- Modal credenciales admin  -->
-    <AdminAuthDialog
-      ref="adminAuthRef"
-      v-model:visible="adminAuthVisible"
-      @credenciales-confirmadas="onCredencialesConfirmadas"
-    />
+<!--  denominaciones apertura de venta -->
+<OpenCashierDialog
+  v-model:visible="aperturaCajaVisible"
+  :isShiftOpen="cajaStore.ventaAbierta"
+  @open-cash-register="onAbrirVenta"
+/>
 
-    <!-- Modal denominaciones  -->
-    <OpenCashierDialog
-      v-model:visible="aperturaCajaVisible"
-      :isShiftOpen="cajaStore.ventaAbierta"
-      @open-cash-register="onAbrirVenta"
-    />
+<!-- Modal conteo cierre de caja -->
+<CloseCashierDialog
+  ref="closeCashierRef"
+  v-model:visible="conteoVisible"
+  @cuadrar="onConteoListo"
+/>
 
-    <!-- Modal conteo cierre de caja -->
-    <CloseCashierDialog
-      ref="closeCashierRef"
-      v-model:visible="conteoVisible"
-      @cuadrar="onConteoListo"
-    />
+<!-- Modal  para el cuadre -->
+<AdminAuthDialog
+  ref="adminAuthCierreRef"
+  v-model:visible="adminAuthCierreVisible"
+  label-boton="Abrir Cuadre"
+  descripcion="Para realizar el cuadre de caja, ingrese las credenciales del administrador."
+  @credenciales-confirmadas="onCredencialesCierre"
+/>
 
-    <!--  Modal credenciales admin  -->
-    <AdminAuthDialog
-      ref="adminAuthCierreRef"
-      v-model:visible="adminAuthCierreVisible"
-      @credenciales-confirmadas="onCredencialesCierre"
-    />
-
-    <!-- MOdal de cierre -->
-    <CierreCajaDialog
-      v-model:visible="cierreVisible"
-      :datos="datosCierre"
-      @cierre-exitoso="onCierreExitoso"
-      @cancelar="onCancelarCierre"
-    />
+<!-- Modal cierre de caja y venta-->
+<CierreCajaDialog
+  v-model:visible="cierreVisible"
+  :datos="datosCierre"
+  @cierre-exitoso="onCierreExitoso"
+  @cancelar="onCancelarCierre"
+/>
   </div>
 </template>
 
