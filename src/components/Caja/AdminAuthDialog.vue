@@ -12,7 +12,7 @@
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <p class="text-[14px] text-[#6b7280]">
-        Para aperturar la caja, ingrese las credenciales del administrador.
+        {{ descripcion }} <!--cambio-->
       </p>
 
       <!-- Email -->
@@ -54,7 +54,7 @@
         <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
       </div>
 
-      <!-- Error general -->
+      
       <div v-if="errorGeneral" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
         <small class="text-red-600 text-[13px] font-medium">{{ errorGeneral }}</small>
       </div>
@@ -66,8 +66,9 @@
           :disabled="cargando"
           @click="localVisible = false"
         />
+        
         <Button
-          label="Abrir caja"
+          :label="labelBoton"
           icon="pi pi-unlock"
           :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
@@ -87,7 +88,9 @@ import Password  from 'primevue/password'
 import Button    from 'primevue/button'
 
 const props = defineProps({
-  visible: { type: Boolean, default: false }
+  visible: { type: Boolean, default: false },
+  labelBoton: {type: String, default: 'Abrir caja' },
+  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrado. '}
 })
 
 const emit = defineEmits(['update:visible', 'credenciales-confirmadas'])

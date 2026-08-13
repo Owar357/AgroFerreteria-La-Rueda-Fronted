@@ -1,17 +1,16 @@
 <template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
-    <Button
-      label="Regresar"
-      icon="pi pi-arrow-left"
-      class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] mb-8"
-      @click="$emit('close')"
-    />
-
-    <div class="flex justify-between items-start mb-8">
+   <div class="flex justify-between items-start mb-8">
       <div>
         <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
         <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
       </div>
+      <Button
+        label="Regresar"
+        icon="pi pi-arrow-left"
+        class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+        @click="$emit('close')"
+      />
     </div>
 
     <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
@@ -108,6 +107,7 @@
         class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
         @click="guardarProducto"
       />
+      
     </div>
   </div>
 
@@ -147,16 +147,6 @@ onMounted(async () => {
 
   nombre.value = props.producto.nombre || ''
   fabricante.value = props.producto.fabricante || ''
-  categoria.value =
-    store.categorias.find((c) => c.id === props.producto.categoria?.id) ??
-    props.producto.categoria ??
-    null
-
-  //aqui rellena,mos los datos con los datos del producto
-  nombre.value = props.producto.nombre || ''
-  fabricante.value = props.producto.fabricante || ''
-
-  // y aqui busco el objecto categoria en el store para que lo autocomplete
   categoria.value =
     store.categorias.find((c) => c.id === props.producto.categoria?.id) ??
     props.producto.categoria ??

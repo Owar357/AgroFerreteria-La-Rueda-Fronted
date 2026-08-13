@@ -72,15 +72,17 @@
               <Button
                 icon="pi pi-eye"
                 v-tooltip.top="'Ver detalles'"
-                class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+                class="!bg-[#2b5e3b] hover:!bg-[#3f5c43] border-none text-white w-9 h-9mrounded-full p-0 transition-colors shadow-sm"
                 @click="$emit('view-detail', data)"
               />
-              <Button
-                icon="pi pi-history"
-                v-tooltip.top="'Ver historial'"
-                class="!bg-[#fbf5e6] hover:!bg-[#f5e6c4] !text-[#cda03f] border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                @click="$emit('view-history', data)"
-              />
+                   <Button
+                   icon="pi pi-history"
+                   v-tooltip.top="'Ver historial de compras'"
+                   class="!bg-[#a17923] hover:!bg-[#91843d] !text-[#ffffff] !border-none w-9 h-9 rounded-lg p-0 transition-all duration-200 shadow-md"
+                  @click="$emit('view-history', data)"
+                  />
+
+            
             </div>
           </template>
         </Column>
@@ -100,6 +102,7 @@ import DataTable             from 'primevue/datatable'
 import Column                from 'primevue/column'
 import { useClienteStore }   from '@/stores/clienteStore'
 import { storeToRefs }       from 'pinia'
+
 
 defineEmits(['view-detail', 'view-history'])
 
