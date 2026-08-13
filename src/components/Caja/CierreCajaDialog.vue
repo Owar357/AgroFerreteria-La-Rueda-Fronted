@@ -144,7 +144,7 @@
           </div>
           <div class="border border-[#e2e8dd] rounded-xl p-3">
             <span class="text-[12px] text-[#6b7280]">Fondo para el Siguiente Turno</span>
-            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">{{ fmt(datos.monto_inicial) }}</p>
+            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">{{ fmt(datos.fondo_) }}</p>
             <span class="text-[11px] text-[#6b7280]">Monto que queda en la gaveta como base</span>
           </div>
         </div>
