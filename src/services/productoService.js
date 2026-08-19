@@ -16,10 +16,8 @@ export const getAllCategorias = () => api.get('/categorias', { params: { per_pag
 // Traer presentaciones de un producto
 export const getPresentacionesByProducto = (id) => api.get(`/productos/${id}`)
 
-// Toggle activo/inactivo de presentación
 export const togglePresentacion = (id) => api.delete(`/presentaciones/${id}`)
 
-// Códigos de barra
 export const getCodigosByPresentacion = (presentacionId) =>
   api.get(`/codigosBarra/${presentacionId}`)
 
@@ -27,3 +25,9 @@ export const añadirPresentacion = (data) => api.post('/presentaciones', data )
 
 export const createCodigoBarra = (data) => api.post('/codigosBarra', data)
 export const deleteCodigoBarra = (id) => api.delete(`/codigosBarra/${id}`)
+
+export const updatePresentacion = (id, data) => api.put(`/presentaciones/${id}`, data)//agrege esteee para las presentaciones
+
+// Traer lotes de una presentación (paginado)-- lotespresentaciones esto agrege para ver el paginado
+export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
+  api.get('/lotes', { params: { presentacion_id: presentacionId, page, per_page: perPage } })

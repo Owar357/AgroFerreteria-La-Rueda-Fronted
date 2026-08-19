@@ -38,7 +38,7 @@ import Button from 'primevue/button'
 import CategoriasTable from '../components/Categorias/CategoriasTable.vue'
 import AddCategoriaDialog from '../components/Categorias/AddCategoriaDialog.vue'
 import EditCategoriaDialog from '../components/Categorias/EditCategoriaDialog.vue'
-import { useCategoriaStore } from '../stores/categoriaStore'
+import { useCategoriaStore } from '../stores/categoriaStore.js'
 
 const store = useCategoriaStore()
 

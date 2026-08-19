@@ -13,10 +13,14 @@
     }"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f;">
+    <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f">
       <div class="flex items-center gap-3">
-        <h2 class="text-white text-base font-semibold m-0 font-inter uppercase tracking-wide">AGREGAR PROVEEDOR</h2>
-        <span class="text-[11px] px-3 py-0.5 rounded-[40px] font-semibold font-inter tracking-wide bg-[#e0b354] text-[#1e3a2f]">
+        <h2 class="text-white text-base font-semibold m-0 font-inter uppercase tracking-wide">
+          AGREGAR PROVEEDOR
+        </h2>
+        <span
+          class="text-[11px] px-3 py-0.5 rounded-[40px] font-semibold font-inter tracking-wide bg-[#e0b354] text-[#1e3a2f]"
+        >
           {{ tipoPersona === 'natural' ? 'Persona natural' : 'Persona jurídica' }}
         </span>
       </div>
@@ -31,7 +35,6 @@
 
     <!-- Body -->
     <div class="px-6 py-6 bg-white font-inter flex flex-col gap-5">
-
       <!-- Tipo de persona -->
       <div class="flex gap-3">
         <button
@@ -40,7 +43,7 @@
             'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border-[1.5px] text-sm font-inter transition-all cursor-pointer',
             tipoPersona === 'natural'
               ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] font-semibold shadow-sm'
-              : 'border-gray-200 bg-white text-gray-500 font-normal hover:border-[#2b5e3b] hover:text-[#1a2e1f]'
+              : 'border-gray-200 bg-white text-gray-500 font-normal hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
           ]"
         >
           <i class="pi pi-user text-base" />
@@ -52,7 +55,7 @@
             'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border-[1.5px] text-sm font-inter transition-all cursor-pointer',
             tipoPersona === 'juridica'
               ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] font-semibold shadow-sm'
-              : 'border-gray-200 bg-white text-gray-500 font-normal hover:border-[#2b5e3b] hover:text-[#1a2e1f]'
+              : 'border-gray-200 bg-white text-gray-500 font-normal hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
           ]"
         >
           <i class="pi pi-building text-base" />
@@ -61,19 +64,18 @@
       </div>
 
       <!-- Información general -->
-      <p class="text-[11px] font-semibold tracking-normal text-gray-400 flex items-center gap-2 m-0 font-inter after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100">
+      <p
+        class="text-[11px] font-semibold tracking-normal text-gray-400 flex items-center gap-2 m-0 font-inter after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100"
+      >
         Información general
       </p>
 
       <div class="grid grid-cols-2 gap-x-4 gap-y-4">
-
         <div class="col-span-2 flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">Nombre</label>
-          <InputText
-            v-model="form.nombre"
-            placeholder="Nombre del proveedor"
-            :pt="inputPt"
-          />
+          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter"
+            >Nombre</label
+          >
+          <InputText v-model="form.nombre" placeholder="Nombre del proveedor" :pt="inputPt" />
         </div>
 
         <div class="col-span-2 flex flex-col gap-1.5">
@@ -102,15 +104,11 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter">Teléfono</label>
-          <InputText
-            v-model="form.telefono"
-            type="tel"
-            placeholder="2222-3333"
-            :pt="inputPt"
-          />
+          <label class="text-[12.5px] font-semibold text-[#1a2e1f] tracking-tight font-inter"
+            >Teléfono</label
+          >
+          <InputText v-model="form.telefono" type="tel" placeholder="2222-3333" :pt="inputPt" />
         </div>
-
       </div>
     </div>
 
@@ -120,7 +118,10 @@
         label="Cancelar"
         @click="visible = false"
         :pt="{
-          root: { class: 'px-5 py-2 rounded-lg border border-gray-200 bg-white text-gray-500 text-sm font-semibold font-inter hover:border-[#2b5e3b] hover:text-[#1a2e1f] transition-all cursor-pointer' },
+          root: {
+            class:
+              'px-5 py-2 rounded-lg border border-gray-200 bg-white text-gray-500 text-sm font-semibold font-inter hover:border-[#2b5e3b] hover:text-[#1a2e1f] transition-all cursor-pointer',
+          },
           label: { class: 'font-inter font-semibold text-sm' },
         }"
         text
@@ -128,12 +129,15 @@
       <Button
         @click="guardar"
         :pt="{
-          root: { class: 'flex items-center gap-2 px-7 py-2 rounded-lg border-0 text-white text-sm font-semibold font-inter transition-all cursor-pointer' },
+          root: {
+            class:
+              'flex items-center gap-2 px-7 py-2 rounded-lg border-0 text-white text-sm font-semibold font-inter transition-all cursor-pointer',
+          },
           label: { class: 'font-inter font-semibold text-sm' },
         }"
-        style="background: #2b5e3b;"
-        @mouseenter="(e) => e.currentTarget.style.background = '#1f482d'"
-        @mouseleave="(e) => e.currentTarget.style.background = '#2b5e3b'"
+        style="background: #2b5e3b"
+        @mouseenter="(e) => (e.currentTarget.style.background = '#1f482d')"
+        @mouseleave="(e) => (e.currentTarget.style.background = '#2b5e3b')"
       >
         <template #icon>
           <i class="pi pi-check-circle text-sm" />
@@ -141,10 +145,8 @@
         <template #default>Guardar proveedor</template>
       </Button>
     </div>
-
   </Dialog>
 </template>
-
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
@@ -166,24 +168,31 @@ const visible = computed({
 const tipoPersona = ref('natural')
 
 const form = reactive({
-  nombre: '', direccion: '', correo: '', telefono: '',
+  nombre: '',
+  direccion: '',
+  correo: '',
+  telefono: '',
 })
 
 function resetForm() {
   Object.assign(form, {
-    nombre: '', direccion: '', correo: '', telefono: '',
+    nombre: '',
+    direccion: '',
+    correo: '',
+    telefono: '',
   })
   tipoPersona.value = 'natural'
 }
 
 function guardar() {
+   
   emit('guardar', {
-    nombre:       form.nombre,
-    direccion:    form.direccion,
-    correo:       form.correo,
-    telefono:     form.telefono,
+    nombre: form.nombre,
+    direccion: form.direccion,
+    correo: form.correo,
+    telefono: form.telefono,
     tipo_persona: tipoPersona.value === 'natural' ? 'NATURAL' : 'JURIDICA',
-    activo:       true,
+    activo: true,
   })
   resetForm()
   visible.value = false
@@ -191,7 +200,8 @@ function guardar() {
 
 const inputPt = {
   root: {
-    class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] transition-all font-inter',
+    class:
+      'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] transition-all font-inter',
   },
 }
 </script>

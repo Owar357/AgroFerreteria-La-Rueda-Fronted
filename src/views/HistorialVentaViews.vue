@@ -1,43 +1,45 @@
 <template>
   <div>
-    <HistorialVentaTable :ventas="ventas" @ver-detalle="abrirDetalle" @anular-venta="confirmarAnulacion" />
+    <HistorialVentasTable
+      :ventas="ventas"
+      @ver-detalle="abrirDetalle"
+      @anular-venta="confirmarAnulacion"
+    />
 
-    <DetallVentaDialogo v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
+    <DetalleVentasDialog v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import Swal from 'sweetalert2'
-import HistorialVentaTable from '../components/Usuarios/HistorialVentaTable.vue'
-import DetallVentaDialogo from '@/components/Usuarios/DetallVentaDialogo.vue'
+import HistorialVentasTable from '../components/Ventas/HistorialVentasTable.vue'
+import DetalleVentasDialog from '../components/Ventas/DetalleVentasDialog.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
 import { useRoute } from 'vue-router'
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
- const route = useRoute()
+const route = useRoute()
 
 const clienteId = route.query.clienteId
-
-
-
-
 
 const aplicarFiltroFechas = async (fechas) => {
   cargando.value = true
   try {
     const response = await getVentas(fechas || {})
     const data = response.data.data || []
-    ventas.value = data.map(v => ({
+    ventas.value = data.map((v) => ({
       id: v.id,
       vendidoPor: v.vendido_por.name,
       numeroFactura: v.numero_factura,
       tipoPago: v.tipo_pago,
       estado: v.estado,
       fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
-        day: '2-digit', month: '2-digit', year: 'numeric'
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
       }),
       total: v.total,
     }))
@@ -51,26 +53,31 @@ const aplicarFiltroFechas = async (fechas) => {
 const cargarVentas = async () => {
   cargando.value = true
   try {
-   const params = clienteId ? { cliente: clienteId, per_page: 50 } : {}
-      const response = await getVentas(params)
+    const params = clienteId ? { cliente: clienteId, per_page: 50 } : {}
+    const response = await getVentas(params)
     const data = response.data.data || response.data || []
-    ventas.value = data.map(v => ({
+    ventas.value = data.map((v) => ({
       id: v.id,
       vendidoPor: v.vendido_por.name,
       numeroFactura: v.numero_factura,
       tipoPago: v.tipo_pago,
       estado: v.estado,
       fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
-        day: '2-digit', month: '2-digit', year: 'numeric'
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
       }),
       total: v.total,
     }))
   } catch (error) {
     console.error(error)
     Swal.fire({
-      toast: true, position: 'top-end', icon: 'error',
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
       title: 'Error al cargar el historial',
-      showConfirmButton: false, timer: 2000
+      showConfirmButton: false,
+      timer: 2000,
     })
   } finally {
     cargando.value = false
@@ -79,43 +86,41 @@ const cargarVentas = async () => {
 
 const abrirDetalle = async (venta) => {
   try {
-
     const response = await getDetallesVenta(venta.id)
     const detalles = response.data.data || response.data
 
     ventaSeleccionada.value = {
       // Datos de la venta (cabecera)
-      vendidoPor: venta.vendidoPor,              // o venta.vendidoPor
+      vendidoPor: venta.vendidoPor, // o venta.vendidoPor
       numeroFactura: venta.numeroFactura,
       fechaEmision: venta.fecha,
       tipoPago: venta.tipoPago,
       estado: venta.estado,
       total: venta.total,
 
-      items: detalles.map(d => ({
+      items: detalles.map((d) => ({
         nombreProducto: d.nombre_producto,
         cantidad: parseFloat(d.cantidad),
         precio: parseFloat(d.precio_unitario),
         unidad: d.unidad_base,
-        subtotal: parseFloat(d.subtotal) || (parseFloat(d.cantidad) * parseFloat(d.precio_unitario))
-      }))
-
+        subtotal: parseFloat(d.subtotal) || parseFloat(d.cantidad) * parseFloat(d.precio_unitario),
+      })),
     }
     mostrarDetalle.value = true
-
-
-
   } catch (error) {
     console.error(error)
     Swal.fire({
-      toast: true, position: 'top-end', icon: 'error',
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
       title: 'Error al cargar el detalle',
-      showConfirmButton: false, timer: 2000
+      showConfirmButton: false,
+      timer: 2000,
     })
   }
 }
 
-const confirmarAnulacion = (venta) => {       // ← llave que cerraba antes de tiempo, fix
+const confirmarAnulacion = (venta) => {
   if (venta.estado === 'ANULADA') return
 
   Swal.fire({
@@ -139,13 +144,16 @@ const confirmarAnulacion = (venta) => {       // ← llave que cerraba antes de 
   }).then((result) => {
     if (!result.isConfirmed) return
 
-    const idx = ventas.value.findIndex(v => v.id === venta.id)
+    const idx = ventas.value.findIndex((v) => v.id === venta.id)
     if (idx !== -1) ventas.value[idx].estado = 'ANULADA'
 
     Swal.fire({
-      title: '¡Venta anulada!', icon: 'success',
+      title: '¡Venta anulada!',
+      icon: 'success',
       text: `La factura ${venta.numeroFactura} fue anulada.`,
-      confirmButtonColor: '#2b5e3b', timer: 3000, timerProgressBar: true
+      confirmButtonColor: '#2b5e3b',
+      timer: 3000,
+      timerProgressBar: true,
     })
   })
 }
@@ -153,7 +161,9 @@ const confirmarAnulacion = (venta) => {       // ← llave que cerraba antes de 
 onMounted(() => cargarVentas())
 
 const formatearMoneda = (valor) =>
-  Number(valor).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  Number(valor)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 </script>
 
 <style>

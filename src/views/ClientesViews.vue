@@ -5,7 +5,7 @@
       @view-history="onViewHistory"
     />
 
-    <ClienteDetalleDialogo
+    <DetalleClientesDialogo
       v-model:visible="detailVisible"
       :client="selectedClient"
     />
@@ -18,7 +18,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
-import ClienteDetalleDialogo from '@/components/Clientes/ClienteDetalleDialogo.vue'
+import DetalleClientesDialogo from '@/components/Clientes/DetalleClientesDialogo.vue'
+
 
 const router = useRouter()
 
@@ -36,12 +37,17 @@ const onViewDetail = (cliente) => {
   }
   detailVisible.value = true
 }
-
 const onViewHistory = (cliente) => {
   router.push({
     name:   'ClienteHistorial',
     params: { id: cliente.id },
-    query:  { clienteId: cliente.id, nombre: cliente.nombre, doc: cliente.numero_documento }
+    query:  {
+      clienteId: cliente.id,
+      nombre: cliente.nombre || cliente.razon_social,
+      doc: cliente.numero_documento
+    }
   })
 }
+
+
 </script>

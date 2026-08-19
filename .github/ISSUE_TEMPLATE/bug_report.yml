@@ -1,0 +1,17 @@
+name: "🐛 Bug Report QA"
+description: Reporte de error encontrado durante las pruebas.
+title: "[BUG] - <descripción breve del error>"
+labels: ["bug"]
+body:
+  - type: input
+    id: link_matriz
+    attributes:
+      label: "Link de la matriz de pruebas"
+      description: Pegar el link de la matriz donde está documentado del error.
+      placeholder: "https://docs.google.com/..."
+    validations:
+      required: true
+
+ 
+
+  

@@ -149,12 +149,16 @@
     }
   })
 
-  function guardar() {
-    console.log('emitiendo actualizar:', { ...form })
-    emit('actualizar', { ...form })
-    visible.value = false
-  }
+ function guardar() {
+  const payload = { id: form.id }
 
+  if (form.nombre?.trim())   payload.nombre   = form.nombre.trim()
+  if (form.correo?.trim())   payload.correo   = form.correo.trim()
+  if (form.telefono?.trim()) payload.telefono = form.telefono.trim()
+
+  emit('actualizar', payload)
+  visible.value = false
+}
     
 
   </script>
