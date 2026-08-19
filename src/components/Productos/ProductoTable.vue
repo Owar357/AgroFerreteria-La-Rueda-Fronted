@@ -118,6 +118,8 @@ import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
 import { useproductoStore } from '@/stores/productoStore'
 
+
+
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 const store = useproductoStore()
 

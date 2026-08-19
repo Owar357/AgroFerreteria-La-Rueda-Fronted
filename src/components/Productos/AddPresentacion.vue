@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import InputText from 'primevue/inputtext'        // ⬅️ te faltaba importar
+import InputText from 'primevue/inputtext'        
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { añadirPresentacion } from '@/services/productoService'
