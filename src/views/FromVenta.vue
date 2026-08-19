@@ -289,6 +289,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
@@ -296,6 +297,8 @@ import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/ser
 import DialogAddCliente from '@/components/Clientes/AddClienteDialog.vue'
 
 import Swal from 'sweetalert2'
+
+const router = useRouter()
 
 const fechaActual = new Date().toLocaleDateString('es-ES', {
   day: '2-digit',
@@ -467,15 +470,34 @@ const registrarVenta = async () => {
     })),
   }
 
-  try {
-    await registerVenta(payload)
-    Swal.fire({
-      icon: 'success',
-      title: '¡Venta registrada!',
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
-    })
+    try {
+    const response = await registerVenta(payload)
+    console.log('Respuesta venta:', response.data)
+
+    if (response.data.apertura_pendiente) {
+      const resultado = await Swal.fire({
+        icon: 'warning',
+        title: 'Venta registrada',
+        text: 'Tienes una apertura de caja pendiente. Debes aperturar tu turno.',
+        confirmButtonText: 'Ir a aperturar',
+        confirmButtonColor: '#e0b354',
+        showCancelButton: true,
+        cancelButtonText: 'Cerrar',
+      })
+
+      if (resultado.isConfirmed) {
+        router.push({ name: 'caja' })
+      }
+    } else {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Venta registrada!',
+        confirmButtonColor: '#2b5e3b',
+        timer: 3000,
+        timerProgressBar: true,
+      })
+    }
+
     anularVenta()
   } catch (error) {
     const status = error.response?.status
@@ -497,7 +519,6 @@ const registrarVenta = async () => {
     }
   }
 }
-
 const anularVenta = () => {
   productosVenta.value = []
   busquedaCliente.value = ''
