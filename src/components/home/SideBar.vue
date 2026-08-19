@@ -21,12 +21,13 @@
           @click="navigate('/admin/usuarios')"
         />
         <SidebarItem
-          icon="pi pi-bell"
-          label="Alertas"
-          :active="activeItem === 'alertas'"
-          @click="navigate('/admin/alertas')"
-          class="mt-1"
-        />
+  icon="pi pi-bell"
+  label="Alertas"
+  :active="activeItem === 'alertas'"
+  :badge="noLeidas"
+  @click="navigate('/admin/alertas')"
+  class="mt-1"
+/>
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
@@ -181,14 +182,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import authService from '@/services/authService'
+import { useAlertaStore } from '@/stores/alertaStore'
 import SidebarItem from '@/components/home/SidebarItem.vue'
 import SidebarDropdown from '@/components/home/SidebarDropdown.vue'
 
 const router = useRouter()
 const route = useRoute()
+
+const alertaStore = useAlertaStore()
+const { noLeidas } = storeToRefs(alertaStore)
+
+onMounted(() => {
+  alertaStore.iniciarActualizacionAutomatica()
+})
+
+onUnmounted(() => {
+  alertaStore.detenerActualizacionAutomatica()
+})
 
 const showInventario = ref(false)
 const showProcesos = ref(false)
