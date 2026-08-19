@@ -16,7 +16,29 @@
       </div>
     </div>
 
-    <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
+    <!-- Indicador de pasos (estilo chevron) -->
+    <div class="flex w-full mb-10 select-none rounded-lg overflow-hidden shadow-sm">
+      <div
+        class="flex-1 flex items-center justify-center gap-3 py-4 pl-8 pr-6 text-white transition-colors"
+        :class="pasoActual === 1 ? 'bg-[#2b5e3b]' : 'bg-[#7fa389]'"
+        style="clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 50%, calc(100% - 24px) 100%, 0 100%)"
+      >
+        <span class="text-[18px] font-semibold">1.</span>
+        <span class="text-[18px] font-medium">Información general</span>
+      </div>
+      <div
+        class="flex-1 flex items-center justify-center gap-3 py-4 pl-10 pr-6 text-white transition-colors -ml-5"
+        :class="pasoActual === 2 ? 'bg-[#2b5e3b]' : 'bg-[#c7d6bd]'"
+        :style="pasoActual === 2 ? '' : 'color:#5b6b57'"
+        style="clip-path: polygon(24px 0, 100% 0, 100% 100%, 24px 100%, 0 50%)"
+      >
+        <span class="text-[18px] font-semibold">2.</span>
+        <span class="text-[18px] font-medium">Presentaciones</span>
+      </div>
+    </div>
+
+    <!-- Paso 1: Información General -->
+    <div v-show="pasoActual === 1" class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
       <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
         <i class="pi pi-box text-[#e0b354] text-[22px]"></i>
         <span class="text-[32px] font-semibold text-[#1a2e1f]"
@@ -158,176 +180,195 @@
           </div>
         </div>
       </div>
+
+      <div class="flex justify-end mt-8">
+        <Button
+          label="Siguiente"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          class="!text-[20px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+          @click="irAPaso2"
+        />
+      </div>
     </div>
 
-    <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
-      <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
-        <i class="pi pi-tags text-[#e0b354] text-[22px]"></i>
-        <span class="text-[32px] font-semibold text-[#1a2e1f]"
-          >2. Información de las Presentaciones del Producto</span
+    <!-- Paso 2: Presentaciones -->
+    <div v-show="pasoActual === 2">
+      <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
+        <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
+          <i class="pi pi-tags text-[#e0b354] text-[22px]"></i>
+          <span class="text-[32px] font-semibold text-[#1a2e1f]"
+            >2. Información de las Presentaciones del Producto</span
+          >
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">Nombre de la presentación</label>
+            <InputText
+              v-model="presentacionActual.nombre"
+              placeholder="Ej: Quintal, Arroba, Libra, 50ml..."
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
+            />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">Código de barra</label>
+            <InputText
+              v-model="presentacionActual.codigoBarra"
+              placeholder="Ej: 7501234567890"
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
+            />
+          </div>
+
+          <!-- Fila: Equivalencia -->
+          <div class="col-span-2 flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">
+              ¿Cuántas
+              <span class="bg-[#dff0e0] text-[#1e3a2f] px-2 py-0.5 rounded-full">
+                [{{ unidadBase || 'unidad base' }}]
+              </span>
+              equivale esta presentación?
+            </label>
+            <div class="flex items-center gap-4">
+              <InputNumber
+                v-model="presentacionActual.equivalencia"
+                fluid
+                placeholder="0"
+                :min="0"
+                inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full"
+              />
+              <span
+                class="bg-[#dff0e0] text-[#1e3a2f] text-[20px] font-medium whitespace-nowrap rounded-full px-5 py-3"
+              >
+                {{ unidadBase || 'unidad base' }}
+              </span>
+            </div>
+            <p class="text-base text-gray-500 mt-1">
+              Si la unidad base es 'libra' y esta presentación es Quintal, equivale a 100 libras.
+            </p>
+          </div>
+
+          <div class="col-span-2 grid grid-cols-3 gap-6">
+            <div class="flex flex-col gap-2">
+              <label class="text-[20px] font-medium text-gray-600">Precio Neto</label>
+              <InputNumber
+                v-model="presentacionActual.precioNeto"
+                fluid
+                placeholder="0.00"
+                :min="0"
+                :minFractionDigits="2"
+                :maxFractionDigits="2"
+                mode="currency"
+                currency="USD"
+                locale="es-SV"
+                inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-[20px] font-medium text-gray-600">IVA Aplicado (13%)</label>
+              <InputNumber
+                :modelValue="ivaCalculado"
+                fluid
+                disabled
+                :minFractionDigits="2"
+                :maxFractionDigits="2"
+                mode="currency"
+                currency="USD"
+                locale="es-SV"
+                inputClass="!bg-[#f2f5ef] !border-gray-300 !text-gray-500 !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-[20px] font-medium text-gray-600">Precio Total</label>
+              <InputNumber
+                :modelValue="precioTotal"
+                fluid
+                disabled
+                :minFractionDigits="2"
+                :maxFractionDigits="2"
+                mode="currency"
+                currency="USD"
+                locale="es-SV"
+                inputClass="!bg-[#f2f5ef] !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+          <Button
+            label="Añadir Nueva Presentación"
+            icon="pi pi-plus"
+            class="flex-1 !text-[20px] !py-4 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+            @click="agregarPresentacion"
+          />
+          <Button
+            label="Limpiar Formulario"
+            icon="pi pi-trash"
+            class="flex-1 !text-[20px] !py-4 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] !font-['Inter',sans-serif]"
+            @click="limpiarFormularioPresentacion"
+          />
+        </div>
+      </div>
+
+      <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
+        <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
+          <i class="pi pi-database text-[#e0b354] text-[22px]"></i>
+          <span class="text-[32px] font-semibold text-[#1a2e1f]">Presentaciones Agregadas</span>
+        </div>
+        <DataTable
+          :value="presentaciones"
+          :paginator="presentaciones.length > 5"
+          :rows="5"
+          class="font-['Inter',sans-serif] text-[20px]"
+          emptyMessage="No hay presentaciones agregadas aún"
         >
+          <Column field="nombre" header="Nombre" class="!text-[20px]" />
+          <Column field="codigoBarra" header="Código Barra" class="!text-[20px]" />
+          <Column field="equivalencia" header="Equivalencia" class="!text-[20px]" />
+          <Column field="unidadBase" header="Unidad Base" class="!text-[20px]" />
+          <Column field="precioSinIva" header="Precio (S/IVA)" class="!text-[20px]">
+            <template #body="{ data }">{{ formatCurrency(data.precioSinIva) }}</template>
+          </Column>
+          <Column field="ivaAplicado" header="IVA" class="!text-[20px]">
+            <template #body="{ data }">{{ formatCurrency(data.ivaAplicado) }}</template>
+          </Column>
+          <Column field="precioConIva" header="Precio (C/IVA)" class="!text-[20px]">
+            <template #body="{ data }">{{ formatCurrency(data.precioConIva) }}</template>
+          </Column>
+
+          <Column header="Acciones" class="!text-[20px]">
+            <template #body="{ index }">
+              <Button
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                rounded
+                @click="eliminarPresentacion(index)"
+              />
+            </template>
+          </Column>
+        </DataTable>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
-        <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">Nombre de la presentación</label>
-          <InputText
-            v-model="presentacionActual.nombre"
-            placeholder="Ej: Quintal, Arroba, Libra, 50ml..."
-            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
-          />
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">Código de barra</label>
-          <InputText
-            v-model="presentacionActual.codigoBarra"
-            placeholder="Ej: 7501234567890"
-            class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[22px]"
-          />
-        </div>
-
-        <!-- Fila: Equivalencia -->
-        <div class="col-span-2 flex flex-col gap-2">
-          <label class="text-[20px] font-medium text-gray-600">
-            ¿Cuántas
-            <span class="bg-[#dff0e0] text-[#1e3a2f] px-2 py-0.5 rounded-full">
-              [{{ unidadBase || 'unidad base' }}]
-            </span>
-            equivale esta presentación?
-          </label>
-          <div class="flex items-center gap-4">
-            <InputNumber
-              v-model="presentacionActual.equivalencia"
-              fluid
-              placeholder="0"
-              :min="0"
-              inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full"
-            />
-            <span
-              class="bg-[#dff0e0] text-[#1e3a2f] text-[20px] font-medium whitespace-nowrap rounded-full px-5 py-3"
-            >
-              {{ unidadBase || 'unidad base' }}
-            </span>
-          </div>
-          <p class="text-base text-gray-500 mt-1">
-            Si la unidad base es 'libra' y esta presentación es Quintal, equivale a 100 libras.
-          </p>
-        </div>
-
-        <div class="col-span-2 grid grid-cols-3 gap-6">
-          <div class="flex flex-col gap-2">
-            <label class="text-[20px] font-medium text-gray-600">Precio Neto</label>
-            <InputNumber
-              v-model="presentacionActual.precioNeto"
-              fluid
-              placeholder="0.00"
-              :min="0"
-              :minFractionDigits="2"
-              :maxFractionDigits="2"
-              mode="currency"
-              currency="USD"
-              locale="es-SV"
-              inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full"
-            />
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label class="text-[20px] font-medium text-gray-600">IVA Aplicado (13%)</label>
-            <InputNumber
-              :modelValue="ivaCalculado"
-              fluid
-              disabled
-              :minFractionDigits="2"
-              :maxFractionDigits="2"
-              mode="currency"
-              currency="USD"
-              locale="es-SV"
-              inputClass="!bg-[#f2f5ef] !border-gray-300 !text-gray-500 !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed"
-            />
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label class="text-[20px] font-medium text-gray-600">Precio Total</label>
-            <InputNumber
-              :modelValue="precioTotal"
-              fluid
-              disabled
-              :minFractionDigits="2"
-              :maxFractionDigits="2"
-              mode="currency"
-              currency="USD"
-              locale="es-SV"
-              inputClass="!bg-[#f2f5ef] !border-gray-300 !text-[#1a2e1f] !text-[20px] !py-[14px] !px-[18px] w-full !cursor-not-allowed"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="flex gap-4 mt-8">
+      <div class="flex justify-between">
         <Button
-          label="Añadir Nueva Presentación"
-          icon="pi pi-plus"
-          class="flex-1 !text-[20px] !py-4 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-          @click="agregarPresentacion"
+          label="Atrás"
+          icon="pi pi-arrow-left"
+          class="!text-[20px] !py-4 !px-10 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] !font-['Inter',sans-serif]"
+          @click="pasoActual = 1"
         />
         <Button
-          label="Limpiar Formulario"
-          icon="pi pi-trash"
-          class="flex-1 !text-[20px] !py-4 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] !font-['Inter',sans-serif]"
-          @click="limpiarFormularioPresentacion"
+          label="Guardar Producto"
+          icon="pi pi-save"
+          :loading="guardando"
+          class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+          @click="guardarProducto"
         />
       </div>
-    </div>
-
-    <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
-      <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
-        <i class="pi pi-database text-[#e0b354] text-[22px]"></i>
-        <span class="text-[32px] font-semibold text-[#1a2e1f]">Presentaciones Agregadas</span>
-      </div>
-      <DataTable
-        :value="presentaciones"
-        :paginator="presentaciones.length > 5"
-        :rows="5"
-        class="font-['Inter',sans-serif] text-[20px]"
-        emptyMessage="No hay presentaciones agregadas aún"
-      >
-        <Column field="nombre" header="Nombre" class="!text-[20px]" />
-        <Column field="codigoBarra" header="Código Barra" class="!text-[20px]" />
-        <Column field="equivalencia" header="Equivalencia" class="!text-[20px]" />
-        <Column field="unidadBase" header="Unidad Base" class="!text-[20px]" />
-        <Column field="precioSinIva" header="Precio (S/IVA)" class="!text-[20px]">
-          <template #body="{ data }">{{ formatCurrency(data.precioSinIva) }}</template>
-        </Column>
-        <Column field="ivaAplicado" header="IVA" class="!text-[20px]">
-          <template #body="{ data }">{{ formatCurrency(data.ivaAplicado) }}</template>
-        </Column>
-        <Column field="precioConIva" header="Precio (C/IVA)" class="!text-[20px]">
-          <template #body="{ data }">{{ formatCurrency(data.precioConIva) }}</template>
-        </Column>
-
-        <Column header="Acciones" class="!text-[20px]">
-          <template #body="{ index }">
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              rounded
-              @click="eliminarPresentacion(index)"
-            />
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-
-    <div class="flex justify-end">
-      <Button
-        label="Guardar Producto"
-        icon="pi pi-save"
-        :loading="guardando"
-        class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-        @click="guardarProducto"
-      />
     </div>
   </div>
 
@@ -338,7 +379,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Checkbox from 'primevue/checkbox'
@@ -355,6 +396,9 @@ import { useproductoStore } from '@/stores/productoStore'
 const emit = defineEmits(['close'])
 const store = useproductoStore()
 
+// ── Borrador en localStorage (para no perder datos si se recarga la página) ──
+const DRAFT_KEY = 'agroferreteria_borrador_nuevo_producto'
+
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
     if (resultado?.error) {
@@ -365,7 +409,42 @@ onMounted(async () => {
       confirmButtonColor: '#2b5e3b',
     })
   }
+
+  restaurarBorrador()
 })
+
+// ── Control del wizard (paso 1 / paso 2) ──────────────────────────────────────
+const pasoActual = ref(1)
+
+const irAPaso2 = () => {
+  errores.value = { nombre: '', fabricante: '', categoria: '', unidadBase: '', tipoProducto: '' }
+  let hayErrores = false
+
+  if (!nombre.value.trim()) {
+    errores.value.nombre = 'El nombre es obligatorio.'
+    hayErrores = true
+  }
+  if (!categoria.value?.id) {
+    errores.value.categoria = 'Seleccione una categoría.'
+    hayErrores = true
+  }
+  if (!fabricante.value.trim()) {
+    errores.value.fabricante = 'El fabricante es obligatorio.'
+    hayErrores = true
+  }
+  if (!unidadBase.value.trim()) {
+    errores.value.unidadBase = 'La unidad base es obligatoria.'
+    hayErrores = true
+  }
+  if (!tipoProducto.value) {
+    errores.value.tipoProducto = 'Seleccione el tipo de venta.'
+    hayErrores = true
+  }
+
+  if (hayErrores) return
+
+  pasoActual.value = 2
+}
 
 const nombre = ref('')
 const fabricante = ref('')
@@ -378,6 +457,46 @@ const tipoProducto = ref(null)
 const aplicaIva = ref(false)
 const guardando = ref(false)
 const errores = ref({ nombre: '', fabricante: '', categoria: '', unidadBase: '', tipoProducto: '' })
+
+// Guarda automáticamente el progreso del formulario en localStorage
+const guardarBorrador = () => {
+  const borrador = {
+    pasoActual: pasoActual.value,
+    nombre: nombre.value,
+    fabricante: fabricante.value,
+    categoria: categoria.value,
+    unidadBase: unidadBase.value,
+    tipoProducto: tipoProducto.value,
+    aplicaIva: aplicaIva.value,
+    presentaciones: presentaciones.value,
+  }
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(borrador))
+}
+
+// Restaura el borrador guardado, si existe, al abrir el formulario
+const restaurarBorrador = () => {
+  const guardado = localStorage.getItem(DRAFT_KEY)
+  if (!guardado) return
+
+  try {
+    const borrador = JSON.parse(guardado)
+    pasoActual.value = borrador.pasoActual ?? 1
+    nombre.value = borrador.nombre ?? ''
+    fabricante.value = borrador.fabricante ?? ''
+    categoria.value = borrador.categoria ?? null
+    unidadBase.value = borrador.unidadBase ?? ''
+    tipoProducto.value = borrador.tipoProducto ?? null
+    aplicaIva.value = borrador.aplicaIva ?? false
+    presentaciones.value = borrador.presentaciones ?? []
+  } catch {
+    localStorage.removeItem(DRAFT_KEY)
+  }
+}
+
+// Borra el borrador (se llama al guardar el producto con éxito)
+const limpiarBorrador = () => {
+  localStorage.removeItem(DRAFT_KEY)
+}
 
 //funcion para buscar las caegoria
 const buscarCategorias = (event) => {
@@ -432,6 +551,13 @@ const presentacionActual = ref({
   precioNeto: null,
 })
 const presentaciones = ref([])
+
+// Cada cambio en los datos del formulario actualiza el borrador
+watch(
+  [pasoActual, nombre, fabricante, categoria, unidadBase, tipoProducto, aplicaIva, presentaciones],
+  guardarBorrador,
+  { deep: true },
+)
 
 const ivaCalculado = computed(() => {
   const neto = presentacionActual.value.precioNeto || 0
@@ -667,6 +793,8 @@ const resetFormularioCompleto = () => {
   presentaciones.value = []
   errores.value = { nombre: '', fabricante: '', categoria: '', unidadBase: '', tipoProducto: '' }
   limpiarFormularioPresentacion()
+  pasoActual.value = 1
+  limpiarBorrador()
 }
 </script>
 
