@@ -30,7 +30,6 @@
             :producto="productoSeleccionado"
             @volver="cerrarDetalle"
           />
-
         </div>
       </transition>
     </div>
