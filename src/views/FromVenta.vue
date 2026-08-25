@@ -456,7 +456,6 @@ const registrarVenta = async () => {
     efectivo_recibido: tipoPago.value === 'efectivo' ? efectivoRecibido.value : null,
     cambio: tipoPago.value === 'efectivo' ? cambio.value : null,
     cliente_id: clienteId.value || null,
-    apertura_caja_id: 1,
     detalles: productosVenta.value.map((p) => ({
       nombre_producto: p.nombre,
       presentacion: p.nombre,
