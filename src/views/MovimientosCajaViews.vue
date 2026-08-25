@@ -17,6 +17,7 @@
       </button>
     </div>
 
+
     <!-- BÚSQUEDA + FILTROS -->
     <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
       <div class="flex items-center gap-3">
@@ -31,6 +32,7 @@
           />
         </div>
 
+
         <div class="flex items-center gap-2 bg-white border border-[#dee6d6] rounded-lg px-3 py-2">
           <i class="pi pi-calendar text-[#819b74] text-sm"></i>
           <span class="text-xs text-[#819b74] font-medium">Desde</span>
@@ -40,6 +42,7 @@
             class="text-sm text-[#1a2e1f] outline-none bg-transparent"
           />
         </div>
+
 
         <div class="flex items-center gap-2 bg-white border border-[#dee6d6] rounded-lg px-3 py-2">
           <i class="pi pi-calendar text-[#819b74] text-sm"></i>
@@ -51,16 +54,15 @@
           />
         </div>
 
+
         <button
-          @click="
-            fechaDesde = '',
-            fechaHasta = ''
-          "
+          @click="((fechaDesde = ''), (fechaHasta = ''))"
           class="px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1 bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-red-600 hover:text-white hover:border-red-600"
         >
           <i class="pi pi-times text-xs"></i> Limpiar fechas
         </button>
       </div>
+
 
       <div class="flex gap-2">
         <button
@@ -98,6 +100,7 @@
         </button>
       </div>
     </div>
+
 
     <!-- TABLA -->
     <div class="bg-white rounded-2xl shadow-sm border border-[#e8efe1] overflow-hidden">
@@ -160,6 +163,7 @@
             </td>
           </tr>
 
+
           <tr v-if="movimientosFiltrados.length === 0">
             <td colspan="5" class="text-center py-12 text-gray-400">
               <i class="pi pi-inbox text-3xl mb-2 block"></i>
@@ -169,14 +173,17 @@
         </tbody>
       </table>
 
+
       <!-- Paginación -->
       <Paginator
         v-model:first="paginaFirst"
         :rows="7"
-        :totalRecords="movimientosFiltrados.length"
+        :totalRecords="totalRecords"
         template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         class="border-t border-[#e8efe1] !bg-white"
+        @page="(e) => { paginaActual = e.page + 1; cargarMovimientos()}"
       />
+
 
       <!-- Footer -->
       <div
@@ -205,6 +212,7 @@
       </div>
     </div>
 
+
     <AddMovimientoCaja
       v-model:visible="dialogVisible"
       :usuarioActual="'Samuel Lara'"
@@ -214,106 +222,87 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import Paginator from 'primevue/paginator'
+import { getMovimientos } from '@/services/movimientoCajaService'
 import AddMovimientoCaja from '@/components/Caja/AddMovimientoCajaDialog.vue'
+import Swal from 'sweetalert2'
 
-const movimientos = ref([
-  {
-    id: 1,
-    tipo: 'ENTRADA',
-    monto: 100.0,
-    concepto: 'Apertura de caja - Turno matutino',
-    usuario: 'Samuel Lara',
-    fecha: '2026-05-25',
-    hora: '08:30',
-  },
-  {
-    id: 2,
-    tipo: 'ENTRADA',
-    monto: 45.0,
-    concepto: 'Venta contado - Fertilizante (cliente Juan Pérez)',
-    usuario: 'Samuel Lara',
-    fecha: '2026-05-22',
-    hora: '09:45',
-  },
-  {
-    id: 3,
-    tipo: 'ENTRADA',
-    monto: 40.0,
-    concepto: 'Venta contado - Herramientas (cliente María López)',
-    usuario: 'Samuel Lara',
-    fecha: '2026-05-21',
-    hora: '10:20',
-  },
-  {
-    id: 4,
-    tipo: 'SALIDA',
-    monto: 50.0,
-    concepto: 'Pago a proveedor - Semillas (AgroSemillas SA)',
-    usuario: 'Samuel Lara',
-    fecha: '2026-05-01',
-    hora: '11:00',
-  },
-  {
-    id: 5,
-    tipo: 'ENTRADA',
-    monto: 30.0,
-    concepto: 'Venta contado - Fungicida (cliente Carlos Ruiz)',
-    usuario: 'Samuel Lara',
-    fecha: '2026-05-25',
-    hora: '11:45',
-  },
-  {
-    id: 6,
-    tipo: 'ENTRADA',
-    monto: 250.0,
-    concepto: 'Transferencia bancaria recibida - Cliente mayorista',
-    usuario: 'Daniel Melgar',
-    fecha: '2026-03-25',
-    hora: '14:30',
-  },
-  {
-    id: 7,
-    tipo: 'SALIDA',
-    monto: 30.0,
-    concepto: 'Gasto menor - Compra de café para oficina',
-    usuario: 'Daniel Melgar',
-    fecha: '2026-02-23',
-    hora: '16:00',
-  },
-  {
-    id: 8,
-    tipo: 'ENTRADA',
-    monto: 120.0,
-    concepto: 'Venta con tarjeta (POS) - Abono foliar',
-    usuario: 'María López',
-    fecha: '2026-05-25',
-    hora: '20:45',
-  },
-])
 
+const cargando = ref(false)
+const movimientos = ref([])
+const totalRecords = ref(0)
+const paginaActual = ref(1)
+
+
+const cargarMovimientos = async () => {
+  cargando.value = true
+  try {
+    const params = {
+      page: paginaActual.value,
+    }
+    if (fechaDesde.value) params.fecha_desde = fechaDesde.value
+    if (fechaHasta.value) params.fecha_hasta = fechaHasta.value
+    if (filtroTipo.value !== 'todos') params.tipo_movimiento = filtroTipo.value
+
+
+    const res = await getMovimientos(params)
+
+    totalRecords.value = res.data.total
+    movimientos.value = res.data.data.map((m) => ({
+      id: m.id,
+      tipo: m.tipo_movimiento,
+      monto: parseFloat(m.monto),
+      concepto: m.motivo,
+      usuario: m.user?.name ?? '-',
+      fecha: m.created_at.split('T')[0],
+      hora: new Date(m.created_at).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }))
+  } catch {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudieron cargar los movimientos.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    cargando.value = false
+  }
+}
+
+
+onMounted(cargarMovimientos)
 const searchText = ref('')
 const filtroTipo = ref('todos')
 const fechaDesde = ref('')
 const fechaHasta = ref('')
 const paginaFirst = ref(0)
 
-watch([searchText, filtroTipo, fechaDesde, fechaHasta], () => {
+
+watch([filtroTipo, fechaDesde, fechaHasta], () => {
   paginaFirst.value = 0
+  cargarMovimientos()
 })
+
 
 const formatFecha = (fecha) => {
   const [y, m, d] = fecha.split('-')
   return `${d}/${m}/${y}`
 }
 
+
 const dialogVisible = ref(false)
 
-const onMovimientoRegistrado = (nuevoMovimiento) => {
-  movimientos.value.unshift(nuevoMovimiento)
+
+const onMovimientoRegistrado = () => {
+  cargarMovimientos()
 }
+
 
 const movimientosFiltrados = computed(() => {
   let resultado = movimientos.value
@@ -329,9 +318,9 @@ const movimientosFiltrados = computed(() => {
   return resultado
 })
 
-const movimientosPaginados = computed(() => {
-  return movimientosFiltrados.value.slice(paginaFirst.value, paginaFirst.value + 7)
-})
+
+const movimientosPaginados = computed(() => movimientos.value)
+
 
 const totalEntradas = computed(() =>
   movimientosFiltrados.value.filter((m) => m.tipo === 'ENTRADA').reduce((s, m) => s + m.monto, 0),
@@ -341,5 +330,6 @@ const totalSalidas = computed(() =>
 )
 const balance = computed(() => totalEntradas.value - totalSalidas.value)
 
+
 const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
-</script>
+</script> 

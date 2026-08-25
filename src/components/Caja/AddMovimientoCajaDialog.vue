@@ -75,6 +75,11 @@
           class="w-full"
           placeholder="Ej: Venta contado - Fertilizante"
           :maxlength="200"
+          @keypress="
+            (e) => {
+              if (/[0-9]/.test(e.key)) e.preventDefault()
+            }
+          "
         />
         <div class="flex justify-between items-center mt-1">
           <p class="text-xs text-[#6d8f60]">
@@ -107,8 +112,8 @@
           :label="tipoMovimiento === 'ENTRADA' ? 'Registrar ingreso' : 'Registrar salida'"
           :icon="tipoMovimiento === 'ENTRADA' ? 'pi pi-plus-circle' : 'pi pi-minus-circle'"
           :severity="tipoMovimiento === 'ENTRADA' ? 'success' : 'danger'"
+          :loading="guardando"
           @click="registrarMovimiento"
-          :disabled="!formularioValido"
           class="rounded-lg"
         />
       </div>
@@ -122,20 +127,13 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
+import { createMovimiento } from '@/services/movimientoCajaService'
+import Swal from 'sweetalert2'
+
+const guardando = ref(false)
 
 const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  usuarioActual: {
-    type: String,
-    default: 'Samuel Lara',
-  },
-  turnoActual: {
-    type: String,
-    default: 'Turno 1 (08:00 - 14:00)',
-  },
+  
 })
 
 const emit = defineEmits(['update:visible', 'movimientoRegistrado'])
@@ -155,22 +153,70 @@ const formularioValido = computed(() => {
   return monto.value !== null && monto.value > 0 && concepto.value.trim().length >= 3
 })
 
-const registrarMovimiento = () => {
-  if (!formularioValido.value) return
+//REGISTRAMOS EL MOVIMEOTO EXTERNO
+const registrarMovimiento = async () => {
+  const montoVacio = monto.value === null || monto.value <= 0
+  const conceptoVacio = concepto.value.trim().length < 3
 
-  const nuevoMovimiento = {
-    id: Date.now(),
-    tipo: tipoMovimiento.value,
-    monto: monto.value,
-    concepto: concepto.value.trim(),
-    usuario: props.usuarioActual,
-    turno: props.turnoActual,
-    fecha: new Date().toISOString().split('T')[0],
-    hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+  if (montoVacio && conceptoVacio) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Campos requeridos',
+      text: 'El monto y el motivo son requeridos para registrar el movimiento.',
+      confirmButtonColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
+    return
   }
 
-  emit('movimientoRegistrado', nuevoMovimiento)
-  cerrarDialog()
+  if (montoVacio) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Monto requerido',
+      text: 'El monto es requerido para registrar el movimiento.',
+      confirmButtonColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
+    return
+  }
+
+  if (conceptoVacio) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Motivo requerido',
+      text: 'El motivo es obligatorio para registrar el movimiento.',
+      confirmButtonColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
+    return
+  }
+
+  guardando.value = true
+  try {
+    await createMovimiento({
+      tipo_movimiento: tipoMovimiento.value,
+      monto: monto.value,
+      motivo: concepto.value.trim(),
+    })
+    emit('movimientoRegistrado')
+    cerrarDialog()
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: tipoMovimiento.value === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
+      showConfirmButton: false,
+      timer: 2000,
+      background: '#ffffff',
+      color: '#1e3a2f',
+      iconColor: '#2b5e3b',
+    })
+  } catch (error) {
+    const msg = error.response?.data?.message || 'Error al registrar el movimiento.'
+    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#2b5e3b' })
+  } finally {
+    guardando.value = false
+  }
 }
 
 const cerrarDialog = () => {

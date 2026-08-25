@@ -422,7 +422,7 @@ const totalEnCaja = computed(() => cajaStore.montoInicial + totalIngresos.value 
 const montoEnCaja = computed(() => totalEnCaja.value)
 const diferencia = computed(() => montoEnCaja.value - montoEsperado.value)
 
-const formatNumber = (value) => (value || 0).toFixed(2)
+const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
 
 
 const abrirCaja = () => {

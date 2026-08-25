@@ -92,7 +92,7 @@
             @click="navigate('/admin/venta/compra')"
             sub
           />
-          >
+          
           <SidebarItem
             v-if="isAdmin || isCajero"
             icon="pi pi-history"
