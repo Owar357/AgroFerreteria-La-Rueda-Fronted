@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div
     class="p-6"
     style="font-family: 'Inter', sans-serif; background-color: #eef2e9; min-height: 100vh"
@@ -34,6 +34,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- 4 Tarjetas -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 w-full">
@@ -107,6 +108,7 @@
       </div>
     </div>
 
+
     <div class="flex gap-6 mb-8">
       <!-- Acciones -->
       <div class="w-72 flex-shrink-0">
@@ -127,6 +129,7 @@
               <i class="pi pi-unlock"></i> Apertura de caja
             </button>
 
+
             <!-- Botón Aperturar venta (caja abierta pero venta NO abierta) -->
             <button
               v-else-if="cajaStore.cajaAbierta && !cajaStore.ventaAbierta"
@@ -135,6 +138,7 @@
             >
               <i class="pi pi-shopping-cart"></i> Aperturar venta
             </button>
+
 
             <!-- Botón Cerrar caja (venta ya abierta) -->
             <button
@@ -145,21 +149,11 @@
               <i class="pi pi-lock"></i> Cerrar caja
             </button>
 
-            <button
-              @click="showSalesDetail"
-              class="w-full py-3 rounded-xl font-semibold bg-[#eef2e9] text-[#1a2e1f] border border-[#d4decb] hover:bg-[#e2e8dd] transition-all flex items-center justify-center gap-2"
-            >
-              <i class="pi pi-chart-simple"></i> Ver ventas del día
-            </button>
-            <button
-              @click="showExternalMovements"
-              class="w-full py-3 rounded-xl font-semibold bg-[#eef2e9] text-[#1a2e1f] border border-[#d4decb] hover:bg-[#e2e8dd] transition-all flex items-center justify-center gap-2"
-            >
-              <i class="pi pi-truck"></i> Ver otros movimientos
-            </button>
+
           </div>
         </div>
       </div>
+
 
       <!-- Resumen -->
       <div class="flex-1 min-w-0">
@@ -235,6 +229,7 @@
       </div>
     </div>
 
+
     <!-- Tabla movimientos -->
     <div class="bg-white rounded-2xl shadow-sm border border-[#e8efe1] overflow-hidden">
       <div class="bg-[#fafdf7] px-6 py-4 border-b border-[#e8efe1]">
@@ -295,12 +290,14 @@
       </div>
     </div>
 
+
     <!-- Modal credenciales admin apertura de caja -->
 <AdminAuthDialog
   ref="adminAuthRef"
   v-model:visible="adminAuthVisible"
   @credenciales-confirmadas="onCredencialesConfirmadas"
 />
+
 
 <!--  denominaciones apertura de venta -->
 <OpenCashierDialog
@@ -309,12 +306,14 @@
   @open-cash-register="onAbrirVenta"
 />
 
+
 <!-- Modal conteo cierre de caja -->
 <CloseCashierDialog
   ref="closeCashierRef"
   v-model:visible="conteoVisible"
   @cuadrar="onConteoListo"
 />
+
 
 <!-- Modal  para el cuadre -->
 <AdminAuthDialog
@@ -324,6 +323,7 @@
   descripcion="Para realizar el cuadre de caja, ingrese las credenciales del administrador."
   @credenciales-confirmadas="onCredencialesCierre"
 />
+
 
 <!-- Modal cierre de caja y venta-->
 <CierreCajaDialog
@@ -335,21 +335,26 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
 import { useCajaStore } from '@/stores/cajaStore'
+
 
 import AdminAuthDialog from '@/components/Caja/AdminAuthDialog.vue'
 import OpenCashierDialog from '@/components/Caja/OpenCashierDialog.vue'
 import CloseCashierDialog from '@/components/Caja/CloseCashierDialog.vue'
 import CierreCajaDialog from '@/components/Caja/CierreCajaDialog.vue'
 
+
 const cajaStore = useCajaStore()
+
 
 const currentDate = ref(
   new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
 )
+
 
 const adminAuthVisible = ref(false)
 const aperturaCajaVisible = ref(false)
@@ -357,13 +362,16 @@ const conteoVisible = ref(false)
 const adminAuthCierreVisible = ref(false)
 const cierreVisible = ref(false)
 
+
 const adminAuthRef = ref(null)
 const adminAuthCierreRef = ref(null)
 const closeCashierRef = ref(null)
 
+
 const datosCierre = ref({})
 const denominacionesGuardadas = ref([])
 const montoContadoGuardado = ref(0)
+
 
 const ventasContado = ref(0)
 const ventasTarjeta = ref(0)
@@ -372,6 +380,7 @@ const entradas = ref(0)
 const retiros = ref(0)
 const montoRealFinal = ref(0)
 const diferenciaFinal = ref(0)
+
 
 const todosMovimientos = ref([
   {
@@ -411,7 +420,9 @@ const todosMovimientos = ref([
   },
 ])
 
+
 const movimientosRecientes = computed(() => [...todosMovimientos.value].slice(-5).reverse())
+
 
 const totalVentas = computed(
   () => ventasContado.value + ventasTarjeta.value + ventasTransferencia.value,
@@ -422,17 +433,21 @@ const totalEnCaja = computed(() => cajaStore.montoInicial + totalIngresos.value 
 const montoEnCaja = computed(() => totalEnCaja.value)
 const diferencia = computed(() => montoEnCaja.value - montoEsperado.value)
 
+
 const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
+
 
 
 const abrirCaja = () => {
   adminAuthVisible.value = true
 }
 
+
 const onCredencialesConfirmadas = async (credenciales) => {
   adminAuthRef.value?.setLoading(true)
   const resultado = await cajaStore.abrirTurnoCaja(credenciales)
   adminAuthRef.value?.setLoading(false)
+
 
   if (resultado.ok) {
     adminAuthVisible.value = false
@@ -453,13 +468,16 @@ const onCredencialesConfirmadas = async (credenciales) => {
 }
 
 
+
 const abrirVenta = () => {
   aperturaCajaVisible.value = true
 }
 
+
 const onAbrirVenta = async ({ total }) => {
   aperturaCajaVisible.value = false
   const resultado = await cajaStore.abrirTurnoVenta(total)
+
 
   if (resultado.ok) {
     calcularResumenDesdeMovimientos()
@@ -492,15 +510,19 @@ const onAbrirVenta = async ({ total }) => {
 }
 
 
+
 const cerrarCaja = () => {
   conteoVisible.value = true
 }
 
 
+
 const onConteoListo = ({ monto_contado, denominaciones }) => {
+
 
   montoContadoGuardado.value = monto_contado
   denominacionesGuardadas.value = denominaciones
+
 
   conteoVisible.value = false
   adminAuthCierreVisible.value = true
@@ -508,13 +530,16 @@ const onConteoListo = ({ monto_contado, denominaciones }) => {
 const onCredencialesCierre = async (credenciales) => {
   adminAuthCierreRef.value?.setLoading(true)
 
+
   const resultado = await cajaStore.cuadrarTurnoVenta({
     email: credenciales.email,
     password: credenciales.password,
     monto_contado: montoContadoGuardado.value,
   })
 
+
   adminAuthCierreRef.value?.setLoading(false)
+
 
   if (resultado.ok) {
     adminAuthCierreVisible.value = false
@@ -526,6 +551,7 @@ const onCredencialesCierre = async (credenciales) => {
   }
 }
 
+
 const onCancelarCierre = () => {
   cierreVisible.value = false
   // Restauramos las denominaciones que el usuario ya había ingresado
@@ -533,12 +559,14 @@ const onCancelarCierre = () => {
   conteoVisible.value = true
 }
 
+
 const onCierreExitoso = () => {
   cierreVisible.value = false
   denominacionesGuardadas.value = []
   montoContadoGuardado.value = 0
   datosCierre.value = {}
 }
+
 
 const calcularResumenDesdeMovimientos = () => {
   let contado = 0,
@@ -559,45 +587,5 @@ const calcularResumenDesdeMovimientos = () => {
   retiros.value = retirosSum
 }
 
-const showSalesDetail = () => {
-  Swal.fire({
-    title: 'Ventas del día',
-    html: `
-      <p>Contado: $${formatNumber(ventasContado.value)}</p>
-      <p>Tarjeta: $${formatNumber(ventasTarjeta.value)}</p>
-      <p>Transferencia: $${formatNumber(ventasTransferencia.value)}</p>
-      <hr><p><strong>Total:</strong> $${formatNumber(totalVentas.value)}</p>
-    `,
-    icon: 'info',
-    confirmButtonText: 'Cerrar',
-    confirmButtonColor: '#2b5e3b',
-  })
-}
 
-const showExternalMovements = () => {
-  const externos = todosMovimientos.value.filter((m) =>
-    ['proveedor', 'gasto', 'compra', 'retiro'].some((k) => m.concepto.toLowerCase().includes(k)),
-  )
-  if (!externos.length) {
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'info',
-      title: 'No hay movimientos externos',
-      showConfirmButton: false,
-      timer: 1500,
-    })
-    return
-  }
-  let html = '<ul style="text-align:left">'
-  externos.forEach((m) => (html += `<li>${m.hora} - ${m.concepto} - ${m.monto}</li>`))
-  html += '</ul>'
-  Swal.fire({
-    title: 'Movimientos externos',
-    html,
-    icon: 'info',
-    confirmButtonText: 'Cerrar',
-    confirmButtonColor: '#2b5e3b',
-  })
-}
 </script>
