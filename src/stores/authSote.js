@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
                 if (this.isAdmin || this.isContador || this.Cajero) {
                     router.push('/admin/dashboard')
                 }else {
-                    router.push('/') //por si se maneja el rol del cliente en el futuro
+                    router.push('/') 
                 }
             }
             catch(error) {
