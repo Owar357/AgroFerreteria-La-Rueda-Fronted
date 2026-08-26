@@ -12,10 +12,8 @@
           <h1 class="text-2xl font-bold text-[#1e3a2f]">{{ producto.nombre }}</h1>
           <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 mt-2">
             <span><span class="font-medium text-[#3c674b]">Código:</span> {{ producto.codigo }}</span>
-            <span><span class="font-medium text-[#3c674b]">Categoría:</span>
-              {{ producto.categoria }}</span>
-            <span><span class="font-medium text-[#3c674b]">Fabricante:</span>
-              {{ producto.fabricante }}</span>
+            <span><span class="font-medium text-[#3c674b]">Categoría:</span> {{ producto.categoria }}</span>
+            <span><span class="font-medium text-[#3c674b]">Fabricante:</span> {{ producto.fabricante }}</span>
           </div>
         </div>
       </div>
@@ -37,7 +35,7 @@
 
         <Column header="Equivalencia" class="text-sm">
           <template #body="{ data }">
-            {{ data.factor_conversion }} {{ data.unidadMedida }}
+            {{ data.factor_conversion }} {{ data.unidadMedida?.nombre || '—' }}
           </template>
         </Column>
         <Column field="precio" header="Precio" class="text-sm">
@@ -70,10 +68,10 @@
                   " class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer" v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
                     " @click="toggleEstadoPresentacion(data)" />
 
-                    <!-- este boton lo agrege para lo de lotes presentaciones-->
-                    <Button icon="pi pi-box" label="Lotes"
-                  class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
+              <!-- este boton lo agrege para lo de lotes presentaciones-->
+              <Button icon="pi pi-box" label="Lotes"
+                class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
             </div>
           </template>
         </Column>
@@ -91,20 +89,16 @@
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
-    
-  <LotesPresentacionTable
-    v-if="vistaLotes"
-    :presentacion="presentacionLotes"
-    @volver="cerrarLotes"
-  />
 
-  <div v-else class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
-    <!-- Botón volver -->
-    <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
-      class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-      @click="volver" />
+    <LotesPresentacionTable v-if="vistaLotes" :presentacion="presentacionLotes" @volver="cerrarLotes" />
 
-  </div>
+    <div v-else class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
+      <!-- Botón volver -->
+      <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
+        class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
+        @click="volver" />
+
+    </div>
   </div>
 </template>
 
@@ -156,7 +150,6 @@ const producto = ref({
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
-  unidad_base: props.producto.unidad_base ?? '—',
 })
 
 onMounted(async () => {
@@ -169,15 +162,14 @@ const cargarPresentaciones = async () => {
     const res = await getPresentacionesByProducto(props.producto.id)
     const data = res.data.data ?? []
 
-    // Fallback: sacar unidad_base desde la presentación
-    if (data.length > 0 && data[0].producto?.unidad_base) {
-      producto.value.unidad_base = data[0].producto.unidad_base
-    }
+   if(res.data.producto?.unidadMedida){
+    producto.value.unidadMedida = res.data.producto.unidadMedida
+   }
 
     presentaciones.value = data.map((p) => ({
       id: p.id,
       nombre: p.nombre,
-      unidadMedida: p.producto?.unidad_base ?? '—',
+      unidadMedida: p.unidad_medida,
       factor_conversion: Number(p.factor_conversion) || 0,
       precio: parseFloat(p.precio_venta ?? 0),
       stock: (p.stock !== null && p.stock !== undefined) ? Number(p.stock) : 0,
