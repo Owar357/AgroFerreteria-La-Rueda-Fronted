@@ -70,10 +70,10 @@
                   " class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer" v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
                     " @click="toggleEstadoPresentacion(data)" />
 
-                    <!-- este boton lo agrege para lo de lotes presentaciones-->
-                    <Button icon="pi pi-box" label="Lotes"
-                  class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
+              <!-- este boton lo agrege para lo de lotes presentaciones-->
+              <Button icon="pi pi-box" label="Lotes"
+                class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
             </div>
           </template>
         </Column>
@@ -91,25 +91,12 @@
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
-    
-  <LotesPresentacionTable
-    v-if="vistaLotes"
-    :presentacion="presentacionLotes"
-    @volver="cerrarLotes"
-  />
-
-  <div v-else class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
-    <!-- Botón volver -->
-    <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
-      class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-      @click="volver" />
-
-  </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -120,27 +107,14 @@ import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vu
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
-import LotesPresentacionTable from './LotesPresentacionTable.vue'
-
-
-const vistaLotes = ref(false)
-const presentacionLotes = ref(null)
-
-const abrirLotes = (presentacion) => {
-  presentacionLotes.value = presentacion
-  vistaLotes.value = true
-}
-
-const cerrarLotes = () => {
-  vistaLotes.value = false
-  presentacionLotes.value = null
-}
 
 const props = defineProps({
   producto: { type: Object, required: true },
 })
 
 const emit = defineEmits(['volver'])
+
+const router = useRouter()
 
 const editarVisible = ref(false)
 const presentacionSeleccionada = ref(null)
@@ -288,6 +262,15 @@ const onGuardarEdicion = (presentacionEditada) => {
 const abrirCodigos = (presentacion) => {
   presentacionCodigos.value = { ...presentacion }
   codigosVisible.value = true
+}
+
+// Navega a la página de lotes de la presentación (ruta independiente)
+const abrirLotes = (presentacion) => {
+  router.push({
+    name: 'lotes-presentacion',
+    params: { id: presentacion.id },
+    query: { nombre: presentacion.nombre },
+  })
 }
 </script>
 
