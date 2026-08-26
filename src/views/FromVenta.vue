@@ -333,6 +333,9 @@ import { useRouter } from 'vue-router'
 import { useCajaStore } from '@/stores/cajaStore'
 
 const router = useRouter()
+const irACaja = () => {
+  router.push({ name: 'caja' })
+}
 
 const fechaActual = new Date().toLocaleDateString('es-ES', {
   day: '2-digit',
