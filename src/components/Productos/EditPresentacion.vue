@@ -9,21 +9,21 @@
         </label>
         <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
           class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
+        <small v-if="errores.nombre" class="text-red-500 text-[12px]">{{ errores.nombre }}</small>
       </div>
 
-
-
+      <!-- Factor de conversión con unidad base -->
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
-          ¿Cuántos
+          ¿Cuánto equivale esta presentación en
           <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
-            {{ unidadBase || '—' }}
+            {{ unidadBase || presentacion?.unidad_medida?.nombre || '—' }} ?
           </span>
-          contiene tu presentación? <span class="text-red-500">*</span>
         </label>
-        <InputNumber v-model="form.factor_conversion" :min="1" :useGrouping="false"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
+        <InputText v-model="form.factor_conversion" placeholder="0" maxlength="6"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" />
+        <small v-if="errores.factor_conversion" class="text-red-500 text-[12px]">{{ errores.factor_conversion }}</small>
+        <small v-else class="text-[12px] text-gray-400">Debe ser un número entero entre 1 y 999,999.</small>
       </div>
 
       <!-- Precio -->
@@ -34,6 +34,7 @@
         <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
           inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
           class="w-full" />
+        <small v-if="errores.precio" class="text-red-500 text-[12px]">{{ errores.precio }}</small>
       </div>
 
       <!-- Botones -->
@@ -56,7 +57,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
-import { updatePresentacion } from '@/services/productoService'// agrege la importacion para conectarlo al backend
+import { updatePresentacion } from '@/services/productoService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -69,70 +70,106 @@ const emit = defineEmits(['update:visible', 'guardar'])
 
 const localVisible = ref(false)
 const guardando = ref(false)
+const errores = ref({ nombre: '', factor_conversion: '', precio: '' })
 
 const form = ref({
   nombre: '',
-  unidadMedida: '',
+  factor_conversion: null,
   precio: null,
-  estado: 'ACTIVO',
 })
 
 watch(
   () => props.visible,
-  (val) => {
-    localVisible.value = val
-  },
+  (val) => { localVisible.value = val },
 )
 watch(localVisible, (val) => {
   emit('update:visible', val)
 })
-
 
 watch(
   () => props.presentacion,
   (val) => {
     if (val) {
       form.value = {
-        ...val,
+        nombre: val.nombre || '',
         factor_conversion: Number(val.factor_conversion) || null,
+        precio: parseFloat(val.precio_venta) || null,
       }
     }
   },
   { immediate: true },
 )
 
+// Filtro para solo números y límite 999999
+watch(() => form.value.factor_conversion, (nuevoValor) => {
+  if (nuevoValor !== undefined && nuevoValor !== null) {
+    let soloNumeros = nuevoValor.toString().replace(/[^0-9]/g, '')
+    if (soloNumeros === '') {
+      form.value.factor_conversion = ''
+      return
+    }
+    let numeroMaximo = parseInt(soloNumeros, 10)
+    if (numeroMaximo > 999999) {
+      form.value.factor_conversion = 999999
+    } else {
+      form.value.factor_conversion = numeroMaximo
+    }
+  }
+})
+
 const resetForm = () => {
-  form.value = { nombre: '', unidadMedida: '', factor_conversion: null, precio: null, estado: 'ACTIVO' }
+  form.value = { nombre: '', factor_conversion: null, precio: null }
+  errores.value = { nombre: '', factor_conversion: '', precio: '' }
   guardando.value = false
 }
 
-// agrege lo de guardar para que conecte al backen los datoooss
-const mostrarAlerta = (tipo, titulo, texto) => {
-  Swal.fire({
-    icon: tipo,
-    title: titulo,
-    text: texto,
-    confirmButtonColor: '#2b5e3b',
-    customClass: { container: '!z-[9999]' },
-  })
-}
-
 const guardar = async () => {
-  const nombreDuplicado = props.presentacionesExistentes.some(
-    (p) => p.nombre.trim().toLowerCase() === form.value.nombre.trim().toLowerCase() && p.id !== props.presentacion?.id
-  )
+  // Reiniciar errores
+  errores.value = { nombre: '', factor_conversion: '', precio: '' }
 
-  if (nombreDuplicado) {
-    mostrarAlerta('warning', 'No se puede editar la presentación', 'Ya existe una presentación con este nombre')
+  // --- Validar Nombre ---
+  if (!form.value.nombre.trim()) {
+    errores.value.nombre = 'El nombre es obligatorio.'
+  } else {
+    const nombreDuplicado = props.presentacionesExistentes.some(
+      (p) => p.nombre.trim().toLowerCase() === form.value.nombre.trim().toLowerCase() && p.id !== props.presentacion?.id
+    )
+    if (nombreDuplicado) {
+      errores.value.nombre = 'Ya existe una presentación con este nombre.'
+    }
+  }
+
+  // --- Validar Factor de conversión ---
+  const factor = form.value.factor_conversion
+  if (factor === null || factor === '' || factor === undefined) {
+    errores.value.factor_conversion = 'El factor de conversión es obligatorio.'
+  } else {
+    const num = Number(factor)
+    if (!Number.isInteger(num)) {
+      errores.value.factor_conversion = 'Debe ser un número entero.'
+    } else if (num <= 0) {
+      errores.value.factor_conversion = 'Debe ser mayor a 0.'
+    } else if (num > 999999) {
+      errores.value.factor_conversion = 'No puede superar los 999,999.'
+    }
+  }
+
+  // --- Validar Precio ---
+  if (!form.value.precio || form.value.precio <= 0) {
+    errores.value.precio = 'El precio debe ser mayor a 0.'
+  }
+
+  // Si hay errores, detener
+  if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) {
     return
   }
 
+  // --- Envío ---
   guardando.value = true
-
   const payload = {
-    nombre: form.value.nombre,
-    factor_conversion: form.value.factor_conversion,
-    precio_venta: form.value.precio,
+    nombre: form.value.nombre.trim(),
+    factor_conversion: Number(form.value.factor_conversion),
+    precio_venta: Number(form.value.precio),
   }
 
   try {
@@ -152,7 +189,7 @@ const guardar = async () => {
       toast: true,
       position: 'top-end',
       icon: 'success',
-      title: '¡Presentación actualizada con éxito!',
+      title: '¡Presentación actualizada!',
       showConfirmButton: false,
       timer: 1500,
       timerProgressBar: true,
@@ -164,11 +201,30 @@ const guardar = async () => {
   } catch (error) {
     const status = error.response?.status
     if (status === 422) {
-      mostrarAlerta('warning', 'Error de validación', 'Revisa los datos enviados e intenta nuevamente.')
+      // Los errores de backend podrías mostrarlos también debajo de cada campo, pero por ahora dejamos Swal
+      Swal.fire({
+        icon: 'warning',
+        title: 'Error de validación',
+        text: 'Revisa los datos enviados e intenta nuevamente.',
+        confirmButtonColor: '#2b5e3b',
+        customClass: { container: '!z-[9999]' },
+      })
     } else if (status === 404) {
-      mostrarAlerta('error', 'No encontrada', 'La presentación ya no existe.')
+      Swal.fire({
+        icon: 'error',
+        title: 'No encontrada',
+        text: 'La presentación ya no existe.',
+        confirmButtonColor: '#2b5e3b',
+        customClass: { container: '!z-[9999]' },
+      })
     } else {
-      mostrarAlerta('error', 'Error', 'No se pudo actualizar la presentación.')
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo actualizar la presentación.',
+        confirmButtonColor: '#2b5e3b',
+        customClass: { container: '!z-[9999]' },
+      })
     }
   } finally {
     guardando.value = false
@@ -187,12 +243,10 @@ const guardar = async () => {
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
 }
-
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 1.5rem !important;
 }
-
 :deep(.p-inputnumber-input) {
   width: 100%;
   background: #f9fafb;
