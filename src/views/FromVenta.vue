@@ -9,8 +9,29 @@
       padding: 12px;
     "
   >
-    <!-- dos columnas ocupando toda la altura -->
     <div
+      v-if="!cajaStore.cajaAbierta"
+      class="flex flex-col items-center justify-center h-full gap-6"
+    >
+      <div
+        class="bg-white rounded-2xl p-10 border border-[#e2e8dd] shadow-lg flex flex-col items-center gap-4 max-w-md w-full"
+      >
+        <i class="pi pi-lock text-[#b91c1c]" style="font-size: 48px"></i>
+        <h2 class="text-[22px] font-semibold text-[#1a2e1f] text-center">Caja no aperturada</h2>
+        <p class="text-[14px] text-[#6b7280] text-center">
+          El administrador debe aperturar la caja para poder realizar ventas.
+        </p>
+        <Button
+          label="Ir a Caja"
+          icon="pi pi-arrow-right"
+          class="!bg-[#2b5e3b] !border-[#2b5e3b] text-white font-semibold px-6 py-3 rounded-lg"
+          @click="irACaja"
+        />
+      </div>
+    </div>
+
+    <div
+      v-else
       class="rounded-2xl overflow-hidden flex-1 min-h-0"
       style="
         background-color: #ffffff;
@@ -21,7 +42,6 @@
     >
       <!-- COLUMNA IZQUIERDA -->
       <div class="flex flex-col overflow-hidden" style="padding: 20px">
-        <!-- Header izquierdo -->
         <div
           class="flex items-center justify-between mb-4 pb-4"
           style="border-bottom: 1px solid #e2e8dd"
@@ -34,6 +54,23 @@
               >
               <span style="font-size: 12px; color: #6b7280">{{ fechaActual }}</span>
             </div>
+          </div>
+          <!-- Indicador de apertura de venta -->
+          <div class="flex items-center gap-2">
+            <span
+              :class="[
+                'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold',
+                cajaStore.ventaAbierta
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-yellow-100 text-yellow-800',
+              ]"
+            >
+              <i
+                class="pi pi-circle-fill text-[8px]"
+                :class="cajaStore.ventaAbierta ? 'text-green-600' : 'text-yellow-500'"
+              ></i>
+              {{ cajaStore.ventaAbierta ? 'Venta abierta' : 'Sin apertura de venta' }}
+            </span>
           </div>
         </div>
 
@@ -58,13 +95,13 @@
               :suggestions="sugerencias"
               @complete="buscarProducto"
               @item-select="alSeleccionarProducto"
-              placeholder="Escribe nombre,cód. interno o cód. de barra"
+              placeholder="Escribe nombre, cód. interno o cód. de barra"
               class="w-full"
               fluid
             />
           </div>
 
-          <!-- Elegir presentación -->
+          <!-- Presentación -->
           <div class="flex gap-2">
             <Select
               v-model="presentacionSeleccionada"
@@ -99,7 +136,6 @@
                 <template #body="slotProps">{{ slotProps.index + 1 }}</template>
               </Column>
               <Column field="nombre" header="Producto" />
-
               <Column header="Cantidad">
                 <template #body="slotProps">
                   <InputNumber
@@ -112,24 +148,21 @@
                   />
                 </template>
               </Column>
-
               <Column header="Precio">
-                <template #body="slotProps">
-                  ${{ parseFloat(slotProps.data.precio).toFixed(2) }}
-                </template>
+                <template #body="slotProps"
+                  >${{ parseFloat(slotProps.data.precio).toFixed(2) }}</template
+                >
               </Column>
-
               <Column header="Descuento">
-                <template #body="slotProps">
-                  ${{ parseFloat(slotProps.data.descuento).toFixed(2) }}
-                </template>
+                <template #body="slotProps"
+                  >${{ parseFloat(slotProps.data.descuento).toFixed(2) }}</template
+                >
               </Column>
               <Column header="Subtotal">
-                <template #body="slotProps">
-                  ${{ parseFloat(slotProps.data.subtotal).toFixed(2) }}
-                </template>
+                <template #body="slotProps"
+                  >${{ parseFloat(slotProps.data.subtotal).toFixed(2) }}</template
+                >
               </Column>
-
               <Column header="" style="width: 40px">
                 <template #body="slotProps">
                   <Button
@@ -152,7 +185,6 @@
 
       <!-- COLUMNA DERECHA -->
       <div class="flex flex-col overflow-hidden" style="padding: 20px">
-        <!-- Header derecho -->
         <div class="flex items-center gap-3 mb-4 pb-4" style="border-bottom: 1px solid #e2e8dd">
           <i class="pi pi-credit-card" style="color: #e0b354; font-size: 20px"></i>
           <span style="font-size: 18px; font-weight: 600; color: #1a2e1f">Cobro y Pago</span>
@@ -187,6 +219,7 @@
           <p class="text-[12px] text-[#2b5e3b] m-0">
             Nombre: <span class="text-[#6b7280] italic">{{ nombreCliente || '—' }}</span>
           </p>
+
           <!-- Forma de pago -->
           <div class="flex flex-col gap-1.5">
             <label style="font-size: 13px; font-weight: 500; color: #4b5563">Forma de pago</label>
@@ -288,14 +321,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { buscarProductos, buscarClientePorDocumento, registerVenta } from '@/services/ventaService'
 import DialogAddCliente from '@/components/Clientes/AddClienteDialog.vue'
-
 import Swal from 'sweetalert2'
+import { useRouter } from 'vue-router'
+import { useCajaStore } from '@/stores/cajaStore'
+
+const router = useRouter()
 
 const fechaActual = new Date().toLocaleDateString('es-ES', {
   day: '2-digit',
@@ -303,11 +340,15 @@ const fechaActual = new Date().toLocaleDateString('es-ES', {
   year: 'numeric',
 })
 
+const cajaStore = useCajaStore()
+
+// Al montar el POS consultamos el estado real de la caja en el backend
+onMounted(() => cajaStore.cargarEstadoCaja())
+
 const tipoFactura = ref('01')
 const presentacionSeleccionada = ref('')
 const presentaciones = ref([])
 const mostrarModalCliente = ref(false)
-
 const productosVenta = ref([])
 const busquedaCliente = ref('')
 const clienteId = ref(null)
@@ -329,20 +370,16 @@ const tiposPago = [
 ]
 
 const subtotalGravado = computed(() =>
-  productosVenta.value.reduce((acc, p) => {
-    if (!p.aplica_iva) return acc
-    return acc + parseFloat((p.subtotal / 1.13).toFixed(4))
-  }, 0),
+  productosVenta.value.reduce(
+    (acc, p) => (p.aplica_iva ? acc + parseFloat((p.subtotal / 1.13).toFixed(4)) : acc),
+    0,
+  ),
 )
 const subtotalExento = computed(() =>
-  productosVenta.value.reduce((acc, p) => {
-    if (p.aplica_iva) return acc
-    return acc + p.subtotal
-  }, 0),
+  productosVenta.value.reduce((acc, p) => (!p.aplica_iva ? acc + p.subtotal : acc), 0),
 )
 const iva = computed(() => subtotalGravado.value * 0.13)
 const total = computed(() => subtotalGravado.value + subtotalExento.value + iva.value)
-
 const cambio = computed(() => Math.max(0, efectivoRecibido.value - total.value))
 
 const buscarProducto = async (event) => {
@@ -366,20 +403,19 @@ const alSeleccionarProducto = (event) => {
 
 const agregarProducto = () => {
   if (!productoSeleccionado.value || !presentacionSeleccionada.value) return
-
   const precio = parseFloat(presentacionSeleccionada.value.precio_venta)
-
   productosVenta.value.push({
     nombre: `${productoSeleccionado.value.nombre} - ${presentacionSeleccionada.value.nombre}`,
     cantidad: 1,
-    precio: precio,
+    precio,
     descuento: 0.0,
     subtotal: precio,
     aplica_iva: productoSeleccionado.value.aplica_iva,
     presentacion_id: presentacionSeleccionada.value.id,
     unidad_base: productoSeleccionado.value.unidad_base,
   })
-  ;((productoSeleccionado.value = null), (presentacionSeleccionada.value = ''))
+  productoSeleccionado.value = null
+  presentacionSeleccionada.value = ''
   presentaciones.value = []
 }
 
@@ -411,7 +447,6 @@ const buscarCliente = async () => {
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#2b5e3b',
       })
-
       if (resultado.isConfirmed) mostrarModalCliente.value = true
     }
   }
@@ -433,7 +468,6 @@ const registrarVenta = async () => {
     })
     return
   }
-
   if (tipoFactura.value === '02' && !clienteId.value) {
     Swal.fire({
       icon: 'warning',
@@ -468,14 +502,33 @@ const registrarVenta = async () => {
   }
 
   try {
-    await registerVenta(payload)
-    Swal.fire({
-      icon: 'success',
-      title: '¡Venta registrada!',
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
-    })
+    const response = await registerVenta(payload)
+    console.log('Respuesta venta:', response.data)
+
+    if (response.data.apertura_pendiente) {
+      const resultado = await Swal.fire({
+        icon: 'warning',
+        title: 'Venta registrada',
+        text: 'Tienes una apertura de caja pendiente. Debes aperturar tu turno.',
+        confirmButtonText: 'Ir a aperturar',
+        confirmButtonColor: '#e0b354',
+        showCancelButton: true,
+        cancelButtonText: 'Cerrar',
+      })
+
+      if (resultado.isConfirmed) {
+        router.push({ name: 'caja' })
+      }
+    } else {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Venta registrada!',
+        confirmButtonColor: '#2b5e3b',
+        timer: 3000,
+        timerProgressBar: true,
+      })
+    }
+
     anularVenta()
   } catch (error) {
     const status = error.response?.status
@@ -497,17 +550,14 @@ const registrarVenta = async () => {
     }
   }
 }
-
 const anularVenta = () => {
   productosVenta.value = []
   busquedaCliente.value = ''
   nombreCliente.value = ''
   efectivoRecibido.value = 0
-  tipoFactura.value = ''
+  tipoFactura.value = '01'
   tipoPago.value = 'efectivo'
 }
 
-const eliminarProducto = (index) => {
-  productosVenta.value.splice(index, 1)
-}
+const eliminarProducto = (index) => productosVenta.value.splice(index, 1)
 </script>

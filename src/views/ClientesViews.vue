@@ -37,12 +37,17 @@ const onViewDetail = (cliente) => {
   }
   detailVisible.value = true
 }
-
 const onViewHistory = (cliente) => {
   router.push({
     name:   'ClienteHistorial',
     params: { id: cliente.id },
-    query:  { clienteId: cliente.id, nombre: cliente.nombre, doc: cliente.numero_documento }
+    query:  {
+      clienteId: cliente.id,
+      nombre: cliente.nombre || cliente.razon_social,
+      doc: cliente.numero_documento
+    }
   })
 }
+
+
 </script>

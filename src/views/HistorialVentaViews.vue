@@ -17,6 +17,8 @@ import HistorialVentasTable from '../components/Ventas/HistorialVentasTable.vue'
 import DetalleVentasDialog from '../components/Ventas/DetalleVentasDialog.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
 import { useRoute } from 'vue-router'
+
+
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
 const ventas = ref([])

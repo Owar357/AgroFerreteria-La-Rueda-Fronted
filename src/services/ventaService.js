@@ -23,3 +23,4 @@ export const getVentas = (params = {}) => {
 export const getDetallesVenta = (id) => {
   return api.get(`/ventas/${id}`)
 }
+export const anularVenta = (id) => api.patch(`/ventas/${id}/anular`)

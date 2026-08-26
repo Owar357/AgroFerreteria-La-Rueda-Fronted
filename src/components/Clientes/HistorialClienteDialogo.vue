@@ -52,13 +52,13 @@
     <!-- Tabla -->
     <div class="border border-[#e2e8dd] rounded-xl overflow-hidden shadow-sm">
     <DataTable
-  :value="purchasesFiltradas"
-  :loading="cargando"
-  responsiveLayout="scroll"
-  class="p-datatable-custom text-[14px]"
-  :rows="10"
-  :paginator="purchasesFiltradas.length > 10"
-  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+            :value="purchasesFiltradas"
+         :loading="cargando"
+             responsiveLayout="scroll"
+          class="p-datatable-custom text-[14px]"
+         :rows="10"
+          :paginator="purchasesFiltradas.length > 10"
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} compras"
   :rowsPerPageOptions="[10, 20, 50]"
 >
@@ -98,18 +98,30 @@
           </template>
         </Column>
 
-        <Column header="Acciones" class="text-center w-[130px]">
+        <Column header="Acciones" class="text-center w-[150px]">
           <template #body="{ data }">
-            <div class="flex gap-2 justify-center">
-              <Button
-                icon="pi pi-history"
-                v-tooltip.top="'Ver historial'"
-                class="!bg-[#fbf5e6] hover:!bg-[#f5e6c4] !text-[#cda03f] border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-               @click="abrirDetalleCompra(data)"
-              />
-            </div>
-          </template>
-        </Column>
+    <div class="flex gap-2 justify-center">
+      <Button
+        icon="pi pi-eye"
+        v-tooltip.top="'Ver detalle'"
+        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+        @click="abrirDetalleCompra(data)"
+      />
+      <Button
+        icon="pi pi-ban"
+        v-tooltip.top="'Anular compra'"
+        :disabled="data.status === 'ANULADA'"
+        :class="
+          data.status === 'ANULADA'
+            ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
+            : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'
+        "
+        class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+        @click="anularCompra(data)"
+      />
+    </div>
+  </template>
+</Column>
       </DataTable>
     </div>
    
@@ -127,9 +139,9 @@ import { useRoute, useRouter } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
-import DetalleFacturaDialogo from './DetalleFacturaDialogo.vue/index.js'
-import { getVentas, getDetallesVenta } from '@/services/ventaService'
-
+import DetalleFacturaDialogo from './DetalleFacturaDialogo.vue'
+import { getVentas, getDetallesVenta, anularVenta } from '@/services/ventaService'
+import Swal from 'sweetalert2'
 const route  = useRoute()
 const router = useRouter()
 
@@ -142,6 +154,32 @@ const purchases = ref([])
 const cargando  = ref(false)
 const filtroFactura = ref('')
 
+async function anularCompra(compra) {
+  const confirmacion = await Swal.fire({
+    title: '¿Anular esta compra?',
+    text: `Se anulará la factura ${compra.factura}. Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, anular',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#b91c1c',
+  })
+
+  if (!confirmacion.isConfirmed) return
+
+  try {
+    await anularVenta(compra.id)
+    Swal.fire('Anulada', 'La compra fue anulada correctamente.', 'success')
+    await cargarHistorial()
+  } catch (error) {
+    if (error.response?.status === 422) {
+      Swal.fire('No se pudo anular', error.response.data.message || 'Verifica el estado de la venta.', 'error')
+    } else {
+      Swal.fire('Error', 'Ocurrió un error al anular la compra.', 'error')
+    }
+    console.error('Error al anular compra:', error)
+  }
+}
 const cargarHistorial = async () => {
   cargando.value = true
   try {

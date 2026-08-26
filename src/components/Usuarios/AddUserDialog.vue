@@ -72,37 +72,7 @@
         }}</small>
       </div>
 
-      <div class="flex flex-col gap-1">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
-        <InputText
-          v-model="form.cashKey"
-          placeholder="Código de apertura"
-          maxlength="6"
-          autocomplete="off"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          @keydown="
-            (e) => {
-              if (
-                !/[0-9]/.test(e.key) &&
-                !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
-              )
-                e.preventDefault()
-            }
-          "
-          @input="
-            form.cashKey = form.cashKey.replace(/\D/g, '').slice(0, 6);validateField('cashKey')"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]'"
-        />
-        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{
-          errors.cashKey
-        }}</small>
-        <small class="text-[13px] text-[#6b7280] font-normal mt-1">
-          (Si el usuario podrá aperturar caja, ingresar código)
-        </small>
-      </div>
-
+     
       <div class="flex justify-center mt-4">
         <Button
           label="Guardar"
@@ -150,7 +120,6 @@ const form = reactive({
   email: '',
   password: '',
   role: null,
-  cashKey: '',
 })
 
 const errors = reactive({
@@ -158,7 +127,6 @@ const errors = reactive({
   email: '',
   password: '',
   role: '',
-  cashKey: '',
 })
 
 const resetForm = () => {
@@ -166,7 +134,6 @@ const resetForm = () => {
   form.email = ''
   form.password = ''
   form.role = null
-  form.cashKey = ''
   Object.keys(errors).forEach((k) => (errors[k] = ''))
 }
 
@@ -188,16 +155,7 @@ const validateField = (field) => {
     else errors.email = ''
   }
 
-  if (field === 'cashKey') {
-    const v = form.cashKey.trim()
-    if (!v) {
-      errors.cashKey = ''
-      return
-    } // es opcional
-    if (v.length !== 6) errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'
-    else errors.cashKey = ''
-  }
-
+ 
   if (field === 'password') {
     const v = form.password
     if (!v) errors.password = 'La contraseña es obligatoria.'
@@ -229,7 +187,7 @@ const handleSave = async () => {
   validateField('password')
   validateField('role')
 
-  if (errors.name || errors.email || errors.password || errors.role || errors.cashKey) return
+  if (errors.name || errors.email || errors.password || errors.role) return
 
   localVisible.value = false
   loading.value = true
@@ -239,7 +197,6 @@ const handleSave = async () => {
     email: form.email.trim(),
     password: form.password,
     role: form.role,
-    cashKey: form.cashKey ? form.cashKey.trim() : null,
   })
 
   loading.value = false

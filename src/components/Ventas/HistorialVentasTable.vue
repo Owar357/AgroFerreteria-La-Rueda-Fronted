@@ -55,12 +55,15 @@
         :globalFilterFields="['vendidoPor', 'numeroFactura']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
+        :lazy="true"
+        :totalRecords="totalRegistros" 
+        :loading="cargando"
         :paginator="true"
-        :rows="5"
-        :rowsPerPageOptions="[5, 10, 20]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
+          @page="onPage"
+        :rows="8"
+       currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-      >
+        >
         <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f]" />
 
         <Column field="numeroFactura" header="N° Factura">
@@ -134,9 +137,25 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 
+//pAGINACOIN DE PARTE  DEL SEERVIDOR
+const totalRegistros = ref(8)
+const cargando = ref(false)
+
+
+
+const onPage = (event) => {
+const paginaDestino = event.page + 1 
+const limitePorPagina = event.rows
+
+
+emit('cambiar-pagina', { 
+    page: paginaDestino, 
+    per_page: limitePorPagina 
+  })
+}
 // Props
 const props = defineProps({
-  // ← fix: faltaba guardar en variable
+ 
   ventas: {
     type: Array,
     required: true,
@@ -152,8 +171,8 @@ const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
 const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 const rangoDeFechas = ref(null)
 
-// Filtros reactivos
-const filtros = reactive({
+// Filtros que usan ref
+const filtros = ref({
   global: { value: null, matchMode: 'contains' },
   estado: { value: null, matchMode: 'equals' },
   tipoPago: { value: null, matchMode: 'equals' },

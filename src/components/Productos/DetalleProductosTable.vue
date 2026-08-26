@@ -1,14 +1,9 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
     <!-- Botón volver -->
-    <Button
-      icon="pi pi-arrow-left"
-      label="Volver a productos"
-      severity="secondary"
-      text
+    <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
       class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-      @click="volver"
-    />
+      @click="volver" />
 
     <!-- Tarjeta del producto -->
     <div class="bg-white rounded-2xl border border-[#e8efe1] shadow-sm p-6 mb-6">
@@ -16,17 +11,11 @@
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f]">{{ producto.nombre }}</h1>
           <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 mt-2">
-            <span
-              ><span class="font-medium text-[#3c674b]">Código:</span> {{ producto.codigo }}</span
-            >
-            <span
-              ><span class="font-medium text-[#3c674b]">Categoría:</span>
-              {{ producto.categoria }}</span
-            >
-            <span
-              ><span class="font-medium text-[#3c674b]">Fabricante:</span>
-              {{ producto.fabricante }}</span
-            >
+            <span><span class="font-medium text-[#3c674b]">Código:</span> {{ producto.codigo }}</span>
+            <span><span class="font-medium text-[#3c674b]">Categoría:</span>
+              {{ producto.categoria }}</span>
+            <span><span class="font-medium text-[#3c674b]">Fabricante:</span>
+              {{ producto.fabricante }}</span>
           </div>
         </div>
       </div>
@@ -38,10 +27,7 @@
       </h2>
       <Button
         class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-[14px] font-semibold !px-4 !py-3 !rounded-lg !border-none shadow-md transition-all duration-200"
-        label="Agregar presentación"
-        icon="pi pi-plus"
-        @click="abrirAñadir()"
-      />
+        label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
     </div>
 
     <!-- Tabla de presentaciones con botones -->
@@ -57,14 +43,11 @@
         <Column field="precio" header="Precio" class="text-sm">
           <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
         </Column>
-        <Column field="stock" header="Stock" class="text-sm"></Column>
+        <Column field="stock" header="Stock" class="text-sm"><template #body="{ data }"> {{ data.stock }} </template>
+        </Column>
         <Column field="estado" header="Estado" class="text-sm">
           <template #body="{ data }">
-            <Tag
-              :value="data.estado"
-              :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'"
-              rounded
-            />
+            <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded />
           </template>
         </Column>
 
@@ -72,36 +55,25 @@
         <Column header="Acciones" :exportable="false" class="text-sm">
           <template #body="{ data }">
             <div class="flex gap-2">
-              <Button
-                icon="pi pi-pencil"
-                label="Editar"
+              <Button icon="pi pi-pencil" label="Editar"
                 class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Editar presentación'"
-                @click="abrirEditar(data)"
-              />
+                v-tooltip.top="'Editar presentación'" @click="abrirEditar(data)" />
 
-              <Button
-                icon="pi pi-barcode"
-                label="Código"
+              <Button icon="pi pi-barcode" label="Código"
                 class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Ver códigos de barra'"
-                @click="abrirCodigos(data)"
-              />
+                v-tooltip.top="'Ver códigos de barra'" @click="abrirCodigos(data)" />
 
-              <Button
-                :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
-                :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'"
-                :class="
-                  data.estado === 'ACTIVO'
-                    ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                    : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
-                "
-                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="
-                  data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
-                "
-                @click="toggleEstadoPresentacion(data)"
-              />
+              <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
+                  ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
+                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
+                  " class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer" v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
+                    " @click="toggleEstadoPresentacion(data)" />
+
+                    <!-- este boton lo agrege para lo de lotes presentaciones-->
+                    <Button icon="pi pi-box" label="Lotes"
+                  class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
             </div>
           </template>
         </Column>
@@ -111,23 +83,28 @@
         </template>
       </DataTable>
 
-      <AñadirPresentacionDialog
-        v-model:visible="AgregarVisible"
-        :unidadBase="producto.unidad_base"
-        :productoId="producto.id"
-        @guardar="onGuardar"
-      />
+      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
+        :productoId="producto.id" @guardar="onGuardar" />
 
-      <EditarPresentacionDialog
-        v-model:visible="editarVisible"
-        :presentacion="presentacionSeleccionada"
-        :unidadBase="producto.unidad_base"
-        :presentacionesExistentes="presentaciones"
-        @guardar="onGuardarEdicion"
-      />
+      <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
+        :unidadBase="producto.unidad_base" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
 
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
+    
+  <LotesPresentacionTable
+    v-if="vistaLotes"
+    :presentacion="presentacionLotes"
+    @volver="cerrarLotes"
+  />
+
+  <div v-else class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
+    <!-- Botón volver -->
+    <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
+      class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
+      @click="volver" />
+
+  </div>
   </div>
 </template>
 
@@ -137,11 +114,27 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
+
 import AñadirPresentacionDialog from '@/components/Productos/AddPresentacion.vue'
 import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
+import LotesPresentacionTable from './LotesPresentacionTable.vue'
+
+
+const vistaLotes = ref(false)
+const presentacionLotes = ref(null)
+
+const abrirLotes = (presentacion) => {
+  presentacionLotes.value = presentacion
+  vistaLotes.value = true
+}
+
+const cerrarLotes = () => {
+  vistaLotes.value = false
+  presentacionLotes.value = null
+}
 
 const props = defineProps({
   producto: { type: Object, required: true },
@@ -187,7 +180,7 @@ const cargarPresentaciones = async () => {
       unidadMedida: p.producto?.unidad_base ?? '—',
       factor_conversion: Number(p.factor_conversion) || 0,
       precio: parseFloat(p.precio_venta ?? 0),
-      stock: p.stock !== null && p.stock !== undefined ? Number(p.stock) : 0,
+      stock: (p.stock !== null && p.stock !== undefined) ? Number(p.stock) : 0,
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
     }))
   } catch (error) {
