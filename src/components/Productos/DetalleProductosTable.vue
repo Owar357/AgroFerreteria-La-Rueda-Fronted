@@ -32,7 +32,6 @@
     <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
       <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-sm">
         <Column field="nombre" header="Nombre" class="text-sm"></Column>
-
         <Column header="Equivalencia" class="text-sm">
           <template #body="{ data }">
             {{ data.factor_conversion }} {{ data.unidadMedida?.nombre || '—' }}
@@ -49,66 +48,52 @@
           </template>
         </Column>
 
-        <!-- ACCIONES-->
+        <!-- ACCIONES -->
         <Column header="Acciones" :exportable="false" class="text-sm">
           <template #body="{ data }">
             <div class="flex gap-2">
               <Button icon="pi pi-pencil" label="Editar"
                 class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
                 v-tooltip.top="'Editar presentación'" @click="abrirEditar(data)" />
-
               <Button icon="pi pi-barcode" label="Código"
                 class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
                 v-tooltip.top="'Ver códigos de barra'" @click="abrirCodigos(data)" />
-
               <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                 :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                   ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
-                  " class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer" v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
-                    " @click="toggleEstadoPresentacion(data)" />
-
-              <!-- este boton lo agrege para lo de lotes presentaciones-->
+                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
+                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'"
+                @click="toggleEstadoPresentacion(data)" />
               <Button icon="pi pi-box" label="Lotes"
                 class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
                 v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
             </div>
           </template>
         </Column>
-
         <template #empty>
           <div class="text-center py-8 text-gray-400">No hay presentaciones registradas</div>
         </template>
       </DataTable>
 
-      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="producto.unidad_base"
+      <!-- DIÁLOGOS -->
+      <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="unidadBaseProducto"
         :productoId="producto.id" @guardar="onGuardar" />
-
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
-        :unidadBase="producto.unidad_base" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
-
+        :unidadBase="unidadBaseProducto" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
 
     <LotesPresentacionTable v-if="vistaLotes" :presentacion="presentacionLotes" @volver="cerrarLotes" />
-
-    <div v-else class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
-      <!-- Botón volver -->
-      <Button icon="pi pi-arrow-left" label="Volver a productos" severity="secondary" text
-        class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-        @click="volver" />
-
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
-
 import AñadirPresentacionDialog from '@/components/Productos/AddPresentacion.vue'
 import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
@@ -116,26 +101,15 @@ import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
 import LotesPresentacionTable from './LotesPresentacionTable.vue'
 
-
-const vistaLotes = ref(false)
-const presentacionLotes = ref(null)
-
-const abrirLotes = (presentacion) => {
-  presentacionLotes.value = presentacion
-  vistaLotes.value = true
-}
-
-const cerrarLotes = () => {
-  vistaLotes.value = false
-  presentacionLotes.value = null
-}
-
 const props = defineProps({
   producto: { type: Object, required: true },
 })
 
 const emit = defineEmits(['volver'])
 
+// Estado
+const vistaLotes = ref(false)
+const presentacionLotes = ref(null)
 const editarVisible = ref(false)
 const presentacionSeleccionada = ref(null)
 const codigosVisible = ref(false)
@@ -152,6 +126,18 @@ const producto = ref({
   fabricante: props.producto.fabricante,
 })
 
+const unidadBaseProducto = computed(() => {
+
+  if (presentaciones.value[0]?.unidadMedida?.nombre) {
+    return presentaciones.value[0].unidadMedida.nombre
+  }
+
+  if (producto.value?.unidad_medida?.nombre) {
+    return producto.value.unidad_medida.nombre
+  }
+  return '—'
+})
+
 onMounted(async () => {
   await cargarPresentaciones()
 })
@@ -161,10 +147,6 @@ const cargarPresentaciones = async () => {
   try {
     const res = await getPresentacionesByProducto(props.producto.id)
     const data = res.data.data ?? []
-
-   if(res.data.producto?.unidadMedida){
-    producto.value.unidadMedida = res.data.producto.unidadMedida
-   }
 
     presentaciones.value = data.map((p) => ({
       id: p.id,
@@ -192,12 +174,19 @@ const cargarPresentaciones = async () => {
 }
 
 const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
-
 const volver = () => emit('volver')
+
+const abrirLotes = (presentacion) => {
+  presentacionLotes.value = presentacion
+  vistaLotes.value = true
+}
+const cerrarLotes = () => {
+  vistaLotes.value = false
+  presentacionLotes.value = null
+}
 
 const toggleEstadoPresentacion = (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
-
   Swal.fire({
     html: `
       <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
@@ -227,12 +216,10 @@ const toggleEstadoPresentacion = (pres) => {
     if (result.isConfirmed) {
       try {
         const res = await togglePresentacion(pres.id)
-
         const index = presentaciones.value.findIndex((p) => p.id === pres.id)
         if (index !== -1) {
           presentaciones.value[index].estado = res.data.activo ? 'ACTIVO' : 'INACTIVO'
         }
-
         Swal.fire({
           toast: true,
           position: 'top-end',
@@ -257,62 +244,26 @@ const toggleEstadoPresentacion = (pres) => {
   })
 }
 
-const abrirAñadir = () => {
-  AgregarVisible.value = true
+const abrirAñadir = () => { AgregarVisible.value = true }
+const abrirEditar = (presentacion) => {
+  presentacionSeleccionada.value = { ...presentacion }
+  editarVisible.value = true
+}
+const abrirCodigos = (presentacion) => {
+  presentacionCodigos.value = { ...presentacion }
+  codigosVisible.value = true
 }
 
 const onGuardar = (nuevaPresentacion) => {
   presentaciones.value.push(nuevaPresentacion)
 }
-
-const abrirEditar = (presentacion) => {
-  presentacionSeleccionada.value = { ...presentacion }
-  editarVisible.value = true
-}
-
 const onGuardarEdicion = (presentacionEditada) => {
   const index = presentaciones.value.findIndex((p) => p.id === presentacionEditada.id)
   if (index !== -1) {
     presentaciones.value[index] = { ...presentacionEditada }
   }
 }
-
-const abrirCodigos = (presentacion) => {
-  presentacionCodigos.value = { ...presentacion }
-  codigosVisible.value = true
-}
 </script>
-
 <style scoped>
-/* Ajustes adicionales */
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #fafdf7;
-  color: #3c674b;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.75rem 1rem;
-  transition: background-color 0.2s;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
-}
-
-/* Hover en fila completa - verde muy suave */
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #eef5e9 !important;
-  /* verde suave agro */
-}
-
-/* Opcional: si quieres hover por celda (más intenso al pasar por cada celda) */
-:deep(.p-datatable .p-datatable-tbody > tr:hover > td) {
-  background-color: transparent;
-  /* para que herede el de la fila, no es necesario */
-}
-
-:deep(.p-button.p-button-text) {
-  font-weight: 500;
-}
+/* (tus estilos) */
 </style>

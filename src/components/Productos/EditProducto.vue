@@ -1,14 +1,14 @@
 <template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
-    <div class="flex justify-between items-start mb-8">
-      <div>
-        <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
-        <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
-      </div>
-      <Button label="Regresar" icon="pi pi-arrow-left"
-        class="!text-[22px] !py-4 !px-10 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-        @click="$emit('close')" />
-    </div>
+    <div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
+    <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
+  </div>
+  <Button label="Regresar" icon="pi pi-arrow-left"
+    class="!text-[22px] !py-4 !px-20 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+    @click="$emit('close')" />
+</div>
 
 
 
