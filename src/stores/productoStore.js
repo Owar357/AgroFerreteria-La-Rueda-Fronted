@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getProductos, createProducto, updateProducto, getAllCategorias } from '../services/productoService'
+import { getUnidades } from '@/services/unidadMedidaService'
 
 
 export const useproductoStore = defineStore('productos', () => {
@@ -10,6 +11,17 @@ export const useproductoStore = defineStore('productos', () => {
   const currentPage    = ref(1)
   const perPage       = ref(8)
   const categorias    = ref([])
+  const unidades = ref([])
+
+  const cargarUnidades = async (magnitud = null) => {
+  try {
+    const params = magnitud ? { magnitud } : {}
+    const response = await getUnidades(params)
+    unidades.value = response.data.data
+  } catch (error) {
+    // manejar error
+  }
+}
 
   const cargarProductos = async (page = 1, rows = perPage.value) => {
     cargando.value = true

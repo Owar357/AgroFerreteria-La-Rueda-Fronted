@@ -31,3 +31,7 @@ export const updatePresentacion = (id, data) => api.put(`/presentaciones/${id}`,
 // Traer lotes de una presentación (paginado)-- lotespresentaciones esto agrege para ver el paginado
 export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
   api.get('/lotes', { params: { presentacion_id: presentacionId, page, per_page: perPage } })
+
+
+//Traer todas las unidades de medida desde el backend
+export const getUnidades = (params = {}) => api.get('/unidades', { params })
