@@ -2,10 +2,10 @@
   <div class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
     <Button icon="pi pi-arrow-left" label="Volver a presentaciones" severity="secondary" text
       class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
-      @click="$emit('volver')" />
+      @click="volver" />
 
     <div class="bg-white rounded-2xl border border-[#e8efe1] shadow-sm p-6 mb-6">
-      <h1 class="text-2xl font-bold text-[#1e3a2f]">Lotes de la presentacion: {{ presentacion.nombre }}</h1>
+      <h1 class="text-2xl font-bold text-[#1e3a2f]">Lotes de: {{ nombrePresentacion }}</h1>
       <p class="text-sm text-gray-600 mt-1">Historial de lotes registrados para esta presentación</p>
     </div>
 
@@ -51,6 +51,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -59,10 +60,11 @@ import Swal from 'sweetalert2'
 import { getLotesByPresentacion } from '@/services/productoService'
 
 const props = defineProps({
-  presentacion: { type: Object, required: true },
+  presentacionId: { type: [String, Number], required: true },
+  nombrePresentacion: { type: String, default: '' },
 })
 
-const emit = defineEmits(['volver'])
+const router = useRouter()
 
 const lotes = ref([])
 const cargando = ref(false)
@@ -77,7 +79,7 @@ onMounted(async () => {
 const cargarLotes = async (page = 1, rows = perPage.value) => {
   cargando.value = true
   try {
-    const res = await getLotesByPresentacion(props.presentacion.id, page, rows)
+    const res = await getLotesByPresentacion(props.presentacionId, page, rows)
     lotes.value = res.data.data
     totalRecords.value = res.data.total
     currentPage.value = res.data.current_page
@@ -90,7 +92,7 @@ const cargarLotes = async (page = 1, rows = perPage.value) => {
         title: 'Presentación no encontrada',
         text: 'Esta presentación ya no existe.',
         confirmButtonColor: '#2b5e3b',
-      }).then(() => emit('volver'))
+      }).then(() => volver())
     } else if (status === 403) {
       Swal.fire({
         icon: 'error',
@@ -114,6 +116,8 @@ const cargarLotes = async (page = 1, rows = perPage.value) => {
 const onPageChange = (event) => {
   cargarLotes(event.page + 1, event.rows)
 }
+
+const volver = () => router.back()
 
 const formatFecha = (fecha) => {
   if (!fecha) return '—'

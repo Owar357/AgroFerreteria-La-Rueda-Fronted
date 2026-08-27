@@ -61,10 +61,11 @@
               <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                 :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                   ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
-                class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'"
-                @click="toggleEstadoPresentacion(data)" />
+                  : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'
+                  " class="rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer" v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'
+                    " @click="toggleEstadoPresentacion(data)" />
+
+              <!-- este boton lo agrege para lo de lotes presentaciones-->
               <Button icon="pi pi-box" label="Lotes"
                 class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
                 v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
@@ -83,12 +84,11 @@
       :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
-
-    <LotesPresentacionTable v-if="vistaLotes" :presentacion="presentacionLotes" @volver="cerrarLotes" />
   </div>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -99,7 +99,6 @@ import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vu
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
-import LotesPresentacionTable from './LotesPresentacionTable.vue'
 
 const props = defineProps({
   producto: { type: Object, required: true },
@@ -107,9 +106,9 @@ const props = defineProps({
 
 const emit = defineEmits(['volver'])
 
+const router = useRouter()
+
 // Estado
-const vistaLotes = ref(false)
-const presentacionLotes = ref(null)
 const editarVisible = ref(false)
 const presentacionSeleccionada = ref(null)
 const codigosVisible = ref(false)
@@ -127,11 +126,9 @@ const producto = ref({
 })
 
 const unidadBaseProducto = computed(() => {
-
   if (presentaciones.value[0]?.unidadMedida?.nombre) {
     return presentaciones.value[0].unidadMedida.nombre
   }
-
   if (producto.value?.unidad_medida?.nombre) {
     return producto.value.unidad_medida.nombre
   }
@@ -176,15 +173,6 @@ const cargarPresentaciones = async () => {
 
 const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
 const volver = () => emit('volver')
-
-const abrirLotes = (presentacion) => {
-  presentacionLotes.value = presentacion
-  vistaLotes.value = true
-}
-const cerrarLotes = () => {
-  vistaLotes.value = false
-  presentacionLotes.value = null
-}
 
 const toggleEstadoPresentacion = (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
@@ -250,10 +238,6 @@ const abrirEditar = (presentacion) => {
   presentacionSeleccionada.value = { ...presentacion }
   editarVisible.value = true
 }
-const abrirCodigos = (presentacion) => {
-  presentacionCodigos.value = { ...presentacion }
-  codigosVisible.value = true
-}
 
 const onGuardar = (nuevaPresentacion) => {
   presentaciones.value.push(nuevaPresentacion)
@@ -264,7 +248,47 @@ const onGuardarEdicion = (presentacionEditada) => {
     presentaciones.value[index] = { ...presentacionEditada }
   }
 }
+
+const abrirCodigos = (presentacion) => {
+  presentacionCodigos.value = { ...presentacion }
+  codigosVisible.value = true
+}
+
+// Navega a la página de lotes de la presentación (ruta independiente)
+const abrirLotes = (presentacion) => {
+  router.push({
+    name: 'lotes-presentacion',
+    params: { id: presentacion.id },
+    query: { nombre: presentacion.nombre },
+  })
+}
 </script>
+
 <style scoped>
-/* (tus estilos) */
+:deep(.p-datatable .p-datatable-thead > tr > th) {
+  background-color: #fafdf7;
+  color: #3c674b;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.2s;
+}
+
+:deep(.p-datatable .p-datatable-tbody > tr > td) {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+:deep(.p-datatable .p-datatable-tbody > tr:hover) {
+  background-color: #eef5e9 !important;
+}
+
+:deep(.p-datatable .p-datatable-tbody > tr:hover > td) {
+  background-color: transparent;
+}
+
+:deep(.p-button.p-button-text) {
+  font-weight: 500;
+}
 </style>
