@@ -80,7 +80,7 @@
       <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="unidadBaseProducto"
         :productoId="producto.id" @guardar="onGuardar" />
       <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
-        :unidadBase="unidadBaseProducto" :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
+      :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
       <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
     </div>
 
@@ -156,6 +156,7 @@ const cargarPresentaciones = async () => {
       precio: parseFloat(p.precio_venta ?? 0),
       stock: (p.stock !== null && p.stock !== undefined) ? Number(p.stock) : 0,
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
+      es_base: p.es_base ?? false, 
     }))
   } catch (error) {
     if (error.response?.status === 404 || error.response?.status === 200) {
