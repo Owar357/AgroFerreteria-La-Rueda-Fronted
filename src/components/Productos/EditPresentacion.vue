@@ -17,13 +17,26 @@
         <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
           ¿Cuánto equivale esta presentación en
           <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
-            {{ unidadBase || presentacion?.unidad_medida?.nombre || '—' }} ?
+            {{ presentacion?.unidadMedida?.nombre || '—' }} ?
           </span>
         </label>
-        <InputText v-model="form.factor_conversion" placeholder="0" maxlength="6"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" />
-        <small v-if="errores.factor_conversion" class="text-red-500 text-[12px]">{{ errores.factor_conversion }}</small>
-        <small v-else class="text-[12px] text-gray-400">Debe ser un número entero entre 1 y 999,999.</small>
+        <InputText 
+          v-model="form.factor_conversion" 
+          placeholder="0" 
+          maxlength="6"
+          :disabled="factorBloqueado"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" 
+        />
+        <!-- Mensajes de ayuda -->
+        <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b]">
+          ⚠️ Es la unidad base de este producto, el factor de conversión fijo es (1).
+        </small>
+        <small v-else-if="errores.factor_conversion" class="text-red-500 text-[12px]">
+          {{ errores.factor_conversion }}
+        </small>
+        <small v-else class="text-[12px] text-gray-400">
+          Debe ser un número entero entre 1 y 999,999.
+        </small>
       </div>
 
       <!-- Precio -->
@@ -51,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue' 
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -62,7 +75,6 @@ import { updatePresentacion } from '@/services/productoService'
 const props = defineProps({
   visible: { type: Boolean, default: false },
   presentacion: { type: Object, default: null },
-  unidadBase: { type: String, default: '' },
   presentacionesExistentes: { type: Array, default: () => [] },
 })
 
@@ -78,6 +90,22 @@ const form = ref({
   precio: null,
 })
 
+// Determina si el factor de conversión debe quedar bloqueado en 1:
+// - UNIDAD FIJA: siempre bloqueado (Unidad / Pieza)
+// - GRANEL: bloqueado solo si esta presentación es la base (Gramo/Libra/Kilogramo + es_base)
+const factorBloqueado = computed(() => {
+  const unidadNombre = (props.presentacion?.unidadMedida?.nombre || '').toLowerCase().trim()
+  const esBase = props.presentacion?.es_base === true
+
+  const unidadesUnidadFija = ['unidad', 'pieza']
+  const unidadesMasaConBase = ['gramo', 'libra', 'kilogramo']
+
+  if (unidadesUnidadFija.includes(unidadNombre)) return true
+  if (unidadesMasaConBase.includes(unidadNombre) && esBase) return true
+
+  return false
+})
+
 watch(
   () => props.visible,
   (val) => { localVisible.value = val },
@@ -90,18 +118,24 @@ watch(
   () => props.presentacion,
   (val) => {
     if (val) {
+      let factor = Number(val.factor_conversion) || null
+      if (factorBloqueado.value) {
+        factor = 1
+      }
       form.value = {
         nombre: val.nombre || '',
-        factor_conversion: Number(val.factor_conversion) || null,
-        precio: parseFloat(val.precio_venta) || null,
+        factor_conversion: factor,
+        precio: parseFloat(val.precio) || null,
       }
     }
   },
   { immediate: true },
 )
 
-// Filtro para solo números y límite 999999
+// Filtro para solo números y límite 999999 (solo si el factor NO está bloqueado)
 watch(() => form.value.factor_conversion, (nuevoValor) => {
+  if (factorBloqueado.value) return
+
   if (nuevoValor !== undefined && nuevoValor !== null) {
     let soloNumeros = nuevoValor.toString().replace(/[^0-9]/g, '')
     if (soloNumeros === '') {
@@ -124,10 +158,8 @@ const resetForm = () => {
 }
 
 const guardar = async () => {
-  // Reiniciar errores
   errores.value = { nombre: '', factor_conversion: '', precio: '' }
 
-  // --- Validar Nombre ---
   if (!form.value.nombre.trim()) {
     errores.value.nombre = 'El nombre es obligatorio.'
   } else {
@@ -139,36 +171,37 @@ const guardar = async () => {
     }
   }
 
-  // --- Validar Factor de conversión ---
-  const factor = form.value.factor_conversion
-  if (factor === null || factor === '' || factor === undefined) {
-    errores.value.factor_conversion = 'El factor de conversión es obligatorio.'
-  } else {
-    const num = Number(factor)
-    if (!Number.isInteger(num)) {
-      errores.value.factor_conversion = 'Debe ser un número entero.'
-    } else if (num <= 0) {
-      errores.value.factor_conversion = 'Debe ser mayor a 0.'
-    } else if (num > 999999) {
-      errores.value.factor_conversion = 'No puede superar los 999,999.'
+  if (!factorBloqueado.value) {
+    const factor = form.value.factor_conversion
+    if (factor === null || factor === '' || factor === undefined) {
+      errores.value.factor_conversion = 'El factor de conversión es obligatorio.'
+    } else {
+      const num = Number(factor)
+      if (!Number.isInteger(num)) {
+        errores.value.factor_conversion = 'Debe ser un número entero.'
+      } else if (num <= 0) {
+        errores.value.factor_conversion = 'Debe ser mayor a 0.'
+      } else if (num > 999999) {
+        errores.value.factor_conversion = 'No puede superar los 999,999.'
+      }
     }
   }
 
-  // --- Validar Precio ---
   if (!form.value.precio || form.value.precio <= 0) {
     errores.value.precio = 'El precio debe ser mayor a 0.'
   }
 
-  // Si hay errores, detener
   if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) {
     return
   }
 
-  // --- Envío ---
   guardando.value = true
+
+  const factorParaEnviar = factorBloqueado.value ? 1 : Number(form.value.factor_conversion)
+
   const payload = {
     nombre: form.value.nombre.trim(),
-    factor_conversion: Number(form.value.factor_conversion),
+    factor_conversion: factorParaEnviar,
     precio_venta: Number(form.value.precio),
   }
 
@@ -201,7 +234,6 @@ const guardar = async () => {
   } catch (error) {
     const status = error.response?.status
     if (status === 422) {
-      // Los errores de backend podrías mostrarlos también debajo de cada campo, pero por ahora dejamos Swal
       Swal.fire({
         icon: 'warning',
         title: 'Error de validación',
