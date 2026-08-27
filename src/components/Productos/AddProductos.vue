@@ -121,12 +121,9 @@
 
         <!-- Unidad Base -->
         <div class="flex flex-col gap-2">
-
           <label class="text-[18px] font-medium text-gray-700">
             Unidad Base <span class="text-red-500">*</span>
           </label>
-
-
           <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
             placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
             class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !py-[16px] rounded-xl shadow-sm focus:!border-[#2b5e3b]"
@@ -134,12 +131,8 @@
               '!border-red-500': errores.unidadMedidaId,
               '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
             }" :pt="{ label: { class: '!text-[18px] !text-[#1a2e1f]' } }" />
-
-
           <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId
             }}</small>
-
-          <!-- Mensaje informativo dinámico (Optimizado) -->
           <p v-if="!presentacionBaseCreada"
             class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
             <i class="pi pi-info-circle text-blue-500 text-[16px] mt-0.5 shrink-0"></i>
@@ -149,7 +142,6 @@
               quintales.
             </span>
           </p>
-
           <p v-else
             class="text-[15px] text-amber-700 mt-1 leading-normal flex items-start gap-1.5 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-200">
             <i class="pi pi-lock text-amber-600 text-[16px] mt-0.5 shrink-0"></i>
@@ -158,7 +150,6 @@
             </span>
           </p>
         </div>
-
 
         <!-- Aplica IVA -->
         <div class="col-span-2 flex items-center gap-3 py-2 mt-2">
@@ -184,20 +175,15 @@
       <div v-if="tipoProducto === 'GRANEL' && !presentacionBaseCreada"
         class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd] shadow-sm">
         <div class="flex items-center gap-4 mb-6 pb-5 border-b border-[#e2e8dd]">
-          <!-- Icono local desde la carpeta assets -->
           <img :src="agregarPaqueteIcon" alt="Agregar presentaciones"
             class="w-[42px] h-[42px] object-contain shrink-0" />
-
           <h2 class="text-[32px] font-semibold text-[#1a2e1f] tracking-tight">
             Crear la Presentación Base (Obligatoria)
           </h2>
         </div>
 
-
-        <!-- Mensaje informativo -->
         <div class="bg-blue-50 border-l-4 border-blue-500 p-5 mb-6 rounded-r-xl rounded-l-md shadow-sm">
           <div class="flex items-start">
-            <!-- Icono cambiado a azul para hacer juego con el banner informativo -->
             <i class="pi pi-info-circle text-blue-500 !text-[22px] mr-3 mt-0.5"></i>
             <div>
               <h3 class="text-[18px] text-gray-800 font-semibold mb-1">¿Qué es la presentación base?</h3>
@@ -205,8 +191,6 @@
                 Es la medida más pequeña o suelta que usarás para despachar este producto
                 <strong>a granel o al detalle</strong>.
               </p>
-
-              <!-- Ejemplo simplificado y corregido -->
               <p
                 class="text-[15px] text-gray-500 mt-2 leading-relaxed bg-white/60 p-3 rounded-lg border border-blue-100">
                 <span class="font-semibold text-blue-700">Ejemplo práctico:</span>
@@ -218,20 +202,14 @@
           </div>
         </div>
 
-
-        <!-- Formulario de Base -->
         <div class="grid grid-cols-2 gap-6">
-
-          <!-- FILA 1: Nombre y Unidad frente a frente (Quitamos col-span-2) -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Nombre de la presentación base <span class="text-red-500">*</span>
             </label>
             <InputText :value="nombreUnidadBase" disabled
               class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-            <small class="text-[14px] text-gray-500">
-              🔒 Fijo
-            </small>
+            <small class="text-[14px] text-gray-500">🔒 Fijo</small>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -241,8 +219,6 @@
             <small class="text-[14px] text-gray-500">🔒 Fija (la unidad base del producto)</small>
           </div>
 
-
-          <!-- FILA 2: Factor de Conversión y Stock Mínimo frente a frente -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">Factor de Conversión</label>
             <InputText value="1.000" disabled
@@ -262,14 +238,10 @@
               :class="{ '!border-red-500': errores.stockMinimo }" />
             <small class="text-[14px] text-gray-500">
               Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
-              menos,
-              el sistema te
-              avisará que te queda poca mercadería.
+              menos, el sistema te avisará que te queda poca mercadería.
             </small>
           </div>
 
-
-          <!-- FILA 3: Precio de Venta y Código de Barra frente a frente (Quitamos col-span-2 del código de barra) -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Precio de Venta <span class="text-red-500">*</span>
@@ -280,21 +252,16 @@
           </div>
 
           <div class="flex flex-col gap-2">
-
             <div class="flex items-center gap-2">
               <label class="text-[18px] font-medium text-gray-700">Código de Barra</label>
               <i class="pi pi-info-circle text-blue-600 hover:text-blue-800 !text-[18px] cursor-help transition-colors"
                 v-tooltip="'Opcional (se puede leer con pistola de barras)'"></i>
             </div>
-
             <InputText v-model="formBase.codigoBarra" placeholder="Ej: 7501234567890" maxlength="14"
               class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
           </div>
-
-
         </div>
 
-        <!-- Botones inferiores alineados de extremo a extremo -->
         <div class="flex justify-between mt-8 pt-4 border-t border-gray-100">
           <Button label="Atrás" icon="pi pi-arrow-left"
             class="!text-[18px] !py-3 !px-8 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] !font-['Inter',sans-serif] rounded-xl hover:!bg-[#e2e8dd] transition-all"
@@ -303,21 +270,16 @@
             class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white !font-['Inter',sans-serif] rounded-xl shadow-md transition-all"
             @click="crearBase" />
         </div>
-
       </div>
 
       <!-- CASO 2: GRANEL CON BASE -->
       <div v-else-if="tipoProducto === 'GRANEL' && presentacionBaseCreada">
-
-        <!-- Formulario de Derivadas -->
         <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd] shadow-sm">
           <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
             <span class="text-[32px] font-semibold text-[#1a2e1f]">➕ Agregar Presentación Derivada</span>
           </div>
 
           <div class="grid grid-cols-2 gap-6">
-
-            <!-- FILA 1: Nombre de la presentación y Unidad de Medida frente a frente -->
             <div class="w-[38%] mt-[20px] flex flex-col gap-2">
               <label class="text-[18px] font-medium text-gray-700">
                 Nombre de la presentación <span class="text-red-500">*</span>
@@ -341,7 +303,6 @@
                   (Ej: <strong class="text-gray-700">Saco de 50 lb</strong>).
                 </span>
               </p>
-
             </div>
 
             <div class="flex flex-col gap-2  mt-[21px]">
@@ -349,17 +310,13 @@
               <InputText :value="nombreUnidadBase" disabled
                 class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
               <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma
-                unidad
-                base)</small>
+                unidad base)</small>
             </div>
 
-
-            <!-- FILA 2: Contenido de la presentación y Precio de Venta frente a frente -->
             <div class="flex flex-col gap-2 w-full min-w-0">
               <label class="text-[18px] font-medium text-gray-700">
                 Contenido de la presentación <span class="text-red-500">*</span>
               </label>
-
               <div class="flex items-center gap-3 w-full min-w-0">
                 <input v-model="formDerivada.factorConversion" type="text" placeholder="0" @input="formDerivada.factorConversion = formDerivada.factorConversion
                   .replace(/[^0-9]/g, '')
@@ -376,7 +333,6 @@
               </small>
             </div>
 
-            <!-- FILA DE ABAJO: Precio de Venta y Reglas frente a frente para ahorrar espacio -->
             <div class="flex flex-col gap-2">
               <label class="text-[18px] font-medium text-gray-700">
                 Precio de Venta <span class="text-red-500">*</span>
@@ -385,7 +341,6 @@
                 :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
                 inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
             </div>
-
 
             <div class="bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-4 mt-[0px]">
               <div class="flex items-start gap-3">
@@ -399,11 +354,8 @@
                 </div>
               </div>
             </div>
-
-
           </div>
 
-          <!-- Botones de Acción -->
           <div class="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-100">
             <Button label="Cancelar" icon="pi pi-times"
               class="!text-[18px] !py-3 !px-8 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] !font-['Inter',sans-serif] rounded-xl"
@@ -413,28 +365,21 @@
               @click="agregarDerivada" />
           </div>
         </div>
-
       </div>
 
       <!-- CASO 3: UNIDAD FIJA -->
       <div v-else-if="tipoProducto === 'UNIDAD FIJA'">
-
-        <!-- Formulario de Unidades Fijas -->
         <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd] shadow-sm">
           <div class="flex items-center gap-3 mb-6 pb-5 border-b border-[#e2e8dd]">
             <span class="text-[32px] font-semibold text-[#1a2e1f]">➕ Agregar Presentación</span>
           </div>
 
           <div class="grid grid-cols-2 gap-6">
-
-            <!-- FILA 1: Nombre de la presentación y Factor de conversión envoltura Flexbox -->
             <div class="col-span-2 flex gap-6 w-full">
-
               <div class="w-[65%] flex flex-col gap-2 mt-[1.5%]">
                 <label class="text-[18px] font-medium text-gray-700">
                   Nombre de la presentación <span class="text-red-500">*</span>
                 </label>
-
                 <AutoComplete v-model="formUnidadFija.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
                   optionValue="nombre" dropdown fluid
                   placeholder="Buscar o escribir unidad (ej. Botella 1L, Martillo)..." @complete="buscarUnidades"
@@ -448,7 +393,6 @@
                     },
                     dropdown: { class: '!bg-white !border-gray-300 rounded-r-xl !h-[60px]' }
                   }" />
-
                 <p class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
                   <i class="pi pi-info-circle text-blue-500 text-[16px] mt-0.5 shrink-0"></i>
                   <span>
@@ -458,32 +402,26 @@
                 </p>
               </div>
 
-
               <div class="w-[35%] flex flex-col gap-2 mt-[18px]">
                 <label class="text-[18px] font-medium text-gray-700">Factor de Conversión</label>
                 <InputText value="1.000" disabled
                   class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed font-mono" />
                 <small class="text-[14px] text-gray-500">🔒 Fijo (unidades fijas no se convierten).</small>
               </div>
-
             </div>
 
-            <!-- FILA 2: Stock Mínimo y Precio de Venta frente a frente -->
             <div class="flex flex-col gap-2 mt-[2%]">
               <label class="text-[18px] font-medium text-gray-700">
                 Stock Mínimo <span class="text-red-500">*</span>
               </label>
               <input v-model="formUnidadFija.stockMinimo" type="text" placeholder="0" @input="formUnidadFija.stockMinimo = formUnidadFija.stockMinimo
                 .replace(/[^0-9]/g, '')
-                .replace(/^(\d{1,6}).*/, '$1')""
-                class=" !bg-white border border-gray-300 text-[#1a2e1f] text-[18px] py-[16px] px-[20px] rounded-xl
-                shadow-sm w-full focus:outline-none focus:border-[#2b5e3b] transition-colors"
+                .replace(/^(\d{1,6}).*/, '$1')"
+                class="!bg-white border border-gray-300 text-[#1a2e1f] text-[18px] py-[16px] px-[20px] rounded-xl shadow-sm w-full focus:outline-none focus:border-[#2b5e3b] transition-colors"
                 :class="{ '!border-red-500': errores.stockMinimo }" />
               <small class="text-[14px] text-gray-500">
                 Cuando te queden exactamente <strong>{{ formUnidadFija.stockMinimo || 0 }} {{ nombreUnidadBase }}
-                </strong>
-                o menos, el sistema te
-                avisará que te queda poca mercadería.
+                </strong> o menos, el sistema te avisará que te queda poca mercadería.
               </small>
             </div>
 
@@ -496,24 +434,17 @@
                 inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
             </div>
 
-            <!-- FILA 3: Código de Barra  -->
             <div class="flex flex-col gap-2 mt-[2%]">
-              <!-- Título con icono de ayuda alineado en azul intenso -->
               <div class="flex items-center gap-2">
                 <label class="text-[18px] font-medium text-gray-700">Código de Barra</label>
                 <i class="pi pi-info-circle text-blue-600 hover:text-blue-800 !text-[22px] cursor-help transition-all duration-200"
                   v-tooltip="'Opcional (se puede leer con pistola de barras).'"></i>
               </div>
-
-              <!-- Input -->
               <InputText v-model="formUnidadFija.codigoBarra" placeholder="Ej: 7501234567890" maxlength="14"
                 class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
             </div>
-
           </div>
 
-
-          <!-- Botones de Acción -->
           <div class="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-100">
             <Button label="Cancelar" icon="pi pi-times"
               class="!text-[18px] !py-3 !px-8 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] !font-['Inter',sans-serif] rounded-xl"
@@ -523,7 +454,6 @@
               @click="agregarUnidadFija" />
           </div>
         </div>
-
       </div>
 
       <!-- TABLA DE PRESENTACIONES (COMÚN) -->
@@ -604,6 +534,9 @@
 
 
 <script setup>
+// ============================================================
+// IMPORTS
+// ============================================================
 import { ref, computed, onMounted, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -621,17 +554,17 @@ import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
 import agregarPaqueteIcon from '@/assets/icons/agregar-paquete.png';
 
+// ============================================================
+// PROPS & EMITS
+// ============================================================
 const emit = defineEmits(['close'])
 const store = useproductoStore()
 
 // ============================================================
-// BORRADOR EN LOCALSTORAGE
+// ESTADO GLOBAL
 // ============================================================
 const DRAFT_KEY = 'agroferreteria_borrador_nuevo_producto'
 
-// ============================================================
-// VARIABLES PRINCIPALES
-// ============================================================
 const nombre = ref('')
 const fabricante = ref('')
 const categoria = ref(null)
@@ -644,12 +577,33 @@ const unidadesSugeridas = ref([])
 const tipoProducto = ref(null)
 const aplicaIva = ref(false)
 const guardando = ref(false)
-const errores = ref({ nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '' })
+const errores = ref({ nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '', stockMinimo: '', factorConversion: '' })
+
+const pasoActual = ref(1)
+const presentaciones = ref([])
 
 // ============================================================
-// PRESENTACIONES - ESTADO Y FUNCIONES
+// FORMULARIOS DE PRESENTACIONES
 // ============================================================
-const presentaciones = ref([])
+const formBase = ref({
+  nombre: '',
+  stockMinimo: null,
+  precioVenta: null,
+  codigoBarra: '',
+})
+
+const formDerivada = ref({
+  nombre: '',
+  factorConversion: null,
+  precioVenta: null,
+})
+
+const formUnidadFija = ref({
+  nombre: '',
+  stockMinimo: null,
+  precioVenta: null,
+  codigoBarra: '',
+})
 
 // ============================================================
 // COMPUTADOS
@@ -670,18 +624,12 @@ const nombreUnidadBase = computed(() => {
 
 const unidadesFiltradas = computed(() => {
   if (!tipoProducto.value) return unidades.value
-
-  // Nombres de unidades de medida permitidas para presentaciones base
   const UnidadesbasesPermitidas = tipoProducto.value === 'GRANEL'
-    ? ['Gramo', 'Libra', 'Kilogramo']  // Para GRANEL
-    : ['Unidad', 'Pieza']              // Para UNIDAD FIJA
-
+    ? ['Gramo', 'Libra', 'Kilogramo']
+    : ['Unidad', 'Pieza']
   return unidades.value.filter((u) => {
-    // Se usa un filtro por magnitud
     const magnitudCorrecta = u.magnitud === (tipoProducto.value === 'GRANEL' ? 'Masa' : 'Unidad')
     if (!magnitudCorrecta) return false
-
-    // Luego se filtra  por nombre el nombre permitido
     return UnidadesbasesPermitidas.includes(u.nombre)
   })
 })
@@ -695,74 +643,9 @@ const codigoGenerado = computed(() => {
 })
 
 // ============================================================
-// FUNCIONES AUXILIARES
+// BORRADOR (localStorage)
 // ============================================================
-const limpiarTexto = (texto = '') =>
-  texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-
-const tresPrimeras = (texto = '') => limpiarTexto(texto).substring(0, 3)
-
-const normalizarNombre = (nombre) => {
-  const limpio = String(nombre || '').trim()
-  if (!limpio) return ''
-  return limpio.charAt(0).toUpperCase() + limpio.slice(1).toLowerCase()
-}
-
-const nombreYaExiste = (nombre, excludeId = null) => {
-  const nombreNormalizado = normalizarNombre(nombre).toLowerCase().replace(/\s+/g, ' ')
-  return presentaciones.value.some(p => {
-    if (excludeId && p.id === excludeId) return false
-    const pNormalizado = (p.nombre || '').toLowerCase().replace(/\s+/g, ' ')
-    return pNormalizado === nombreNormalizado
-  })
-}
-
-// ============================================================
-// CARGA DE DATOS
-// ============================================================
-const cargarUnidades = async () => {
-  try {
-    const response = await getUnidades()
-    unidades.value = response.data.data
-  } catch (error) {
-    console.error('Error al cargar unidades:', error)
-  }
-}
-
-const buscarUnidades = (event) => {
-  const query = event.query?.toLowerCase() || ''
-  if (!query.trim()) {
-    unidadesSugeridas.value = unidadesFiltradas.value.slice(0, 10)
-    return
-  }
-  unidadesSugeridas.value = unidadesFiltradas.value.filter(u =>
-    u.nombre.toLowerCase().includes(query)
-  )
-}
-
-const buscarCategorias = (event) => {
-  textoBusquedaCategoria.value = event.query
-  if (!event.query.trim()) {
-    categoriasFiltradas.value = [...store.categorias]
-    return
-  }
-  categoriasFiltradas.value = store.categorias.filter((cat) =>
-    cat.nombre.toLowerCase().includes(event.query.toLowerCase())
-  )
-}
-
-const abrirModalCategoria = () => {
-  mostrarModalCategoria.value = true
-}
-
-const actualizarCategorias = async () => {
-  await store.cargarCategorias()
-}
-
-// ============================================================
-// BORRADOR
-// ============================================================
-const guardarBorrador = () => {
+function guardarBorrador() {
   const borrador = {
     pasoActual: pasoActual.value,
     nombre: nombre.value,
@@ -776,7 +659,7 @@ const guardarBorrador = () => {
   localStorage.setItem(DRAFT_KEY, JSON.stringify(borrador))
 }
 
-const restaurarBorrador = () => {
+function restaurarBorrador() {
   const guardado = localStorage.getItem(DRAFT_KEY)
   if (!guardado) return
   try {
@@ -794,215 +677,148 @@ const restaurarBorrador = () => {
   }
 }
 
-const limpiarBorrador = () => {
+function limpiarBorrador() {
   localStorage.removeItem(DRAFT_KEY)
 }
 
 // ============================================================
-// PRESENTACIONES - FORMULARIOS
+// WATCHERS
 // ============================================================
-const formBase = ref({
-  nombre: '',
-  stockMinimo: null,
-  precioVenta: null,
-  codigoBarra: '',
+// Recalcular IVA automáticamente cuando cambia el checkbox
+watch(aplicaIva, (nuevoValor) => {
+  presentaciones.value.forEach(p => {
+    const sinIva = p.precioSinIva || 0
+    if (nuevoValor) {
+      const iva = Number((sinIva * 0.13).toFixed(2))
+      p.ivaAplicado = iva
+      p.precioConIva = Number((sinIva + iva).toFixed(2))
+    } else {
+      p.ivaAplicado = 0
+      p.precioConIva = Number(sinIva.toFixed(2))
+    }
+  })
 })
 
-const formDerivada = ref({
-  nombre: '',
-  factorConversion: null,
-  precioVenta: null,
-  // codigoBarra no se usa en derivadas
+// Sincronizar nombre de la base con la unidad base
+watch(nombreUnidadBase, (nuevoValor) => {
+  if (tipoProducto.value === 'GRANEL' && !presentacionBaseCreada.value) {
+    formBase.value.nombre = nuevoValor
+  }
+}, { immediate: true })
+
+// Sincronizar presentaciones con el borrador
+watch(
+  [pasoActual, nombre, fabricante, categoria, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
+  guardarBorrador,
+  { deep: true }
+)
+
+// Cuando el usuario cambia el tipo de producto, validar unidad seleccionada
+watch(tipoProducto, () => {
+  if (unidadMedidaId.value) {
+    const esValida = unidadesFiltradas.value.some(u => u.id === unidadMedidaId.value)
+    if (!esValida) {
+      unidadMedidaId.value = null
+    }
+  }
 })
 
-const formUnidadFija = ref({
-  nombre: '',
-  stockMinimo: null,
-  precioVenta: null,
-  codigoBarra: '',
+// Limpiar código de barras (solo números, 14 dígitos)
+watch(() => formBase.value.codigoBarra, (nuevoValor) => {
+  if (nuevoValor) {
+    formBase.value.codigoBarra = nuevoValor
+      .trim()
+      .replace(/[^0-9]/g, '')
+      .slice(0, 14)
+  }
+})
+
+watch(() => formUnidadFija.value.codigoBarra, (nuevoValor) => {
+  if (nuevoValor) {
+    formUnidadFija.value.codigoBarra = nuevoValor
+      .trim()
+      .replace(/[^0-9]/g, '')
+      .slice(0, 14)
+  }
 })
 
 // ============================================================
-// PRESENTACIONES - MÉTODOS
+// MÉTODOS AUXILIARES
 // ============================================================
-const limpiarFormularioDerivada = () => {
-  formDerivada.value = { nombre: '', factorConversion: null, precioVenta: null }
-  factorTexto.value = ''
+function limpiarTexto(texto = '') {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
 }
 
-const limpiarFormularioUnidadFija = () => {
-  formUnidadFija.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
+function tresPrimeras(texto = '') {
+  return limpiarTexto(texto).substring(0, 3)
 }
 
-// Selección en AutoComplete
-const onSelectDerivada = (event) => {
-  formDerivada.value.nombre = event.value.nombre
+function normalizarNombre(nombre) {
+  const limpio = String(nombre || '').trim()
+  if (!limpio) return ''
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1).toLowerCase()
 }
 
-const onSelectUnidadFija = (event) => {
-  formUnidadFija.value.nombre = event.value.nombre
-}
-
-// Crear Presentación Base (GRANEL)
-const crearBase = () => {
-  const nombreBase = normalizarNombre(nombreUnidadBase.value)
-  if (!nombreBase) {
-    Swal.fire({ icon: 'warning', title: 'Unidad base requerida', text: 'Debes seleccionar una unidad base en el paso 1.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  // Validar código de barra para la base (obligatorio)
-  if (!formBase.value.codigoBarra || formBase.value.codigoBarra.trim() === '') {
-    Swal.fire({ icon: 'warning', title: 'Código de barra requerido', text: 'La presentación base debe tener un código de barra.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  // Validar duplicado
-  if (nombreYaExiste(nombreBase)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombreBase}" ya existe.`, confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (!formBase.value.stockMinimo || formBase.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (!formBase.value.precioVenta || formBase.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  presentaciones.value.push({
-    nombre: nombreBase,
-    codigoBarra: formBase.value.codigoBarra,
-    equivalencia: 1,
-    unidadBase: nombreUnidadBase.value,
-    aplicaIva: aplicaIva.value,
-    precioSinIva: Number(formBase.value.precioVenta),
-    ivaAplicado: aplicaIva.value ? Number(formBase.value.precioVenta * 0.13) : 0,
-    precioConIva: aplicaIva.value ? Number(formBase.value.precioVenta * 1.13) : Number(formBase.value.precioVenta),
-    es_base: true,
-    stock_minimo: Number(formBase.value.stockMinimo),
+function nombreYaExiste(nombre, excludeId = null) {
+  const nombreNormalizado = normalizarNombre(nombre).toLowerCase().replace(/\s+/g, ' ')
+  return presentaciones.value.some(p => {
+    if (excludeId && p.id === excludeId) return false
+    const pNormalizado = (p.nombre || '').toLowerCase().replace(/\s+/g, ' ')
+    return pNormalizado === nombreNormalizado
   })
-
-  formBase.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
-  Swal.fire({ icon: 'success', title: `¡Presentación Base "${nombreBase}" creada!`, text: 'Ahora puedes agregar presentaciones derivadas.', timer: 1500, showConfirmButton: false })
 }
 
-// Agregar Presentación Derivada (GRANEL)
-const agregarDerivada = () => {
-  const nombre = normalizarNombre(formDerivada.value.nombre)
-  if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  const factor = Number(formDerivada.value.factorConversion)
-  if (!factor || factor <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Factor inválido', text: 'Ingresa un factor de conversión mayor a 0.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (!formDerivada.value.precioVenta || formDerivada.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  presentaciones.value.push({
-    nombre: nombre,
-    equivalencia: factor,
-    unidadBase: nombreUnidadBase.value,
-    aplicaIva: aplicaIva.value,
-    precioSinIva: Number(formDerivada.value.precioVenta),
-    ivaAplicado: aplicaIva.value ? Number(formDerivada.value.precioVenta * 0.13) : 0,
-    precioConIva: aplicaIva.value ? Number(formDerivada.value.precioVenta * 1.13) : Number(formDerivada.value.precioVenta),
-    es_base: false,
-    stock_minimo: 0,
-  })
-
-  limpiarFormularioDerivada()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+function formatCurrency(value) {
+  return new Intl.NumberFormat('es-SV', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value || 0)
 }
-
-// Agregar Presentación (UNIDAD FIJA)
-const agregarUnidadFija = () => {
-  const nombre = normalizarNombre(formUnidadFija.value.nombre)
-  if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (!formUnidadFija.value.stockMinimo || formUnidadFija.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  if (!formUnidadFija.value.precioVenta || formUnidadFija.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
-    return
-  }
-
-  presentaciones.value.push({
-    nombre: nombre,
-    codigoBarra: formUnidadFija.value.codigoBarra || '',
-    equivalencia: 1,
-    unidadBase: nombreUnidadBase.value,
-    aplicaIva: aplicaIva.value,
-    precioSinIva: Number(formUnidadFija.value.precioVenta),
-    ivaAplicado: aplicaIva.value ? Number(formUnidadFija.value.precioVenta * 0.13) : 0,
-    precioConIva: aplicaIva.value ? Number(formUnidadFija.value.precioVenta * 1.13) : Number(formUnidadFija.value.precioVenta),
-    es_base: false,
-    stock_minimo: Number(formUnidadFija.value.stockMinimo),
-  })
-
-  limpiarFormularioUnidadFija()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
-}
-
-// --- Editar / Eliminar ---
-const editarPresentacion = (index) => {
-  Swal.fire({ icon: 'info', title: 'Editar presentación', text: `Funcionalidad en desarrollo. Índice: ${index}`, confirmButtonColor: '#2b5e3b' })
-}
-
-const eliminarPresentacion = async (index) => {
-  const resultado = await Swal.fire({
-    title: '¿Eliminar presentación?',
-    text: 'Quiere eliminar esta presentación de la tabla.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#6b7280',
-  })
-  if (resultado.isConfirmed) {
-    presentaciones.value.splice(index, 1)
-    Swal.fire({ icon: 'success', title: 'Eliminada', timer: 1500, showConfirmButton: false })
-  }
-}
-
-// --- Formateo de moneda ---
-const formatCurrency = (value) =>
-  new Intl.NumberFormat('es-SV', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value || 0)
 
 // ============================================================
-// CONTROL DEL WIZARD
+// CARGA DE DATOS
 // ============================================================
-const pasoActual = ref(1)
+async function cargarUnidades() {
+  try {
+    const response = await getUnidades()
+    unidades.value = response.data.data
+  } catch (error) {
+    console.error('Error al cargar unidades:', error)
+  }
+}
 
-const irAPaso2 = () => {
-  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '' }
+function buscarUnidades(event) {
+  const query = event.query?.toLowerCase() || ''
+  if (!query.trim()) {
+    unidadesSugeridas.value = unidadesFiltradas.value.slice(0, 10)
+    return
+  }
+  unidadesSugeridas.value = unidadesFiltradas.value.filter(u =>
+    u.nombre.toLowerCase().includes(query)
+  )
+}
+
+function buscarCategorias(event) {
+  textoBusquedaCategoria.value = event.query
+  if (!event.query.trim()) {
+    categoriasFiltradas.value = [...store.categorias]
+    return
+  }
+  categoriasFiltradas.value = store.categorias.filter((cat) =>
+    cat.nombre.toLowerCase().includes(event.query.toLowerCase())
+  )
+}
+
+function abrirModalCategoria() {
+  mostrarModalCategoria.value = true
+}
+
+async function actualizarCategorias() {
+  await store.cargarCategorias()
+}
+
+// ============================================================
+// NAVEGACIÓN DEL WIZARD
+// ============================================================
+function irAPaso2() {
+  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '', stockMinimo: '', factorConversion: '' }
   let hayErrores = false
 
   if (!nombre.value.trim()) {
@@ -1031,10 +847,188 @@ const irAPaso2 = () => {
 }
 
 // ============================================================
+// MÉTODOS DE PRESENTACIONES (Crear, Agregar, Editar, Eliminar)
+// ============================================================
+function limpiarFormularioDerivada() {
+  formDerivada.value = { nombre: '', factorConversion: null, precioVenta: null }
+}
+
+function limpiarFormularioUnidadFija() {
+  formUnidadFija.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
+}
+
+function onSelectDerivada(event) {
+  formDerivada.value.nombre = event.value.nombre
+}
+
+function onSelectUnidadFija(event) {
+  formUnidadFija.value.nombre = event.value.nombre
+}
+
+// Crear Presentación Base (GRANEL)
+function crearBase() {
+  const nombreBase = normalizarNombre(nombreUnidadBase.value)
+  if (!nombreBase) {
+    Swal.fire({ icon: 'warning', title: 'Unidad base requerida', text: 'Debes seleccionar una unidad base en el paso 1.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formBase.value.codigoBarra || formBase.value.codigoBarra.trim() === '') {
+    Swal.fire({ icon: 'warning', title: 'Código de barra requerido', text: 'La presentación base debe tener un código de barra.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (nombreYaExiste(nombreBase)) {
+    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombreBase}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formBase.value.stockMinimo || formBase.value.stockMinimo <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formBase.value.precioVenta || formBase.value.precioVenta <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  const sinIva = Number(formBase.value.precioVenta)
+  const iva = aplicaIva.value ? Number((sinIva * 0.13).toFixed(2)) : 0
+  const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
+
+  presentaciones.value.push({
+    nombre: nombreBase,
+    codigoBarra: formBase.value.codigoBarra,
+    equivalencia: 1,
+    unidadBase: nombreUnidadBase.value,
+    aplicaIva: aplicaIva.value,
+    precioSinIva: sinIva,
+    ivaAplicado: iva,
+    precioConIva: conIva,
+    es_base: true,
+    stock_minimo: Number(formBase.value.stockMinimo),
+  })
+
+  formBase.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
+  Swal.fire({ icon: 'success', title: `¡Presentación Base "${nombreBase}" creada!`, text: 'Ahora puedes agregar presentaciones derivadas.', timer: 1500, showConfirmButton: false })
+}
+
+// Agregar Presentación Derivada (GRANEL)
+function agregarDerivada() {
+  const nombre = normalizarNombre(formDerivada.value.nombre)
+  if (!nombre) {
+    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (nombreYaExiste(nombre)) {
+    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  const factor = Number(formDerivada.value.factorConversion)
+  if (!factor || factor <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Factor inválido', text: 'Ingresa un factor de conversión mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formDerivada.value.precioVenta || formDerivada.value.precioVenta <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  const sinIva = Number(formDerivada.value.precioVenta)
+  const iva = aplicaIva.value ? Number((sinIva * 0.13).toFixed(2)) : 0
+  const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
+
+  presentaciones.value.push({
+    nombre: nombre,
+    equivalencia: factor,
+    unidadBase: nombreUnidadBase.value,
+    aplicaIva: aplicaIva.value,
+    precioSinIva: sinIva,
+    ivaAplicado: iva,
+    precioConIva: conIva,
+    es_base: false,
+    stock_minimo: 0,
+  })
+
+  limpiarFormularioDerivada()
+  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+}
+
+// Agregar Presentación (UNIDAD FIJA)
+function agregarUnidadFija() {
+  const nombre = normalizarNombre(formUnidadFija.value.nombre)
+  if (!nombre) {
+    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (nombreYaExiste(nombre)) {
+    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formUnidadFija.value.stockMinimo || formUnidadFija.value.stockMinimo <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  if (!formUnidadFija.value.precioVenta || formUnidadFija.value.precioVenta <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    return
+  }
+
+  const sinIva = Number(formUnidadFija.value.precioVenta)
+  const iva = aplicaIva.value ? Number((sinIva * 0.13).toFixed(2)) : 0
+  const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
+
+  presentaciones.value.push({
+    nombre: nombre,
+    codigoBarra: formUnidadFija.value.codigoBarra || '',
+    equivalencia: 1,
+    unidadBase: nombreUnidadBase.value,
+    aplicaIva: aplicaIva.value,
+    precioSinIva: sinIva,
+    ivaAplicado: iva,
+    precioConIva: conIva,
+    es_base: false,
+    stock_minimo: Number(formUnidadFija.value.stockMinimo),
+  })
+
+  limpiarFormularioUnidadFija()
+  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+}
+
+// Editar y Eliminar
+function editarPresentacion(index) {
+  Swal.fire({ icon: 'info', title: 'Editar presentación', text: `Funcionalidad en desarrollo. Índice: ${index}`, confirmButtonColor: '#2b5e3b' })
+}
+
+async function eliminarPresentacion(index) {
+  const resultado = await Swal.fire({
+    title: '¿Eliminar presentación?',
+    text: 'Quiere eliminar esta presentación de la tabla.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6b7280',
+  })
+  if (resultado.isConfirmed) {
+    presentaciones.value.splice(index, 1)
+    Swal.fire({ icon: 'success', title: 'Eliminada', timer: 1500, showConfirmButton: false })
+  }
+}
+
+// ============================================================
 // GUARDAR PRODUCTO
 // ============================================================
-const guardarProducto = async () => {
-  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '' }
+async function guardarProducto() {
+  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '', stockMinimo: '', factorConversion: '' }
   let hayErrores = false
 
   if (!nombre.value.trim()) {
@@ -1114,7 +1108,7 @@ const guardarProducto = async () => {
   }
 }
 
-const resetFormularioCompleto = () => {
+function resetFormularioCompleto() {
   nombre.value = ''
   fabricante.value = ''
   categoria.value = null
@@ -1122,82 +1116,12 @@ const resetFormularioCompleto = () => {
   tipoProducto.value = null
   aplicaIva.value = false
   presentaciones.value = []
-  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '' }
+  errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '', stockMinimo: '', factorConversion: '' }
   limpiarFormularioDerivada()
   limpiarFormularioUnidadFija()
   pasoActual.value = 1
   limpiarBorrador()
 }
-
-// ============================================================
-// WATCHES
-// ============================================================
-// Sincronizar nombre de la base con la unidad base
-watch(nombreUnidadBase, (nuevoValor) => {
-  if (tipoProducto.value === 'GRANEL' && !presentacionBaseCreada.value) {
-    formBase.value.nombre = nuevoValor
-  }
-}, { immediate: true })
-
-// Sincronizar presentaciones con el borrador
-watch(
-  [pasoActual, nombre, fabricante, categoria, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
-  guardarBorrador,
-  { deep: true }
-)
-
-// ============================================================
-// FACTOR TEXTO (para el input de contenido de la presentación)
-// ============================================================
-const factorTexto = ref('')
-
-// Cuando factorTexto cambie, actualizar formDerivada.factorConversion
-watch(factorTexto, (nuevoValor) => {
-  if (!nuevoValor) {
-    formDerivada.value.factorConversion = null
-    return
-  }
-  // Limpiar y formatear
-  let valorLimpio = nuevoValor
-    .replace(/[^0-9.]/g, '')
-    .replace(/(\..*?)\..*/g, '$1')
-    .replace(/^(\d+)\.(\d{2}).*/, '$1.$2')
-
-  if (valorLimpio !== nuevoValor) {
-    factorTexto.value = valorLimpio
-  }
-  formDerivada.value.factorConversion = parseFloat(valorLimpio) || null
-}, { immediate: true })
-
-
-//Cuando el usuario cambia el tipo de producto
-watch(tipoProducto, () => {
-  if (unidadMedidaId.value) {
-    const esValida = unidadesFiltradas.value.some(u => u.id === unidadMedidaId.value)
-    if (!esValida) {
-      unidadMedidaId.value = null
-    }
-  }
-})
-
-watch(() => formBase.value.codigoBarra, (nuevoValor) => {
-  if (nuevoValor) {
-    formBase.value.codigoBarra = nuevoValor
-      .trim()
-      .replace(/[^0-9]/g, '')
-      .slice(0, 14)
-  }
-})
-
-
-watch(() => formUnidadFija.value.codigoBarra, (nuevoValor) => {
-  if (nuevoValor) {
-    formUnidadFija.value.codigoBarra = nuevoValor
-      .trim()
-      .replace(/[^0-9]/g, '')
-      .slice(0, 14)
-  }
-})
 
 // ============================================================
 // ON MOUNTED
@@ -1217,7 +1141,6 @@ onMounted(async () => {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
 }
-
 :deep(.p-select:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
