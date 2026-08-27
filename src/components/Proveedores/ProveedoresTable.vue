@@ -73,37 +73,53 @@
           </template>
         </Column>
 
-        <Column header="Acciones">
+                <Column header="Acciones">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <Button
-                icon="pi pi-pencil"
-                label="Editar"
-                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Editar proveedor'"
-                @click="handleEdit(slotProps.data)"
-              />
+              
+              <template v-if="slotProps.data.activo">
+                <Button
+                  icon="pi pi-pencil"
+                  label="Editar"
+                  class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Editar proveedor'"
+                  @click="handleEdit(slotProps.data)"
+                />
 
-              <Button
-                icon="pi pi-eye"
-                label="Ver"
-                class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Ver detalles'"
-                @click="handleDetail(slotProps.data)"
-              />
+                <Button
+                  icon="pi pi-eye"
+                  label="Ver"
+                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Ver detalles'"
+                  @click="handleDetail(slotProps.data)"
+                />
 
-               <Button
-                v-if="slotProps.data.activo"
-                icon="pi pi-ban"
-                label="Desactivar"
-                class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Desactivar proveedor'"
-                @click="confirmarDesactivar(slotProps.data)"
-              />
-              <span v-else class="text-[#9ca3af] text-sm italic"></span>
+                <Button
+                  icon="pi pi-ban"
+                  label="Desactivar"
+                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Desactivar proveedor'"
+                  @click="confirmarDesactivar(slotProps.data)"
+                />
+              </template>
+
+              
+              <template v-else>
+                <Button
+                  icon="pi pi-eye"
+                  label="Ver"
+                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Ver detalles'"
+                  @click="handleDetail(slotProps.data)"
+                />
+                
+               
+              </template>
+
             </div>
           </template>
         </Column>
+
       </DataTable>
     </div>
   </div>
@@ -140,9 +156,26 @@ const filters = ref({
 })
 
 const proveedoresFiltrados = computed(() => {
-  if (filtroEstado.value === null) return proveedores.value
-  return proveedores.value.filter((p) => p.activo === filtroEstado.value)
+  // Aseguramos que proveedores tenga datos antes de filtrar
+  const lista = proveedores.value ?? []
+
+  return lista.filter((p) => {
+   
+    const textoBusqueda = filters.value.global.value?.toLowerCase() || ''
+    const coincideBusqueda = 
+      !textoBusqueda ||
+      p.nombre?.toLowerCase().includes(textoBusqueda) ||
+      p.correo?.toLowerCase().includes(textoBusqueda)
+
+    const coincideEstado = 
+      filtroEstado.value === null || filtroEstado.value === undefined
+        ? true
+        : p.activo === filtroEstado.value
+
+    return coincideBusqueda && coincideEstado
+  })
 })
+
 
 onMounted(async () => {
   const resultado = await store.cargarProveedores()
@@ -296,4 +329,3 @@ const confirmarDesactivar = async (proveedor) => {
   background-color: #eef2e9 !important;
 }
 </style>
- 

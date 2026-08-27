@@ -55,7 +55,6 @@
         :globalFilterFields="['vendidoPor', 'numeroFactura']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
-        :lazy="true"
         :totalRecords="totalRegistros" 
         :loading="cargando"
         :paginator="true"
@@ -135,76 +134,94 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed } from 'vue'
 
-//pAGINACOIN DE PARTE  DEL SEERVIDOR
-const totalRegistros = ref(8)
-const cargando = ref(false)
-
-
-
-const onPage = (event) => {
-const paginaDestino = event.page + 1 
-const limitePorPagina = event.rows
-
-
-emit('cambiar-pagina', { 
-    page: paginaDestino, 
-    per_page: limitePorPagina 
-  })
-}
 // Props
 const props = defineProps({
- 
   ventas: {
     type: Array,
     required: true,
     default: () => [],
   },
+  cargando: {
+    type: Boolean,
+    default: false
+  }
 })
 
 // Emits
-const emit = defineEmits(['ver-detalle', 'anular-venta', 'filtrar-fechas'])
+const emit = defineEmits(['ver-detalle', 'anular-venta', 'cambiar-pagina'])
+
+// Paginación desde el Servidor (Control de eventos de navegación de PrimeVue)
+const totalRegistros = computed(() => props.ventas?.length || 0)
+
+const onPage = (event) => {
+  const paginaDestino = event.page + 1 
+  const limitePorPagina = event.rows
+
+  emit('cambiar-pagina', { 
+    page: paginaDestino, 
+    per_page: limitePorPagina 
+  })
+}
 
 // Opciones de filtros
 const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
 const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 const rangoDeFechas = ref(null)
 
-// Filtros que usan ref
+// Filtros reactivos vinculados a los v-model de la interfaz
 const filtros = ref({
   global: { value: null, matchMode: 'contains' },
   estado: { value: null, matchMode: 'equals' },
   tipoPago: { value: null, matchMode: 'equals' },
 })
 
-const onFechaSeleccionada = () => {
-  const rango = rangoDeFechas.value
-  if (!rango) return
-
-  const desde = rango[0]
-  const hasta = rango[1] || rango[0]
-
-  emit('filtrar-fechas', {
-    fecha_desde: desde.toISOString().split('T')[0],
-    fecha_hasta: hasta.toISOString().split('T')[0],
-  })
-}
-
-// Filtro por rango de fechas
 const ventasFiltradas = computed(() => {
-  if (!props.ventas) return []
-  if (!rangoDeFechas.value?.[0]) return props.ventas
-  const [desde, hasta] = rangoDeFechas.value
-  return props.ventas.filter((venta) => {
-    if (!venta.fecha) return false
-    const [d, m, a] = venta.fecha.split('/')
-    const fechaVenta = new Date(`${a}-${m}-${d}`)
-    return hasta ? fechaVenta >= desde && fechaVenta <= hasta : fechaVenta >= desde
-  })
+  let lista = props.ventas ?? []
+
+  const textoBusqueda = filtros.value.global.value?.toLowerCase().trim() || ''
+  if (textoBusqueda) {
+    lista = lista.filter((v) => 
+      v.vendidoPor?.toLowerCase().includes(textoBusqueda) ||
+      v.numeroFactura?.toLowerCase().includes(textoBusqueda)
+    )
+  }
+
+  
+  const estadoSeleccionado = filtros.value.estado.value
+  if (estadoSeleccionado) {
+    lista = lista.filter((v) => v.estado === estadoSeleccionado)
+  }
+
+ 
+  const pagoSeleccionado = filtros.value.tipoPago.value
+  if (pagoSeleccionado) {
+    lista = lista.filter((v) => v.tipoPago === pagoSeleccionado)
+  }
+
+ 
+  if (rangoDeFechas.value?.[0]) {
+    const desde = new Date(rangoDeFechas.value[0])
+    desde.setHours(0, 0, 0, 0) 
+
+    // Si seleccionó la segunda fecha del rango la usamos, si no, igualamos a la primera
+    const hasta = rangoDeFechas.value[1] ? new Date(rangoDeFechas.value[1]) : new Date(desde)
+    hasta.setHours(23, 59, 59, 999)
+
+    lista = lista.filter((v) => {
+      if (!v.fecha) return false
+      
+      const [d, m, a] = v.fecha.split('/')
+      const fechaVenta = new Date(Number(a), Number(m) - 1, Number(d))
+      return fechaVenta >= desde && fechaVenta <= hasta
+    })
+  }
+
+  return lista
 })
 
-// Helpers visuales
+// Helpers visuales para estilos e íconos de la tabla
 const estiloPago = (tipo) => {
   if (tipo === 'EFECTIVO')
     return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
@@ -227,6 +244,7 @@ const formatearMoneda = (valor) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
+
 
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {

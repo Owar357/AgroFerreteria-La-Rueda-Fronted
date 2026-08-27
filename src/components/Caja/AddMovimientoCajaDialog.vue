@@ -63,6 +63,27 @@
           Ingrese el monto en dólares (ej: 150.00)
         </p>
       </div>
+      <div>
+  <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
+    <i class="pi pi-wallet mr-1 text-[#e0b354]"></i> Origen del dinero
+  </label>
+  <Select
+    v-model="origen"
+    :options="opcionesOrigen"
+    optionLabel="label"
+    optionValue="value"
+    class="w-full"
+    placeholder="Seleccione el origen"
+  />
+  <p class="text-xs text-[#6d8f60] mt-1">
+    <i class="pi pi-info-circle mr-1"></i>
+    {{
+      tipoMovimiento === 'ENTRADA'
+        ? 'Las entradas solo pueden provenir de caja chica.'
+        : 'Seleccione si el dinero sale de caja chica o de las ventas del turno.'
+    }}
+  </p>
+</div>
 
       <div>
         <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
@@ -127,15 +148,18 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
+import { Select } from 'primevue'
 import { createMovimiento } from '@/services/movimientoCajaService'
 import Swal from 'sweetalert2'
 
 const guardando = ref(false)
 
 const props = defineProps({
-  
+  visible: {
+    type: Boolean,
+    default: false,
+  },
 })
-
 const emit = defineEmits(['update:visible', 'movimientoRegistrado'])
 
 const tipoMovimiento = ref('ENTRADA')
@@ -145,6 +169,26 @@ const concepto = ref('')
 const visible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val),
+})
+
+//para seleccionar si es de venta o caja chica
+const origen = ref('CAJA_CHICA')
+
+const opcionesOrigen = computed(() => {
+  if (tipoMovimiento.value === 'ENTRADA') {
+    return [{ label: 'Caja chica', value: 'CAJA_CHICA' }]
+  }
+  return [
+    { label: 'Caja chica', value: 'CAJA_CHICA' },
+    { label: 'Ventas', value: 'VENTAS' },
+  ]
+})
+
+// Cuando cambia a ENTRADA, forzar origen válido
+watch(tipoMovimiento, (nuevoTipo) => {
+  if (nuevoTipo === 'ENTRADA') {
+    origen.value = 'CAJA_CHICA'
+  }
 })
 
 const esEntrada = computed(() => tipoMovimiento.value === 'ENTRADA')
@@ -197,7 +241,9 @@ const registrarMovimiento = async () => {
       tipo_movimiento: tipoMovimiento.value,
       monto: monto.value,
       motivo: concepto.value.trim(),
+      origen: origen.value, //AGREGADO
     })
+    
     emit('movimientoRegistrado')
     cerrarDialog()
     Swal.fire({
@@ -210,10 +256,20 @@ const registrarMovimiento = async () => {
       background: '#ffffff',
       color: '#1e3a2f',
       iconColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
     })
+
+
   } catch (error) {
     const msg = error.response?.data?.message || 'Error al registrar el movimiento.'
-    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#2b5e3b' })
+    Swal.fire({ 
+    icon: 'error', 
+    title: 'Error', 
+    text: msg, 
+    confirmButtonColor: '#2b5e3b' })
+    customClass: { container: '!z-[9999]' }
+
+
   } finally {
     guardando.value = false
   }
@@ -224,6 +280,7 @@ const cerrarDialog = () => {
   tipoMovimiento.value = 'ENTRADA'
   monto.value = null
   concepto.value = ''
+  origen.value =  'CAJA_CHICA'
   visible.value = false
 }
 
@@ -231,7 +288,8 @@ watch(visible, (nuevoValor) => {
   if (!nuevoValor) {
     tipoMovimiento.value = 'ENTRADA'
     monto.value = null
-    concepto.value = ''
+    concepto.value = '',
+      origen.value = 'CAJA_CHICA'
   }
 })
 </script>

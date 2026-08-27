@@ -406,32 +406,47 @@ const alSeleccionarProducto = (event) => {
 
 const agregarProducto = () => {
   if (!productoSeleccionado.value || !presentacionSeleccionada.value) return
-  const precio = parseFloat(presentacionSeleccionada.value.precio_venta)
+
+  const producto = productoSeleccionado.value
+  const presentacion = presentacionSeleccionada.value
+
+  console.log('Producto seleccionado:', producto)
+
+  const unidadBase =
+    producto.unidad_base ||
+    producto.unidad_medida?.abreviatura ||
+    producto.unidad_medida?.nombre ||
+    producto.unidadMedida?.abreviatura ||
+    producto.unidadMedida?.nombre ||
+    null
+
+  if (!unidadBase) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Unidad base requerida',
+      text: `El producto "${producto.nombre}" no tiene una unidad de medida configurada.`,
+      confirmButtonColor: '#2b5e3b',
+    })
+    return
+  }
+
+  const precio = parseFloat(presentacion.precio_venta)
+
   productosVenta.value.push({
-    nombre: `${productoSeleccionado.value.nombre} - ${presentacionSeleccionada.value.nombre}`,
+    nombre: `${producto.nombre} - ${presentacion.nombre}`,
     cantidad: 1,
     precio,
-    descuento: 0.0,
+    descuento: 0,
     subtotal: precio,
-    aplica_iva: productoSeleccionado.value.aplica_iva,
-    presentacion_id: presentacionSeleccionada.value.id,
-    unidad_base: productoSeleccionado.value.unidad_base,
+    aplica_iva: producto.aplica_iva,
+    presentacion_id: presentacion.id,
+    unidad_base: unidadBase,
   })
+
   productoSeleccionado.value = null
   presentacionSeleccionada.value = ''
   presentaciones.value = []
 }
-
-watch(
-  productosVenta,
-  () => {
-    productosVenta.value.forEach((fila) => {
-      fila.subtotal = parseFloat((fila.cantidad * fila.precio).toFixed(4))
-    })
-  },
-  { deep: true },
-)
-
 const buscarCliente = async () => {
   if (!busquedaCliente.value.trim()) return
   try {
@@ -481,29 +496,30 @@ const registrarVenta = async () => {
     return
   }
 
-  const payload = {
-    tipo_pago: tipoPago.value.toUpperCase(),
-    gravado: parseFloat(subtotalGravado.value.toFixed(2)),
-    exento: parseFloat(subtotalExento.value.toFixed(2)),
-    iva: parseFloat(iva.value.toFixed(2)),
-    total: parseFloat(total.value.toFixed(2)),
-    efectivo_recibido: tipoPago.value === 'efectivo' ? efectivoRecibido.value : null,
-    cambio: tipoPago.value === 'efectivo' ? cambio.value : null,
-    cliente_id: clienteId.value || null,
-    apertura_caja_id: 1,
-    detalles: productosVenta.value.map((p) => ({
-      nombre_producto: p.nombre,
-      presentacion: p.nombre,
-      cantidad: p.cantidad,
-      precio_unitario: p.precio,
-      subtotal: p.subtotal,
-      iva_aplicado: p.aplica_iva ? parseFloat(((p.subtotal / 1.13) * 0.13).toFixed(4)) : 0,
-      descuento_aplicado: p.descuento,
-      presentacion_id: p.presentacion_id,
-      unidad_base: p.unidad_base,
-    })),
-  }
+    const payload = {
+      tipo_pago: tipoPago.value.toUpperCase(),
+      gravado: parseFloat(subtotalGravado.value.toFixed(2)),
+      exento: parseFloat(subtotalExento.value.toFixed(2)),
+      iva: parseFloat(iva.value.toFixed(2)),
+      total: parseFloat(total.value.toFixed(2)),
+      efectivo_recibido: tipoPago.value === 'efectivo' ? efectivoRecibido.value : null,
+      cambio: tipoPago.value === 'efectivo' ? cambio.value : null,
+      cliente_id: clienteId.value || null,
+      apertura_caja_id: 1,
+      detalles: productosVenta.value.map((p) => ({
+        nombre_producto: p.nombre,
+        presentacion: p.nombre,
+        cantidad: p.cantidad,
+        precio_unitario: p.precio,
+        subtotal: p.subtotal,
+        iva_aplicado: p.aplica_iva ? parseFloat(((p.subtotal / 1.13) * 0.13).toFixed(4)) : 0,
+        descuento_aplicado: p.descuento,
+        presentacion_id: p.presentacion_id,
+        unidad_base: p.unidad_base,
+      })),
+    }
 
+   // console.log('Payload de venta:', payload)
   try {
     const response = await registerVenta(payload)
     console.log('Respuesta venta:', response.data)
@@ -545,9 +561,9 @@ const registrarVenta = async () => {
       })
     } else {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo registrar la venta.',
+        icon: 'warning',
+        title: '¡Sin Stock!',
+        text: 'No se pudo registrar la venta por que el producto no tiene Stock.',
         confirmButtonColor: '#2b5e3b',
       })
     }

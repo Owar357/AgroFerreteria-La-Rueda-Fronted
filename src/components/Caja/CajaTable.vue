@@ -272,14 +272,14 @@
               <th class="px-6 py-4 text-left">Concepto</th>
               <th class="px-6 py-4 text-left">Monto</th>
               <th class="px-6 py-4 text-left">Tipo</th>
-              <th class="px-6 py-4 text-left">Saldo después</th>
+           
             </tr>
           </thead>
 
           <tbody class="divide-y divide-[#f0f5ea] text-sm">
             <tr
               v-for="mov in movimientosRecientes"
-              :key="mov.hora + mov.concepto"
+              :key="mov.id"
               class="hover:bg-[#fefcf5] transition-colors"
             >
               <td class="px-6 py-3.5 font-medium text-[#1a2e1f]">
@@ -310,13 +310,11 @@
                   {{ mov.tipo }}
                 </span>
               </td>
-              <td class="px-6 py-3.5 font-medium text-[#1a2e1f]">
-                {{ mov.saldo }}
-              </td>
+             
             </tr>
 
             <tr v-if="movimientosRecientes.length === 0">
-              <td colspan="5" class="text-center py-10 text-gray-400">
+              <td colspan="4" class="text-center py-10 text-gray-400">
                 No hay movimientos registrados
               </td>
             </tr>
@@ -346,14 +344,14 @@
           <th class="px-6 py-4 text-left">Concepto</th>
           <th class="px-6 py-4 text-left">Monto</th>
           <th class="px-6 py-4 text-left">Tipo</th>
-          <th class="px-6 py-4 text-left">Saldo después</th>
+         
         </tr>
       </thead>
 
       <tbody class="divide-y divide-[#f0f5ea] text-sm">
         <tr
           v-for="mov in movimientosRecientes"
-          :key="mov.hora + mov.concepto"
+          :key="mov.id"
           class="hover:bg-[#fefcf5] transition-colors"
         >
           <td class="px-6 py-3.5 font-medium text-[#1a2e1f]">
@@ -384,13 +382,11 @@
               {{ mov.tipo }}
             </span>
           </td>
-          <td class="px-6 py-3.5 font-medium text-[#1a2e1f]">
-            {{ mov.saldo }}
-          </td>
+        
         </tr>
 
         <tr v-if="movimientosRecientes.length === 0">
-          <td colspan="5" class="text-center py-10 text-gray-400">
+          <td colspan="4" class="text-center py-10 text-gray-400">
             No hay movimientos registrados
           </td>
         </tr>
@@ -446,10 +442,10 @@
 
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Swal from 'sweetalert2'
 import { useCajaStore } from '@/stores/cajaStore'
-
+import { getMovimientos } from '@/services/movimientoCajaService'
 
 import AdminAuthDialog from '@/components/Caja/AdminAuthDialog.vue'
 import OpenCashierDialog from '@/components/Caja/OpenCashierDialog.vue'
@@ -500,46 +496,44 @@ const montoRealFinal = ref(0)
 const diferenciaFinal = ref(0)
 
 
-const todosMovimientos = ref([
-  {
-    hora: '09:45',
-    concepto: 'Venta contado - Fertilizante',
-    monto: '+$45.00',
-    tipo: 'Ingreso',
-    saldo: '$145.00',
-  },
-  {
-    hora: '10:20',
-    concepto: 'Venta contado - Herramientas',
-    monto: '+$40.00',
-    tipo: 'Ingreso',
-    saldo: '$185.00',
-  },
-  {
-    hora: '11:00',
-    concepto: 'Pago a proveedor (semillas)',
-    monto: '-$50.00',
-    tipo: 'Egreso',
-    saldo: '$135.00',
-  },
-  {
-    hora: '11:45',
-    concepto: 'Venta contado - Fungicida',
-    monto: '+$30.00',
-    tipo: 'Ingreso',
-    saldo: '$165.00',
-  },
-  {
-    hora: '12:30',
-    concepto: 'Transferencia recibida (cliente)',
-    monto: '+$25.00',
-    tipo: 'Ingreso',
-    saldo: '$190.00',
-  },
-])
+
+// --- NUEVO: movimientos reales desde el backend ---
+const movimientosRecientes = ref([])
+const cargandoMovimientos = ref(false)
+
+const formatearHora = (fechaISO) =>
+  new Date(fechaISO).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+
+const mapearMovimiento = (mov) => ({
+  id: mov.id,
+  hora: formatearHora(mov.created_at),
+  concepto: mov.motivo,
+  monto: `${mov.tipo_movimiento === 'ENTRADA' ? '+' : '-'}$${formatNumber(mov.monto)}`,
+  tipo: mov.tipo_movimiento === 'ENTRADA' ? 'Ingreso' : 'Egreso',
+  esAnulado: mov.es_anulado,
+})
+
+const cargarMovimientosRecientes = async () => {
+  cargandoMovimientos.value = true
+  try {
+    const { data } = await getMovimientos({ per_page: 5 })
+    movimientosRecientes.value = (data.data ?? []).map(mapearMovimiento)
+  } catch (error) {
+    console.error('Error al cargar movimientos recientes:', error)
+    movimientosRecientes.value = []
+  } finally {
+    cargandoMovimientos.value = false
+  }
+}
+
+onMounted(() => {
+  cargarMovimientosRecientes()
+})
+
+// Permite refrescar la tabla desde fuera (ej. tras registrar un movimiento externo en otra vista)
+defineExpose({ cargarMovimientosRecientes })
 
 
-const movimientosRecientes = computed(() => [...todosMovimientos.value].slice(-5).reverse())
 
 
 const totalVentas = computed(
@@ -589,6 +583,7 @@ const onCredencialesConfirmadas = async (credenciales) => {
 
 const abrirVenta = () => {
   aperturaCajaVisible.value = true
+ 
 }
 
 
@@ -598,14 +593,8 @@ const onAbrirVenta = async ({ total }) => {
 
 
   if (resultado.ok) {
-    calcularResumenDesdeMovimientos()
-    todosMovimientos.value.push({
-      hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      concepto: 'Apertura de venta',
-      monto: `+$${formatNumber(total)}`,
-      tipo: 'Ingreso',
-      saldo: `$${formatNumber(total)}`,
-    })
+   
+    
     Swal.fire({
       toast: true,
       position: 'top-end',
@@ -664,6 +653,8 @@ const onCredencialesCierre = async (credenciales) => {
     // Guardamos los datos del cuadre para el modal final
     datosCierre.value = resultado.data
     cierreVisible.value = true
+    cargarMovimientosRecientes()
+
   } else {
     adminAuthCierreRef.value?.mostrarError(resultado.error)
   }
@@ -686,24 +677,7 @@ const onCierreExitoso = () => {
 }
 
 
-const calcularResumenDesdeMovimientos = () => {
-  let contado = 0,
-    tarjeta = 0,
-    transferencia = 0,
-    retirosSum = 0
-  for (const mov of todosMovimientos.value) {
-    if (mov.concepto.includes('Venta contado')) contado += parseFloat(mov.monto.replace('+$', ''))
-    else if (mov.concepto.includes('Venta por tarjeta'))
-      tarjeta += parseFloat(mov.monto.replace('+$', ''))
-    else if (mov.concepto.includes('Transferencia'))
-      transferencia += parseFloat(mov.monto.replace('+$', ''))
-    else if (mov.tipo === 'Egreso') retirosSum += parseFloat(mov.monto.replace('-$', ''))
-  }
-  ventasContado.value = contado
-  ventasTarjeta.value = tarjeta
-  ventasTransferencia.value = transferencia
-  retiros.value = retirosSum
-}
+
 
 
 </script>
