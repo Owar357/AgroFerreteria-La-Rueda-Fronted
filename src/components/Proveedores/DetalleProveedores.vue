@@ -101,22 +101,23 @@
       <Button
         label="Cerrar"
         @click="visible = false"
-        :pt="{
-          root: {
-            class:
-              'px-5 py-2 rounded-lg border border-gray-200 bg-white text-gray-500 text-sm font-semibold font-inter hover:border-[#2b5e3b] hover:text-[#1a2e1f] transition-all cursor-pointer',
-          },
-          label: { class: 'font-inter font-semibold text-sm' },
-        }"
+         :pt="{
+    root: {
+      class:
+        'px-6 py-2.5 rounded-lg border !border-[#c2d6c7] bg-[#4caf50] text-[#1b3d24] text-sm font-semibold font-inter hover:bg-[#d2e4ce] hover:border-[#2b5e3b] transition-all cursor-pointer min-w-[110px] text-center justify-center shadow-sm',
+    },
+    label: { class: 'font-inter font-semibold text-sm' },
+  }"
         text
       />
       <Button
+      v-if="proveedor?.activo"
         @click="$emit('open-edit', proveedor)"
         style="background: #2b5e3b"
         :pt="{
           root: {
             class:
-              'flex items-center gap-2 px-6 py-2 rounded-lg border-0 text-white text-sm font-semibold font-inter transition-all cursor-pointer',
+              'flex items-center justify-center gap-2 px-7 py-2.5 rounded-lg border-0 text-white text-sm font-semibold font-inter transition-all cursor-pointer min-w-[170px] whitespace-nowrap', // 👈 Ajusté padding, min-w, centrado y evité salto de línea
           },
           label: { class: 'font-inter font-semibold text-sm' },
         }"
