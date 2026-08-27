@@ -9,8 +9,7 @@
           @click="$emit('open-add')" />
       </div>
 
-      <div class="flex flex-row  items-center w-full gap-4">
-
+      <div class="flex flex-row items-center w-full gap-4">
         <IconField class="w-[38%]">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText v-model="filters['global'].value" placeholder="Buscar por nombre, código..."
@@ -20,35 +19,61 @@
         <Select v-model="filtroCategoria" :options="uniqueCategories" showClear placeholder="Todas las categorías"
           class="w-[260px] bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[15px] rounded-xl h-[48px] shadow-sm focus:!border-[#2b5e3b] flex items-center px-4" />
       </div>
-
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <DataTable :value="productosFiltrados" :loading="store.cargando" lazy :paginator="true" :rows="store.perPage"
+      <!-- 🔄 Si está cargando, pasamos un array de 5 filas simuladas y ocultamos la paginación -->
+      <DataTable :value="store.cargando ? Array.from({ length: 5 }) : productosFiltrados" 
+        lazy :paginator="!store.cargando" :rows="store.perPage"
         :totalRecords="store.totalRecords" v-model:filters="filters"
         :globalFilterFields="['nombre', 'fabricante', 'codigo']" responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos" @page="onPageChange">
+        
         <template #empty>
           <div class="text-center py-6 text-[#6b7280] text-[14px]">
             No hay productos registrados.
           </div>
         </template>
 
-        <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]" />
-        <Column field="codigo" header="Código" class="text-[#6b7280]" />
-
-        <Column header="Categoría" class="text-[#4b5563]">
+        <!-- Columna: Nombre -->
+        <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
           <template #body="slotProps">
-            {{ slotProps.data.categoria?.nombre ?? '—' }}
+            <Skeleton v-if="store.cargando" width="75%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.nombre }}</span>
           </template>
         </Column>
 
+        <!-- Columna: Fabricante -->
+        <Column field="fabricante" header="Fabricante" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.cargando" width="55%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.fabricante }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Código -->
+        <Column field="codigo" header="Código" class="text-[#6b7280]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.cargando" width="45%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.codigo }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Categoría -->
+        <Column header="Categoría" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.cargando" width="60%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.categoria?.nombre ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Tipo -->
         <Column header="Tipo" class="text-[#4b5563]">
           <template #body="slotProps">
-            <span :class="[
+            <Skeleton v-if="store.cargando" width="4.5rem" height="1.5rem" borderRadius="20px" />
+            <span v-else :class="[
               'px-2 py-1 rounded text-[12px] font-semibold uppercase',
               slotProps.data.tipo_producto === 'GRANEL'
                 ? 'bg-[#fef9c3] text-[#854d0e]'
@@ -58,16 +83,26 @@
             </span>
           </template>
         </Column>
+
+        <!-- Columna: Acciones -->
         <Column header="Acciones" class="w-[200px]">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <Button icon="pi pi-pencil" label="Editar"
-                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Editar producto'" @click="handleEdit(slotProps.data)" />
+              <!-- Skeletons simétricos para los dos botones -->
+              <template v-if="store.cargando">
+                <Skeleton width="4.8rem" height="2.1rem" borderRadius="8px" />
+                <Skeleton width="3.8rem" height="2.1rem" borderRadius="8px" />
+              </template>
+              
+              <template v-else>
+                <Button icon="pi pi-pencil" label="Editar"
+                  class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Editar producto'" @click="handleEdit(slotProps.data)" />
 
-              <Button icon="pi pi-eye" label="Ver"
-                class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Ver presentaciones'" @click="handleDetail(slotProps.data)" />
+                <Button icon="pi pi-eye" label="Ver"
+                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Ver presentaciones'" @click="handleDetail(slotProps.data)" />
+              </template>
             </div>
           </template>
         </Column>
@@ -82,6 +117,7 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import Skeleton from 'primevue/skeleton' 
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
 import DataTable from 'primevue/datatable'

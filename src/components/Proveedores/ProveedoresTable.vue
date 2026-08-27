@@ -36,16 +36,16 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+      <!-- 🔄 Si loading es true, pasamos un array de 5 filas simuladas y ocultamos la paginación -->
       <DataTable
-        :value="proveedoresFiltrados"
-        :loading="loading"
+        :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados"
         :lazy="false"
         :totalRecords="totalProveedores"
         v-model:filters="filters"
         :globalFilterFields="['nombre', 'correo']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
-        :paginator="true"
+        :paginator="!loading"
         :rows="7"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
@@ -57,15 +57,35 @@
           </div>
         </template>
 
-        <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] capitalize" />
+       
+        <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] capitalize">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="70%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.nombre }}</span>
+          </template>
+        </Column>
+  
+        <Column field="correo" header="Correo" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="80%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.correo }}</span>
+          </template>
+        </Column>
 
-        <Column field="correo" header="Correo" class="text-[#4b5563]" />
+      
+        <Column field="telefono" header="Teléfono" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="50%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.telefono }}</span>
+          </template>
+        </Column>
 
-        <Column field="telefono" header="Teléfono" class="text-[#4b5563]" />
-
+       
         <Column field="estado" header="Estado">
           <template #body="slotProps">
+            <Skeleton v-if="loading" width="5rem" height="1.4rem" borderRadius="20px" />
             <Tag
+              v-else
               :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
               :severity="slotProps.data.activo ? 'success' : 'danger'"
               rounded
@@ -73,57 +93,64 @@
           </template>
         </Column>
 
-                <Column header="Acciones">
+        <!-- Columna: Acciones -->
+        <Column header="Acciones">
           <template #body="slotProps">
             <div class="flex gap-2">
               
-              <template v-if="slotProps.data.activo">
-                <Button
-                  icon="pi pi-pencil"
-                  label="Editar"
-                  class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Editar proveedor'"
-                  @click="handleEdit(slotProps.data)"
-                />
-
-                <Button
-                  icon="pi pi-eye"
-                  label="Ver"
-                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Ver detalles'"
-                  @click="handleDetail(slotProps.data)"
-                />
-
-                <Button
-                  icon="pi pi-ban"
-                  label="Desactivar"
-                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Desactivar proveedor'"
-                  @click="confirmarDesactivar(slotProps.data)"
-                />
+              <template v-if="loading">
+                <Skeleton width="4.5rem" height="2.1rem" borderRadius="8px" />
+                <Skeleton width="3.5rem" height="2.1rem" borderRadius="8px" />
               </template>
 
-              
               <template v-else>
-                <Button
-                  icon="pi pi-eye"
-                  label="Ver"
-                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Ver detalles'"
-                  @click="handleDetail(slotProps.data)"
-                />
-                
                
+                <template v-if="slotProps.data.activo">
+                  <Button
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Editar proveedor'"
+                    @click="handleEdit(slotProps.data)"
+                  />
+
+                  <Button
+                    icon="pi pi-eye"
+                    label="Ver"
+                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Ver detalles'"
+                    @click="handleDetail(slotProps.data)"
+                  />
+
+                  <Button
+                    icon="pi pi-ban"
+                    label="Desactivar"
+                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Desactivar proveedor'"
+                    @click="confirmarDesactivar(slotProps.data)"
+                  />
+                </template>
+
+                
+                <template v-else>
+                  <Button
+                    icon="pi pi-eye"
+                    label="Ver"
+                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Ver detalles'"
+                    @click="handleDetail(slotProps.data)"
+                  />
+                </template>
               </template>
 
             </div>
           </template>
         </Column>
-
       </DataTable>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
@@ -132,6 +159,8 @@ import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import { Select } from 'primevue'
 import Button from 'primevue/button'
+import Skeleton from 'primevue/skeleton'
+
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'

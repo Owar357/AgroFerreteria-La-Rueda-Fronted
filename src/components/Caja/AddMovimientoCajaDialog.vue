@@ -9,7 +9,41 @@
     :style="{ borderRadius: '1rem' }"
     @hide="cerrarDialog"
   >
-    <div class="space-y-5 p-1">
+    <!-- 🔄 SKELETON LOADER FORMULARIO (Se muestra mientras cargando es true) -->
+    <div v-if="cargando" class="space-y-6 p-4">
+      <!-- Esqueleto para los botones conmutadores de Arriba -->
+      <Skeleton width="100%" height="2.6rem" borderRadius="12px" />
+      
+      <!-- Esqueleto para Texto de Ayuda -->
+      <Skeleton width="85%" height="1rem" />
+
+      <!-- Esqueleto para campo Monto -->
+      <div class="space-y-2">
+        <Skeleton width="30%" height="1.1rem" />
+        <Skeleton width="100%" height="2.6rem" borderRadius="8px" />
+        <Skeleton width="55%" height="0.9rem" />
+      </div>
+
+      <!-- Esqueleto para campo Origen -->
+      <div class="space-y-2">
+        <Skeleton width="35%" height="1.1rem" />
+        <Skeleton width="100%" height="2.6rem" borderRadius="8px" />
+        <Skeleton width="60%" height="0.9rem" />
+      </div>
+
+      <!-- Esqueleto para Descripción / Concepto -->
+      <div class="space-y-2">
+        <Skeleton width="45%" height="1.1rem" />
+        <Skeleton width="100%" height="5.5rem" borderRadius="8px" />
+        <div class="flex justify-between">
+          <Skeleton width="50%" height="0.9rem" />
+          <Skeleton width="15%" height="0.9rem" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟢 INTERFAZ DE FORMULARIO REAL (Se renderiza cuando termina de cargar) -->
+    <div v-else class="space-y-5 p-1">
       <div class="flex w-full rounded-xl overflow-hidden border border-[#dee6d6]">
         <button
           @click="tipoMovimiento = 'ENTRADA'"
@@ -63,27 +97,28 @@
           Ingrese el monto en dólares (ej: 150.00)
         </p>
       </div>
+
       <div>
-  <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
-    <i class="pi pi-wallet mr-1 text-[#e0b354]"></i> Origen del dinero
-  </label>
-  <Select
-    v-model="origen"
-    :options="opcionesOrigen"
-    optionLabel="label"
-    optionValue="value"
-    class="w-full"
-    placeholder="Seleccione el origen"
-  />
-  <p class="text-xs text-[#6d8f60] mt-1">
-    <i class="pi pi-info-circle mr-1"></i>
-    {{
-      tipoMovimiento === 'ENTRADA'
-        ? 'Las entradas solo pueden provenir de caja chica.'
-        : 'Seleccione si el dinero sale de caja chica o de las ventas del turno.'
-    }}
-  </p>
-</div>
+        <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
+          <i class="pi pi-wallet mr-1 text-[#e0b354]"></i> Origen del dinero
+        </label>
+        <Select
+          v-model="origen"
+          :options="opcionesOrigen"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full"
+          placeholder="Seleccione el origen"
+        />
+        <p class="text-xs text-[#6d8f60] mt-1">
+          <i class="pi pi-info-circle mr-1"></i>
+          {{
+            tipoMovimiento === 'ENTRADA'
+              ? 'Las entradas solo pueden provenir de caja chica.'
+              : 'Seleccione si el dinero sale de caja chica o de las ventas del turno.'
+          }}
+        </p>
+      </div>
 
       <div>
         <label class="block text-sm font-medium text-[#1e3a2f] mb-2">
@@ -119,28 +154,38 @@
       </div>
     </div>
 
+    <!-- Footer -->
     <template #footer>
       <div class="flex gap-3 justify-end">
-        <Button
-          label="Cancelar"
-          icon="pi pi-times"
-          severity="secondary"
-          text
-          @click="cerrarDialog"
-          class="rounded-lg"
-        />
-        <Button
-          :label="tipoMovimiento === 'ENTRADA' ? 'Registrar ingreso' : 'Registrar salida'"
-          :icon="tipoMovimiento === 'ENTRADA' ? 'pi pi-plus-circle' : 'pi pi-minus-circle'"
-          :severity="tipoMovimiento === 'ENTRADA' ? 'success' : 'danger'"
-          :loading="guardando"
-          @click="registrarMovimiento"
-          class="rounded-lg"
-        />
+        <!-- Esqueleto para los botones del footer mientras carga -->
+        <template v-if="cargando">
+          <Skeleton width="5.5rem" height="2.4rem" borderRadius="8px" />
+          <Skeleton width="9rem" height="2.4rem" borderRadius="8px" />
+        </template>
+        
+        <template v-else>
+          <Button
+            label="Cancelar"
+            icon="pi pi-times"
+            severity="secondary"
+            text
+            @click="cerrarDialog"
+            class="rounded-lg"
+          />
+          <Button
+            :label="tipoMovimiento === 'ENTRADA' ? 'Registrar ingreso' : 'Registrar salida'"
+            :icon="tipoMovimiento === 'ENTRADA' ? 'pi pi-plus-circle' : 'pi pi-minus-circle'"
+            :severity="tipoMovimiento === 'ENTRADA' ? 'success' : 'danger'"
+            :loading="guardando"
+            @click="registrarMovimiento"
+            class="rounded-lg"
+          />
+        </template>
       </div>
     </template>
   </Dialog>
 </template>
+
 
 <script setup>
 import { ref, computed, watch } from 'vue'
