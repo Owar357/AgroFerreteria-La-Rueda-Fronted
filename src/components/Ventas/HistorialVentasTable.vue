@@ -49,83 +49,118 @@
 
     <!-- Tabla -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+      <!-- 🔄 Si cargando es true, pasamos un array de 8 filas simuladas (según tus rows) y ocultamos la paginación -->
       <DataTable
-        :value="ventasFiltradas"
+        :value="cargando ? Array.from({ length: 8 }) : ventasFiltradas"
         v-model:filters="filtros"
         :globalFilterFields="['vendidoPor', 'numeroFactura']"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
-        :lazy="true"
         :totalRecords="totalRegistros" 
-        :loading="cargando"
-        :paginator="true"
-          @page="onPage"
+        :paginator="!cargando"
+        @page="onPage"
         :rows="8"
-       currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-        >
-        <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f]" />
+      >
+        <template #empty>
+          <div class="text-center py-6 text-[#6b7280] text-[14px]">
+            No hay ventas registradas.
+          </div>
+        </template>
 
-        <Column field="numeroFactura" header="N° Factura">
-          <template #body="{ data }">
-            <span class="font-mono text-[13px] text-[#2b5e3b] font-semibold">{{
-              data.numeroFactura
-            }}</span>
+        <!-- Columna: Vendido por -->
+        <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f]">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="65%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.vendidoPor }}</span>
           </template>
         </Column>
 
-        <Column field="tipoPago" header="Tipo de pago">
-          <template #body="{ data }">
-            <span :class="estiloPago(data.tipoPago)">
-              <i class="pi text-[11px]" :class="iconoPago(data.tipoPago)" />
-              {{ data.tipoPago }}
+        <!-- Columna: N° Factura -->
+        <Column field="numeroFactura" header="N° Factura">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="5rem" height="1.2rem" />
+            <span v-else class="font-mono text-[13px] text-[#2b5e3b] font-semibold">
+              {{ slotProps.data.numeroFactura }}
             </span>
           </template>
         </Column>
 
+        <!-- Columna: Tipo de pago -->
+        <Column field="tipoPago" header="Tipo de pago">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="6.5rem" height="1.5rem" borderRadius="20px" />
+            <span v-else :class="estiloPago(slotProps.data.tipoPago)">
+              <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
+              {{ slotProps.data.tipoPago }}
+            </span>
+          </template>
+        </Column>
+
+        <!-- Columna: Estado -->
         <Column field="estado" header="Estado">
-          <template #body="{ data }">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="20px" />
             <span
+              v-else
               :class="
-                data.estado === 'PROCESADA'
+                slotProps.data.estado === 'PROCESADA'
                   ? 'bg-[#dff0e0] text-[#2b5e3b] px-2 py-1 rounded-full text-xs font-medium'
                   : 'bg-[#fee2e2] text-[#b91c1c] px-2 py-1 rounded-full text-xs font-medium'
               "
             >
-              {{ data.estado }}
+              {{ slotProps.data.estado }}
             </span>
           </template>
         </Column>
 
-        <Column field="fecha" header="Fecha" class="text-[#6b7280]" />
-
-        <Column field="total" header="Total">
-          <template #body="{ data }">
-            <span class="font-bold text-[#1a2e1f]">${{ formatearMoneda(data.total) }}</span>
+        <!-- Columna: Fecha -->
+        <Column field="fecha" header="Fecha" class="text-[#6b7280]">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="5.5rem" height="1.2rem" />
+            <span v-else>{{ slotProps.data.fecha }}</span>
           </template>
         </Column>
 
+        <!-- Columna: Total -->
+        <Column field="total" header="Total">
+          <template #body="slotProps">
+            <Skeleton v-if="cargando" width="4rem" height="1.2rem" />
+            <span v-else class="font-bold text-[#1a2e1f]">${{ formatearMoneda(slotProps.data.total) }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Acciones -->
         <Column header="Acciones" class="text-center w-[130px]">
-          <template #body="{ data }">
+          <template #body="slotProps">
             <div class="flex gap-2 justify-center">
-              <Button
-                icon="pi pi-eye"
-                v-tooltip.top="'Ver detalle'"
-                class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                @click="$emit('ver-detalle', data)"
-              />
-              <Button
-                icon="pi pi-ban"
-                v-tooltip.top="'Anular venta'"
-                :disabled="data.estado === 'ANULADA'"
-                :class="
-                  data.estado === 'ANULADA'
-                    ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
-                    : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'
-                "
-                class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                @click="$emit('anular-venta', data)"
-              />
+              <!-- Skeletons redondos simulando los botones circulares (w-8 h-8) -->
+              <template v-if="cargando">
+                <Skeleton shape="circle" size="2rem" />
+                <Skeleton shape="circle" size="2rem" />
+              </template>
+              
+              <template v-else>
+                <Button
+                  icon="pi pi-eye"
+                  v-tooltip.top="'Ver detalle'"
+                  class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+                  @click="$emit('ver-detalle', slotProps.data)"
+                />
+                <Button
+                  icon="pi pi-ban"
+                  v-tooltip.top="'Anular venta'"
+                  :disabled="slotProps.data.estado === 'ANULADA'"
+                  :class="
+                    slotProps.data.estado === 'ANULADA'
+                      ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
+                      : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'
+                  "
+                  class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
+                  @click="$emit('anular-venta', slotProps.data)"
+                />
+              </template>
             </div>
           </template>
         </Column>
@@ -134,77 +169,98 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, reactive } from 'vue'
-
-//pAGINACOIN DE PARTE  DEL SEERVIDOR
-const totalRegistros = ref(8)
-const cargando = ref(false)
+import { ref, computed } from 'vue'
+import Skeleton from 'primevue/skeleton'
 
 
-
-const onPage = (event) => {
-const paginaDestino = event.page + 1 
-const limitePorPagina = event.rows
-
-
-emit('cambiar-pagina', { 
-    page: paginaDestino, 
-    per_page: limitePorPagina 
-  })
-}
 // Props
 const props = defineProps({
- 
   ventas: {
     type: Array,
     required: true,
     default: () => [],
   },
+  cargando: {
+    type: Boolean,
+    default: false
+  }
 })
 
 // Emits
-const emit = defineEmits(['ver-detalle', 'anular-venta', 'filtrar-fechas'])
+const emit = defineEmits(['ver-detalle', 'anular-venta', 'cambiar-pagina'])
+
+// Paginación desde el Servidor (Control de eventos de navegación de PrimeVue)
+const totalRegistros = computed(() => props.ventas?.length || 0)
+
+const onPage = (event) => {
+  const paginaDestino = event.page + 1 
+  const limitePorPagina = event.rows
+
+  emit('cambiar-pagina', { 
+    page: paginaDestino, 
+    per_page: limitePorPagina 
+  })
+}
 
 // Opciones de filtros
 const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
 const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 const rangoDeFechas = ref(null)
 
-// Filtros que usan ref
+// Filtros reactivos vinculados a los v-model de la interfaz
 const filtros = ref({
   global: { value: null, matchMode: 'contains' },
   estado: { value: null, matchMode: 'equals' },
   tipoPago: { value: null, matchMode: 'equals' },
 })
 
-const onFechaSeleccionada = () => {
-  const rango = rangoDeFechas.value
-  if (!rango) return
-
-  const desde = rango[0]
-  const hasta = rango[1] || rango[0]
-
-  emit('filtrar-fechas', {
-    fecha_desde: desde.toISOString().split('T')[0],
-    fecha_hasta: hasta.toISOString().split('T')[0],
-  })
-}
-
-// Filtro por rango de fechas
 const ventasFiltradas = computed(() => {
-  if (!props.ventas) return []
-  if (!rangoDeFechas.value?.[0]) return props.ventas
-  const [desde, hasta] = rangoDeFechas.value
-  return props.ventas.filter((venta) => {
-    if (!venta.fecha) return false
-    const [d, m, a] = venta.fecha.split('/')
-    const fechaVenta = new Date(`${a}-${m}-${d}`)
-    return hasta ? fechaVenta >= desde && fechaVenta <= hasta : fechaVenta >= desde
-  })
+  let lista = props.ventas ?? []
+
+  const textoBusqueda = filtros.value.global.value?.toLowerCase().trim() || ''
+  if (textoBusqueda) {
+    lista = lista.filter((v) => 
+      v.vendidoPor?.toLowerCase().includes(textoBusqueda) ||
+      v.numeroFactura?.toLowerCase().includes(textoBusqueda)
+    )
+  }
+
+  
+  const estadoSeleccionado = filtros.value.estado.value
+  if (estadoSeleccionado) {
+    lista = lista.filter((v) => v.estado === estadoSeleccionado)
+  }
+
+ 
+  const pagoSeleccionado = filtros.value.tipoPago.value
+  if (pagoSeleccionado) {
+    lista = lista.filter((v) => v.tipoPago === pagoSeleccionado)
+  }
+
+ 
+  if (rangoDeFechas.value?.[0]) {
+    const desde = new Date(rangoDeFechas.value[0])
+    desde.setHours(0, 0, 0, 0) 
+
+    // Si seleccionó la segunda fecha del rango la usamos, si no, igualamos a la primera
+    const hasta = rangoDeFechas.value[1] ? new Date(rangoDeFechas.value[1]) : new Date(desde)
+    hasta.setHours(23, 59, 59, 999)
+
+    lista = lista.filter((v) => {
+      if (!v.fecha) return false
+      
+      const [d, m, a] = v.fecha.split('/')
+      const fechaVenta = new Date(Number(a), Number(m) - 1, Number(d))
+      return fechaVenta >= desde && fechaVenta <= hasta
+    })
+  }
+
+  return lista
 })
 
-// Helpers visuales
+// Helpers visuales para estilos e íconos de la tabla
 const estiloPago = (tipo) => {
   if (tipo === 'EFECTIVO')
     return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
@@ -227,6 +283,7 @@ const formatearMoneda = (valor) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
+
 
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {

@@ -26,7 +26,7 @@
         />
 
         <!-- Filtro proveedor -->
-        <AutoComplete
+        <AutoComplete 
           v-model="proveedorSeleccionado"
           optionLabel="nombre"
           :suggestions="proveedoresFiltrados"
@@ -67,12 +67,12 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+      <!-- 🔄 Si loading es true, inyectamos un array de 5 filas simuladas y ocultamos la paginación -->
       <DataTable
-        :value="compras"
-        :loading="loading"
+        :value="loading ? Array.from({ length: 5 }) : compras"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
-        :paginator="true"
+        :paginator="!loading"
         :rows="5"
         :totalRecords="paginacion.total"
         :lazy="true"
@@ -84,22 +84,52 @@
           <div class="text-center py-6 text-gray-400">No se encontraron compras.</div>
         </template>
 
-        <Column field="fechaEmision" header="Fecha Emisión" />
-        <Column field="proveedor" header="Proveedor" class="text-[#6b7280]" />
-        <Column field="tipoDocumento" header="Tipo Documento" />
-        <Column field="numDocumento" header="Nº Documento" />
-        
-
-
-        <Column field="precioFactura" header="Precio Factura">
+        <!-- Columna: Fecha Emisión -->
+        <Column field="fechaEmision" header="Fecha Emisión">
           <template #body="slotProps">
-            <span class="font-bold text-[#2b5e3b]">${{ slotProps.data.precioFactura }}</span>
+            <Skeleton v-if="loading" width="5.5rem" height="1.2rem" />
+            <span v-else>{{ slotProps.data.fechaEmision }}</span>
           </template>
         </Column>
 
+        <!-- Columna: Proveedor -->
+        <Column field="proveedor" header="Proveedor" class="text-[#6b7280]">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="75%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.proveedor }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Tipo Documento -->
+        <Column field="tipoDocumento" header="Tipo Documento">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="4.5rem" height="1.2rem" />
+            <span v-else>{{ slotProps.data.tipoDocumento }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Nº Documento -->
+        <Column field="numDocumento" header="Nº Documento">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="5rem" height="1.2rem" />
+            <span v-else>{{ slotProps.data.numDocumento }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Precio Factura -->
+        <Column field="precioFactura" header="Precio Factura">
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="4rem" height="1.2rem" />
+            <span v-else class="font-bold text-[#2b5e3b]">${{ slotProps.data.precioFactura }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Estado de Pago -->
         <Column field="estadoPago" header="Estado de Pago">
           <template #body="slotProps">
+            <Skeleton v-if="loading" width="5.5rem" height="1.5rem" borderRadius="20px" />
             <span
+              v-else
               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
               :class="{
                 'bg-green-100 text-green-800': slotProps.data.estadoPago === 'PAGADO',
@@ -113,39 +143,52 @@
             </span>
           </template>
         </Column>
-        
 
+        <!-- Columna: Estado de compra -->
         <Column header="Estado de compra" class="text-center w-[150px]">
-     <template #body="slotProps">
-    <span
-      class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
-      :class="slotProps.data.esAnulado
-        ? 'bg-gray-200 text-gray-800'
-        : 'bg-green-100 text-green-800'"
-    >
-            {{ slotProps.data.esAnulado ? 'Anulada' : 'Activa' }}
-        </span>
-        </template>
-         </Column>
+          <template #body="slotProps">
+            <Skeleton v-if="loading" width="4.5rem" height="1.5rem" borderRadius="20px" class="mx-auto" />
+            <span
+              v-else
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+              :class="slotProps.data.esAnulado
+                ? 'bg-gray-200 text-gray-800'
+                : 'bg-green-100 text-green-800'"
+            >
+              {{ slotProps.data.esAnulado ? 'Anulada' : 'Activa' }}
+            </span>
+          </template>
+        </Column>
 
+        <!-- Columna: Acciones -->
         <Column header="Acciones" class="text-right w-[200px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-end">
-              <Button
-                icon="pi pi-eye"
-                label="Ver"
-                class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Ver detalles'"
-                @click="verDetalles(slotProps.data)"
-              />
-              <Button
-                 v-if="!slotProps.data.esAnulado"
-                 icon="pi pi-ban"
-                 label="Anular"
-                 class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                 v-tooltip.top="'Anular compra'"
-                 @click="anularCompra(slotProps.data)"
-              />
+              
+              <!-- Skeletons simétricos imitando la caja de botones -->
+              <template v-if="loading">
+                <Skeleton width="3.8rem" height="2.1rem" borderRadius="8px" />
+                <Skeleton width="4.5rem" height="2.1rem" borderRadius="8px" />
+              </template>
+
+              <template v-else>
+                <Button
+                  icon="pi pi-eye"
+                  label="Ver"
+                  class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Ver detalles'"
+                  @click="verDetalles(slotProps.data)"
+                />
+                <Button
+                   v-if="!slotProps.data.esAnulado"
+                   icon="pi pi-ban"
+                   label="Anular"
+                   class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                   v-tooltip.top="'Anular compra'"
+                   @click="anularCompra(slotProps.data)"
+                />
+              </template>
+
             </div>
           </template>
         </Column>
@@ -154,6 +197,7 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
@@ -161,6 +205,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
+import Skeleton from 'primevue/skeleton'
 import { DatePicker } from 'primevue'
 import { proveedores as getProveedores } from '@/services/proveedorService'
 import authService from '@/services/authService'

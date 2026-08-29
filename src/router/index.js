@@ -136,7 +136,15 @@ const routes = [
         name: 'ClienteHistorial',               
         component: () => import('@/components/Clientes/HistorialClienteDialogo.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
-       }
+       },
+       //agrege esto para cargar la pagina aparatee de lotes 
+       {
+          path: 'inventario/presentaciones/:id/lotes',
+             name: 'lotes-presentacion',
+            component: () => import('@/components/Productos/LotesPresentacionTable.vue'),
+           props: (route) => ({ presentacionId: route.params.id, nombrePresentacion: route.query.nombre }),
+             meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
+           }
     ]
   },
 

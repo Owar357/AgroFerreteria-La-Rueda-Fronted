@@ -41,7 +41,7 @@
   import AddProductos from '../components/Productos/AddProductos.vue'
   import { useproductoStore } from '../stores/productoStore.js'
   import DetalleProductosTable from '../components/Productos/DetalleProductosTable.vue'
-import EditProducto from '@/components/Productos/EditProducto.vue'
+  import EditProducto from '@/components/Productos/EditProducto.vue'
 
 
 
