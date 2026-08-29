@@ -536,7 +536,6 @@ const formatearFecha = (fecha) => {
   return `${anio}-${mes}-${dia}`
 }
 
-//SOLUCCION DEL BUG
 const limpiarMonto = (valor) => {
   if (valor === null || valor === undefined || valor === '') return null
   const limpio = parseFloat(String(valor).replace(/[^0-9.]/g, ''))
