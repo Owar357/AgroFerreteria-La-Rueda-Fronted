@@ -321,7 +321,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -429,6 +429,7 @@ const agregarProducto = () => {
     })
     return
   }
+  // aqui quite el codigo 
 
   const precio = parseFloat(presentacion.precio_venta)
 
@@ -519,10 +520,12 @@ const registrarVenta = async () => {
       })),
     }
 
-   // console.log('Payload de venta:', payload)
+   
   try {
     const response = await registerVenta(payload)
     console.log('Respuesta venta:', response.data)
+
+      //ESTO SE AGREGO OMAR
 
     if (response.data.apertura_pendiente) {
       const resultado = await Swal.fire({

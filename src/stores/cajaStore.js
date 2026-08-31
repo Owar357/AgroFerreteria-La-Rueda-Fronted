@@ -4,15 +4,20 @@ import { abrirCaja, abrirVenta, cuadrarVenta, cerrarVentaCaja, getEstadoCaja } f
 
 export const useCajaStore = defineStore('caja', () => {
 
-  // ── Estado ─────────────────────────────────────────────────────────────────
+  
   const cajaAbierta  = ref(false)
   const ventaAbierta = ref(false)
   const montoInicial = ref(0)
   const cargando     = ref(false)
-  const estadoCargado = ref(false) // true cuando ya se consultó el estado al backend
+  const estadoCargado = ref(false) 
+  const necesitaActualizarResumen = ref(false) 
 
-  // ── Cargar estado real desde el backend ───────────────────────────────────
-  // Se llama al montar el POS y la vista de Caja para sincronizar el estado
+
+  const marcarActualizacionPendiente = () => {
+    necesitaActualizarResumen.value = true
+  }
+
+ 
   const cargarEstadoCaja = async () => {
     try {
       const response = await getEstadoCaja()
@@ -21,14 +26,14 @@ export const useCajaStore = defineStore('caja', () => {
       montoInicial.value = response.data.monto_inicial ?? 0
       estadoCargado.value = true
     } catch {
-      // Si falla la consulta dejamos el estado en false por seguridad
+      
       cajaAbierta.value   = false
       ventaAbierta.value  = false
       estadoCargado.value = true
     }
   }
 
-  // ── Apertura de caja ──────────────────────────────────────────────────────
+  
   const abrirTurnoCaja = async (payload) => {
     cargando.value = true
     try {
@@ -50,7 +55,6 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // ── Apertura de venta ─────────────────────────────────────────────────────
   const abrirTurnoVenta = async (montoInicialValue) => {
     cargando.value = true
     try {
@@ -71,7 +75,7 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // ── Cuadre de venta ───────────────────────────────────────────────────────
+  
   const cuadrarTurnoVenta = async (payload) => {
     cargando.value = true
     try {
@@ -92,7 +96,6 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // ── Cierre de venta y caja ────────────────────────────────────────────────
   const cerrarTurnoVentaCaja = async (payload) => {
     cargando.value = true
     try {
@@ -115,7 +118,7 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // ── Cierre local (fallback) ───────────────────────────────────────────────
+  
   const cerrarTurno = () => {
     cajaAbierta.value  = false
     ventaAbierta.value = false
@@ -124,6 +127,7 @@ export const useCajaStore = defineStore('caja', () => {
 
   return {
     cajaAbierta, ventaAbierta, montoInicial, cargando, estadoCargado,
+    necesitaActualizarResumen, marcarActualizacionPendiente,
     cargarEstadoCaja,
     abrirTurnoCaja, abrirTurnoVenta,
     cuadrarTurnoVenta, cerrarTurnoVentaCaja,
