@@ -462,10 +462,6 @@ const registrarVenta = async () => {
     })),
   }
 
-<<<<<<< HEAD:src/views/FromVenta.vue
-   
-=======
->>>>>>> 672e6d16697e2e2a890fc900d02562032149f8a8:src/components/Ventas/POS.vue
   try {
     const response = await registerVenta(payload)
 
