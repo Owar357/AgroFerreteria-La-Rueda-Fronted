@@ -442,16 +442,16 @@
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import Swal from 'sweetalert2'
 import { useCajaStore } from '@/stores/cajaStore'
 import { getMovimientos } from '@/services/movimientoCajaService'
+import { getResumenTurno } from '@/services/movimientoCajaService' // o el service que corresponda
 
 import AdminAuthDialog from '@/components/Caja/AdminAuthDialog.vue'
 import OpenCashierDialog from '@/components/Caja/OpenCashierDialog.vue'
 import CloseCashierDialog from '@/components/Caja/CloseCashierDialog.vue'
 import CierreCajaDialog from '@/components/Caja/CierreCajaDialog.vue'
-
 
 const cajaStore = useCajaStore()
 
@@ -460,15 +460,14 @@ const cleanRole = rawRole.replace(/[^a-zA-Z]/g, '').toLowerCase()
 
 const rolUsuario = ref(cleanRole)
 
-
-const esAdministrador = computed(() => rolUsuario.value === 'admin' || rolUsuario.value === 'administrador')
+const esAdministrador = computed(
+  () => rolUsuario.value === 'admin' || rolUsuario.value === 'administrador',
+)
 const esCajero = computed(() => rolUsuario.value === 'cajero')
-
 
 const currentDate = ref(
   new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
 )
-
 
 const adminAuthVisible = ref(false)
 const aperturaCajaVisible = ref(false)
@@ -476,28 +475,31 @@ const conteoVisible = ref(false)
 const adminAuthCierreVisible = ref(false)
 const cierreVisible = ref(false)
 
-
 const adminAuthRef = ref(null)
 const adminAuthCierreRef = ref(null)
 const closeCashierRef = ref(null)
-
 
 const datosCierre = ref({})
 const denominacionesGuardadas = ref([])
 const montoContadoGuardado = ref(0)
 
-
+// --- Datos del resumen del turno (vienen del backend, endpoint /caja/resumen-turno) ---
 const ventasContado = ref(0)
 const ventasTarjeta = ref(0)
 const ventasTransferencia = ref(0)
 const entradas = ref(0)
 const retiros = ref(0)
+const montoEnCajaReal = ref(0)
+const montoEsperadoReal = ref(0)
+const totalEnCajaReal = ref(0)
+
+// Estos dos siguen siendo locales, se llenan al momento del cierre (CloseCashierDialog / CierreCajaDialog)
 const montoRealFinal = ref(0)
 const diferenciaFinal = ref(0)
 
+const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
 
-
-// --- NUEVO: movimientos reales desde el backend ---
+// --- Movimientos recientes (tabla "Últimos movimientos") ---
 const movimientosRecientes = ref([])
 const cargandoMovimientos = ref(false)
 
@@ -526,40 +528,61 @@ const cargarMovimientosRecientes = async () => {
   }
 }
 
+// --- Resumen del turno (4 tarjetas + resumen del admin) ---
+const cargarResumenTurno = async () => {
+  try {
+    const { data } = await getResumenTurno()
+    cajaStore.montoInicial = parseFloat(data.monto_inicial)
+    ventasContado.value = parseFloat(data.ventas_contado)
+    ventasTarjeta.value = parseFloat(data.ventas_tarjeta)
+    ventasTransferencia.value = parseFloat(data.ventas_transferencia)
+    entradas.value = parseFloat(data.total_entradas)
+    retiros.value = parseFloat(data.total_salidas)
+    montoEnCajaReal.value = parseFloat(data.monto_en_caja)
+    montoEsperadoReal.value = parseFloat(data.monto_esperado)
+    totalEnCajaReal.value = parseFloat(data.total_en_caja)
+  } catch (error) {
+    console.error('Error al cargar el resumen del turno:', error)
+  }
+}
+
+// Refresca ambos: movimientos + resumen. Útil para llamar tras cualquier acción que cambie los datos.
+const refrescarDatosTurno = async () => {
+  await Promise.all([cargarMovimientosRecientes(), cargarResumenTurno()])
+}
+
 onMounted(() => {
-  cargarMovimientosRecientes()
+  refrescarDatosTurno()
 })
 
-// Permite refrescar la tabla desde fuera (ej. tras registrar un movimiento externo en otra vista)
-defineExpose({ cargarMovimientosRecientes })
+// Permite refrescar desde fuera (ej. tras registrar un movimiento externo o una venta en otra vista)
+defineExpose({ refrescarDatosTurno })
 
-
-
-
-const totalVentas = computed(
-  () => ventasContado.value + ventasTarjeta.value + ventasTransferencia.value,
+watch(
+  () => cajaStore.necesitaActualizarResumen,
+  (necesitaActualizar) => {
+    if (necesitaActualizar) {
+      refrescarDatosTurno()
+      cajaStore.necesitaActualizarResumen = false
+    }
+  },
 )
-const totalIngresos = computed(() => totalVentas.value + entradas.value)
-const montoEsperado = computed(() => cajaStore.montoInicial + totalIngresos.value - retiros.value)
-const totalEnCaja = computed(() => cajaStore.montoInicial + totalIngresos.value - retiros.value)
-const montoEnCaja = computed(() => totalEnCaja.value)
+
+// --- Computeds que ahora leen datos reales del backend, sin recalcular localmente ---
+const montoEsperado = computed(() => montoEsperadoReal.value)
+const montoEnCaja = computed(() => montoEnCajaReal.value)
+const totalEnCaja = computed(() => totalEnCajaReal.value)
 const diferencia = computed(() => montoEnCaja.value - montoEsperado.value)
 
-
-const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
-
-
-
+// --- Acciones ---
 const abrirCaja = () => {
   adminAuthVisible.value = true
 }
-
 
 const onCredencialesConfirmadas = async (credenciales) => {
   adminAuthRef.value?.setLoading(true)
   const resultado = await cajaStore.abrirTurnoCaja(credenciales)
   adminAuthRef.value?.setLoading(false)
-
 
   if (resultado.ok) {
     adminAuthVisible.value = false
@@ -579,22 +602,16 @@ const onCredencialesConfirmadas = async (credenciales) => {
   }
 }
 
-
-
 const abrirVenta = () => {
   aperturaCajaVisible.value = true
- 
 }
-
 
 const onAbrirVenta = async ({ total }) => {
   aperturaCajaVisible.value = false
   const resultado = await cajaStore.abrirTurnoVenta(total)
 
-
   if (resultado.ok) {
-   
-    
+    await refrescarDatosTurno()
     Swal.fire({
       toast: true,
       position: 'top-end',
@@ -616,27 +633,20 @@ const onAbrirVenta = async ({ total }) => {
   }
 }
 
-
-
 const cerrarCaja = () => {
   conteoVisible.value = true
 }
 
-
-
 const onConteoListo = ({ monto_contado, denominaciones }) => {
-
-
   montoContadoGuardado.value = monto_contado
   denominacionesGuardadas.value = denominaciones
-
 
   conteoVisible.value = false
   adminAuthCierreVisible.value = true
 }
+
 const onCredencialesCierre = async (credenciales) => {
   adminAuthCierreRef.value?.setLoading(true)
-
 
   const resultado = await cajaStore.cuadrarTurnoVenta({
     email: credenciales.email,
@@ -644,30 +654,25 @@ const onCredencialesCierre = async (credenciales) => {
     monto_contado: montoContadoGuardado.value,
   })
 
-
   adminAuthCierreRef.value?.setLoading(false)
-
 
   if (resultado.ok) {
     adminAuthCierreVisible.value = false
-    // Guardamos los datos del cuadre para el modal final
     datosCierre.value = resultado.data
+    montoRealFinal.value = parseFloat(resultado.data.monto_contado)
+    diferenciaFinal.value = parseFloat(resultado.data.diferencia)
     cierreVisible.value = true
-    cargarMovimientosRecientes()
-
+    await refrescarDatosTurno()
   } else {
     adminAuthCierreRef.value?.mostrarError(resultado.error)
   }
 }
 
-
 const onCancelarCierre = () => {
   cierreVisible.value = false
-  // Restauramos las denominaciones que el usuario ya había ingresado
   closeCashierRef.value?.restaurar(denominacionesGuardadas.value)
   conteoVisible.value = true
 }
-
 
 const onCierreExitoso = () => {
   cierreVisible.value = false
@@ -675,9 +680,4 @@ const onCierreExitoso = () => {
   montoContadoGuardado.value = 0
   datosCierre.value = {}
 }
-
-
-
-
-
 </script>

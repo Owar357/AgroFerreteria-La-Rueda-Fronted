@@ -232,7 +232,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -347,6 +347,7 @@ const agregarProducto = () => {
     })
     return
   }
+  // aqui quite el codigo 
 
   // 1. Obtener precio original y porcentaje de descuento del lote/presentación
   const precioOriginal = parseFloat(presentacion.precio_venta) || 0
@@ -467,6 +468,8 @@ const registrarVenta = async () => {
 
     cajaStore.marcarActualizacionPendiente()
 
+
+      //ESTO SE AGREGO OMAR
 
     if (response.data.apertura_pendiente) {
       const resultado = await Swal.fire({

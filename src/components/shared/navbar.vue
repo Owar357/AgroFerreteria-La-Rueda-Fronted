@@ -45,7 +45,7 @@
           {{ user?.name }}
         </span>
         <span class="text-[#A9C6A5] text-xs">
-          Usuario, {{ roleLabel }}
+           {{ roleLabel }}
         </span>
       </div>
     </div>
