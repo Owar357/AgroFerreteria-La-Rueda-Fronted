@@ -97,10 +97,12 @@
               <Column header="Precio Unit.">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.porcentaje_descuento > 0" class="flex flex-col">
-                    <span class="text-[11px] text-gray-400 line-through">${{ parseFloat(slotProps.data.precio).toFixed(2) }}</span>
+                    <span class="text-[11px] text-gray-400 line-through">${{
+                      parseFloat(slotProps.data.precio).toFixed(2) }}</span>
                     <span class="text-xs font-bold text-amber-700">
                       ${{ (slotProps.data.precio - (slotProps.data.descuento / slotProps.data.cantidad)).toFixed(2) }}
-                      <span class="text-[10px] bg-amber-100 text-amber-800 px-1 rounded ml-0.5">-{{ slotProps.data.porcentaje_descuento }}%</span>
+                      <span class="text-[10px] bg-amber-100 text-amber-800 px-1 rounded ml-0.5">-{{
+                        slotProps.data.porcentaje_descuento }}%</span>
                     </span>
                   </div>
                   <span v-else>${{ parseFloat(slotProps.data.precio).toFixed(2) }}</span>
@@ -461,6 +463,10 @@ const registrarVenta = async () => {
 
   try {
     const response = await registerVenta(payload)
+
+
+    cajaStore.marcarActualizacionPendiente()
+
 
     if (response.data.apertura_pendiente) {
       const resultado = await Swal.fire({
