@@ -102,8 +102,10 @@ const props = defineProps({
   nombrePresentacion: { type: String, default: '' },
 })
 
-const router = useRouter()
+
 const loteStore = useLoteStore()
+
+const emit = defineEmits(['volver'])
 
 // Modal
 const modalVisible = ref(false)
@@ -146,7 +148,9 @@ const guardarDescuento = async () => {
   }
 }
 
-const volver = () => router.back()
+const volver = () => {
+  emit('volver')
+}
 
 const formatFecha = (fecha) => {
   if (!fecha) return '—'

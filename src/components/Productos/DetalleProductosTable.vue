@@ -132,8 +132,8 @@ const props = defineProps({
   producto: { type: Object, required: true },
 })
 
-const emit = defineEmits(['volver'])
-const router = useRouter()
+const emit = defineEmits(['volver', 'open-lotes'])
+
 
 // Estado
 const editarVisible = ref(false)
@@ -303,12 +303,11 @@ const abrirCodigos = (presentacion) => {
 }
 
 const abrirLotes = (presentacion) => {
-  router.push({
-    name: 'lotes-presentacion',
-    params: { id: presentacion.id },
-    query: { nombre: presentacion.nombre },
-  })
+  emit('open-lotes', presentacion)
 }
+
+
+
 </script>
 
 <style scoped>
