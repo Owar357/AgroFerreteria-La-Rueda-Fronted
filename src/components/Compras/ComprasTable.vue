@@ -295,7 +295,7 @@ const anularCompra = (compra) => {
     }
   })
 }
-// este agrege lo combie por el anterior
+
 
 onMounted(async () => {
   try {
