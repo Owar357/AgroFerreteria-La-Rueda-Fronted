@@ -52,6 +52,10 @@ export const deleteCodigoBarra = (id) => api.delete(`/codigosBarra/${id}`)
 export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
   api.get('/lotes', { params: { presentacion_id: presentacionId, page, per_page: perPage } })
 
+// Actualizar porcentaje de descuento de un lote específico
+export const updateDescuentoLote = (loteId, porcentajeDescuento) =>
+  api.patch(`/lotes/${loteId}/descuento`, { porcentaje_descuento: porcentajeDescuento })
+
 // ==========================================
 // KARDEX (NUEVO)
 // ==========================================
@@ -66,6 +70,7 @@ export const getKardexByProducto = (productoId, page = 1, perPage = 10, filtros 
       fecha_fin: filtros.fecha_fin || null,
     },
   })
+
 // ==========================================
 // TABLAS DE APOYO / SELECTS
 // ==========================================
