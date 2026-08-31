@@ -69,22 +69,24 @@ const routes = [
         component: () => import('@/views/HistorialVentaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
+
+
       {
         path: 'gestion/pos',
-        name: 'FromVenta',
-        component: () => import('@/views/FromVenta.vue'),
+        name: 'POS',
+        component: () => import('@/components/Ventas/POS.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       
  
-
-      
       {
         path: 'venta/venta',
         name: 'venta',
-        component: () => import('@/views/FromVenta.vue'),
+        component: () => import('@/components/Ventas/POS.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
+
+      
       {
         path: 'caja',
         name: 'caja',
