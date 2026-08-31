@@ -1,18 +1,20 @@
 <template>
   <div class="overflow-hidden relative">
-    <transition :name="transitionName" mode="out-in">
-      <div :key="vistaActual" class="w-full">
-        <!-- 1. LISTA -->
-        <ProductoTable 
-          v-if="vistaActual === 'lista'"
-          @open-add="abrirFormularioCrear"
-          @open-edit="abrirFormularioEditar"
-          @open-detail="abrirDetalle"
-        />
+    <!-- 1. LISTA — SIEMPRE montada, solo se oculta -->
+    <div v-show="vistaActual === 'lista'" class="w-full">
+      <ProductoTable
+        @open-add="abrirFormularioCrear"
+        @open-edit="abrirFormularioEditar"
+        @open-detail="abrirDetalle"
+      />
+    </div>
 
+    <!-- Las demás vistas sí se destruyen entre sí, con su transición -->
+    <transition :name="transitionName" mode="out-in">
+      <div v-if="vistaActual !== 'lista'" :key="vistaActual" class="w-full">
         <!-- 2. CREAR -->
         <AddProductos
-          v-else-if="vistaActual === 'formulario'"
+          v-if="vistaActual === 'formulario'"
           :producto="productoSeleccionado"
           @close="cerrarFormulario"
         />
@@ -32,7 +34,7 @@
           @open-lotes="abrirLotes"
         />
 
-        <!-- 5. LOTES (Nuevo estado interno) -->
+        <!-- 5. LOTES -->
         <LotesPresentacionTable
           v-else-if="vistaActual === 'lotes'"
           :presentacionId="presentacionSeleccionada?.id"
@@ -50,20 +52,16 @@ import ProductoTable from '../components/Productos/ProductoTable.vue'
 import AddProductos from '../components/Productos/AddProductos.vue'
 import EditProducto from '@/components/Productos/EditProducto.vue'
 import DetalleProductosTable from '../components/Productos/DetalleProductosTable.vue'
-import LotesPresentacionTable from '../components/Productos/LotesPresentacionTable.vue' 
+import LotesPresentacionTable from '../components/Productos/LotesPresentacionTable.vue'
 import { useproductoStore } from '../stores/productoStore.js'
 
 const store = useproductoStore()
 
-// Control de vista actual
-const vistaActual = ref('lista') 
+const vistaActual = ref('lista')
 const productoSeleccionado = ref(null)
 const presentacionSeleccionada = ref(null)
-
-// Control de dirección de la transición
 const transitionName = ref('slide-forward')
 
-// --- NAVEGACIÓN HACIA ADELANTE ---
 const abrirFormularioCrear = () => {
   transitionName.value = 'slide-forward'
   productoSeleccionado.value = null
@@ -88,23 +86,23 @@ const abrirLotes = (presentacion) => {
   vistaActual.value = 'lotes'
 }
 
-// --- NAVEGACIÓN HACIA ATRÁS ---
 const cerrarFormulario = () => {
   transitionName.value = 'slide-backward'
   vistaActual.value = 'lista'
   productoSeleccionado.value = null
-  store.cargarProductos(1, store.perPage)
+  store.cargarProductos(1, store.perPage) // aquí SÍ quieres refrescar (creaste/editaste algo)
 }
 
 const cerrarDetalle = () => {
   transitionName.value = 'slide-backward'
   vistaActual.value = 'lista'
   productoSeleccionado.value = null
+  // ❌ sin store.cargarProductos() — ProductoTable nunca se destruyó, conserva su página
 }
 
 const cerrarLotes = () => {
   transitionName.value = 'slide-backward'
-  vistaActual.value = 'detalle' 
+  vistaActual.value = 'detalle'
   presentacionSeleccionada.value = null
 }
 </script>
