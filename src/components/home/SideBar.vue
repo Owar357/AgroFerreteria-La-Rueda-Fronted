@@ -136,6 +136,7 @@
             sub
           />
           <SidebarItem
+            v-if="isCajero"
             icon="pi pi-percentage"
             label="Movimientos de Caja"
             :active="activeItem === 'movimientos-caja'"
@@ -143,6 +144,7 @@
             sub
           />
           <SidebarItem
+          v-if="isCajero"
             icon="pi pi-calculator"
             label="POS"
             :active="activeItem === 'pos'"
