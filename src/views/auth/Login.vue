@@ -3,16 +3,30 @@
     class="min-h-screen bg-[#839370] flex items-center justify-center p-4 md:p-8 font-['Inter',sans-serif]"
   >
     <div
-      class="w-full max-w-[850px] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[500px] border border-[#e2e8dd]"
+      class="w-full max-w-[900px] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[520px] border border-[#e2e8dd]"
     >
+      <!-- Panel izquierdo -->
       <div
-        class="w-full md:w-5/12 bg-[#1e3a2f] flex flex-col justify-between items-center p-8 text-center min-h-[250px] md:min-h-auto"
+        class="relative w-full md:w-5/12 bg-[#14291d] flex flex-col justify-between items-center p-8 text-center min-h-[280px] md:min-h-auto overflow-hidden"
       >
+        <!-- Textura de fondo sutil -->
+        <svg
+          class="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <pattern id="loginGrid" width="36" height="36" patternUnits="userSpaceOnUse">
+              <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#ffffff" stroke-width="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#loginGrid)" />
+        </svg>
+
         <div class="hidden md:block"></div>
 
-        <div class="flex flex-col items-center gap-4 my-auto">
+        <div class="relative z-10 flex flex-col items-center gap-4 my-auto">
           <div
-            class="bg-[#1e3a2f] p-2 rounded-2xl w-40 h-40 flex items-center justify-center shadow-md overflow-hidden"
+            class="bg-[#1e3a2f] p-2 rounded-2xl w-36 h-36 flex items-center justify-center shadow-md overflow-hidden border border-white/10"
           >
             <img
               src="/src/assets/logo.png"
@@ -21,24 +35,35 @@
             />
           </div>
 
-          <h2 class="text-white text-[28px] md:text-[32px] font-bold leading-tight tracking-wide">
+          <h2 class="text-white text-[26px] md:text-[30px] font-bold leading-tight tracking-wide drop-shadow-sm">
             AgroFerretería<br />La Rueda
           </h2>
+
+          <!-- Badge panel administrativo -->
+          <div
+            class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20"
+          >
+            <i class="pi pi-shield text-[#d9c98a] text-[12px]"></i>
+            <span class="text-[#d9c98a] text-[12px] font-medium tracking-wide">
+              Panel administrativo
+            </span>
+          </div>
         </div>
 
-        <div class="text-[#e2e8dd] text-[16px] font-medium tracking-wide">
+        <div class="relative z-10 text-[#f4f1e8]/50 text-[14px] font-medium tracking-wide">
           Aguilares, El Salvador 2026
         </div>
       </div>
 
+      <!-- Panel derecho -->
       <div class="w-full md:w-7/12 flex flex-col justify-between items-center p-8 gap-6">
         <div class="hidden md:block"></div>
 
-        <div class="w-full max-w-[380px] flex flex-col gap-6 my-auto">
+        <div class="w-full max-w-[380px] flex flex-col gap-5 my-auto">
           <div class="text-center md:text-left">
-            <h1 class="text-[#1a2e1f] text-[32px] font-bold tracking-tight">Inicio de sesión</h1>
-            <p class="text-[#6b7280] text-[15px] mt-1">
-              Ingrese su correo y contraseña para continuar
+            <h1 class="text-[#1a2e1f] text-[30px] font-bold tracking-tight">Inicio de sesión</h1>
+            <p class="text-[#6b7280] text-[14px] mt-1 leading-relaxed">
+              Ingresá tu correo y contraseña para continuar.
             </p>
           </div>
 
@@ -50,8 +75,9 @@
             <span>{{ errorMessage }}</span>
           </div>
 
-          <form @submit.prevent="handleLogin" class="flex flex-col gap-5">
+          <form @submit.prevent="handleLogin" class="flex flex-col gap-4">
             <div class="w-full">
+              <label class="block text-[12px] font-medium text-[#6b7280] mb-1.5">Correo</label>
               <IconField>
                 <InputIcon class="pi pi-envelope text-[#9ca3af] text-[14px]" />
                 <InputText
@@ -64,6 +90,7 @@
             </div>
 
             <div class="w-full">
+              <label class="block text-[12px] font-medium text-[#6b7280] mb-1.5">Contraseña</label>
               <IconField>
                 <InputIcon class="pi pi-lock text-[#9ca3af] text-[14px]" />
                 <Password
@@ -78,15 +105,24 @@
               </IconField>
             </div>
 
-            <div class="flex justify-center mt-6">
+            <div class="flex justify-center mt-4">
               <Button
                 type="submit"
                 label="Ingresar"
                 :loading="loading"
-                class="!bg-[#1e3a2f] hover:!bg-[#1f482d] text-white text-[14px] font-semibold py-4 px-6 rounded-full border-none shadow-lg tracking-wide transition-colors duration-200 cursor-pointer"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                class="w-full !bg-[#14291d] hover:!bg-[#1f482d] text-white text-[14px] font-semibold py-3.5 px-6 rounded-xl border-none shadow-lg tracking-wide transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2"
               />
             </div>
           </form>
+
+          <div class="flex items-center justify-center gap-1.5 mt-2">
+            <i class="pi pi-info-circle text-[#9ca3af] text-[11px]"></i>
+            <span class="text-[11px] text-[#9ca3af]">
+              Acceso restringido a personal autorizado
+            </span>
+          </div>
         </div>
 
         <div class="hidden md:block"></div>
@@ -187,22 +223,22 @@ async function handleLogin() {
 
 <style>
 .custom-login-input {
-  background-color: #f9fafb !important;
+  background-color: #ffffff !important;
   color: #1a2e1f !important;
-  border: 1.5px solid #d1d5db !important;
-  border-radius: 9999px !important;
-  padding: 0.75rem 1.25rem 0.75rem 2.8rem !important;
+  border: 1.5px solid #e2e5e0 !important;
+  border-radius: 10px !important;
+  padding: 0.7rem 1rem 0.7rem 2.6rem !important;
   height: auto !important;
 }
 
 .custom-login-input:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(30, 58, 47, 0.12) !important;
   border-color: #2b5e3b !important;
 }
 
 .p-password-toggle {
-  right: 1.25rem !important;
-  color: #6b7280 !important;
+  right: 1.1rem !important;
+  color: #9ca3af !important;
 }
 
 .p-password input {

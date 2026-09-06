@@ -69,22 +69,24 @@ const routes = [
         component: () => import('@/views/HistorialVentaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
+
+
       {
         path: 'gestion/pos',
-        name: 'FromVenta',
-        component: () => import('@/views/FromVenta.vue'),
+        name: 'POS',
+        component: () => import('@/components/Ventas/POS.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       
  
-
-      
       {
         path: 'venta/venta',
         name: 'venta',
-        component: () => import('@/views/FromVenta.vue'),
+        component: () => import('@/components/Ventas/POS.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
+
+      
       {
         path: 'caja',
         name: 'caja',
@@ -136,7 +138,15 @@ const routes = [
         name: 'ClienteHistorial',               
         component: () => import('@/components/Clientes/HistorialClienteDialogo.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
-       }
+       },
+       //agrege esto para cargar la pagina aparatee de lotes 
+       {
+          path: 'inventario/presentaciones/:id/lotes',
+             name: 'lotes-presentacion',
+            component: () => import('@/components/Productos/LotesPresentacionTable.vue'),
+           props: (route) => ({ presentacionId: route.params.id, nombrePresentacion: route.query.nombre }),
+             meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
+           }
     ]
   },
 

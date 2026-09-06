@@ -1,28 +1,46 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getProductos, createProducto, updateProducto, getAllCategorias } from '../services/productoService'
+import { getUnidades } from '@/services/unidadMedidaService'
 
 
 export const useproductoStore = defineStore('productos', () => {
   const productos     = ref([])
   const cargando      = ref(false)
   const totalRecords  = ref(0)
-  const currenPage    = ref(1)
+  const currentPage    = ref(1)
   const perPage       = ref(8)
   const categorias    = ref([])
+  const unidades = ref([])
+
+  const cargarUnidades = async (magnitud = null) => {
+  try {
+    const params = magnitud ? { magnitud } : {}
+    const response = await getUnidades(params)
+    unidades.value = response.data.data
+  } catch (error) {
+    // manejar error
+  }
+}
 
   const cargarProductos = async (page = 1, rows = perPage.value) => {
     cargando.value = true
+
     try {
-      const response      = await getProductos(page, rows)
+
+      const response = await getProductos(page, rows)
+     
       productos.value     = response.data.data
       totalRecords.value  = response.data.total
-      currenPage.value    = response.data.curren_Page
+      currentPage.value = response.data.current_page
       perPage.value       = response.data.per_page
+
+     
     } catch (error) {
       if (error.response?.status === 404) {
         productos.value    = []
         totalRecords.value = 0
+
         return
       }
       return {
@@ -101,7 +119,7 @@ const actualizarProducto = async (id, data) => {
 }
 
 return {
-  productos, cargando, totalRecords, currenPage, perPage, categorias,
+  productos, cargando, totalRecords, currentPage, perPage, categorias,
   cargarProductos, cargarCategorias, crearProducto, actualizarProducto,
 }
 

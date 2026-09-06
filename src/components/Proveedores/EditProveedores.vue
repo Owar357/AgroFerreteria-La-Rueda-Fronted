@@ -76,6 +76,7 @@
           text
         />
         <Button
+         label="Editar"
           @click="guardar"
           :pt="{
             root: { class: 'flex items-center gap-2 px-8 py-2 rounded-lg border-0 text-[#1a2e1f] text-sm font-semibold font-inter transition-all cursor-pointer' },

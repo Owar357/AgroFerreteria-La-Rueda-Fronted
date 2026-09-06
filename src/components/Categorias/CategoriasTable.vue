@@ -1,10 +1,9 @@
 <template>
   <DataTable
-    :value="store.categorias"
-    :loading="store.cargando"
+    :value="store.cargando ? Array.from({ length: 5 }) : store.categorias"
     responsiveLayout="scroll"
     class="p-datatable-custom text-[14px]"
-    :paginator="true"
+    :paginator="!store.cargando"
     :lazy="true"
     :rows="store.perPage"
     :totalRecords="store.totalRecords"
@@ -12,17 +11,29 @@
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
     @page="onPageChange"
-  >
+  > 
+
     <template #empty>
       <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay categorías registradas.</div>
     </template>
 
-    <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]" />
+    <!-- Columna: Nombre -->
+    <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
+      <template #body="slotProps">
+        <Skeleton v-if="store.cargando" width="70%" height="1.2rem" />
+        <span v-else>{{ slotProps.data.nombre }}</span>
+      </template>
+    </Column>
 
+    <!-- Columna: Acciones -->
     <Column header="Acciones" class="text-right w-[150px]">
       <template #body="slotProps">
-        <div class="flex gap-2">
+        <div class="flex gap-2 justify-end">
+          <!-- Esqueleto para el botón de editar -->
+          <Skeleton v-if="store.cargando" width="5.5rem" height="2rem" borderRadius="8px" />
+          
           <Button
+            v-else
             icon="pi pi-pencil"
             label="Editar"
             class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
@@ -37,6 +48,10 @@
 
 <script setup>
 import { useCategoriaStore } from '../../stores/categoriaStore'
+import Skeleton from 'primevue/skeleton'
+import DataTable from 'primevue/datatable' // Asegúrate de tener estas importaciones si no son globales
+import Column from 'primevue/column'
+import Button from 'primevue/button'
 
 const emit = defineEmits(['open-edit', 'open-view'])
 const store = useCategoriaStore()

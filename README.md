@@ -42,3 +42,20 @@ npm run build
 ```sh
 npm run lint
 ```
+
+========================================================================
+LICENCIAS DE TERCEROS Y ATRIBUCIONES
+========================================================================
+Este proyecto de graducación utiliza elementos gráficos de terceros bajo licencias 
+gratuitas de uso comercial con atribución obligatoria.
+
+
+ICONOS UTILIZADOS:
+- Icono de producto diseñado por Andrean Prabowo desde Flaticon (https://flaticon.es).
+
+
+
+------------------------------------------------------------------------
+El uso de estos recursos se realiza bajo los términos de uso estándar 
+de Flaticon (https://flaticon.com/legal).
+========================================================================

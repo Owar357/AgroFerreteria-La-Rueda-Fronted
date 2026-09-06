@@ -33,11 +33,11 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+      <!-- 🔄 EXPLICACIÓN: Si está cargando, le mandamos un array falso de 5 elementos para simular las filas -->
       <DataTable
-        :value="usuariosFiltrados"
-        :loading="store.loading"
+        :value="store.loading ? Array.from({ length: 5 }) : usuariosFiltrados"
         lazy
-        :paginator="true"
+        :paginator="!store.loading"
         :rows="store.perPage"
         :totalRecords="store.totalRecords"
         responsiveLayout="scroll"
@@ -52,12 +52,28 @@
           </div>
         </template>
 
-        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]" />
-        <Column field="email" header="Email" class="text-[#4b5563]" />
+        <!-- Columna: Nombre -->
+        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.loading" width="60%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.name }}</span>
+          </template>
+        </Column>
 
+        <!-- Columna: Email -->
+        <Column field="email" header="Email" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.loading" width="80%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.email }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Estado -->
         <Column field="activo" header="Estado">
           <template #body="slotProps">
+            <Skeleton v-if="store.loading" width="4rem" height="1.5rem" borderRadius="4px" />
             <span
+              v-else
               :class="[
                 'px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide',
                 slotProps.data.activo
@@ -70,44 +86,64 @@
           </template>
         </Column>
 
+        <!-- Columna: Rol -->
         <Column header="Rol">
-          <template #body="slotProps">{{ slotProps.data.roles?.[0]?.name ?? '—' }}</template>
-        </Column>
-
-        <Column header="Creado por" class="text-[#4b5563]">
-          <template #body="slotProps">{{ slotProps.data.registrado_por?.name ?? '—' }}</template>
-        </Column>
-
-        <Column field="created_at" header="Fecha" class="text-[#6b7280]">
           <template #body="slotProps">
-            {{
-              slotProps.data.created_at
-                ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
-                : '—'
-            }}
+            <Skeleton v-if="store.loading" width="50%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.roles?.[0]?.name ?? '—' }}</span>
           </template>
         </Column>
 
+        <!-- Columna: Creado por -->
+        <Column header="Creado por" class="text-[#4b5563]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.loading" width="55%" height="1.2rem" />
+            <span v-else>{{ slotProps.data.registrado_por?.name ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: Fecha -->
+        <Column field="created_at" header="Fecha" class="text-[#6b7280]">
+          <template #body="slotProps">
+            <Skeleton v-if="store.loading" width="5rem" height="1.2rem" />
+            <span v-else>
+              {{
+                slotProps.data.created_at
+                  ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                  : '—'
+              }}
+            </span>
+          </template>
+        </Column>
+
+        <!-- Columna: Acciones -->
         <Column header="Acciones" class="text-center w-[180px]">
           <template #body="slotProps">
-            <div class="flex gap-2 justify-center">
-              <Button
-                icon="pi pi-pencil"
-                label="Editar"
-                class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Editar categoría'"
-                @click="$emit('open-edit', slotProps.data)"
-              />
+            <div v-if="store.loading" class="flex gap-2 justify-center">
+              <Skeleton width="4rem" height="2rem" borderRadius="8px" />
+              <Skeleton width="5rem" height="2rem" borderRadius="8px" />
+            </div>
+            
+            <div v-else class="flex gap-2 justify-center">
+              <template v-if="slotProps.data.activo">
+                <Button
+                  icon="pi pi-pencil"
+                  label="Editar"
+                  class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Editar usuario'"
+                  @click="$emit('open-edit', slotProps.data)"
+                />
 
-              <Button
-                v-if="slotProps.data.activo"
-                icon="pi pi-eye-slash"
-                label="Desactivar"
-                class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                v-tooltip.top="'Desactivar usuario'"
-                @click="confirmarDesactivar(slotProps.data)"
-              />
-              <span v-else class="text-[#9ca3af] text-sm italic">-</span>
+                <Button
+                  v-if="usuarioActual?.id !== slotProps.data.id"
+                  icon="pi pi-eye-slash"
+                  label="Desactivar"
+                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Desactivar usuario'"
+                  @click="confirmarDesactivar(slotProps.data)"
+                />
+              </template>
+              <span v-else class="text-[#9ca3af] text-sm italic">Inactivo</span>
             </div>
           </template>
         </Column>
@@ -115,6 +151,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -124,6 +161,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
+import Skeleton from 'primevue/skeleton' 
 import Column from 'primevue/column'
 import Swal from 'sweetalert2'
 import authService from '@/services/authService'
