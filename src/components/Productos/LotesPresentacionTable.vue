@@ -1,94 +1,121 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-6 mx-auto">
+  <div class="bg-[#eef2e9] min-h-screen p-6 font-['Inter',sans-serif]">
+    <!-- Botón Volver -->
     <Button icon="pi pi-arrow-left" label="Volver a presentaciones" severity="secondary" text
-      class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-4 !px-4 !py-2 !rounded-lg transition-all duration-200"
+      class="!text-[#2b5e3b] !border !border-[#2b5e3b] hover:!bg-[#2b5e3b] hover:!text-white mb-6 !px-4 !py-2 !rounded-lg transition-all duration-200"
       @click="volver" />
 
-    <div class="bg-white rounded-2xl border border-[#e8efe1] shadow-sm p-6 mb-6">
-      <h1 class="text-2xl font-bold text-[#1e3a2f]">Lotes de: {{ nombrePresentacion }}</h1>
-      <p class="text-sm text-gray-600 mt-1">Historial de lotes registrados para esta presentación</p>
+    <!-- Header / Título -->
+    <div class="flex items-center gap-3 mb-6">
+      <div class="bg-white p-3 rounded-2xl shadow-sm border border-[#e2e8dd]">
+        <i class="pi pi-box text-[24px] text-[#5F6B52]"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-[#1e3a2f]">Gestión de Lotes</h1>
+        <p class="text-gray-500 text-sm mt-1">
+          Presentación: <span class="font-semibold text-[#1e3a2f]">{{ nombrePresentacion || '—' }}</span>
+        </p>
+      </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
-      <DataTable :value="loteStore.lotes" :loading="loteStore.cargando" lazy :paginator="true" :rows="loteStore.perPage"
-        :totalRecords="loteStore.totalRecords" responsiveLayout="scroll" class="p-datatable-sm" @page="onPageChange">
-        <Column field="lote_interno" header="Lote Interno" class="text-sm" />
-        <Column field="lote_fabricante" header="Lote Fabricante" class="text-sm">
-          <template #body="{ data }">{{ data.lote_fabricante ?? '—' }}</template>
-        </Column>
-        <Column field="fecha_vencimiento" header="Fecha Vencimiento" class="text-sm">
-          <template #body="{ data }">{{ formatFecha(data.fecha_vencimiento) }}</template>
-        </Column>
-        <Column field="cantidad_inicial" header="Cant. Inicial" class="text-sm" />
-        <Column field="cantidad_actual" header="Cant. Actual" class="text-sm" />
-        <Column field="costo_unitario_compra" header="Costo Unitario" class="text-sm">
-          <template #body="{ data }">${{ formatNumber(data.costo_unitario_compra) }}</template>
-        </Column>
+    <!-- Tabla de Lotes -->
+    <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden">
+      <DataTable :value="loteStore.lotes" :loading="loteStore.loading" lazy paginator :rows="loteStore.perPage"
+        :totalRecords="loteStore.totalRecords" :first="(loteStore.currentPage - 1) * loteStore.perPage"
+        @page="onPageChange" responsiveLayout="scroll" class="p-datatable-sm"
+        emptyMessage="No hay lotes registrados para esta presentación.">
+        <Column field="lote_interno" header="Cód. Lote" class="text-sm font-medium" />
 
-        <!-- COLUMNA % DESCUENTO PROMO -->
-        <Column field="porcentaje_descuento" header="% Oferta" class="text-sm">
+        <Column field="cantidad_inicial" header="Cant. Inicial" class="text-sm text-right">
           <template #body="{ data }">
-            <span v-if="Number(data.porcentaje_descuento) > 0"
-              class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-              {{ Number(data.porcentaje_descuento) }}%
-            </span>
-            <span v-else class="text-gray-400 text-xs">0%</span>
+            {{ formatNumber(data.cantidad_inicial) }}
           </template>
         </Column>
-        <Column field="estado" header="Estado" class="text-sm">
+
+        <Column field="cantidad_actual" header="Cant. Actual" class="text-sm text-right">
+          <template #body="{ data }">
+            <span class="font-bold text-[#1e3a2f]">{{ formatNumber(data.cantidad_actual) }}</span>
+          </template>
+        </Column>
+
+        <Column field="costo_unitario_compra" header="Costo Unit." class="text-sm text-right">
+          <template #body="{ data }">
+            ${{ formatNumber(data.costo_unitario_compra) }}
+          </template>
+        </Column>
+
+        <Column field="precio_venta" header="Precio Venta" class="text-sm text-right">
+          <template #body="{ data }">
+            ${{ formatNumber(data.precio_venta) }}
+          </template>
+        </Column>
+
+        <Column field="porcentaje_descuento" header="Desc. (%)" class="text-sm text-center">
+          <template #body="{ data }">
+            <span v-if="Number(data.porcentaje_descuento) > 0"
+              class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-xs">
+              {{ data.porcentaje_descuento }}%
+            </span>
+            <span v-else class="text-gray-400">0%</span>
+          </template>
+        </Column>
+
+        <Column field="fecha_vencimiento" header="Vencimiento" class="text-sm">
+          <template #body="{ data }">
+            {{ formatFecha(data.fecha_vencimiento) }}
+          </template>
+        </Column>
+
+        <Column field="estado" header="Estado" class="text-sm text-center">
           <template #body="{ data }">
             <Tag :value="data.estado" :severity="severidadEstado(data.estado)" rounded />
           </template>
         </Column>
 
-        <!-- COLUMNA ACCIONES PARA EDITAR DESCUENTO -->
+        <!-- Acciones corregidas -->
         <Column header="Acciones" class="text-sm text-center" style="width: 120px">
           <template #body="{ data }">
-            <Button icon="pi pi-tag" v-tooltip.top="'Gestionar Descuento'" severity="warning" text rounded
-              :disabled="data.estado !== 'ACTIVO' || Number(data.cantidad_actual) <= 0"
-              @click="abrirModalDescuento(data)" />
+            <div class="flex justify-center gap-1">
+              <!-- 1. Gestionar Descuento -->
+              <Button icon="pi pi-tag" v-tooltip.top="'Gestionar Descuento'" severity="warning" text rounded
+                :disabled="data.estado !== 'ACTIVO' || Number(data.cantidad_actual) <= 0"
+                @click="abrirModalDescuento(data)" />
+
+              <!-- 2. Ajuste de Inventario -->
+              <Button icon="pi pi-sliders-h" v-tooltip.top="'Ajustar Inventario'" severity="help" text rounded
+                :disabled="data.estado === 'INACTIVO'" @click="abrirModalAjuste(data)" />
+            </div>
           </template>
         </Column>
-
-        <template #empty>
-          <div class="text-center py-8 text-gray-400">
-            Esta presentación aún no tiene lotes registrados
-          </div>
-        </template>
       </DataTable>
     </div>
 
-    <!-- MODAL DE ASIGNACIÓN DE DESCUENTO -->
-    <Dialog v-model:visible="modalVisible" header="Gestionar Descuento Promocional" :modal="true"
-      class="w-full max-w-md">
-      <div v-if="loteSeleccionado" class="space-y-4 pt-2">
-        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-sm space-y-1">
-          <p><strong>Lote:</strong> {{ loteSeleccionado.lote_interno }}</p>
-          <p><strong>Stock Actual:</strong> {{ loteSeleccionado.cantidad_actual }}</p>
-          <p><strong>Vencimiento:</strong> {{ formatFecha(loteSeleccionado.fecha_vencimiento) }}</p>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">% Porcentaje de Descuento</label>
+    <!-- Modal para Descuentos -->
+    <Dialog v-model:visible="modalVisible" header="Gestionar Descuento" :style="{ width: '380px' }" modal>
+      <div class="flex flex-col gap-4 py-2">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-[#4b5563]">Porcentaje de descuento (%)</label>
           <InputNumber v-model="porcentajeInput" suffix="%" :min="0" :max="100" :minFractionDigits="0"
-            :maxFractionDigits="2" class="w-full" placeholder="0 %" />
-          <p class="text-xs text-gray-500 mt-1">Ingrese 0 si desea quitar la promoción al lote.</p>
+            :maxFractionDigits="2" class="w-full" />
         </div>
       </div>
-
       <template #footer>
-        <Button label="Cancelar" severity="secondary" text @click="modalVisible = false" />
-        <Button label="Guardar Descuento" icon="pi pi-check" severity="success" :loading="guardando"
-          @click="guardarDescuento" />
+        <div class="flex justify-end gap-2">
+          <Button label="Cancelar" icon="pi pi-times" severity="secondary" outlined @click="modalVisible = false" />
+          <Button label="Guardar" icon="pi pi-check" :loading="guardando"
+            class="!bg-[#2b5e3b] !border-[#2b5e3b] !text-white" @click="guardarDescuento" />
+        </div>
       </template>
     </Dialog>
 
+
+    <AjusteLoteDialog v-model="mostrarModalAjuste" :lote="loteSeleccionado" :nombre-presentacion="nombrePresentacion"
+      :unidad-medida="unidadMedida || 'Unidad'" @ajuste-realizado="refrescarTablaLotes" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -97,18 +124,20 @@ import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import { useLoteStore } from '@/stores/loteStore'
 
+// Importación correcta del componente Modal de Ajuste
+import AjusteLoteDialog from '@/components/Inventario/AjusteLoteDialog.vue'
+
 const props = defineProps({
   presentacionId: { type: [String, Number], required: true },
   nombrePresentacion: { type: String, default: '' },
 })
 
-
 const loteStore = useLoteStore()
-
 const emit = defineEmits(['volver'])
 
-// Modal
+// Modales
 const modalVisible = ref(false)
+const mostrarModalAjuste = ref(false)
 const loteSeleccionado = ref(null)
 const porcentajeInput = ref(0)
 const guardando = ref(false)
@@ -117,8 +146,21 @@ onMounted(async () => {
   await loteStore.fetchLotesByPresentacion(props.presentacionId)
 })
 
+const refrescarTablaLotes = async () => {
+  await loteStore.fetchLotesByPresentacion(
+    props.presentacionId,
+    loteStore.currentPage,
+    loteStore.perPage
+  )
+}
+
 const onPageChange = (event) => {
   loteStore.fetchLotesByPresentacion(props.presentacionId, event.page + 1, event.rows)
+}
+
+const abrirModalAjuste = (lote) => {
+  loteSeleccionado.value = lote
+  mostrarModalAjuste.value = true
 }
 
 const abrirModalDescuento = (lote) => {
@@ -136,13 +178,10 @@ const guardarDescuento = async () => {
       porcentajeInput.value,
       props.presentacionId
     )
-
     modalVisible.value = false
-
-    await loteStore.fetchLotesByPresentacion(props.presentacionId, loteStore.currentPage, loteStore.perPage)
-
+    await refrescarTablaLotes()
   } catch (e) {
-
+    console.error(e)
   } finally {
     guardando.value = false
   }

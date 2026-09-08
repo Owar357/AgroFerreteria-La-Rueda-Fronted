@@ -5,8 +5,14 @@ import { api } from './authService'
 // ==========================================
 
 // Mandamos a traer los productos con paginación
-export const getProductos = (page = 1, perPage = 8) =>
-  api.get('/productos', { params: { page, per_page: perPage } })
+export const getProductos = (page = 1, perPage = 8, q = '', categoria = '') => {
+  const params = { page, per_page: perPage }
+
+  if (q && q.trim()) params.q = q.trim()
+  if (categoria) params.categoria = categoria
+
+  return api.get('/productos', { params })
+}
 
 // Para agregar un nuevo producto
 export const createProducto = (data) => api.post('/productos', data)

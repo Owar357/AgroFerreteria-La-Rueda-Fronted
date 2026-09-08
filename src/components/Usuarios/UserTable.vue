@@ -35,10 +35,10 @@
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
       <!-- 🔄 EXPLICACIÓN: Si está cargando, le mandamos un array falso de 5 elementos para simular las filas -->
       <DataTable
-        :value="store.loading ? Array.from({ length: 5 }) : usuariosFiltrados"
+        :value="store.users"
         lazy
-        :paginator="!store.loading"
         :rows="store.perPage"
+        paginator
         :totalRecords="store.totalRecords"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
@@ -218,24 +218,9 @@ const confirmarDesactivar = async (user) => {
 }
 const store = useUserStore()
 
-onMounted(async () => {
-  const resultado = await store.fetchUsers()
-  if (resultado?.status === 403) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Sin autorización',
-      text: 'No tienes permisos para ver los usuarios.',
-      confirmButtonColor: '#2b5e3b',
-    })
-  } else if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
-  }
-})
+onMounted(async () => {})
+
+
 
 const busqueda = ref('')
 const filtroEstado = ref(null)
@@ -261,8 +246,27 @@ const usuariosFiltrados = computed(() => {
   })
 })
 
-const onPageChange = (event) => {
-  store.fetchUsers(event.page + 1, event.rows)
+const onPageChange = async (event) => {
+  const page = event.page + 1
+  const rows = event.rows
+  
+  const resultado = await store.fetchUsers(page, rows)
+  
+  if (resultado?.status === 403) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para ver los usuarios.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else if (resultado?.error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: resultado.error,
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 }
 
 defineEmits(['open-add', 'open-edit'])

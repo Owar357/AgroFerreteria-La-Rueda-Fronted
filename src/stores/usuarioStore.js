@@ -15,6 +15,9 @@ export const useUserStore = defineStore('userStore', () => {
   const perPage = ref(5)
 
   const fetchUsers = async (page = 1, rows = perPage.value) => {
+
+    if (loading.value) return
+    
     loading.value = true
     try {
       const response = await getUsuarios(page, rows)

@@ -51,8 +51,9 @@ import { ref, reactive, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { useCategoriaStore } from '../../stores/categoriaStore'
+import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito} from '@/utils/SweetAlertService'
+
 
 const props = defineProps({
   visible:   { type: Boolean, default: false },
@@ -100,6 +101,12 @@ const validarInput = () => {
     return false
   }
 
+  if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(valor)) {
+    error.value = 'El nombre no puede contener caracteres especiales.'
+    return false
+  }
+
+  
   error.value = ''
   return true
 }
@@ -111,27 +118,11 @@ const dispararActualizar = async () => {
   }
   if (!validarInput()) return
 
-  const confirmacion = await Swal.fire({
-    html: `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-        <div style="width:56px; height:56px; border-radius:50%; background:#fef3c7; display:flex; align-items:center; justify-content:center;">
-          <i class="pi pi-pencil" style="font-size:24px; color:#b45309;"></i>
-        </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">¿Guardar cambios?</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">Se actualizará la categoría a "${form.nombre.trim()}"</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: '#2b5e3b',
-    cancelButtonColor: '#e2e8dd',
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Guardar cambios?',
+    mensajeHtml: `Se actualizará la categoría a "<strong>${form.nombre.trim()}</strong>"`,
+    icono: 'pi-pencil',
     confirmButtonText: 'Sí, guardar',
-    cancelButtonText: 'Cancelar',
-    customClass: {
-      container: '!z-[9999]',
-      confirmButton: '!rounded-lg !font-semibold !text-sm',
-      cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
-      popup: '!rounded-2xl',
-    },
   })
 
   if (!confirmacion.isConfirmed) return
@@ -143,6 +134,12 @@ const dispararActualizar = async () => {
   if (resultado.ok) {
    
     localVisible.value = false
+
+   mostrarExito(
+  '¡Categoría actualizada!',
+  'La categoría fue actualizada exitosamente.'
+)
+
     Swal.fire({
       icon: 'success',
       title: '¡Categoría actualizada!',
@@ -152,24 +149,15 @@ const dispararActualizar = async () => {
     })
   } else if (resultado.status === 403) {
     
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: {
-        confirmButton: '!rounded-lg !font-semibold !text-sm',
-        popup: '!rounded-2xl',
-      },
+    mostrarAlertaConfirmar({})
+    mostrarAlertaConfirmar({
+      tipo: 'ban',
+      icono: 'pi-bell',
+      titulo: 'Sin autorización',
+      mensajeHtml: 'No tiene permisos para editar este registro',
+      confirmButtonText : 'Entendido'
     })
+
   } else if (resultado.error) {
     error.value = resultado.error
   }
