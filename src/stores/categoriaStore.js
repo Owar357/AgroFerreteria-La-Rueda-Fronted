@@ -10,6 +10,8 @@ export const useCategoriaStore = defineStore('categoria', () => {
   const perPage = ref(5)
 
   const cargarCategorias = async (page = 1, rows = perPage.value) => {
+
+    if (cargando.value) return
     cargando.value = true
     try {
       const response = await getCategorias(page, rows)

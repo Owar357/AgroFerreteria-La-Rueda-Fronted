@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    :value="store.cargando ? Array.from({ length: 5 }) : store.categorias"
+    :value="store.cargando ? Array.from({ length: store.perPage }) : store.categorias"
     responsiveLayout="scroll"
     class="p-datatable-custom text-[14px]"
     :paginator="!store.cargando"
@@ -29,7 +29,6 @@
     <Column header="Acciones" class="text-right w-[150px]">
       <template #body="slotProps">
         <div class="flex gap-2 justify-end">
-          <!-- Esqueleto para el botón de editar -->
           <Skeleton v-if="store.cargando" width="5.5rem" height="2rem" borderRadius="8px" />
           
           <Button
@@ -47,21 +46,32 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import Skeleton from 'primevue/skeleton'
-import DataTable from 'primevue/datatable' // Asegúrate de tener estas importaciones si no son globales
+import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 
 const emit = defineEmits(['open-edit', 'open-view'])
 const store = useCategoriaStore()
+const route = useRoute()
+const router = useRouter()
 
-// Cargar primera página al montar
-store.cargarCategorias(1, store.perPage)
+onMounted(() => {
+  const pageFromUrl = Number(route.query.page) || 1
+  store.currentPage = pageFromUrl
+  store.cargarCategorias(pageFromUrl, store.perPage)
+})
 
 const onPageChange = (event) => {
   const page = event.page + 1
-  store.cargarCategorias(page, event.rows)
+  
+  if (page !== store.currentPage) {
+    router.push({ query: { ...route.query, page } })
+    store.cargarCategorias(page, event.rows)
+  }
 }
 </script>
 
