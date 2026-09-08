@@ -20,13 +20,8 @@
             {{ presentacion?.unidadMedida?.nombre || '—' }} ?
           </span>
         </label>
-        <InputText 
-          v-model="form.factor_conversion" 
-          placeholder="0" 
-          maxlength="6"
-          :disabled="factorBloqueado"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" 
-        />
+        <InputText v-model="form.factor_conversion" placeholder="0" maxlength="6" :disabled="factorBloqueado"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" />
         <!-- Mensajes de ayuda -->
         <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b]">
           ⚠️ Es la unidad base de este producto, el factor de conversión fijo es (1).
@@ -64,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue' 
+import { ref, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -97,8 +92,22 @@ const factorBloqueado = computed(() => {
   const unidadNombre = (props.presentacion?.unidadMedida?.nombre || '').toLowerCase().trim()
   const esBase = props.presentacion?.es_base === true
 
-  const unidadesUnidadFija = ['unidad', 'pieza']
-  const unidadesMasaConBase = ['gramo', 'libra', 'kilogramo']
+
+  const unidadesUnidadFija = ['unidad', 'pieza'];
+
+  const unidadesMasaConBase = [
+    'gramo',
+    'libra',
+    'kilogramo',
+    'arroba',
+    'quintal',
+    'mililitro',
+    'litro',
+    'galón',
+    'centímetro',
+    'metro'
+  ];
+
 
   if (unidadesUnidadFija.includes(unidadNombre)) return true
   if (unidadesMasaConBase.includes(unidadNombre) && esBase) return true
@@ -275,10 +284,12 @@ const guardar = async () => {
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
 }
+
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 1.5rem !important;
 }
+
 :deep(.p-inputnumber-input) {
   width: 100%;
   background: #f9fafb;

@@ -21,17 +21,17 @@
           @click="navigate('/admin/usuarios')"
         />
         <SidebarItem
-  icon="pi pi-bell"
-  label="Alertas"
-  :active="activeItem === 'alertas'"
-  :badge="noLeidas"
-  @click="navigate('/admin/alertas')"
-  class="mt-1"
-/>
+          icon="pi pi-bell"
+          label="Alertas"
+          :active="activeItem === 'alertas'"
+          :badge="noLeidas"
+          @click="navigate('/admin/alertas')"
+          class="mt-1"
+        />
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- LOGÍSTICA  solo ADMIN -->
+      <!-- LOGÍSTICA — solo ADMIN -->
       <template v-if="isAdmin">
         <p
           style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
@@ -144,7 +144,7 @@
             sub
           />
           <SidebarItem
-          v-if="isCajero"
+            v-if="isCajero"
             icon="pi pi-calculator"
             label="POS"
             :active="activeItem === 'pos'"
@@ -198,12 +198,19 @@ const route = useRoute()
 const alertaStore = useAlertaStore()
 const { noLeidas } = storeToRefs(alertaStore)
 
+const manejarEnfoqueVentana = () => {
+  if (document.visibilityState === 'visible') {
+    alertaStore.fetchAlertas()
+  }
+}
+
 onMounted(() => {
-  alertaStore.iniciarActualizacionAutomatica()
+  alertaStore.fetchAlertas()
+  document.addEventListener('visibilitychange', manejarEnfoqueVentana)
 })
 
 onUnmounted(() => {
-  alertaStore.detenerActualizacionAutomatica()
+  document.removeEventListener('visibilitychange', manejarEnfoqueVentana)
 })
 
 const showInventario = ref(false)

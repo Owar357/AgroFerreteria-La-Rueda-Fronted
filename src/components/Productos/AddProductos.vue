@@ -1,4 +1,4 @@
-+<template>
+<template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
 
     <!-- TARJETA CONTENEDORA PRINCIPAL (Envuelve ambos pasos) -->
@@ -46,7 +46,7 @@
       <!-- CUERPO DEL PASO 1: INFORMACIÓN GENERAL -->
       <div v-show="pasoActual === 1" class="p-8">
         <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-          <div <div
+          <div
             class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
             <i class="pi pi-info text-[#2b5e3b] text-2xl font-bold"></i>
           </div>
@@ -148,8 +148,7 @@
                 '!border-red-500': errores.unidadMedidaId,
                 '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
               }" :pt="{ label: { class: '!text-[18px] !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId
-            }}</small>
+            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId }}</small>
 
             <p v-if="!presentacionBaseCreada"
               class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
@@ -199,7 +198,6 @@
             <span class="text-[26px] font-semibold text-[#1a2e1f]">Crear la Presentación Base (Obligatoria)</span>
           </div>
 
-
           <div class="bg-blue-50 border-l-4 border-blue-500 p-5 mb-6 rounded-r-xl rounded-l-md shadow-sm">
             <div class="flex items-start">
               <i class="pi pi-info-circle text-blue-500 !text-[22px] mr-3 mt-0.5"></i>
@@ -237,7 +235,7 @@
               <InputText :value="nombreUnidadBase" disabled
                 class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
               <small class="text-[14px] text-gray-500 flex items-center gap-1">
-                <i class="pi pi-lock text-[12px]"></i> Fijo(es la unidad base del producto)
+                <i class="pi pi-lock text-[12px]"></i> Fijo (es la unidad base del producto)
               </small>
             </div>
 
@@ -305,7 +303,7 @@
                 Nombre de la presentación <span class="text-red-500">*</span>
               </label>
               <AutoComplete v-model="formDerivada.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
-                optionValue="nombre" dropdown fluid placeholder="Ej: Quintal, Arroba , Gramo..."
+                optionValue="nombre" dropdown fluid placeholder="Ej: Arroba, Quintal, Saco..."
                 @complete="buscarUnidades" @item-select="onSelectDerivada"
                 class="w-full !bg-white !border-gray-300 !text-[18px] !py-[0px] rounded-xl" :pt="{
                   root: { class: 'w-full' },
@@ -329,9 +327,7 @@
               <label class="text-[18px] font-medium text-gray-700">Unidad de Medida</label>
               <InputText :value="nombreUnidadBase" disabled
                 class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-              <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma
-                unidad
-                base)</small>
+              <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma unidad base)</small>
             </div>
 
             <div class="flex flex-col gap-2 w-full min-w-0">
@@ -350,7 +346,7 @@
               </div>
               <small class="text-[14px] text-gray-500">
                 Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.<br>
-                Si tu base es Libra y vendes un Quintal, aquí debes poner 100.
+                Si tu base es Libra y vendes una Arroba, aquí debes poner 25.
               </small>
             </div>
 
@@ -390,13 +386,12 @@
         <!-- CASO 3: UNIDAD FIJA -->
         <div v-else-if="tipoProducto === 'UNIDAD FIJA'" class="mb-8">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-            <div <div
+            <div
               class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
               <i class="pi pi-plus text-[#2b5e3b] text-2xl font-bold"></i>
             </div>
             <span class="text-[26px] font-semibold text-[#1a2e1f]">Agregar Presentación</span>
           </div>
-
 
           <div class="grid grid-cols-2 gap-6">
             <div class="col-span-2 flex gap-6 w-full">
@@ -482,7 +477,7 @@
         <!-- TABLA DE PRESENTACIONES AGREGADAS -->
         <div class="mt-8 pt-6 border-t border-[#e2e8dd]">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-            <div <div
+            <div
               class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
               <i class="pi pi-list text-[#2b5e3b] text-2xl font-bold"></i>
             </div>
@@ -567,7 +562,6 @@ import Swal from 'sweetalert2'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
-import agregarPaqueteIcon from '@/assets/icons/agregar-paquete.png'
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
@@ -625,15 +619,27 @@ const nombreUnidadBase = computed(() => {
   return unidad?.nombre || ''
 })
 
+// Unidades mínimas para seleccionar como Unidad Base en el Paso 1
 const unidadesFiltradas = computed(() => {
   if (!tipoProducto.value) return unidades.value
-  const UnidadesbasesPermitidas = tipoProducto.value === 'GRANEL'
-    ? ['Gramo', 'Libra', 'Kilogramo']
+  
+  const unidadesBasesPermitidas = tipoProducto.value === 'GRANEL'
+    ? [
+      'Gramo',
+      'Libra',
+      'Kilogramo',
+      'Mililitro',
+      'Litro',
+      'Galón',
+      'Centímetro',
+      'Metro'
+    ]
     : ['Unidad', 'Pieza']
+
   return unidades.value.filter((u) => {
-    const magnitudCorrecta = u.magnitud === (tipoProducto.value === 'GRANEL' ? 'Masa' : 'Unidad')
+    const magnitudCorrecta = u.magnitud === (tipoProducto.value === 'GRANEL' ? 'Masa' : 'Unidad') || u.magnitud === 'Volumen' || u.magnitud === 'Longitud'
     if (!magnitudCorrecta) return false
-    return UnidadesbasesPermitidas.includes(u.nombre)
+    return unidadesBasesPermitidas.includes(u.nombre)
   })
 })
 
@@ -770,13 +776,25 @@ async function cargarUnidades() {
   }
 }
 
+// Filtro estricto por magnitud compatible
 function buscarUnidades(event) {
   const query = event.query?.toLowerCase() || ''
+  
+  const unidadBaseActual = unidades.value.find(u => u.id === unidadMedidaId.value)
+  const magnitudBase = unidadBaseActual?.magnitud
+
+  // Solo se admiten unidades pertenecientes a la misma magnitud
+  const listaOpciones = unidades.value.filter(u => {
+    if (!magnitudBase) return true
+    return u.magnitud === magnitudBase
+  })
+
   if (!query.trim()) {
-    unidadesSugeridas.value = unidadesFiltradas.value.slice(0, 10)
+    unidadesSugeridas.value = listaOpciones.slice(0, 10)
     return
   }
-  unidadesSugeridas.value = unidadesFiltradas.value.filter(u =>
+  
+  unidadesSugeridas.value = listaOpciones.filter(u =>
     u.nombre.toLowerCase().includes(query)
   )
 }
@@ -838,11 +856,22 @@ function limpiarFormularioUnidadFija() {
 }
 
 function onSelectDerivada(event) {
-  formDerivada.value.nombre = event.value.nombre
+  const item = event.value
+  const nombreSeleccionado = typeof item === 'object' ? item.nombre : item
+  formDerivada.value.nombre = nombreSeleccionado
+
+  if (nombreUnidadBase.value.toLowerCase() === 'libra') {
+    if (nombreSeleccionado.toLowerCase() === 'arroba') {
+      formDerivada.value.factorConversion = 25
+    } else if (nombreSeleccionado.toLowerCase() === 'quintal') {
+      formDerivada.value.factorConversion = 100
+    }
+  }
 }
 
 function onSelectUnidadFija(event) {
-  formUnidadFija.value.nombre = event.value.nombre
+  const item = event.value
+  formUnidadFija.value.nombre = typeof item === 'object' ? item.nombre : item
 }
 
 function crearBase() {
