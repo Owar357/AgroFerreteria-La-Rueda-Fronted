@@ -25,6 +25,19 @@
       </template>
     </Column>
 
+    <!-- Columna: % Ganancia Mínimo -->
+    <Column header="% Ganancia Mínima" class="text-center w-[180px]">
+      <template #body="slotProps">
+        <Skeleton v-if="store.cargando" width="60%" height="1.2rem" class="mx-auto" />
+        <span 
+          v-else 
+          class="inline-block px-3 py-1 rounded-full text-[12px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]"
+        >
+          {{ slotProps.data.porcentaje_ganancia_minimo !== null ? parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}%
+        </span>
+      </template>
+    </Column>
+
     <!-- Columna: Acciones -->
     <Column header="Acciones" class="text-right w-[150px]">
       <template #body="slotProps">

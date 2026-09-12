@@ -105,6 +105,19 @@
             <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
           </div>
 
+          <!-- % Ganancia Mínimo Especial (Opcional) -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[18px] font-medium text-gray-700">
+              % Ganancia Mínimo Especial (Opcional)
+            </label>
+            <InputNumber v-model="porcentajeGananciaMinimo" placeholder="Ej: 20.00" suffix="%" :min="0" :max="100"
+              :minFractionDigits="1" :maxFractionDigits="2"
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
+            <small class="text-[14px] text-gray-500">
+              Si se deja vacío, heredará automáticamente <br> el margen de ganancia de su categoría.
+            </small>
+          </div>
+
           <!-- Código del Producto -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">Código del Producto</label>
@@ -558,10 +571,10 @@ import Select from 'primevue/select'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
-import Swal from 'sweetalert2'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
+import { mostrarExito, mostrarError, mostrarAccesoDenegado, mostrarConfirmacion, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
@@ -571,6 +584,7 @@ const DRAFT_KEY = 'agroferreteria_borrador_nuevo_producto'
 const nombre = ref('')
 const fabricante = ref('')
 const categoria = ref(null)
+const porcentajeGananciaMinimo = ref(null)
 const categoriasFiltradas = ref([])
 const textoBusquedaCategoria = ref('')
 const mostrarModalCategoria = ref(false)
@@ -619,7 +633,6 @@ const nombreUnidadBase = computed(() => {
   return unidad?.nombre || ''
 })
 
-// Unidades mínimas para seleccionar como Unidad Base en el Paso 1
 const unidadesFiltradas = computed(() => {
   if (!tipoProducto.value) return unidades.value
   
@@ -657,6 +670,7 @@ function guardarBorrador() {
     nombre: nombre.value,
     fabricante: fabricante.value,
     categoria: categoria.value,
+    porcentajeGananciaMinimo: porcentajeGananciaMinimo.value,
     unidadMedidaId: unidadMedidaId.value,
     tipoProducto: tipoProducto.value,
     aplicaIva: aplicaIva.value,
@@ -674,6 +688,7 @@ function restaurarBorrador() {
     nombre.value = borrador.nombre ?? ''
     fabricante.value = borrador.fabricante ?? ''
     categoria.value = borrador.categoria ?? null
+    porcentajeGananciaMinimo.value = borrador.porcentajeGananciaMinimo ?? null
     unidadMedidaId.value = borrador.unidadMedidaId ?? null
     tipoProducto.value = borrador.tipoProducto ?? null
     aplicaIva.value = borrador.aplicaIva ?? false
@@ -708,7 +723,7 @@ watch(nombreUnidadBase, (nuevoValor) => {
 }, { immediate: true })
 
 watch(
-  [pasoActual, nombre, fabricante, categoria, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
+  [pasoActual, nombre, fabricante, categoria, porcentajeGananciaMinimo, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
   guardarBorrador,
   { deep: true }
 )
@@ -776,14 +791,12 @@ async function cargarUnidades() {
   }
 }
 
-// Filtro estricto por magnitud compatible
 function buscarUnidades(event) {
   const query = event.query?.toLowerCase() || ''
   
   const unidadBaseActual = unidades.value.find(u => u.id === unidadMedidaId.value)
   const magnitudBase = unidadBaseActual?.magnitud
 
-  // Solo se admiten unidades pertenecientes a la misma magnitud
   const listaOpciones = unidades.value.filter(u => {
     if (!magnitudBase) return true
     return u.magnitud === magnitudBase
@@ -877,27 +890,27 @@ function onSelectUnidadFija(event) {
 function crearBase() {
   const nombreBase = normalizarNombre(nombreUnidadBase.value)
   if (!nombreBase) {
-    Swal.fire({ icon: 'warning', title: 'Unidad base requerida', text: 'Debes seleccionar una unidad base en el paso 1.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Unidad base requerida', mensajeHtml: 'Debes seleccionar una unidad base en el paso 1.' })
     return
   }
 
   if (!formBase.value.codigoBarra || formBase.value.codigoBarra.trim() === '') {
-    Swal.fire({ icon: 'warning', title: 'Código de barra requerido', text: 'La presentación base debe tener un código de barra.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Código de barra requerido', mensajeHtml: 'La presentación base debe tener un código de barra.' })
     return
   }
 
   if (nombreYaExiste(nombreBase)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombreBase}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombreBase}</strong>" ya existe.` })
     return
   }
 
   if (!formBase.value.stockMinimo || formBase.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Stock mínimo requerido', mensajeHtml: 'Define un stock mínimo mayor a 0.' })
     return
   }
 
   if (!formBase.value.precioVenta || formBase.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -919,29 +932,29 @@ function crearBase() {
   })
 
   formBase.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
-  Swal.fire({ icon: 'success', title: `¡Presentación Base "${nombreBase}" creada!`, text: 'Ahora puedes agregar presentaciones derivadas.', timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación Base "${nombreBase}" creada!`, 'Ahora puedes agregar presentaciones derivadas.')
 }
 
 function agregarDerivada() {
   const nombre = normalizarNombre(formDerivada.value.nombre)
   if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre requerido', mensajeHtml: 'Ingresa un nombre para la presentación.' })
     return
   }
 
   if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombre}</strong>" ya existe.` })
     return
   }
 
   const factor = Number(formDerivada.value.factorConversion)
   if (!factor || factor <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Factor inválido', text: 'Ingresa un factor de conversión mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Factor inválido', mensajeHtml: 'Ingresa un factor de conversión mayor a 0.' })
     return
   }
 
   if (!formDerivada.value.precioVenta || formDerivada.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -962,28 +975,28 @@ function agregarDerivada() {
   })
 
   limpiarFormularioDerivada()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación "${nombre}" agregada!`)
 }
 
 function agregarUnidadFija() {
   const nombre = normalizarNombre(formUnidadFija.value.nombre)
   if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre requerido', mensajeHtml: 'Ingresa un nombre para la presentación.' })
     return
   }
 
   if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombre}</strong>" ya existe.` })
     return
   }
 
   if (!formUnidadFija.value.stockMinimo || formUnidadFija.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Stock mínimo requerido', mensajeHtml: 'Define un stock mínimo mayor a 0.' })
     return
   }
 
   if (!formUnidadFija.value.precioVenta || formUnidadFija.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -1005,27 +1018,23 @@ function agregarUnidadFija() {
   })
 
   limpiarFormularioUnidadFija()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación "${nombre}" agregada!`)
 }
 
 function editarPresentacion(index) {
-  Swal.fire({ icon: 'info', title: 'Editar presentación', text: `Funcionalidad en desarrollo. Índice: ${index}`, confirmButtonColor: '#2b5e3b' })
+  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: `Funcionalidad en desarrollo. Índice: ${index}` })
 }
 
 async function eliminarPresentacion(index) {
-  const resultado = await Swal.fire({
-    title: '¿Eliminar presentación?',
-    text: 'Quiere eliminar esta presentación de la tabla.',
-    icon: 'warning',
-    showCancelButton: true,
+  const resultado = await mostrarConfirmacion({
+    titulo: '¿Eliminar presentación?',
+    mensajeHtml: '¿Deseas eliminar esta presentación de la lista?',
+    icono: 'pi-trash',
     confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#6b7280',
   })
   if (resultado.isConfirmed) {
     presentaciones.value.splice(index, 1)
-    Swal.fire({ icon: 'success', title: 'Eliminada', timer: 1500, showConfirmButton: false })
+    mostrarExito('Eliminada', 'La presentación fue removida de la tabla.')
   }
 }
 
@@ -1057,7 +1066,7 @@ async function guardarProducto() {
   if (hayErrores) return
 
   if (presentaciones.value.length === 0) {
-    Swal.fire({ icon: 'warning', title: 'Sin presentaciones', text: 'Debe agregar al menos una presentación.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Sin presentaciones', mensajeHtml: 'Debe agregar al menos una presentación.' })
     return
   }
 
@@ -1069,6 +1078,7 @@ async function guardarProducto() {
     unidad_medida_id: unidadMedidaId.value,
     aplica_iva: aplicaIva.value,
     categoria_id: categoria.value.id,
+    porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : null,
     presentaciones: presentaciones.value.map((p) => ({
       nombre: p.nombre.toLowerCase(),
       fabricante: p.fabricante?.toLowerCase() || '',
@@ -1087,26 +1097,12 @@ async function guardarProducto() {
 
   if (resultado.ok) {
     resetFormularioCompleto()
-    await Swal.fire({ icon: 'success', title: '¡Producto guardado!', text: 'El producto fue guardado con éxito.', confirmButtonColor: '#2b5e3b', confirmButtonText: 'Aceptar' })
+    await mostrarExito('¡Producto guardado!', 'El producto fue guardado con éxito.')
     emit('close')
   } else if (resultado.status === 403) {
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tiene permisos para crear productos.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: { confirmButton: '!rounded-lg !font-semibold !text-sm', popup: '!rounded-2xl' },
-    })
+    mostrarAccesoDenegado()
   } else if (resultado.error) {
-    Swal.fire({ icon: 'error', title: 'Error de validación', text: resultado.error, confirmButtonColor: '#2b5e3b' })
+    mostrarError('Error de validación', resultado.error)
   }
 }
 
@@ -1114,6 +1110,7 @@ function resetFormularioCompleto() {
   nombre.value = ''
   fabricante.value = ''
   categoria.value = null
+  porcentajeGananciaMinimo.value = null
   unidadMedidaId.value = null
   tipoProducto.value = null
   aplicaIva.value = false
@@ -1128,7 +1125,7 @@ function resetFormularioCompleto() {
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    Swal.fire({ icon: 'error', title: 'Error', text: resultado.error, confirmButtonColor: '#2b5e3b' })
+    mostrarError('Error', resultado.error)
   }
   await cargarUnidades()
   restaurarBorrador()

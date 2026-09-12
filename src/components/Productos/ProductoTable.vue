@@ -59,7 +59,7 @@
         <Column field="nombre" header="Nombre" class="font-medium text-[#1a2e1f]">
           <template #body="slotProps">
             <Skeleton v-if="store.cargando" width="75%" height="1.2rem" />
-            <span v-else class="font-semibold text-[#1a2e1f]">{{ slotProps.data.nombre }}</span>
+            <span v-else class="font-semibold text-[#1a2e1f] capitalize">{{ slotProps.data.nombre }}</span>
           </template>
         </Column>
 
@@ -67,7 +67,7 @@
         <Column field="fabricante" header="Fabricante" class="text-[#4b5563]">
           <template #body="slotProps">
             <Skeleton v-if="store.cargando" width="55%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.fabricante || '—' }}</span>
+            <span v-else class="capitalize">{{ slotProps.data.fabricante || '—' }}</span>
           </template>
         </Column>
 
@@ -76,7 +76,7 @@
           <template #body="slotProps">
             <Skeleton v-if="store.cargando" width="45%" height="1.2rem" />
             <span v-else
-              class="font-mono text-xs bg-[#f1f5f0] px-2 py-0.5 rounded text-[#334155] border border-[#e2e8dd]">
+              class="font-mono text-xs bg-[#f1f5f0] px-2 py-0.5 rounded text-[#334155] border border-[#e2e8dd] uppercase">
               {{ slotProps.data.codigo }}
             </span>
           </template>
@@ -87,6 +87,29 @@
           <template #body="slotProps">
             <Skeleton v-if="store.cargando" width="60%" height="1.2rem" />
             <span v-else>{{ slotProps.data.categoria?.nombre ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <!-- Columna: % Ganancia Mínimo -->
+        <Column header="% Ganancia Mínimo" class="text-center">
+          <template #body="slotProps">
+            <Skeleton v-if="store.cargando" width="50%" height="1.2rem" class="mx-auto" />
+            <template v-else>
+              <span 
+                v-if="slotProps.data.porcentaje_ganancia_minimo !== null"
+                class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]"
+                v-tooltip.top="'Definido individualmente en el producto'"
+              >
+                {{ parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) }}%
+              </span>
+              <span 
+                v-else
+                class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200"
+                v-tooltip.top="'Heredado de la categoría'"
+              >
+                {{ slotProps.data.categoria?.porcentaje_ganancia_minimo !== null ? parseFloat(slotProps.data.categoria.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}% (Heredado)
+              </span>
+            </template>
           </template>
         </Column>
 
@@ -117,7 +140,7 @@
               <template v-else>
                 <Button icon="pi pi-pencil" label="Editar"
                   class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all cursor-pointer"
-                  @click="handleEdit(slotProps.data)" " v-tooltip.top="'Editar productos'"/>
+                  @click="handleEdit(slotProps.data)" v-tooltip.top="'Editar producto'" />
 
                 <Button icon="pi pi-box" label="Presentaciones"
                   class="!bg-white hover:!bg-[#f0f4ee] !text-[#2b5e3b] !border !border-[#cfe0d2] rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all cursor-pointer"
@@ -140,10 +163,10 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Skeleton from 'primevue/skeleton'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { useproductoStore } from '@/stores/productoStore'
+import { mostrarAccesoDenegado, mostrarError } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 const store = useproductoStore()
@@ -157,23 +180,12 @@ onMounted(async () => {
 
   const resultado = await store.cargarProductos(1, store.perPage)
   if (resultado?.status === 403) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Sin autorización',
-      text: 'No tiene los permisos para ver los productos.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarAccesoDenegado()
   } else if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error de conexión', resultado.error)
   }
 })
 
-// Opciones de categorías con "Todas" por defecto
 const opcionesCategorias = computed(() => [
   { nombre: 'Todas las categorías', id: null },
   ...store.categorias
@@ -202,7 +214,6 @@ const handleDetail = (product) => emit('open-detail', product)
 </script>
 
 <style>
-/* Estilos para alinear el Footer de Paginación de PrimeVue correctamente */
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #fcfdfe !important;
   color: #1e3a2f !important;
@@ -232,6 +243,5 @@ const handleDetail = (product) => emit('open-detail', product)
   font-size: 13px !important;
   color: #64748b !important;
   order: -1;
-  /* Pone "Mostrando 1 a 2 de 2" a la izquierda */
 }
 </style>

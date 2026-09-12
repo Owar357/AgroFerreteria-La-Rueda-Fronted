@@ -1,16 +1,14 @@
 <template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
     <div class="flex justify-between items-center mb-8">
-  <div>
-    <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
-    <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
-  </div>
-  <Button label="Regresar" icon="pi pi-arrow-left"
-    class="!text-[22px] !py-4 !px-20 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
-    @click="$emit('close')" />
-</div>
-
-
+      <div>
+        <h1 class="text-[48px] font-semibold text-[#1a2e1f] leading-tight m-0">Editar Producto</h1>
+        <p class="text-[20px] text-gray-500 mt-2">Modifica la información general del producto</p>
+      </div>
+      <Button label="Regresar" icon="pi pi-arrow-left"
+        class="!text-[22px] !py-4 !px-20 !bg-[#2b5e3b] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif]"
+        @click="$emit('close')" />
+    </div>
 
     <div class="rounded-2xl p-8 mb-6 bg-white border border-[#e2e8dd]">
 
@@ -22,7 +20,7 @@
       </div>
 
       <!-- FILA 1: CUADROS INFORMATIVOS -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 ">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Tipo de Producto (Granel) -->
         <div class="bg-gray-50/80 p-4 rounded-xl border border-[#e2e8dd]/60 flex flex-col justify-between">
           <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Tipo de Producto</p>
@@ -58,7 +56,7 @@
       <!-- FILA 2: GRID DEL FORMULARIO DE ENTRADA -->
       <div class="flex flex-col gap-6 w-full">
 
-        <!-- Fila 1: Nombre del Producto-->
+        <!-- Fila 1: Nombre del Producto -->
         <div class="w-full flex flex-col gap-2">
           <label class="text-[20px] font-medium text-gray-600">
             Nombre del Producto <span class="text-red-500">*</span>
@@ -69,11 +67,11 @@
           <small v-if="errores.nombre" class="text-red-500 text-[14px]">{{ errores.nombre }}</small>
         </div>
 
-        <!-- Fila 2: -->
+        <!-- Fila 2: Fabricante, Categoría y % Ganancia Mínimo -->
         <div class="flex flex-col md:flex-row gap-6 w-full">
 
           <!-- FABRICANTE -->
-          <div class="w-full md:w-[60%] flex flex-col gap-2">
+          <div class="w-full md:w-[40%] flex flex-col gap-2">
             <label class="text-[20px] font-medium text-gray-600">
               Fabricante <span class="text-red-500">*</span>
             </label>
@@ -84,7 +82,7 @@
           </div>
 
           <!-- CATEGORÍA -->
-          <div class="w-full md:w-[40%] flex flex-col gap-2">
+          <div class="w-full md:w-[35%] flex flex-col gap-2">
             <label class="text-[20px] font-medium text-gray-600">
               Categoría <span class="text-red-500">*</span>
             </label>
@@ -110,6 +108,19 @@
               </template>
             </AutoComplete>
             <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
+          </div>
+
+          <!-- % GANANCIA MÍNIMO -->
+          <div class="w-full md:w-[25%] flex flex-col gap-2">
+            <label class="text-[20px] font-medium text-gray-600">
+              % Ganancia Mínimo
+            </label>
+            <InputNumber v-model="porcentajeGananciaMinimo" placeholder="Ej: 20.00" suffix="%" :min="0" :max="100"
+              :minFractionDigits="1" :maxFractionDigits="2"
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
+            <small class="text-[13px] text-gray-500">
+              Llenar solo si este producto tiene un margen diferente y/o especial a su categoría.
+             </small>
           </div>
 
         </div>
@@ -141,11 +152,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import AutoComplete from 'primevue/autocomplete'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import { useproductoStore } from '@/stores/productoStore'
-import Swal from 'sweetalert2'
+import { mostrarExito, mostrarError } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   producto: { type: Object, required: true },
@@ -154,12 +166,10 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const store = useproductoStore()
 
-// ============================================================
-// DATOS DEL PRODUCTO
-// ============================================================
 const nombre = ref('')
 const fabricante = ref('')
 const categoria = ref(null)
+const porcentajeGananciaMinimo = ref(null)
 const tipoProducto = ref('')
 const nombreUnidadBase = ref('')
 const aplicaIva = ref(false)
@@ -170,21 +180,12 @@ const mostrarModalCategoria = ref(false)
 const guardando = ref(false)
 const errores = ref({ nombre: '', fabricante: '', categoria: '' })
 
-// ============================================================
-// CARGA INICIAL
-// ============================================================
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error', resultado.error)
   }
 
-  // Asignar valores del producto
   nombre.value = props.producto.nombre || ''
   fabricante.value = props.producto.fabricante || ''
   categoria.value =
@@ -192,23 +193,21 @@ onMounted(async () => {
     props.producto.categoria ??
     null
 
-  // Información adicional (solo lectura)
+  porcentajeGananciaMinimo.value = props.producto.porcentaje_ganancia_minimo !== null
+    ? parseFloat(props.producto.porcentaje_ganancia_minimo)
+    : null
+
   tipoProducto.value = props.producto.tipo_producto || ''
   aplicaIva.value = props.producto.aplica_iva || false
 
-  // Obtener nombre de la unidad base
   if (props.producto.unidad_medida?.nombre) {
     nombreUnidadBase.value = props.producto.unidad_medida.nombre
   } else if (props.producto.unidad_medida_id) {
-    // Si solo tenemos el ID, buscar el nombre en las unidades cargadas
     const unidad = store.unidades?.find(u => u.id === props.producto.unidad_medida_id)
     nombreUnidadBase.value = unidad?.nombre || '—'
   }
 })
 
-// ============================================================
-// CATEGORÍAS
-// ============================================================
 const buscarCategorias = (event) => {
   textoBusquedaCategoria.value = event.query
   if (!event.query.trim()) {
@@ -228,9 +227,6 @@ const actualizarCategorias = async () => {
   await store.cargarCategorias()
 }
 
-// ============================================================
-// CÓDIGO GENERADO
-// ============================================================
 const limpiarTexto = (texto = '') =>
   texto
     .normalize('NFD')
@@ -248,9 +244,6 @@ const codigoGenerado = computed(() => {
   return tresPrimeras(catNombre) + tresPrimeras(proNombre) + tresPrimeras(fabNombre)
 })
 
-// ============================================================
-// GUARDAR
-// ============================================================
 const guardarProducto = async () => {
   errores.value = { nombre: '', fabricante: '', categoria: '' }
   let hayErrores = false
@@ -271,32 +264,23 @@ const guardarProducto = async () => {
 
   guardando.value = true
 
-  const resultado = await store.actualizarProducto(props.producto.id, {
+  const payload = {
     nombre: nombre.value.trim().toLowerCase(),
     fabricante: fabricante.value.trim().toLowerCase(),
     categoria_id: categoria.value.id,
     codigo: codigoGenerado.value.toLowerCase(),
-  })
+    porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : null
+  }
 
+  const resultado = await store.actualizarProducto(props.producto.id, payload)
   guardando.value = false
 
   if (!resultado.ok) {
-    Swal.fire({
-      icon: 'error',
-      title: 'No se pudo guardar',
-      text: resultado.error,
-      confirmButtonColor: '#b91c1c',
-    })
+    mostrarError('No se pudo guardar', resultado.error)
     return
   }
 
-  await Swal.fire({
-    icon: 'success',
-    title: 'Producto editado',
-    text: 'Producto editado con éxito',
-    confirmButtonColor: '#2b5e3b',
-    confirmButtonText: 'Aceptar',
-  })
+  await mostrarExito('Producto editado', 'La información del producto se actualizó con éxito.')
   emit('close')
 }
 </script>
