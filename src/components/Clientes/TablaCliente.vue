@@ -111,7 +111,7 @@
 
 
 <script setup>
-import { ref, onMounted, computed } from 'vue' // 👈 Importamos computed
+import { ref, onMounted, computed } from 'vue' 
 import IconField             from 'primevue/iconfield'
 import InputIcon             from 'primevue/inputicon'
 import InputText             from 'primevue/inputtext'
