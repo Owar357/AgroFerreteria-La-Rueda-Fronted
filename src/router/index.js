@@ -66,7 +66,7 @@ const routes = [
       {
         path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
-        component: () => import('@/views/HistorialVentaViews.vue'),
+       component: () => import('@/views/HistorialVentaViews.vue'), 
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
 

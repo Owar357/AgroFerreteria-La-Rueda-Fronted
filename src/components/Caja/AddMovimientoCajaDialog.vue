@@ -289,13 +289,15 @@ const registrarMovimiento = async () => {
       origen: origen.value, //AGREGADO
     })
     
+    const tipoRegistrado = tipoMovimiento.value   
+
     emit('movimientoRegistrado')
     cerrarDialog()
     Swal.fire({
       toast: true,
       position: 'top-end',
       icon: 'success',
-      title: tipoMovimiento.value === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
+      title: tipoRegistrado === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
       showConfirmButton: false,
       timer: 2000,
       background: '#ffffff',
@@ -307,12 +309,13 @@ const registrarMovimiento = async () => {
 
   } catch (error) {
     const msg = error.response?.data?.message || 'Error al registrar el movimiento.'
-    Swal.fire({ 
-    icon: 'error', 
-    title: 'Error', 
-    text: msg, 
-    confirmButtonColor: '#2b5e3b' })
-    customClass: { container: '!z-[9999]' }
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: msg,
+      confirmButtonColor: '#2b5e3b',
+      customClass: { container: '!z-[9999]' },
+    })
 
 
   } finally {
