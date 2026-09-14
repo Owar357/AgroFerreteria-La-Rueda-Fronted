@@ -1,17 +1,38 @@
 <template>
   <DataTable
-    :value="store.cargando ? Array.from({ length: store.perPage }) : store.categorias"
+    :value="store.cargando ? Array.from({ length: store.porPagina }) : store.categorias"
     responsiveLayout="scroll"
     class="p-datatable-custom text-[14px]"
     :paginator="!store.cargando"
     :lazy="true"
-    :rows="store.perPage"
-    :totalRecords="store.totalRecords"
-    :first="(store.currentPage - 1) * store.perPage"
+    :rows="store.porPagina"
+    :totalRecords="store.totalRegistros"
+    :first="(store.paginaActual - 1) * store.porPagina"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
-    @page="onPageChange"
+    @page="cambiarPagina"
   > 
+
+    <template #header>
+      <div class="flex items-center justify-between w-full gap-4">
+        <span class="relative w-full max-w-[320px]">
+          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[#8a998e] text-sm"></i>
+          <input
+            type="text"
+            v-model="textoBusqueda"
+            @input="store.buscarCategorias(textoBusqueda)"
+            placeholder="Buscar categoría..."
+            class="w-30rem pl-9 pr-3 py-3 text-[14px] rounded-lg border border-[#dce4d7] bg-[#f9faf8] text-[#1a2e1f] placeholder-[#8a998e] focus:outline-none focus:ring-2 focus:ring-[#2b5e3b]/30 focus:border-[#2b5e3b] transition-colors"
+          />
+        </span>
+
+        <Button
+          label="+ Agregar Nueva Categoría"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-3 rounded-lg border-none cursor-pointer shadow-md transition-colors shrink-0"
+          @click="emit('open-add')"
+        />
+      </div>
+    </template>
 
     <template #empty>
       <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay categorías registradas.</div>
@@ -59,7 +80,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import Skeleton from 'primevue/skeleton'
@@ -67,21 +88,23 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 
-const emit = defineEmits(['open-edit', 'open-view'])
+const textoBusqueda = ref('')
+
+const emit = defineEmits(['open-edit', 'open-view', 'open-add'])
 const store = useCategoriaStore()
 const route = useRoute()
 const router = useRouter()
 
 onMounted(() => {
   const pageFromUrl = Number(route.query.page) || 1
-  store.currentPage = pageFromUrl
-  store.cargarCategorias(pageFromUrl, store.perPage)
+  store.paginaActual = pageFromUrl
+  store.cargarCategorias(pageFromUrl, store.porPagina)
 })
 
-const onPageChange = (event) => {
+const cambiarPagina = (event) => {
   const page = event.page + 1
   
-  if (page !== store.currentPage) {
+  if (page !== store.paginaActual) {
     router.push({ query: { ...route.query, page } })
     store.cargarCategorias(page, event.rows)
   }
@@ -89,6 +112,13 @@ const onPageChange = (event) => {
 </script>
 
 <style>
+.p-datatable-custom .p-datatable-header {
+  background-color: #ffffff !important;
+  border: none !important;
+  border-bottom: 2px solid #e2e8dd !important;
+  padding: 1.25rem 1.25rem 1rem 1.25rem;
+}
+
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;

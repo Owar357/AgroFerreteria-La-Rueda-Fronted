@@ -283,7 +283,14 @@
 <script setup>
 import { buscarProductoCompra, registrarCompra } from '@/services/compraService'
 import { proveedores } from '@/services/proveedorService'
-import Swal from 'sweetalert2'
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  manejarAlertaGananciaReducida
+} from '@/utils/SweetAlertService'
+
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 
 const emit = defineEmits(['close'])
@@ -488,21 +495,19 @@ const eliminarItemDeTabla = (index) => {
 
 const registrarCompraFinal = async () => {
   if (!documentoForm.proveedor || !documentoForm.estadoPago) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Campos incompletos',
-      text: 'Completa los datos del documento.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Campos incompletos',
+      mensajeHtml: 'Completa los datos principales del documento de compra.'
     })
     return
   }
 
   if (itemsAgregados.value.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Sin items',
-      text: 'Agrega al menos un lote.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Sin items',
+      mensajeHtml: 'Agrega al menos un lote al detalle de la compra.'
     })
     return
   }
@@ -547,14 +552,18 @@ const registrarCompraFinal = async () => {
   }
 
   try {
-    await registrarCompra(payload)
-    Swal.fire({
-      icon: 'success',
-      title: '¡Compra registrada!',
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
-    })
+
+    const res = await registrarCompra(payload)
+
+
+    if (res.data?.status === 'warning' && res.data?.alertas) {
+
+      await manejarAlertaGananciaReducida(res.data.alertas)
+    } else {
+      await mostrarExito('¡Compra registrada!', 'La compra y sus lotes fueron guardados con éxito.')
+    }
+
+
     itemsAgregados.value = []
     Object.assign(documentoForm, {
       proveedor: null,
@@ -566,23 +575,18 @@ const registrarCompraFinal = async () => {
       fechaVencimiento: null,
     })
     emit('close')
+
   } catch (error) {
     const status = error.response?.status
-    if (status === 422) {
-      const mensajes = Object.values(error.response.data.errors).flat()
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error de validación',
-        text: mensajes[0],
-        confirmButtonColor: '#2b5e3b',
-      })
+    const data = error.response?.data
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else if (status === 422 && data?.errors) {
+      const mensajes = Object.values(data.errors).flat()
+      mostrarError('Error de validación', mensajes[0])
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo registrar la compra.',
-        confirmButtonColor: '#2b5e3b',
-      })
+      mostrarError('Error', data?.message || 'No se pudo registrar la compra.')
     }
   }
 }

@@ -14,10 +14,9 @@
       </div>
     </div>
 
-    <!-- 2.(Card) -->
     <div class="bg-white rounded-2xl border border-[#dce4d7] shadow-sm overflow-hidden">
 
-      <!-- Toolbar Superior / Filtros integrados -->
+     
       <div
         class="p-5 border-b border-[#e2e8dd] bg-[#fbfdf9] flex flex-col md:flex-row justify-between items-center gap-4">
 
