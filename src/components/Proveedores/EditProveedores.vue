@@ -1,156 +1,123 @@
-  <template>
-    <Dialog
-      v-model:visible="visible"
-      modal
-      :closable="false"
-      :style="{ width: '450px' }"
-      :pt="{
-        root: { class: 'rounded-xl overflow-hidden border-0 shadow-xl' },
-        header: { style: 'display: none;' },
-        content: { class: 'p-0' },
-        footer: { style: 'display: none;' },
-        mask: { style: 'background: rgba(10, 25, 15, 0.55);' },
-      }"
-    >
-      <!-- Header -->
-      <div class="flex items-center justify-between px-5 py-4" style="background: #1e3a2f;">
-        <div class="flex items-center gap-3">
-          <i class="pi pi-pencil text-white text-base" />
-          <h2 class="text-white text-base font-semibold m-0 font-inter">Editar proveedor</h2>
-        </div>
-        <button
-          @click="visible = false"
-          class="text-white/70 hover:text-white hover:bg-white/10 rounded-md p-1 transition-all border-0 bg-transparent cursor-pointer"
-          aria-label="Cerrar"
-        >
-          <i class="pi pi-times text-sm" />
-        </button>
+<template>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="EDITAR PROVEEDOR"
+    :style="{ width: '450px' }"
+    :draggable="false"
+    class="custom-dialog"
+    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+  >
+    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
+
+      <!-- Nombre -->
+      <div class="flex flex-col gap-2">
+        <label class="text-[14px] font-medium text-[#1a2e1f]">
+          Nombre: <span class="text-red-500">*</span>
+        </label>
+        <InputText
+          v-model="form.nombre"
+          placeholder="Nombre del proveedor"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          @keyup.enter="guardar"
+        />
       </div>
 
-      <!-- Body / Formulario -->
-    
-        <div class="px-6 py-5 bg-[#eef2e9] font-inter flex flex-col gap-4">
-        <!-- Campo Nombre -->
-        <div class="flex flex-col gap-1">
-          <label class="text-[12.5px] font-medium text-[#1a2e1f] font-inter">Nombre</label>
-          <InputText
-            v-model="form.nombre"
-            placeholder="Nombre del proveedor"
-            :pt="inputPt"
-          />
-        </div>
-
-        <!-- Campo Correo -->
-        <div class="flex flex-col gap-1">
-          <label class="text-[12.5px] font-medium text-[#1a2e1f] font-inter">Correo electrónico</label>
-          <InputText
-            v-model="form.correo"
-            type="email"
-            placeholder="correo@ejemplo.com"
-            :pt="inputPt"
-          />
-        </div>
-
-        <!-- Campo Teléfono -->
-        <div class="flex flex-col gap-1">
-          <label class="text-[12.5px] font-medium text-[#1a2e1f] font-inter">Teléfono</label>
-          <InputText
-            v-model="form.telefono"
-            type="tel"
-            placeholder="2222-3333"
-            :pt="inputPt"
-          />
-        </div>
-
+      <!-- Correo electrónico -->
+      <div class="flex flex-col gap-2">
+        <label class="text-[14px] font-medium text-[#1a2e1f]">
+          Correo electrónico:
+        </label>
+        <InputText
+          v-model="form.correo"
+          type="email"
+          placeholder="correo@ejemplo.com"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          @keyup.enter="guardar"
+        />
       </div>
 
-      <!-- Footer -->
-      <div class="flex justify-end gap-2.5 px-6 py-3.5 border-t border-[#dce8dc]" style="background: #eef2e9;">
+      <!-- Teléfono -->
+      <div class="flex flex-col gap-2">
+        <label class="text-[14px] font-medium text-[#1a2e1f]">
+          Teléfono:
+        </label>
+        <InputText
+          v-model="form.telefono"
+          type="tel"
+          placeholder="2222-3333"
+          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          @keyup.enter="guardar"
+        />
+      </div>
+
+      <!-- Acciones (Botones con la misma distancia y tamaño de EditCategoria) -->
+      <div class="flex justify-between gap-4 mt-2">
         <Button
           label="Cancelar"
+          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
           @click="visible = false"
-          :pt="{
-            root: { class: 'px-5 py-2 rounded-lg border border-[#c8ddd0] bg-white text-[#4b5563] text-sm font-medium font-inter hover:border-[#2b5e3b] hover:text-[#1a2e1f] transition-all cursor-pointer' },
-            label: { class: 'font-inter font-medium text-sm' },
-          }"
-          text
         />
         <Button
-         label="Editar"
+          label="Guardar"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
           @click="guardar"
-          :pt="{
-            root: { class: 'flex items-center gap-2 px-8 py-2 rounded-lg border-0 text-[#1a2e1f] text-sm font-semibold font-inter transition-all cursor-pointer' },
-            label: { class: 'font-inter font-semibold text-sm' },
-          }"
-          style="background: #2b5e3b;"
-          @mouseenter="(e) => e.currentTarget.style.background = '#2b5e3b'"
-          @mouseleave="(e) => e.currentTarget.style.background = '#2b5e3b'"
-        >
-          <template #icon>
-            <i class="pi pi-check-circle text-sm" />
-          </template>
-          <template #default>Actualizar cambios</template>
-        </Button>
+        />
       </div>
-      
-    </Dialog>
-  </template>
 
-  <script setup>
-  import { reactive, computed, watch } from 'vue'
-  import Dialog from 'primevue/dialog'
-  import InputText from 'primevue/inputtext'
-  import Button from 'primevue/button'
+    </div>
+  </Dialog>
+</template>
 
-  const props = defineProps({
-    modelValue: { type: Boolean, default: false },
-    proveedor:  { type: Object, default: null },
-  })
+<script setup>
+import { reactive, computed, watch } from 'vue'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
 
-  const emit = defineEmits(['update:modelValue', 'actualizar'])
+const props = defineProps({
+  modelValue: { type: Boolean, default: false },
+  proveedor:  { type: Object, default: null },
+})
 
-  const visible = computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val),
-  })
+const emit = defineEmits(['update:modelValue', 'actualizar'])
 
-  const form = reactive({
-    id:           null,
-    nombre:       '',
-    correo:       '',
-    telefono:     '',
-    direccion:    '',
-    tipo_persona: '',
-    nit:          '',
-    nrc:          '',
-    dui:          null,
-    activo:       true,
-  })
+const visible = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+})
 
-  const inputPt = {
-    root: {
-      class: 'w-full bg-white border border-gray-200 text-[#1a2e1f] text-[14px] rounded-lg py-2 px-3 focus:outline-none focus:ring-1 focus:ring-[#2b5e3b] focus:border-[#2b5e3b] transition-all font-inter',
-    },
+const form = reactive({
+  id:           null,
+  nombre:       '',
+  correo:       '',
+  telefono:     '',
+  direccion:    '',
+  tipo_persona: '',
+  nit:          '',
+  nrc:          '',
+  dui:          null,
+  activo:       true,
+})
+
+// Carga los campos al abrir el modal manteniendo la lógica de negocio intacta
+watch(() => props.modelValue, (isOpen) => {
+  if (isOpen && props.proveedor) {
+    const p = props.proveedor
+    form.id           = p.id           ?? null
+    form.nombre       = p.nombre       ?? ''
+    form.correo       = p.correo       ?? ''
+    form.telefono     = p.telefono     ?? ''
+    form.direccion    = p.direccion    ?? ''
+    form.tipo_persona = p.tipo_persona ?? ''
+    form.nit          = p.nit          ?? ''
+    form.nrc          = p.nrc          ?? ''
+    form.dui          = p.dui          ?? null
+    form.activo       = p.activo       ?? true
   }
+})
 
-  // Carga TODOS los campos al abrir el modal
-  watch(() => props.modelValue, (isOpen) => {
-    if (isOpen && props.proveedor) {
-      const p = props.proveedor
-      form.id           = p.id           ?? null
-      form.nombre       = p.nombre       ?? ''
-      form.correo       = p.correo       ?? ''
-      form.telefono     = p.telefono     ?? ''
-      form.direccion    = p.direccion    ?? ''
-      form.tipo_persona = p.tipo_persona ?? ''
-      form.nit          = p.nit          ?? ''
-      form.nrc          = p.nrc          ?? ''
-      form.dui          = p.dui          ?? null
-      form.activo       = p.activo       ?? true
-    }
-  })
-
- function guardar() {
+function guardar() {
   const payload = { id: form.id }
 
   if (form.nombre?.trim())   payload.nombre   = form.nombre.trim()
@@ -160,6 +127,27 @@
   emit('actualizar', payload)
   visible.value = false
 }
-    
+</script>
 
-  </script>
+<style>
+.custom-dialog .p-dialog-header {
+  background-color: #1e3a2f !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #e2e8dd;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.custom-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  padding: 1.5rem !important;
+}
+
+.p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
+}
+</style>

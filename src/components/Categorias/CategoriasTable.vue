@@ -1,36 +1,22 @@
 <template>
-  <DataTable
-    :value="store.cargando ? Array.from({ length: store.porPagina }) : store.categorias"
-    responsiveLayout="scroll"
-    class="p-datatable-custom text-[14px]"
-    :paginator="!store.cargando"
-    :lazy="true"
-    :rows="store.porPagina"
-    :totalRecords="store.totalRegistros"
-    :first="(store.paginaActual - 1) * store.porPagina"
+  <DataTable :value="store.cargando ? Array.from({ length: store.porPagina }) : store.categorias"
+    responsiveLayout="scroll" class="p-datatable-custom text-[14px]" :paginator="!store.cargando" :lazy="true"
+    :rows="store.porPagina" :totalRecords="store.totalRegistros" :first="(store.paginaActual - 1) * store.porPagina"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
-    @page="cambiarPagina"
-  > 
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías" @page="cambiarPagina">
 
     <template #header>
       <div class="flex items-center justify-between w-full gap-4">
         <span class="relative w-full max-w-[320px]">
           <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[#8a998e] text-sm"></i>
-          <input
-            type="text"
-            v-model="textoBusqueda"
-            @input="store.buscarCategorias(textoBusqueda)"
+          <input type="text" v-model="textoBusqueda" @input="store.buscarCategorias(textoBusqueda)"
             placeholder="Buscar categoría..."
-            class="w-30rem pl-9 pr-3 py-3 text-[14px] rounded-lg border border-[#dce4d7] bg-[#f9faf8] text-[#1a2e1f] placeholder-[#8a998e] focus:outline-none focus:ring-2 focus:ring-[#2b5e3b]/30 focus:border-[#2b5e3b] transition-colors"
-          />
+            class="w-30rem pl-9 pr-3 py-3 text-[14px] rounded-lg border border-[#dce4d7] bg-[#f9faf8] text-[#1a2e1f] placeholder-[#8a998e] focus:outline-none focus:ring-2 focus:ring-[#2b5e3b]/30 focus:border-[#2b5e3b] transition-colors" />
         </span>
 
-        <Button
-          label="+ Agregar Nueva Categoría"
+        <Button label="+ Agregar Nueva Categoría"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-3 rounded-lg border-none cursor-pointer shadow-md transition-colors shrink-0"
-          @click="emit('open-add')"
-        />
+          @click="emit('open-add')" />
       </div>
     </template>
 
@@ -50,11 +36,10 @@
     <Column header="% Ganancia Mínima" class="text-center w-[180px]">
       <template #body="slotProps">
         <Skeleton v-if="store.cargando" width="60%" height="1.2rem" class="mx-auto" />
-        <span 
-          v-else 
-          class="inline-block px-3 py-1 rounded-full text-[12px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]"
-        >
-          {{ slotProps.data.porcentaje_ganancia_minimo !== null ? parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}%
+        <span v-else
+          class="inline-block px-3 py-1 rounded-full text-[12px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]">
+          {{ slotProps.data.porcentaje_ganancia_minimo !== null ?
+            parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}%
         </span>
       </template>
     </Column>
@@ -64,15 +49,10 @@
       <template #body="slotProps">
         <div class="flex gap-2 justify-end">
           <Skeleton v-if="store.cargando" width="5.5rem" height="2rem" borderRadius="8px" />
-          
-          <Button
-            v-else
-            icon="pi pi-pencil"
-            label="Editar"
+
+          <Button v-else icon="pi pi-pencil" label="Editar"
             class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-            v-tooltip.top="'Editar categoría'"
-            @click="emit('open-edit', slotProps.data)"
-          />
+            v-tooltip.top="'Editar categoría'" @click="emit('open-edit', slotProps.data)" />
         </div>
       </template>
     </Column>
@@ -103,7 +83,7 @@ onMounted(() => {
 
 const cambiarPagina = (event) => {
   const page = event.page + 1
-  
+
   if (page !== store.paginaActual) {
     router.push({ query: { ...route.query, page } })
     store.cargarCategorias(page, event.rows)
@@ -119,7 +99,7 @@ const cambiarPagina = (event) => {
   padding: 1.25rem 1.25rem 1rem 1.25rem;
 }
 
-.p-datatable-custom .p-datatable-thead > tr > th {
+.p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
   border-bottom: 2px solid #e2e8dd !important;
@@ -130,13 +110,13 @@ const cambiarPagina = (event) => {
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr {
+.p-datatable-custom .p-datatable-tbody>tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
   border-bottom: 1px solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr:hover {
+.p-datatable-custom .p-datatable-tbody>tr:hover {
   background-color: #f4f7f2 !important;
 }
 </style>

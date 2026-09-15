@@ -1,16 +1,18 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#090909] font-['Inter',sans-serif]">
 
-    <div class="flex items-center gap-3 mb-5">
-        <div
-          class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-          <i class="pi pi-book text-[#2b5e3b] text-lg"></i>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight text-[#1a2e1f]">Catálogo de categorias</h1>
-          <p class="text-1xl text-[#526356] mt-0.5">Gestión general de las categorías y ganacias </p>
-        </div>
+      <div class="flex items-center gap-3 mb-6">
+      <div
+        class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-book text-[#2b5e3b] text-xl "></i>
       </div>
+      <div>
+        <h1 class="text-[28px] md:text-[32px] font-bold text-[#1a2e1f] leading-tight m-0">
+          Catálogo de categorias
+        </h1>
+        <p class="text-[14px] text-gray-500 mt-0.5 m-0">Gestión general de las categorías y ganacias</p>
+      </div>
+    </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg">
       <CategoriasTable

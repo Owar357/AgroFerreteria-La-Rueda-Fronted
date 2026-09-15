@@ -1,22 +1,25 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center gap-3">
-        <div
-          class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-          <i class="pi pi-book text-[#2b5e3b] text-lg"></i>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight text-[#1a2e1f]">Catálogo de productos</h1>
-          <p class="text-1xl text-[#526356] mt-0.5">Gestión general del inventario</p>
-        </div>
+
+
+    <div class="flex items-center gap-3 mb-6">
+      <div
+        class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-book text-[#2b5e3b] text-xl "></i>
+      </div>
+      <div>
+        <h1 class="text-[28px] md:text-[32px] font-bold text-[#1a2e1f] leading-tight m-0">
+          Catálogo de productos
+        </h1>
+        <p class="text-[14px] text-gray-500 mt-0.5 m-0">Gestión general del inventario</p>
       </div>
     </div>
 
+
     <div class="bg-white rounded-2xl border border-[#dce4d7] shadow-sm overflow-hidden">
 
-     
+
       <div
         class="p-5 border-b border-[#e2e8dd] bg-[#fbfdf9] flex flex-col md:flex-row justify-between items-center gap-4">
 
@@ -37,7 +40,7 @@
 
         <!-- Botón Acción Principal (Derecha) -->
         <Button label="Nuevo Producto" icon="pi pi-plus"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-medium px-4 h-[40px] rounded-lg border-none cursor-pointer transition-all shadow-sm w-full md:w-auto flex justify-center items-center gap-2"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-medium px-6 h-[40px] rounded-lg border-none cursor-pointer transition-all shadow-sm w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2"
           @click="$emit('open-add')" />
       </div>
 
@@ -94,19 +97,16 @@
           <template #body="slotProps">
             <Skeleton v-if="store.cargando" width="50%" height="1.2rem" class="mx-auto" />
             <template v-else>
-              <span 
-                v-if="slotProps.data.porcentaje_ganancia_minimo !== null"
+              <span v-if="slotProps.data.porcentaje_ganancia_minimo !== null"
                 class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]"
-                v-tooltip.top="'Definido individualmente en el producto'"
-              >
+                v-tooltip.top="'Definido individualmente en el producto'">
                 {{ parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) }}%
               </span>
-              <span 
-                v-else
+              <span v-else
                 class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200"
-                v-tooltip.top="'Heredado de la categoría'"
-              >
-                {{ slotProps.data.categoria?.porcentaje_ganancia_minimo !== null ? parseFloat(slotProps.data.categoria.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}% (Heredado)
+                v-tooltip.top="'Heredado de la categoría'">
+                {{ slotProps.data.categoria?.porcentaje_ganancia_minimo !== null ?
+                  parseFloat(slotProps.data.categoria.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}% (Heredado)
               </span>
             </template>
           </template>
