@@ -8,6 +8,7 @@ export const useLoteStore = defineStore('lote', () => {
   const lotes = ref([])
   const cargando = ref(false)
   const totalRecords = ref(0)
+  const stockTotalActivo = ref(0)
   const currentPage = ref(1)
   const perPage = ref(5)
 
@@ -17,6 +18,7 @@ export const useLoteStore = defineStore('lote', () => {
       const res = await getLotesByPresentacion(presentacionId, page, rows)
       lotes.value = res.data.data
       totalRecords.value = res.data.total
+      stockTotalActivo.value = res.data.stock_total_activo ?? 0 
       currentPage.value = res.data.current_page
       perPage.value = res.data.per_page
     } catch (error) {
@@ -62,7 +64,6 @@ export const useLoteStore = defineStore('lote', () => {
         showConfirmButton: false
       })
 
-      
       await fetchLotesByPresentacion(presentacionId, currentPage.value, perPage.value)
       return res.data
     } catch (error) {
@@ -81,6 +82,7 @@ export const useLoteStore = defineStore('lote', () => {
     lotes,
     cargando,
     totalRecords,
+    stockTotalActivo,
     currentPage,
     perPage,
     fetchLotesByPresentacion,

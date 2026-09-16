@@ -62,20 +62,6 @@ export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
 export const updateDescuentoLote = (loteId, porcentajeDescuento) =>
   api.patch(`/lotes/${loteId}/descuento`, { porcentaje_descuento: porcentajeDescuento })
 
-// ==========================================
-// KARDEX (NUEVO)
-// ==========================================
-
-// Traer historial de movimientos Kardex por producto (paginado)
-export const getKardexByProducto = (productoId, page = 1, perPage = 10, filtros = {}) =>
-  api.get(`/kardex/${productoId}`, {
-    params: {
-      page: page,
-      per_page: perPage,
-      fecha_inicio: filtros.fecha_inicio || null,
-      fecha_fin: filtros.fecha_fin || null,
-    },
-  })
 
 // ==========================================
 // TABLAS DE APOYO / SELECTS

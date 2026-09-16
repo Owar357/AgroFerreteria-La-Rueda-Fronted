@@ -5,37 +5,49 @@ import { getCategorias, createCategoria, updateCategoria } from '../services/cat
 export const useCategoriaStore = defineStore('categoria', () => {
   const categorias = ref([])
   const cargando = ref(false)
-  const totalRecords = ref(0)
-  const currentPage = ref(1)
-  const perPage = ref(5)
+  const totalRegistros = ref(0)
+  const paginaActual = ref(1)
+  const porPagina = ref(5)
+  const terminoBusqueda = ref('')
 
-  const cargarCategorias = async (page = 1, rows = perPage.value) => {
+  let debounceTimeout = null
+
+  const cargarCategorias = async (page = 1, rows = porPagina.value) => {
 
     if (cargando.value) return
     cargando.value = true
     try {
-      const response = await getCategorias(page, rows)
+      const response = await getCategorias(page, rows, terminoBusqueda.value)
       categorias.value = response.data.data
-      totalRecords.value = response.data.total
-      currentPage.value = response.data.current_page
-      perPage.value = response.data.per_page
+      totalRegistros.value = response.data.total
+      paginaActual.value = response.data.current_page
+      porPagina.value = response.data.per_page
     } catch (error) {
       if (error.response?.status === 404) {
         categorias.value = []
-        totalRecords.value = 0
+        totalRegistros.value = 0
         return
       }
-      // Devolvemos el error para que el componente lo maneje
       return { ok: false, status: error.response?.status, error: error.response?.data?.message }
     } finally {
       cargando.value = false
     }
   }
 
+  const buscarCategorias = (term) => {
+    terminoBusqueda.value = term
+
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(() => {
+      paginaActual.value = 1
+      cargarCategorias(1, porPagina.value)
+    }, 400)
+  }
+
   const crearCategoria = async (data) => {
     try {
       const response = await createCategoria(data)
-      await cargarCategorias(1, perPage.value)
+      await cargarCategorias(1, porPagina.value)
       return { ok: true, categoria: response.data.categoria }
     } catch (error) {
       const status = error.response?.status
@@ -70,10 +82,12 @@ export const useCategoriaStore = defineStore('categoria', () => {
   return {
     categorias,
     cargando,
-    totalRecords,
-    currentPage,
-    perPage,
+    totalRegistros,
+    paginaActual,
+    porPagina,
+    terminoBusqueda,
     cargarCategorias,
+    buscarCategorias,
     crearCategoria,
     actualizarCategoria,
   }

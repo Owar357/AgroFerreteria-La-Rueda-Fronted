@@ -20,6 +20,13 @@ const routes = [
     meta: { requiresAuth: false }
   },
 
+  {
+  path: '/acceso-denegado',
+  name: 'unauthorized',
+  component: () => import('../views/auth/AccesoDenegado.vue'),
+  meta: { requiresAuth: true }
+},
+
 
   {
     path: '/admin',
@@ -75,7 +82,7 @@ const routes = [
         path: 'gestion/pos',
         name: 'POS',
         component: () => import('@/components/Ventas/POS.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
+        meta: { requiresAuth: true, allowedRoles: ['CAJERO'] },
       },
       
  
@@ -83,7 +90,7 @@ const routes = [
         path: 'venta/venta',
         name: 'venta',
         component: () => import('@/components/Ventas/POS.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
+        meta: { requiresAuth: true, allowedRoles: ['CAJERO'] },
       },
 
       
@@ -97,7 +104,7 @@ const routes = [
         path: 'venta/movimientos-de-caja',
         name: 'movimientos-caja',
         component: () => import('@/views/MovimientosCajaViews.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
+        meta: { requiresAuth: true, allowedRoles: ['CAJERO'] },
       },
 
       {
@@ -159,7 +166,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes // Aquí se  inyecta el array 
+  routes 
 })
 
 
@@ -179,8 +186,11 @@ router.beforeEach((to) => {
 
   //  Control de Roles (Si la ruta tiene roles asignados y el usuario no lo incluye)
   if (isLoggedIn && to.meta.allowedRoles && !to.meta.allowedRoles.includes(userRole)) {
-    const homeRoute = authService.getHomeRoute()
-    return (homeRoute) 
+    return {
+      name: 'unauthorized',
+      query : {intento:  to.name}
+    }
+
   }
 
   return true

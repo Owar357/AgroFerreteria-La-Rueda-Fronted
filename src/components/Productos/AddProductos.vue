@@ -1,17 +1,11 @@
 <template>
   <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
-
-    <!-- TARJETA CONTENEDORA PRINCIPAL (Envuelve ambos pasos) -->
     <div class="rounded-2xl bg-white border border-[#e2e8dd] shadow-sm overflow-hidden mb-6">
-
-      <!-- ENCABEZADO INTEGRADO (Regresar + Título + Stepper Chevron) -->
       <div class="p-8 pb-6 border-b border-[#e2e8dd] bg-[#fbfdf9]">
-
-        <!-- Fila Superior: Botón Regresar + Título -->
         <div class="flex items-center gap-6 mb-6">
           <Button label="Regresar" icon="pi pi-arrow-left"
             class="!text-[18px] !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] rounded-xl shadow-sm cursor-pointer transition-all shrink-0"
-            @click="$emit('close')" />
+            @click="$emit('close')" />  
 
           <div>
             <h1 class="text-[36px] font-semibold text-[#1a2e1f] leading-tight m-0">Nuevo Producto</h1>
@@ -21,7 +15,6 @@
           </div>
         </div>
 
-        <!-- Indicador de Pasos Integrado (Chevron Original) -->
         <div class="flex w-full select-none rounded-xl overflow-hidden shadow-sm">
           <div
             class="flex-1 flex items-center justify-center gap-3 py-3.5 pl-8 pr-6 text-white transition-colors cursor-pointer"
@@ -40,10 +33,8 @@
             <span class="text-[17px] font-medium">Presentaciones</span>
           </div>
         </div>
-
       </div>
 
-      <!-- CUERPO DEL PASO 1: INFORMACIÓN GENERAL -->
       <div v-show="pasoActual === 1" class="p-8">
         <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
           <div
@@ -54,7 +45,6 @@
         </div>
 
         <div class="grid grid-cols-2 gap-6">
-          <!-- Nombre -->
           <div class="col-span-2 flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Nombre del Producto <span class="text-red-500">*</span>
@@ -65,7 +55,6 @@
             <small v-if="errores.nombre" class="text-red-500 text-[14px]">{{ errores.nombre }}</small>
           </div>
 
-          <!-- Fabricante -->
           <div class="col-span-2 flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Fabricante <span class="text-red-500">*</span>
@@ -76,7 +65,6 @@
             <small v-if="errores.fabricante" class="text-red-500 text-[14px]">{{ errores.fabricante }}</small>
           </div>
 
-          <!-- Categoría -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Categoría <span class="text-red-500">*</span>
@@ -105,7 +93,18 @@
             <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
           </div>
 
-          <!-- Código del Producto -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[18px] font-medium text-gray-700">
+              % Ganancia Mínimo Especial (Opcional)
+            </label>
+            <InputNumber v-model="porcentajeGananciaMinimo" placeholder="Ej: 20.00" suffix="%" :min="0" :max="100"
+              :minFractionDigits="1" :maxFractionDigits="2"
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
+            <small class="text-[14px] text-gray-500">
+              Si se deja vacío, heredará automáticamente <br> el margen de ganancia de su categoría.
+            </small>
+          </div>
+
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">Código del Producto</label>
             <div class="relative">
@@ -118,7 +117,6 @@
             </small>
           </div>
 
-          <!-- Tipo de Venta -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Tipo de Venta <span class="text-red-500">*</span>
@@ -136,7 +134,6 @@
             <small v-if="errores.tipoProducto" class="text-red-500 text-[14px]">{{ errores.tipoProducto }}</small>
           </div>
 
-          <!-- Unidad Base -->
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
               Unidad Base <span class="text-red-500">*</span>
@@ -168,7 +165,6 @@
             </p>
           </div>
 
-          <!-- Aplica IVA -->
           <div class="col-span-2 flex items-center gap-3 py-2 mt-2">
             <Checkbox v-model="aplicaIva" :binary="true" inputId="ivaGeneral" class="!w-[22px] !h-[22px]" />
             <label for="ivaGeneral" class="text-[18px] text-[#1a2e1f] cursor-pointer font-medium">
@@ -177,7 +173,6 @@
           </div>
         </div>
 
-        <!-- Botón Siguiente Paso -->
         <div class="flex justify-end mt-8 pt-4 border-t border-gray-100">
           <Button label="Siguiente Paso" icon="pi pi-arrow-right" iconPos="right"
             class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white !font-['Inter',sans-serif] rounded-xl shadow-md transition-all cursor-pointer"
@@ -185,10 +180,7 @@
         </div>
       </div>
 
-      <!-- CUERPO DEL PASO 2: PRESENTACIONES -->
       <div v-show="pasoActual === 2" class="p-8">
-
-        <!-- CASO 1: GRANEL SIN BASE -->
         <div v-if="tipoProducto === 'GRANEL' && !presentacionBaseCreada" class="mb-8">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
             <div
@@ -291,7 +283,6 @@
           </div>
         </div>
 
-        <!-- CASO 2: GRANEL CON BASE -->
         <div v-else-if="tipoProducto === 'GRANEL' && presentacionBaseCreada" class="mb-8">
           <div class="flex items-center gap-3 mb-6 pb-4 border-b border-[#e2e8dd]">
             <span class="text-[26px] font-semibold text-[#1a2e1f]">➕ Agregar Presentación Derivada</span>
@@ -356,7 +347,7 @@
               </label>
               <InputNumber v-model="formDerivada.precioVenta" fluid placeholder="0.00" :min="0" :minFractionDigits="2"
                 :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
-                inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
+                inputClass="!bg-[#1a2e1f] !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
             </div>
 
             <div class="bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-4 mt-[0px]">
@@ -383,7 +374,6 @@
           </div>
         </div>
 
-        <!-- CASO 3: UNIDAD FIJA -->
         <div v-else-if="tipoProducto === 'UNIDAD FIJA'" class="mb-8">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
             <div
@@ -474,7 +464,6 @@
           </div>
         </div>
 
-        <!-- TABLA DE PRESENTACIONES AGREGADAS -->
         <div class="mt-8 pt-6 border-t border-[#e2e8dd]">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
             <div
@@ -527,7 +516,6 @@
           </DataTable>
         </div>
 
-        <!-- Botones Inferiores de Navegación del Paso 2 -->
         <div class="flex justify-between mt-8 pt-6 border-t border-[#e2e8dd]">
           <Button label="Atrás" icon="pi pi-arrow-left"
             class="!text-[18px] !py-3 !px-8 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer"
@@ -536,11 +524,8 @@
             class="!text-[22px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer"
             @click="guardarProducto" />
         </div>
-
       </div>
-
     </div>
-
   </div>
 
   <AddCategoriaDialog v-model:visible="mostrarModalCategoria" @categoria-creada="actualizarCategorias" />
@@ -558,10 +543,10 @@ import Select from 'primevue/select'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
-import Swal from 'sweetalert2'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
+import { mostrarExito, mostrarError, mostrarAccesoDenegado, mostrarConfirmacion, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
@@ -571,6 +556,7 @@ const DRAFT_KEY = 'agroferreteria_borrador_nuevo_producto'
 const nombre = ref('')
 const fabricante = ref('')
 const categoria = ref(null)
+const porcentajeGananciaMinimo = ref(null)
 const categoriasFiltradas = ref([])
 const textoBusquedaCategoria = ref('')
 const mostrarModalCategoria = ref(false)
@@ -605,6 +591,63 @@ const formUnidadFija = ref({
   codigoBarra: '',
 })
 
+function limpiarTexto(texto = '') {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .trim()
+    .toUpperCase()
+}
+
+function generarAcronimoProducto(nombreProd = '') {
+  const limpio = limpiarTexto(nombreProd)
+  if (!limpio) return ''
+
+  const stopWords = ['DE', 'DEL', 'PARA', 'CON', 'EN', 'EL', 'LA', 'LOS', 'LAS', 'UN', 'UNA', 'Y']
+  const palabras = limpio.split(/\s+/).filter(p => !stopWords.includes(p))
+
+  if (palabras.length === 0) return limpio.substring(0, 4)
+
+  if (palabras.length === 1) {
+    return palabras[0].substring(0, 4)
+  }
+
+  if (palabras.length === 2) {
+    const p1 = palabras[0].substring(0, 2)
+    const p2 = palabras[1].substring(0, 2)
+    return `${p1}${p2}`
+  }
+
+  return palabras.map(p => p.charAt(0)).join('').substring(0, 5)
+}
+
+function generarCodigoFabricante(fab = '') {
+  const limpio = limpiarTexto(fab)
+  if (!limpio) return ''
+
+  const palabras = limpio.split(/\s+/)
+  if (palabras.length >= 2) {
+    return (palabras[0].charAt(0) + palabras[1].substring(0, 2)).substring(0, 3)
+  }
+  return limpio.substring(0, 3)
+}
+
+const codigoGenerado = computed(() => {
+  const catObj = categoria.value
+  const proNombre = nombre.value || ''
+  const fabNombre = fabricante.value || ''
+
+  if (!catObj || !proNombre || !fabNombre) return ''
+
+  const catCode = (catObj.codigo_corto || limpiarTexto(catObj.nombre).substring(0, 3)).toUpperCase()
+  const fabCode = generarCodigoFabricante(fabNombre)
+  const prodCode = generarAcronimoProducto(proNombre)
+
+  const codigoCompleto = `${catCode}-${fabCode}-${prodCode}`
+  return codigoCompleto.substring(0, 24)
+})
+
 const presentacionBaseCreada = computed(() => {
   return presentaciones.value.some(p => p.es_base === true)
 })
@@ -619,10 +662,9 @@ const nombreUnidadBase = computed(() => {
   return unidad?.nombre || ''
 })
 
-// Unidades mínimas para seleccionar como Unidad Base en el Paso 1
 const unidadesFiltradas = computed(() => {
   if (!tipoProducto.value) return unidades.value
-  
+
   const unidadesBasesPermitidas = tipoProducto.value === 'GRANEL'
     ? [
       'Gramo',
@@ -643,20 +685,13 @@ const unidadesFiltradas = computed(() => {
   })
 })
 
-const codigoGenerado = computed(() => {
-  const catNombre = categoria.value?.nombre || ''
-  const proNombre = nombre.value || ''
-  const fabNombre = fabricante.value || ''
-  if (!catNombre || !proNombre || !fabricante.value) return ''
-  return tresPrimeras(catNombre) + tresPrimeras(proNombre) + tresPrimeras(fabNombre)
-})
-
 function guardarBorrador() {
   const borrador = {
     pasoActual: pasoActual.value,
     nombre: nombre.value,
     fabricante: fabricante.value,
     categoria: categoria.value,
+    porcentajeGananciaMinimo: porcentajeGananciaMinimo.value,
     unidadMedidaId: unidadMedidaId.value,
     tipoProducto: tipoProducto.value,
     aplicaIva: aplicaIva.value,
@@ -674,6 +709,7 @@ function restaurarBorrador() {
     nombre.value = borrador.nombre ?? ''
     fabricante.value = borrador.fabricante ?? ''
     categoria.value = borrador.categoria ?? null
+    porcentajeGananciaMinimo.value = borrador.porcentajeGananciaMinimo ?? null
     unidadMedidaId.value = borrador.unidadMedidaId ?? null
     tipoProducto.value = borrador.tipoProducto ?? null
     aplicaIva.value = borrador.aplicaIva ?? false
@@ -708,7 +744,7 @@ watch(nombreUnidadBase, (nuevoValor) => {
 }, { immediate: true })
 
 watch(
-  [pasoActual, nombre, fabricante, categoria, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
+  [pasoActual, nombre, fabricante, categoria, porcentajeGananciaMinimo, unidadMedidaId, tipoProducto, aplicaIva, presentaciones],
   guardarBorrador,
   { deep: true }
 )
@@ -740,22 +776,14 @@ watch(() => formUnidadFija.value.codigoBarra, (nuevoValor) => {
   }
 })
 
-function limpiarTexto(texto = '') {
-  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-}
-
-function tresPrimeras(texto = '') {
-  return limpiarTexto(texto).substring(0, 3)
-}
-
-function normalizarNombre(nombre) {
-  const limpio = String(nombre || '').trim()
+function normalizarNombre(nombreText) {
+  const limpio = String(nombreText || '').trim()
   if (!limpio) return ''
   return limpio.charAt(0).toUpperCase() + limpio.slice(1).toLowerCase()
 }
 
-function nombreYaExiste(nombre, excludeId = null) {
-  const nombreNormalizado = normalizarNombre(nombre).toLowerCase().replace(/\s+/g, ' ')
+function nombreYaExiste(nombreText, excludeId = null) {
+  const nombreNormalizado = normalizarNombre(nombreText).toLowerCase().replace(/\s+/g, ' ')
   return presentaciones.value.some(p => {
     if (excludeId && p.id === excludeId) return false
     const pNormalizado = (p.nombre || '').toLowerCase().replace(/\s+/g, ' ')
@@ -776,14 +804,12 @@ async function cargarUnidades() {
   }
 }
 
-// Filtro estricto por magnitud compatible
 function buscarUnidades(event) {
   const query = event.query?.toLowerCase() || ''
-  
+
   const unidadBaseActual = unidades.value.find(u => u.id === unidadMedidaId.value)
   const magnitudBase = unidadBaseActual?.magnitud
 
-  // Solo se admiten unidades pertenecientes a la misma magnitud
   const listaOpciones = unidades.value.filter(u => {
     if (!magnitudBase) return true
     return u.magnitud === magnitudBase
@@ -793,7 +819,7 @@ function buscarUnidades(event) {
     unidadesSugeridas.value = listaOpciones.slice(0, 10)
     return
   }
-  
+
   unidadesSugeridas.value = listaOpciones.filter(u =>
     u.nombre.toLowerCase().includes(query)
   )
@@ -877,27 +903,27 @@ function onSelectUnidadFija(event) {
 function crearBase() {
   const nombreBase = normalizarNombre(nombreUnidadBase.value)
   if (!nombreBase) {
-    Swal.fire({ icon: 'warning', title: 'Unidad base requerida', text: 'Debes seleccionar una unidad base en el paso 1.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Unidad base requerida', mensajeHtml: 'Debes seleccionar una unidad base en el paso 1.' })
     return
   }
 
   if (!formBase.value.codigoBarra || formBase.value.codigoBarra.trim() === '') {
-    Swal.fire({ icon: 'warning', title: 'Código de barra requerido', text: 'La presentación base debe tener un código de barra.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Código de barra requerido', mensajeHtml: 'La presentación base debe tener un código de barra.' })
     return
   }
 
   if (nombreYaExiste(nombreBase)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombreBase}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombreBase}</strong>" ya existe.` })
     return
   }
 
   if (!formBase.value.stockMinimo || formBase.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Stock mínimo requerido', mensajeHtml: 'Define un stock mínimo mayor a 0.' })
     return
   }
 
   if (!formBase.value.precioVenta || formBase.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -919,29 +945,29 @@ function crearBase() {
   })
 
   formBase.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
-  Swal.fire({ icon: 'success', title: `¡Presentación Base "${nombreBase}" creada!`, text: 'Ahora puedes agregar presentaciones derivadas.', timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación Base "${nombreBase}" creada!`, 'Ahora puedes agregar presentaciones derivadas.')
 }
 
 function agregarDerivada() {
-  const nombre = normalizarNombre(formDerivada.value.nombre)
-  if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+  const nombreDerivada = normalizarNombre(formDerivada.value.nombre)
+  if (!nombreDerivada) {
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre requerido', mensajeHtml: 'Ingresa un nombre para la presentación.' })
     return
   }
 
-  if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+  if (nombreYaExiste(nombreDerivada)) {
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombreDerivada}</strong>" ya existe.` })
     return
   }
 
   const factor = Number(formDerivada.value.factorConversion)
   if (!factor || factor <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Factor inválido', text: 'Ingresa un factor de conversión mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Factor inválido', mensajeHtml: 'Ingresa un factor de conversión mayor a 0.' })
     return
   }
 
   if (!formDerivada.value.precioVenta || formDerivada.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -950,7 +976,7 @@ function agregarDerivada() {
   const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
 
   presentaciones.value.push({
-    nombre: nombre,
+    nombre: nombreDerivada,
     equivalencia: factor,
     unidadBase: nombreUnidadBase.value,
     aplicaIva: aplicaIva.value,
@@ -962,28 +988,28 @@ function agregarDerivada() {
   })
 
   limpiarFormularioDerivada()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación "${nombreDerivada}" agregada!`)
 }
 
 function agregarUnidadFija() {
-  const nombre = normalizarNombre(formUnidadFija.value.nombre)
-  if (!nombre) {
-    Swal.fire({ icon: 'warning', title: 'Nombre requerido', text: 'Ingresa un nombre para la presentación.', confirmButtonColor: '#2b5e3b' })
+  const nombreFija = normalizarNombre(formUnidadFija.value.nombre)
+  if (!nombreFija) {
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre requerido', mensajeHtml: 'Ingresa un nombre para la presentación.' })
     return
   }
 
-  if (nombreYaExiste(nombre)) {
-    Swal.fire({ icon: 'warning', title: 'Nombre duplicado', text: `La presentación "${nombre}" ya existe.`, confirmButtonColor: '#2b5e3b' })
+  if (nombreYaExiste(nombreFija)) {
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Nombre duplicado', mensajeHtml: `La presentación "<strong>${nombreFija}</strong>" ya existe.` })
     return
   }
 
   if (!formUnidadFija.value.stockMinimo || formUnidadFija.value.stockMinimo <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Stock mínimo requerido', text: 'Define un stock mínimo mayor a 0.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Stock mínimo requerido', mensajeHtml: 'Define un stock mínimo mayor a 0.' })
     return
   }
 
   if (!formUnidadFija.value.precioVenta || formUnidadFija.value.precioVenta <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Precio requerido', text: 'Define un precio de venta válido.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
@@ -992,7 +1018,7 @@ function agregarUnidadFija() {
   const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
 
   presentaciones.value.push({
-    nombre: nombre,
+    nombre: nombreFija,
     codigoBarra: formUnidadFija.value.codigoBarra || '',
     equivalencia: 1,
     unidadBase: nombreUnidadBase.value,
@@ -1005,27 +1031,23 @@ function agregarUnidadFija() {
   })
 
   limpiarFormularioUnidadFija()
-  Swal.fire({ icon: 'success', title: `¡Presentación "${nombre}" agregada!`, timer: 1500, showConfirmButton: false })
+  mostrarExito(`¡Presentación "${nombreFija}" agregada!`)
 }
 
 function editarPresentacion(index) {
-  Swal.fire({ icon: 'info', title: 'Editar presentación', text: `Funcionalidad en desarrollo. Índice: ${index}`, confirmButtonColor: '#2b5e3b' })
+  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: `Funcionalidad en desarrollo. Índice: ${index}` })
 }
 
 async function eliminarPresentacion(index) {
-  const resultado = await Swal.fire({
-    title: '¿Eliminar presentación?',
-    text: 'Quiere eliminar esta presentación de la tabla.',
-    icon: 'warning',
-    showCancelButton: true,
+  const resultado = await mostrarConfirmacion({
+    titulo: '¿Eliminar presentación?',
+    mensajeHtml: '¿Deseas eliminar esta presentación de la lista?',
+    icono: 'pi-trash',
     confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#6b7280',
   })
   if (resultado.isConfirmed) {
     presentaciones.value.splice(index, 1)
-    Swal.fire({ icon: 'success', title: 'Eliminada', timer: 1500, showConfirmButton: false })
+    mostrarExito('Eliminada', 'La presentación fue removida de la tabla.')
   }
 }
 
@@ -1057,7 +1079,7 @@ async function guardarProducto() {
   if (hayErrores) return
 
   if (presentaciones.value.length === 0) {
-    Swal.fire({ icon: 'warning', title: 'Sin presentaciones', text: 'Debe agregar al menos una presentación.', confirmButtonColor: '#2b5e3b' })
+    mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Sin presentaciones', mensajeHtml: 'Debe agregar al menos una presentación.' })
     return
   }
 
@@ -1069,6 +1091,7 @@ async function guardarProducto() {
     unidad_medida_id: unidadMedidaId.value,
     aplica_iva: aplicaIva.value,
     categoria_id: categoria.value.id,
+    porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : null,
     presentaciones: presentaciones.value.map((p) => ({
       nombre: p.nombre.toLowerCase(),
       fabricante: p.fabricante?.toLowerCase() || '',
@@ -1087,26 +1110,12 @@ async function guardarProducto() {
 
   if (resultado.ok) {
     resetFormularioCompleto()
-    await Swal.fire({ icon: 'success', title: '¡Producto guardado!', text: 'El producto fue guardado con éxito.', confirmButtonColor: '#2b5e3b', confirmButtonText: 'Aceptar' })
+    await mostrarExito('¡Producto guardado!', 'El producto fue guardado con éxito.')
     emit('close')
   } else if (resultado.status === 403) {
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tiene permisos para crear productos.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: { confirmButton: '!rounded-lg !font-semibold !text-sm', popup: '!rounded-2xl' },
-    })
+    mostrarAccesoDenegado()
   } else if (resultado.error) {
-    Swal.fire({ icon: 'error', title: 'Error de validación', text: resultado.error, confirmButtonColor: '#2b5e3b' })
+    mostrarError('Error de validación', resultado.error)
   }
 }
 
@@ -1114,6 +1123,7 @@ function resetFormularioCompleto() {
   nombre.value = ''
   fabricante.value = ''
   categoria.value = null
+  porcentajeGananciaMinimo.value = null
   unidadMedidaId.value = null
   tipoProducto.value = null
   aplicaIva.value = false
@@ -1128,7 +1138,7 @@ function resetFormularioCompleto() {
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    Swal.fire({ icon: 'error', title: 'Error', text: resultado.error, confirmButtonColor: '#2b5e3b' })
+    mostrarError('Error', resultado.error)
   }
   await cargarUnidades()
   restaurarBorrador()

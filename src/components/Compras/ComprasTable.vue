@@ -209,7 +209,8 @@ import Skeleton from 'primevue/skeleton'
 import { DatePicker } from 'primevue'
 import { proveedores as getProveedores } from '@/services/proveedorService'
 import authService from '@/services/authService'
-import Swal from 'sweetalert2'
+import { mostrarConfirmacion } from '@/utils/SweetAlertService'
+
 
 const props = defineProps({
   compras: { type: Array, default: () => [] },
@@ -263,17 +264,18 @@ const emitirFiltros = () => {
 const verDetalles = (compra) => {
   emit('ver-detalle', compra)
 }
-// desde aquii hasta abajo
-const anularCompra = (compra) => {
-  Swal.fire({
-    title: 'Anular compra',
-    html: `
+
+
+const anularCompra = async (compra) => {
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Anular compra?',
+    mensajeHtml: `
       <div style="text-align:left; font-size:14px; color:#374151">
         <p>Esta acción <strong>no se puede deshacer</strong> y afectará:</p>
-        <ul style="margin-top:8px; padding-left:20px;">
-          <li>=>El stock de los productos(se restara del inventario).</li>
-          <li>=>Si ocurrio algún movimiento contables asociado no se podrá anular.</li>
-          <li>=>El estado de pago de la compra cambiara.</li>
+        <ul style="margin-top:8px; padding-left:20px; line-height: 1.6;">
+          <li>• El stock de los productos (se restará del inventario).</li>
+          <li>• Si ocurrió algún movimiento contable asociado no se podrá anular.</li>
+          <li>• El estado de pago de la compra cambiará a anulado.</li>
         </ul>
         <div style="background:#f9fafb; border:1px solid #e2e8dd; border-radius:8px; padding:12px; margin-top:12px">
           <p><strong>Documento:</strong> ${compra.numDocumento}</p>
@@ -282,18 +284,13 @@ const anularCompra = (compra) => {
         </div>
       </div>
     `,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, anular compra ',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#b91c1c',
-    cancelButtonColor: '#6b7280',
-    reverseButtons: true,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      emit('anular-compra', compra.id)
-    }
+    icono: 'pi-ban',
+    confirmButtonText: 'Sí, anular compra',
   })
+
+  if (confirmacion.isConfirmed) {
+    emit('anular-compra', compra.id)
+  }
 }
 
 
