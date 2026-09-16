@@ -1,9 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getKardexByProducto } from '@/services/productoService'
+import { getKardexByProducto } from '@/services/kardexService'
 
 export const useKardexStore = defineStore('kardex', () => {
   const movimientos  = ref([])
+  const metricas     = ref({
+    total_entradas: 0,
+    total_salidas: 0,
+    monto_total_entradas: 0,
+    monto_total_salidas: 0
+  })
   const cargando     = ref(false)
   const totalRecords = ref(0)
   const currentPage  = ref(1)
@@ -21,10 +27,20 @@ export const useKardexStore = defineStore('kardex', () => {
       currentPage.value  = paginacion.current_page ?? page
       perPage.value      = paginacion.per_page ?? rows
 
+      if (response.data.metricas) {
+        metricas.value = response.data.metricas
+      }
+
       return { ok: true }
     } catch (error) {
       movimientos.value  = []
       totalRecords.value = 0
+      metricas.value     = {
+        total_entradas: 0,
+        total_salidas: 0,
+        monto_total_entradas: 0,
+        monto_total_salidas: 0
+      }
       return {
         ok: false,
         status: error.response?.status,
@@ -39,10 +55,17 @@ export const useKardexStore = defineStore('kardex', () => {
     movimientos.value  = []
     totalRecords.value = 0
     currentPage.value  = 1
+    metricas.value     = {
+      total_entradas: 0,
+      total_salidas: 0,
+      monto_total_entradas: 0,
+      monto_total_salidas: 0
+    }
   }
 
   return {
     movimientos,
+    metricas,
     cargando,
     totalRecords,
     currentPage,

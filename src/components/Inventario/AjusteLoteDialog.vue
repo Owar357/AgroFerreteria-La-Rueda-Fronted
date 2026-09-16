@@ -4,13 +4,13 @@
         <div v-if="lote" class="flex flex-col gap-4 text-[#374151]" style="font-family: 'Inter', sans-serif;">
 
             <!-- Card resumen del lote -->
-            
+
             <div class="bg-[#f9fafb] border border-[#e2e8dd] rounded-xl p-3.5 flex flex-col gap-1.5 text-xs">
 
                 <div class="flex justify-between text-[#6b7280] pt-1 border-t border-[#e2e8dd]/60">
                     <span>Lote: <strong>{{ lote.lote_interno || lote.codigo }}</strong></span>
                     <span>Costo Unit. Producto: <strong>${{ parseFloat(lote.costo_unitario_compra || 0).toFixed(2)
-                    }}</strong></span>
+                            }}</strong></span>
                 </div>
 
                 <div class="flex justify-between text-[#2b5e3b] font-medium pt-1">
@@ -88,6 +88,8 @@ import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Swal from 'sweetalert2'
 import { registrarAjusteInventario } from '@/services/inventarioService'
+
+
 
 const props = defineProps({
     modelValue: Boolean,
@@ -173,7 +175,15 @@ const nombreUnidad = computed(() => {
 
 const diferenciaCalculada = computed(() => {
     const stockSistema = parseFloat(props.lote?.cantidad_actual || 0)
-    return (form.value.cantidad_fisica || 0) - stockSistema
+    const dif = (form.value.cantidad_fisica || 0) - stockSistema
+
+    if (dif > 0) {
+        form.value.tipo_ajuste = 'INCREMENTO'
+    } else if (dif < 0) {
+        form.value.tipo_ajuste = 'DISMINUCION'
+    }
+
+    return dif
 })
 
 watch(
@@ -206,6 +216,28 @@ const guardarAjuste = async () => {
             icon: 'warning',
             title: 'Cantidad inválida',
             text: 'La cantidad física no puede ser negativa.',
+            confirmButtonColor: '#2b5e3b',
+        })
+        return
+    }
+
+    const stockSistema = parseFloat(props.lote?.cantidad_actual || 0)
+
+    if (form.value.tipo_ajuste === 'INCREMENTO' && form.value.cantidad_fisica <= stockSistema) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Operación no permitida',
+            text: `Eligió "Incremento", por lo que la cantidad física (${form.value.cantidad_fisica}) debe ser mayor al stock actual del sistema (${stockSistema}).`,
+            confirmButtonColor: '#2b5e3b',
+        })
+        return
+    }
+
+    if (form.value.tipo_ajuste === 'DISMINUCION' && form.value.cantidad_fisica >= stockSistema) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Operación no permitida',
+            text: `Eligió "Disminución", por lo que la cantidad física (${form.value.cantidad_fisica}) debe ser menor al stock actual del sistema (${stockSistema}).`,
             confirmButtonColor: '#2b5e3b',
         })
         return
@@ -252,4 +284,11 @@ const guardarAjuste = async () => {
         cargando.value = false
     }
 }
+
 </script>
+
+<style>
+.swal2-container {
+    z-index: 99999 !important;
+}
+</style>

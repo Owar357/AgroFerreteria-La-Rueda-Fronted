@@ -28,7 +28,7 @@
           <IconField class="w-[600px] flex items-center">
             <InputIcon class="pi pi-search text-gray-400 text-sm ml-1" />
             <InputText v-model="filters['global'].value" placeholder="Buscar por nombre o correo..."
-              class="w-full !bg-white h-[40px] !border-gray-300 !text-[#1a2e1f] !text-sm rounded-xl !py-2.5 !pl-10 !pr-3.5 focus:!border-[#2b5e3b] shadow-xs" />
+              class="w-full !bg-white h-[40px] z!border-gray-300 !text-[#1a2e1f] !text-sm rounded-xl !py-2.5 !pl-10 !pr-3.5 focus:!border-[#2b5e3b] shadow-xs" />
           </IconField>
 
           <!-- SELECTOR DE ESTADOS LIGERAMENTE MÁS ANCHO -->
