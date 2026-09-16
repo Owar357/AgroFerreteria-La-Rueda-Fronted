@@ -24,6 +24,11 @@ export const getDetallesVenta = (id) => {
   return api.get(`/ventas/${id}`)
 }
 
+ 
+export const anularVenta = (id) => {
+  return api.patch(`/ventas/${id}/anular`)
+}
+
 // Si en algún momento necesitas consumir el ticket vía Axios
 export const imprimirTicketPDF = (ventaId) => {
   return api.get(`/reportes/ticket/${ventaId}`)

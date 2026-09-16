@@ -36,6 +36,18 @@ export const useClienteStore = defineStore('cliente', () => {
     }
   }
 
+  const onViewDetail = (cliente) => {
+  selectedClient.value = {
+    name: cliente.nombre || cliente.razon_social,
+    personType: cliente.tipo_persona,  
+    documentNumber: cliente.numero_documento,
+    nrc: cliente.nrc,
+    phone: cliente.telefono,
+    email: cliente.correo,
+  }
+  detailVisible.value = true
+}
+
   const crearCliente = async (data) => {
     try {
       const response = await createCliente(data)
