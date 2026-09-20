@@ -27,7 +27,7 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- 🔄 Si cargando es true, pasamos un array de filas simuladas y ocultamos la paginación -->
+      
       <DataTable
         :value="cargando ? Array.from({ length: porPagina || 5 }) : clientesFiltrados"
         v-model:filters="filters"
@@ -43,7 +43,7 @@
           <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay clientes registrados.</div>
         </template>
 
-        <!-- Columna: Tipo de persona -->
+        
         <Column field="tipo_persona" header="Tipo de persona">
           <template #body="slotProps">
             <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="4px" />
@@ -60,7 +60,7 @@
           </template>
         </Column>
 
-        <!-- Columna: Nombre -->
+       
         <Column field="nombre" header="Nombre">
           <template #body="slotProps">
             <Skeleton v-if="cargando" width="75%" height="1.2rem" />
@@ -68,7 +68,7 @@
           </template>
         </Column>
 
-        <!-- Columna: N° Documento -->
+       
         <Column field="numero_documento" header="N° Documento">
           <template #body="slotProps">
             <Skeleton v-if="cargando" width="6rem" height="1.2rem" />
@@ -76,7 +76,7 @@
           </template>
         </Column>
 
-        <!-- Columna: Acciones -->
+      
         <Column header="Acciones" class="text-center w-[130px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-center">
@@ -87,7 +87,7 @@
               </template>
               
               <template v-else>
-                <!-- Nota: Corregido un pequeño typo de tu clase original 'h-9mrounded-full' a 'h-9 rounded-full' -->
+             
                 <Button
                   icon="pi pi-eye"
                   v-tooltip.top="'Ver detalles'"
@@ -111,7 +111,7 @@
 
 
 <script setup>
-import { ref, onMounted, computed } from 'vue' // 👈 Importamos computed
+import { ref, onMounted, computed } from 'vue'
 import IconField             from 'primevue/iconfield'
 import InputIcon             from 'primevue/inputicon'
 import InputText             from 'primevue/inputtext'

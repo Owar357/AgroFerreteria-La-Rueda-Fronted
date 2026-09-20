@@ -29,7 +29,7 @@ const selectedClient = ref(null)
 const onViewDetail = (cliente) => {
   selectedClient.value = {
     name: cliente.nombre || cliente.razon_social,
-    personType: cliente.tipo_persona === 'NATURAL' ? 'Natural' : 'Jurídica',
+    personType: cliente.tipo_persona, // ya viene como 'Natural' / 'Jurídica' desde el backend
     documentNumber: cliente.numero_documento,
     nrc: cliente.nrc,
     phone: cliente.telefono,
@@ -37,6 +37,9 @@ const onViewDetail = (cliente) => {
   }
   detailVisible.value = true
 }
+
+
+
 const onViewHistory = (cliente) => {
   router.push({
     name:   'ClienteHistorial',

@@ -5,8 +5,14 @@ import { api } from './authService'
 // ==========================================
 
 // Mandamos a traer los productos con paginación
-export const getProductos = (page = 1, perPage = 8) =>
-  api.get('/productos', { params: { page, per_page: perPage } })
+export const getProductos = (page = 1, perPage = 8, q = '', categoria = '') => {
+  const params = { page, per_page: perPage }
+
+  if (q && q.trim()) params.q = q.trim()
+  if (categoria) params.categoria = categoria
+
+  return api.get('/productos', { params })
+}
 
 // Para agregar un nuevo producto
 export const createProducto = (data) => api.post('/productos', data)
@@ -56,20 +62,6 @@ export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
 export const updateDescuentoLote = (loteId, porcentajeDescuento) =>
   api.patch(`/lotes/${loteId}/descuento`, { porcentaje_descuento: porcentajeDescuento })
 
-// ==========================================
-// KARDEX (NUEVO)
-// ==========================================
-
-// Traer historial de movimientos Kardex por producto (paginado)
-export const getKardexByProducto = (productoId, page = 1, perPage = 10, filtros = {}) =>
-  api.get(`/kardex/${productoId}`, {
-    params: {
-      page: page,
-      per_page: perPage,
-      fecha_inicio: filtros.fecha_inicio || null,
-      fecha_fin: filtros.fecha_fin || null,
-    },
-  })
 
 // ==========================================
 // TABLAS DE APOYO / SELECTS

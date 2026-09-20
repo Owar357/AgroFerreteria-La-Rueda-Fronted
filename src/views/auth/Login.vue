@@ -135,14 +135,9 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import authService from '@/services/authService'
+import { mostrarExito , mostrarError } from '@/utils/SweetAlertService'
 
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
 
-import Swal from 'sweetalert2'
 
 const router = useRouter()
 
@@ -167,58 +162,39 @@ function validate() {
 }
 
 async function handleLogin() {
-  errorMessage.value = ''
   if (!validate()) return
-
   loading.value = true
 
   try {
     const response = await authService.login(form.identity, form.password)
 
     if (!response.success) {
-      errorMessage.value = response.message
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: response.message,
-        confirmButtonColor: '#1e3a2f',
+      mostrarError('Acceso denegado', response.message, {
+        timer: 3500,
+        customClass: {
+          container: '!z-[9999]',
+          popup: '!rounded-2xl',
+        }
       })
-
       return
     }
 
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: '¡Sesión iniciada con éxito!',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-      background: 'rgba(30, 58, 47, 0.85)',
-      color: '#ffffff',
-      iconColor: '#a7f3d0',
-    })
+    mostrarExito('¡Bienvenido!', 'Iniciando sesión correctamente...')
 
     setTimeout(() => {
       router.push(response.route)
     }, 1200)
+
   } catch (error) {
     console.error('Error en login:', error)
-
-    errorMessage.value = 'Error de conexión con el servidor.'
-
-    Swal.fire({
-      icon: 'warning',
-      title: 'Error de respuesta',
-      text: 'Hubo un inconveniente al conectar con el servidor backend.',
-      confirmButtonColor: '#1e3a2f',
-    })
+    const msg = error.response?.data?.message || 'Hubo un inconveniente al conectar con el servidor.'
+    mostrarError('Acceso denegado', msg)
   } finally {
     loading.value = false
   }
 }
+
+
 </script>
 
 <style>

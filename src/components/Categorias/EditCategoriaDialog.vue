@@ -10,6 +10,7 @@
   >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
 
+      <!-- Nombre -->
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">
           Nombre: <span class="text-red-500">*</span>
@@ -19,14 +20,41 @@
           placeholder="Modifique el nombre..."
           :class="[
             'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            error ? 'border-red-500 border' : 'border-[#d1d5db]'
+            errorNombre ? 'border-red-500 border' : 'border-[#d1d5db]'
           ]"
-          @input="validarInput"
+          @input="validarNombre"
           @keyup.enter="dispararActualizar"
         />
-        <small v-if="error" class="text-red-500 text-[12px]">{{ error }}</small>
+        <small v-if="errorNombre" class="text-red-500 text-[12px]">{{ errorNombre }}</small>
       </div>
 
+      <!-- % Ganancia Mínimo -->
+      <div class="flex flex-col gap-2">
+        <label class="text-[14px] font-medium text-[#1a2e1f]">
+          % Ganancia Mínimo Deseado:
+        </label>
+        <InputNumber
+          v-model="form.porcentaje_ganancia_minimo"
+          placeholder="Ej: 15.00"
+          suffix="%"
+          :min="0"
+          :max="100"
+          :minFractionDigits="1"
+          :maxFractionDigits="2"
+          :class="[
+            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 rounded-lg',
+            errorGanancia ? 'border-red-500 border' : 'border-[#d1d5db]',
+          ]"
+          @input="validarGanancia"
+          @keyup.enter="dispararActualizar"
+        />
+        <small class="text-[#6b7280] text-[14px]">Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicara a todos los productos
+          que pertenezcan a esta categoría
+        </small>
+        <small v-if="errorGanancia" class="text-red-500 text-[12px]">{{ errorGanancia }}</small>
+      </div>
+
+      <!-- Acciones -->
       <div class="flex justify-between gap-4 mt-2">
         <Button
           label="Cancelar"
@@ -50,9 +78,10 @@
 import { ref, reactive, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { useCategoriaStore } from '../../stores/categoriaStore'
+import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible:   { type: Boolean, default: false },
@@ -63,115 +92,105 @@ const emit = defineEmits(['update:visible'])
 
 const store        = useCategoriaStore()
 const localVisible = ref(false)
-const form         = reactive({ id: null, nombre: '', estado: '' })
-const error        = ref('')
+const form         = reactive({ id: null, nombre: '', porcentaje_ganancia_minimo: 15.00 })
+const errorNombre   = ref('')
+const errorGanancia = ref('')
 const guardando    = ref(false)
 
 watch(() => props.visible, (val) => { localVisible.value = val })
-
-
 watch(localVisible, (val) => { emit('update:visible', val) })
-
 
 watch(
   () => props.categoria,
   (val) => {
     if (val) {
-      form.id     = val.id
-      form.nombre = val.nombre
-      form.estado = val.estado
-      error.value = ''
+      form.id                         = val.id
+      form.nombre                     = val.nombre
+      form.porcentaje_ganancia_minimo = val.porcentaje_ganancia_minimo !== null ? parseFloat(val.porcentaje_ganancia_minimo) : 15.00
+      errorNombre.value               = ''
+      errorGanancia.value             = ''
     }
   }
 )
 
-const validarInput = () => {
+const validarNombre = () => {
   const valor = form.nombre
 
-  if (!valor) { error.value = ''; return false }
+  if (!valor) { errorNombre.value = ''; return false }
 
   if (/\d/.test(valor)) {
-    error.value = 'El nombre no puede contener números.'
+    errorNombre.value = 'El nombre no puede contener números.'
     return false
   }
 
   if (valor.trim().length < 2) {
-    error.value = 'El nombre debe tener al menos 2 caracteres.'
+    errorNombre.value = 'El nombre debe tener al menos 2 caracteres.'
     return false
   }
 
-  error.value = ''
+  if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(valor)) {
+    errorNombre.value = 'El nombre no puede contener caracteres especiales.'
+    return false
+  }
+
+  errorNombre.value = ''
+  return true
+}
+
+const validarGanancia = () => {
+  const val = form.porcentaje_ganancia_minimo
+  if (val !== null && val !== undefined) {
+    if (val < 0 || val > 100) {
+      errorGanancia.value = 'El porcentaje debe estar entre 0% y 100%.'
+      return false
+    }
+  }
+  errorGanancia.value = ''
   return true
 }
 
 const dispararActualizar = async () => {
   if (!form.nombre.trim()) {
-    error.value = 'El nombre de la categoría es obligatorio.'
+    errorNombre.value = 'El nombre de la categoría es obligatorio.'
     return
   }
-  if (!validarInput()) return
+  if (!validarNombre() || !validarGanancia()) return
 
-  const confirmacion = await Swal.fire({
-    html: `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-        <div style="width:56px; height:56px; border-radius:50%; background:#fef3c7; display:flex; align-items:center; justify-content:center;">
-          <i class="pi pi-pencil" style="font-size:24px; color:#b45309;"></i>
-        </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">¿Guardar cambios?</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">Se actualizará la categoría a "${form.nombre.trim()}"</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: '#2b5e3b',
-    cancelButtonColor: '#e2e8dd',
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Guardar cambios?',
+    mensajeHtml: `Se actualizará la categoría a "<strong>${form.nombre.trim()}</strong>"`,
+    icono: 'pi-pencil',
     confirmButtonText: 'Sí, guardar',
-    cancelButtonText: 'Cancelar',
-    customClass: {
-      container: '!z-[9999]',
-      confirmButton: '!rounded-lg !font-semibold !text-sm',
-      cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
-      popup: '!rounded-2xl',
-    },
   })
 
   if (!confirmacion.isConfirmed) return
 
   guardando.value = true
-  const resultado = await store.actualizarCategoria(form.id, { nombre: form.nombre.trim() })
+  
+  const payload = {
+    nombre: form.nombre.trim(),
+    porcentaje_ganancia_minimo: form.porcentaje_ganancia_minimo !== null ? form.porcentaje_ganancia_minimo : 15.00
+  }
+
+  const resultado = await store.actualizarCategoria(form.id, payload)
   guardando.value = false
 
   if (resultado.ok) {
-   
     localVisible.value = false
-    Swal.fire({
-      icon: 'success',
-      title: '¡Categoría actualizada!',
-      text: 'La categoría fue actualizada exitosamente.',
-      confirmButtonColor: '#2b5e3b',
-      timerProgressBar: true,
-    })
+    mostrarExito(
+      '¡Categoría actualizada!',
+      'La categoría fue actualizada exitosamente.'
+    )
   } else if (resultado.status === 403) {
-    
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: {
-        confirmButton: '!rounded-lg !font-semibold !text-sm',
-        popup: '!rounded-2xl',
-      },
+    mostrarAlertaConfirmar({
+      tipo: 'ban',
+      icono: 'pi-bell',
+      titulo: 'Sin autorización',
+      mensajeHtml: 'No tiene permisos para editar este registro',
+      confirmButtonText : 'Entendido'
     })
   } else if (resultado.error) {
-    error.value = resultado.error
+    errorNombre.value = resultado.error
   }
 }
 </script>
@@ -193,7 +212,8 @@ const dispararActualizar = async () => {
   padding: 1.5rem !important;
 }
 
-.p-inputtext:enabled:focus {
+.p-inputtext:enabled:focus,
+.p-inputnumber:enabled:focus {
   box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }

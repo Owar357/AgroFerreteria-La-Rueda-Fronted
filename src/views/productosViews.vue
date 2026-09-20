@@ -90,14 +90,13 @@ const cerrarFormulario = () => {
   transitionName.value = 'slide-backward'
   vistaActual.value = 'lista'
   productoSeleccionado.value = null
-  store.cargarProductos(1, store.perPage) // aquí SÍ quieres refrescar (creaste/editaste algo)
+  store.cargarProductos(1, store.perPage) 
 }
 
 const cerrarDetalle = () => {
   transitionName.value = 'slide-backward'
   vistaActual.value = 'lista'
   productoSeleccionado.value = null
-  // ❌ sin store.cargarProductos() — ProductoTable nunca se destruyó, conserva su página
 }
 
 const cerrarLotes = () => {
