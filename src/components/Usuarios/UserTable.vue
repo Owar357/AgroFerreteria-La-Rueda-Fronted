@@ -1,38 +1,17 @@
 <template>
   <div class="bg-[#eef2e9] min-h-full p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <div class="flex flex-col mb-8 gap-4">
-      <div class="flex justify-between items-center w-full">
-        <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de usuarios</h1>
-        <Button
-          label="+ Agregar"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="$emit('open-add')"
-        />
+    <div class="flex items-center gap-3 mb-8">
+      <div
+        class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
       </div>
-
-      <div class="flex justify-start items-center w-full gap-8">
-        <IconField class="w-80">
-          <InputIcon class="pi pi-search text-[#6b7280]" />
-          <InputText
-            v-model="busqueda"
-            placeholder="Buscar usuario..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
-          />
-        </IconField>
-
-        <Select
-          v-model="filtroEstado"
-          :options="statusOptions"
-          optionLabel="label"
-          optionValue="value"
-          showClear
-          placeholder="Todos los estados"
-          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center"
-        />
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-[#1a2e1f]">Registro de usuarios</h1>
+        <p class="text-1xl text-[#526356] mt-0.5">Gestión de cuentas, roles y permisos del sistema</p>
       </div>
     </div>
 
-    <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
+    <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg">
       <!-- 🔄 EXPLICACIÓN: Si está cargando, le mandamos un array falso de 5 elementos para simular las filas -->
       <DataTable
         :value="store.users"
@@ -46,6 +25,37 @@
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
         @page="onPageChange"
       >
+        <template #header>
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+              <IconField class="w-full sm:w-80">
+                <InputIcon class="pi pi-search text-[#6b7280]" />
+                <InputText
+                  v-model="busqueda"
+                  placeholder="Buscar usuario..."
+                  class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
+                />
+              </IconField>
+
+              <Select
+                v-model="filtroEstado"
+                :options="statusOptions"
+                optionLabel="label"
+                optionValue="value"
+                showClear
+                placeholder="Todos los estados"
+                class="w-full sm:w-56 !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center"
+              />
+            </div>
+
+            <Button
+              label="+ Agregar"
+              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-md transition-all w-full md:w-auto whitespace-nowrap shrink-0"
+              @click="$emit('open-add')"
+            />
+          </div>
+        </template>
+
         <template #empty>
           <div class="text-center py-6 text-[#6b7280] text-[14px]">
             No hay usuarios registrados.
@@ -273,6 +283,13 @@ defineEmits(['open-add', 'open-edit'])
 </script>
 
 <style>
+.p-datatable-custom .p-datatable-header {
+  background-color: #ffffff !important;
+  border: none !important;
+  border-bottom: 2px solid #e2e8dd !important;
+  padding: 1.25rem 1.25rem 1rem 1.25rem;
+}
+
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;

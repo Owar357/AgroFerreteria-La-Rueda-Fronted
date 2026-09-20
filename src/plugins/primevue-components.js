@@ -24,6 +24,7 @@ import StepPanel from 'primevue/steppanel'
 import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import Password from 'primevue/password'
+import KeyFilter from 'primevue/keyfilter'
 
 export default {
   install: (app) => {
@@ -52,5 +53,6 @@ export default {
     app.component('RadioButton', RadioButton)
     app.component('Checkbox', Checkbox)
     app.component('Password', Password)
+    app.directive('keyfilter', KeyFilter)
   },
 }

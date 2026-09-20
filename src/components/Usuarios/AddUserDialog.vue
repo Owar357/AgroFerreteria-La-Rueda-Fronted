@@ -10,52 +10,34 @@
     @hide="resetForm"
   >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
-        <InputText
-          v-model="form.name"
-          placeholder="Nombre completo"
-          @input="validateField('name')"
-          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500 focus:border-red-500': errors.name }"
-        />
-        <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">{{
-          errors.name
-        }}</small>
-      </div>
+      <BaseInput
+        v-model="form.name"
+        label="Nombre"
+        size="xl"
+        placeholder="Nombre completo"
+        filter="alpha"
+        :error="errors.name"
+        @input="validateField('name')"
+      />
 
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Email</label>
-        <InputText
-          v-model="form.email"
-          autocomplete="off"
-          placeholder="correo@ejemplo.com"
-          @input="validateField('email')"
-          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500 focus:border-red-500': errors.email }"
-        />
-        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{
-          errors.email
-        }}</small>
-      </div>
+      <BaseInput
+        v-model="form.email"
+        label="Email"
+        size="xl"
+        placeholder="correo@ejemplo.com"
+        autocomplete="off"
+        :error="errors.email"
+        @input="validateField('email')"
+      />
 
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña</label>
-        <Password
-          v-model="form.password"
-          toggleMask
-          :feedback="false"
-          placeholder="********"
-          @input="validateField('password')"
-          class="w-full"
-          inputClass="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg"
-          :class="{ 'border-red-500': errors.password }"
-          :inputProps="{ autocomplete: 'new-password' }"
-        />
-        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
-          errors.password
-        }}</small>
-      </div>
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña"
+        size="xl"
+        placeholder="********"
+        :error="errors.password"
+        @input="validateField('password')"
+      />
 
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f]">Rol</label>
@@ -72,7 +54,6 @@
         }}</small>
       </div>
 
-     
       <div class="flex justify-center mt-4">
         <Button
           label="Guardar"
@@ -87,13 +68,10 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Select from 'primevue/select'
-import Button from 'primevue/button'
 import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/usuarioStore'
+import BaseInput from '../base/BaseInput.vue'
+import BasePassword from '../base/BasePassword.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -155,7 +133,6 @@ const validateField = (field) => {
     else errors.email = ''
   }
 
- 
   if (field === 'password') {
     const v = form.password
     if (!v) errors.password = 'La contraseña es obligatoria.'
