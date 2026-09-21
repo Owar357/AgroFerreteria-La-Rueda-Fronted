@@ -24,13 +24,14 @@
           icon="pi pi-bell"
           label="Alertas"
           :active="activeItem === 'alertas'"
+          :badge="noLeidas"
           @click="navigate('/admin/alertas')"
           class="mt-1"
         />
         <hr class="border-none border-t my-3" style="border-color: #162e1e" />
       </template>
 
-      <!-- LOGÍSTICA  solo ADMIN -->
+      <!-- LOGÍSTICA — solo ADMIN -->
       <template v-if="isAdmin">
         <p
           style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
@@ -135,6 +136,7 @@
             sub
           />
           <SidebarItem
+            v-if="isCajero"
             icon="pi pi-percentage"
             label="Movimientos de Caja"
             :active="activeItem === 'movimientos-caja'"
@@ -142,6 +144,7 @@
             sub
           />
           <SidebarItem
+            v-if="isCajero"
             icon="pi pi-calculator"
             label="POS"
             :active="activeItem === 'pos'"
@@ -181,14 +184,34 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import authService from '@/services/authService'
+import { useAlertaStore } from '@/stores/alertaStore'
 import SidebarItem from '@/components/home/SidebarItem.vue'
 import SidebarDropdown from '@/components/home/SidebarDropdown.vue'
 
 const router = useRouter()
 const route = useRoute()
+
+const alertaStore = useAlertaStore()
+const { noLeidas } = storeToRefs(alertaStore)
+
+const manejarEnfoqueVentana = () => {
+  if (document.visibilityState === 'visible') {
+    alertaStore.fetchAlertas()
+  }
+}
+
+onMounted(() => {
+  alertaStore.fetchAlertas()
+  document.addEventListener('visibilitychange', manejarEnfoqueVentana)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', manejarEnfoqueVentana)
+})
 
 const showInventario = ref(false)
 const showProcesos = ref(false)

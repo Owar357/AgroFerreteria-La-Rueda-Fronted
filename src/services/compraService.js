@@ -7,8 +7,13 @@ export const buscarProductoCompra = (q) => {
 export const registrarCompra = (data) => api.post('/compras', data)
 
 export const compras = (params) => api.get('/compras', { params })
-export const anularCompra = (id) => api.patch(`/compras/${id}/anular`)// este e puesto ahorita por si no me finciona 
+
+export const anularCompra = (id) => api.patch(`/compras/${id}/anular`)
 
 export const VerDetallesCompra = (id) => {
   return api.get(`/compras/${id}`)
+}
+
+export const actualizarPreciosMasivo = (precios) => {
+  return api.post('/presentaciones/actualizar-precios-masivo', { precios })
 }

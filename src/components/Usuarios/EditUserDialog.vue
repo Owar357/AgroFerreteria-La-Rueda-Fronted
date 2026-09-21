@@ -10,27 +10,27 @@
     @hide="resetForm"
   >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      <!-- Clave de caja -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Clave de caja</label>
-        <InputText
-          v-model="form.cashKey"
-          placeholder="Ingrese código de caja"
-          maxlength="6"
-          autocomplete="off"
-          @input="validarCashKey"
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errors.cashKey ? 'border-red-500 border' : 'border-[#d1d5db]',
-          ]"
-        />
-        <small v-if="errors.cashKey" class="text-red-600 text-[12px] font-medium">{{
-          errors.cashKey
-        }}</small>
-        <small class="text-[13px] text-[#6b7280]"
-          >(Opcional — solo si el usuario apertura caja)</small
-        >
-      </div>
+      <!-- NOMBRE -->
+      <!-- Nombre -->
+<div class="flex flex-col gap-2">
+  <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
+
+  <InputText
+    v-model.trim="form.name"
+    placeholder="Ingrese el nombre del usuario"
+    maxlength="100"
+    autocomplete="name"
+    @input="validarNombre"
+    :class="[
+      'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
+      errors.name ? 'border-red-500 border' : 'border-[#d1d5db]',
+    ]"
+  />
+
+  <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">
+    {{ errors.name }}
+  </small>
+</div>
 
       <!-- Contraseña nueva -->
       <div class="flex flex-col gap-2">
@@ -91,6 +91,7 @@
         <Button
           label="Guardar datos"
           :loading="loading"
+          :disabled="!tieneCambios"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-4 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
           @click="handleUpdate"
         />
@@ -100,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
@@ -120,57 +121,87 @@ const localVisible = ref(false)
 const loading = ref(false)
 
 const form = reactive({
-  cashKey: '',
+  name: '',
   password: '',
   confirmPassword: '',
 })
 
 const errors = reactive({
-  cashKey: '',
+  name: '',
   password: '',
   confirmPassword: '',
 })
 
+const cargarDatosUsuario = () => {
+  form.name = props.user?.name ?? ''
+  form.password = ''
+  form.confirmPassword = ''
+
+  errors.name = ''
+  errors.password = ''
+  errors.confirmPassword = ''
+}
+
 watch(
   () => props.visible,
-  (val) => (localVisible.value = val),
+  (visible) => {
+    localVisible.value = visible
+
+    if (visible) {
+      cargarDatosUsuario()
+     
+    }
+  },
+  { immediate: true },
 )
-watch(localVisible, (val) => emit('update:visible', val))
 
 watch(
   () => props.user,
-  (val) => {
-    if (val) {
-      form.cashKey = val.pin_caja || ''
-      form.password = ''
-      form.confirmPassword = ''
-      errors.cashKey = errors.password = errors.confirmPassword = ''
+  () => {
+    if (localVisible.value) {
+      cargarDatosUsuario()
+       console.log('Usuario a editar:', props.user)
     }
   },
-  { immediate: true, deep: true },
+  { deep: true },
 )
 
-const resetForm = () => {
-  form.cashKey = form.password = form.confirmPassword = ''
-  errors.cashKey = errors.password = errors.confirmPassword = ''
-}
+watch(localVisible, (visible) => {
+  emit('update:visible', visible)
+})
 
-// Validaciones 
-const validarCashKey = () => {
-  const v = form.cashKey.trim()
-  if (!v) {
-    errors.cashKey = ''
-    return true
-  }
-  if (!/^\d+$/.test(v)) {
-    errors.cashKey = 'La clave de caja solo puede contener números.'
+const resetForm = () => {
+  form.name = ''
+  form.password = ''
+  form.confirmPassword = ''
+
+  errors.name = ''
+  errors.password = ''
+  errors.confirmPassword = ''
+}
+//validaciones para el nombre
+const validarNombre = () => {
+  const nombre = form.name.trim()
+
+  if (!nombre) {
+    errors.name = 'El nombre es obligatorio.'
     return false
   }
-  if (v.length !== 6) {
-    errors.cashKey = 'La clave de caja debe tener exactamente 6 dígitos.'
+
+  if (nombre.length < 10) {
+    errors.name = 'El nombre debe tener al menos 10 caracteres.'
     return false
   }
-  errors.cashKey = ''
+
+  // Expresión regular: Solo letras (con tildes/ñ) y espacios
+  const regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
+  
+  if (!regexLetras.test(nombre)) {
+    errors.name = 'El nombre no puede contener números ni caracteres especiales.'
+    return false
+  }
+
+  errors.name = ''
   return true
 }
 
@@ -210,20 +241,32 @@ const validarConfirmPassword = () => {
   return true
 }
 
+
+const tieneCambios = computed(() => {
+  const nombreOriginal = props.user?.name ?? ''
+  
+  // Si cambió el nombre, o si escribió algo en el campo de contraseña
+  const cambioNombre = form.name.trim() !== nombreOriginal.trim()
+  const cambioPassword = form.password.length > 0
+
+  return cambioNombre || cambioPassword
+})
+
 // Guardamos
 const handleUpdate = async () => {
-  // Validar que al menos un campo tenga datos
-  if (!form.cashKey.trim() && !form.password && !form.confirmPassword) {
+
+  //  NUEVA VALIDACIÓN: Si no se modificó nada, frena y avisa
+  if (!tieneCambios.value) {
     Swal.fire({
       icon: 'warning',
       title: 'Sin cambios',
-      text: 'Debes modificar al menos un campo para guardar.',
+      text: 'No se editó ningún campo.',
       confirmButtonColor: '#2b5e3b',
+      confirmButtonText: 'Entendido'
     })
     return
   }
-
-  const cashKeyOk = validarCashKey()
+  const nombreOk = validarNombre()
   const passwordOk = validarPassword()
   const confirmOk = validarConfirmPassword()
 
@@ -232,36 +275,35 @@ const handleUpdate = async () => {
     return
   }
 
-  if (!cashKeyOk || !passwordOk || !confirmOk) return
+  if (!nombreOk || !passwordOk || !confirmOk) return
 
-  // Cerramos el modal 
-  localVisible.value = false
   loading.value = true
 
-  
   const payload = {
-  
+    name: form.name.trim(),
     rol: props.user?.roles?.[0]?.name || '',
   }
 
-  if (form.cashKey.trim()) payload.pin_caja = form.cashKey.trim()
-  if (form.password) payload.password = form.password
+  if (form.password) {
+    payload.password = form.password
+    payload.password_confirmation = form.confirmPassword
+  }
 
   const resultado = await store.updateUser(props.user?.id, payload)
+
   loading.value = false
 
   if (resultado.ok) {
+    localVisible.value = false
+
     await Swal.fire({
       icon: 'success',
       title: '¡Datos actualizados!',
-      text: 'los datos del usuario fueron editado exitosamente.',
+      text: 'Los datos del usuario fueron actualizados exitosamente.',
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Aceptar',
-      timerProgressBar: true,
     })
   } else if (resultado.error) {
-    // Si hay error volvemos a abrir el modal con el mensaje
-    localVisible.value = true
     Swal.fire({
       icon: 'error',
       title: 'Error al actualizar',

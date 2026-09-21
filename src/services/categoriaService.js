@@ -1,6 +1,7 @@
 import { api } from './authService'
 
-export const getCategorias   = (page = 1, perPage = 5) => api.get('/categorias', { params: { page, per_page: perPage } })
+export const getCategorias   = (page = 1, perPage = 5, search = '') =>
+  api.get('/categorias', { params: { page, per_page: perPage, search: search || undefined } })
 
 export const createCategoria = (data)        => api.post('/categorias', data)
 
