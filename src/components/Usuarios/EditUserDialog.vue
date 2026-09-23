@@ -3,96 +3,52 @@
     v-model:visible="localVisible"
     modal
     header="EDITAR USUARIO"
-    :style="{ width: '500px' }"
     :draggable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
     @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
+    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- NOMBRE -->
-      <!-- Nombre -->
-<div class="flex flex-col gap-2">
-  <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
+      <BaseInput
+        v-model.trim="form.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre del usuario"
+        filter="alpha"
+        maxlength="100"
+        autocomplete="name"
+        :error="errors.name"
+        @input="validarNombre"
+      />
 
-  <InputText
-    v-model.trim="form.name"
-    placeholder="Ingrese el nombre del usuario"
-    maxlength="100"
-    autocomplete="name"
-    @input="validarNombre"
-    :class="[
-      'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-      errors.name ? 'border-red-500 border' : 'border-[#d1d5db]',
-    ]"
-  />
+      <!-- CONTRASEÑA NUEVA -->
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña nueva"
+        size="xl"
+        placeholder="********"
+        help="(Opcional — dejar vacío para no cambiar la contraseña)"
+        :error="errors.password"
+        @input="validarPassword"
+      />
 
-  <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">
-    {{ errors.name }}
-  </small>
-</div>
+      <!-- CONFIRMAR CONTRASEÑA -->
+      <BasePassword
+        v-model="form.confirmPassword"
+        label="Confirmar contraseña"
+        placeholder="********"
+        :error="errors.confirmPassword"
+        @input="validarConfirmPassword"
+      />
 
-      <!-- Contraseña nueva -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña nueva</label>
-        <Password
-          v-model="form.password"
-          toggleMask
-          :feedback="false"
-          placeholder="********"
-          @input="validarPassword"
-          :inputProps="{ autocomplete: 'new-password' }"
-          class="w-full"
-          :inputClass="
-            [
-              'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-              errors.password ? 'border-red-500 border' : 'border-[#d1d5db]',
-            ].join(' ')
-          "
-        />
-        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
-          errors.password
-        }}</small>
-        <small class="text-[13px] text-[#6b7280]"
-          >(Opcional — dejar vacío para no cambiar la contraseña)</small
-        >
-      </div>
-
-      <!-- Confirmar contraseña -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Confirmar contraseña</label>
-        <Password
-          v-model="form.confirmPassword"
-          toggleMask
-          :feedback="false"
-          placeholder="********"
-          @input="validarConfirmPassword"
-          class="w-full"
-          :inputProps="{ autocomplete: 'new-password' }"
-          :inputClass="
-            [
-              'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-              errors.confirmPassword ? 'border-red-500 border' : 'border-[#d1d5db]',
-            ].join(' ')
-          "
-        />
-        <small v-if="errors.confirmPassword" class="text-red-600 text-[12px] font-medium">{{
-          errors.confirmPassword
-        }}</small>
-      </div>
-
-      <div class="flex justify-between mt-6 gap-6">
-        <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-6 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="loading"
-          @click="localVisible = false"
-        />
+      <!-- BOTÓN PRINCIPAL (ANCHO COMPLETO W-FULL) -->
+      <div class="flex justify-center mt-4 w-full">
         <Button
           label="Guardar datos"
           :loading="loading"
           :disabled="!tieneCambios"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-4 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
           @click="handleUpdate"
         />
       </div>
@@ -102,12 +58,12 @@
 
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
 import Swal from 'sweetalert2'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 import { useUserStore } from '@/stores/usuarioStore'
+import BaseInput from '../base/BaseInput.vue'
+import BasePassword from '../base/BasePassword.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -149,7 +105,6 @@ watch(
 
     if (visible) {
       cargarDatosUsuario()
-     
     }
   },
   { immediate: true },
@@ -160,7 +115,6 @@ watch(
   () => {
     if (localVisible.value) {
       cargarDatosUsuario()
-       console.log('Usuario a editar:', props.user)
     }
   },
   { deep: true },
@@ -179,7 +133,8 @@ const resetForm = () => {
   errors.password = ''
   errors.confirmPassword = ''
 }
-//validaciones para el nombre
+
+// Validaciones para el nombre
 const validarNombre = () => {
   const nombre = form.name.trim()
 
@@ -193,9 +148,8 @@ const validarNombre = () => {
     return false
   }
 
-  // Expresión regular: Solo letras (con tildes/ñ) y espacios
   const regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
-  
+
   if (!regexLetras.test(nombre)) {
     errors.name = 'El nombre no puede contener números ni caracteres especiales.'
     return false
@@ -241,28 +195,27 @@ const validarConfirmPassword = () => {
   return true
 }
 
-
 const tieneCambios = computed(() => {
   const nombreOriginal = props.user?.name ?? ''
-  
-  // Si cambió el nombre, o si escribió algo en el campo de contraseña
+
   const cambioNombre = form.name.trim() !== nombreOriginal.trim()
   const cambioPassword = form.password.length > 0
 
   return cambioNombre || cambioPassword
 })
 
-// Guardamos
 const handleUpdate = async () => {
-
-  //  NUEVA VALIDACIÓN: Si no se modificó nada, frena y avisa
   if (!tieneCambios.value) {
     Swal.fire({
       icon: 'warning',
       title: 'Sin cambios',
       text: 'No se editó ningún campo.',
       confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido'
+      confirmButtonText: 'Entendido',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
     return
   }
@@ -302,6 +255,10 @@ const handleUpdate = async () => {
       text: 'Los datos del usuario fueron actualizados exitosamente.',
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Aceptar',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   } else if (resultado.error) {
     Swal.fire({
@@ -309,6 +266,10 @@ const handleUpdate = async () => {
       title: 'Error al actualizar',
       text: resultado.error,
       confirmButtonColor: '#2b5e3b',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   }
 }
@@ -322,9 +283,9 @@ const handleUpdate = async () => {
 .custom-dialog .p-dialog-header {
   background-color: #1e3a2f !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 0.0625rem solid #e2e8dd;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
@@ -332,12 +293,12 @@ const handleUpdate = async () => {
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
 .p-password-input:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 

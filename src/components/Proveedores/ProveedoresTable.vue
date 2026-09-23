@@ -1,131 +1,289 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
+  <div class="bg-[#eef2e9] min-h-screen p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
     <!-- ENCABEZADO DE MÓDULO UNIFICADO -->
     <div class="flex items-center gap-3 mb-6">
       <div
         class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-        <i class="pi pi-users text-[#2b5e3b] text-xl "></i>
+        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
-        <h1 class="text-[28px] md:text-[32px] font-bold text-[#1a2e1f] leading-tight m-0">
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
           Registro de Proveedores
         </h1>
-        <p class="text-[14px] text-gray-500 mt-0.5 m-0">Gestión de contactos, directorio y comerciales</p>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de contactos, directorio y comerciales</p>
       </div>
     </div>
 
-    <!-- TARJETA CONTENEDORA PRINCIPAL (ESTÁNDAR) -->
-    <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden">
+    <!-- TARJETA CONTENEDORA PRINCIPAL -->
+    <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
 
-      <!-- BARRA DE HERRAMIENTAS Y FILTROS REAJUSTADA -->
-      <div
-        class="p-5 border-b border-[#e2e8dd] bg-[#fbfdf9] flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
-
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-
+      <!-- APARTADO DE FILTROS ESTÁTICO SUPERIOR -->
+      <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-[#fbfdf9]">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           
-          <IconField class="w-[600px] flex items-center">
-            <InputIcon class="pi pi-search text-gray-400 text-sm ml-1" />
-            <InputText v-model="filters['global'].value" placeholder="Buscar por nombre o correo..."
-              class="w-full !bg-white h-[40px] z!border-gray-300 !text-[#1a2e1f] !text-sm rounded-xl !py-2.5 !pl-10 !pr-3.5 focus:!border-[#2b5e3b] shadow-xs" />
-          </IconField>
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+            <!-- Búsqueda Responsiva -->
+            <IconField class="w-full sm:w-[20rem] lg:w-[30rem]">
+              <InputIcon class="pi pi-search text-gray-400 text-sm" />
+              <InputText 
+                v-model="filters['global'].value" 
+                placeholder="Buscar por nombre o correo..."
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-[2.625rem] focus:!border-[#2b5e3b]" 
+              />
+            </IconField>
 
-          <!-- SELECTOR DE ESTADOS LIGERAMENTE MÁS ANCHO -->
-          <Select v-model="filtroEstado" :options="estadoOptions" optionLabel="label" optionValue="value" showClear
-            placeholder="Todos los estados"
-            class="w-full sm:w-60 !bg-white h-[40px] !border-gray-300 !text-[#1a2e1f] !text-sm rounded-xl flex items-center focus:!border-[#2b5e3b] shadow-xs"
-            :pt="{
-              root: { class: '!py-0.5' }
-            }" />
+            <!-- Selector de Estado -->
+            <Select 
+              v-model="filtroEstado" 
+              :options="estadoOptions" 
+              optionLabel="label" 
+              optionValue="value" 
+              showClear
+              placeholder="Todos los estados"
+              class="w-full sm:w-[13.75rem] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-[2.625rem] flex items-center px-2 focus:!border-[#2b5e3b]" 
+            />
+          </div>
+
+          <!-- Botón Agregar Proveedor -->
+          <Button 
+            label="Agregar Proveedor" 
+            icon="pi pi-plus"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-6 h-[2.625rem] rounded-xl border-none cursor-pointer shadow-sm transition-all w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
+            @click="$emit('open-add')" 
+          />
         </div>
-
-        <!-- BOTÓN AGREGAR PROVEEDOR -->
-        <Button label="Agregar Proveedor" icon="pi pi-plus"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-sm font-semibold !px-6 !py-2.5 rounded-xl !border-none cursor-pointer shadow-sm transition-all shrink-0"
-          @click="$emit('open-add')" />
       </div>
 
-      <!-- TABLA DE DATOS DE PROVEEDORES -->
-      <DataTable :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados" :lazy="false"
-        :totalRecords="totalProveedores" v-model:filters="filters" :globalFilterFields="['nombre', 'correo']"
-        responsiveLayout="scroll" class="p-datatable-sm" :paginator="!loading" :rows="7"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport">
-        <template #empty>
-          <div class="flex flex-col items-center justify-center py-12 text-gray-400">
-            <i class="pi pi-inbox text-[48px] mb-3 text-gray-300" />
-            <span class="text-[15px] font-medium">No hay proveedores registrados</span>
-          </div>
-        </template>
-
-        <!-- Columna: Nombre -->
-        <Column field="nombre" header="Nombre" class="text-sm font-semibold text-[#1a2e1f] capitalize">
-          <template #body="slotProps">
-            <Skeleton v-if="loading" width="70%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.nombre }}</span>
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL: 2 Columnas + Desplegable (< 768px)          -->
+      <!-- ======================================================= -->
+      <div class="block md:hidden w-full">
+        <DataTable 
+          v-model:expandedRows="expandedRows"
+          :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados" 
+          :lazy="false"
+          :totalRecords="totalProveedores" 
+          v-model:filters="filters" 
+          :globalFilterFields="['nombre', 'correo']"
+          dataKey="id"
+          class="p-datatable-custom text-sm w-full" 
+          :paginator="!loading" 
+          :rows="7"
+          currentPageReportTemplate="{first}-{last} de {totalRecords}"
+          paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+        >
+          <template #empty>
+            <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+              <i class="pi pi-inbox text-3xl mb-2 opacity-40" />
+              <span class="text-sm font-medium">No hay proveedores registrados</span>
+            </div>
           </template>
-        </Column>
 
-        <!-- Columna: Correo -->
-        <Column field="correo" header="Correo" class="text-sm text-gray-600">
-          <template #body="slotProps">
-            <Skeleton v-if="loading" width="80%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.correo || '—' }}</span>
-          </template>
-        </Column>
+      
+          <Column expander style="width: 2.5rem" />
 
-        <!-- Columna: Teléfono -->
-        <Column field="telefono" header="Teléfono" class="text-sm text-gray-600 font-mono">
-          <template #body="slotProps">
-            <Skeleton v-if="loading" width="50%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.telefono || '—' }}</span>
-          </template>
-        </Column>
+          <!-- Columna: Nombre -->
+          <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="70%" height="1.2rem" />
+              <span v-else class="capitalize block leading-tight">{{ slotProps.data.nombre }}</span>
+            </template>
+          </Column>
 
-        <!-- Columna: Estado -->
-        <Column field="estado" header="Estado" class="text-sm">
-          <template #body="slotProps">
-            <Skeleton v-if="loading" width="5rem" height="1.4rem" borderRadius="20px" />
-            <Tag v-else :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
-              :severity="slotProps.data.activo ? 'success' : 'danger'" rounded class="!text-xs !px-2.5" />
-          </template>
-        </Column>
+          <!-- Columna: Estado -->
+          <Column field="estado" header="Estado">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="4rem" height="1.4rem" borderRadius="20px" />
+              <Tag 
+                v-else 
+                :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
+                :severity="slotProps.data.activo ? 'success' : 'danger'" 
+                rounded 
+                class="!text-[10px] !px-2 py-0.5 whitespace-nowrap" 
+              />
+            </template>
+          </Column>
 
-        <!-- Columna: Acciones -->
-        <Column header="Acciones" class="text-sm">
-          <template #body="slotProps">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <template v-if="loading">
-                <Skeleton width="4.5rem" height="2rem" borderRadius="8px" />
-                <Skeleton width="3.5rem" height="2rem" borderRadius="8px" />
-              </template>
+          <!-- Plantilla de Expansión (Móvil) -->
+          <template #expansion="slotProps">
+            <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
+              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+                
+                <!-- Correo (2 columnas) -->
+                <div class="col-span-2">
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                    Correo
+                  </span>
+                  <span class="text-gray-800 font-medium break-all block">
+                    {{ slotProps.data.correo || '—' }}
+                  </span>
+                </div>
 
-              <template v-else>
+                <!-- Teléfono (2 columnas) -->
+                <div class="col-span-2 pt-1 border-t border-gray-100">
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                    Teléfono
+                  </span>
+                  <span class="text-gray-800 font-mono font-medium block">
+                    {{ slotProps.data.telefono || '—' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Botones de Acción Móvil -->
+              <div class="mt-3 pt-2 flex gap-2 justify-end items-center flex-wrap">
                 <template v-if="slotProps.data.activo">
-                  <Button icon="pi pi-pencil" label="Editar"
-                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer"
-                    v-tooltip.top="'Editar proveedor'" @click="handleEdit(slotProps.data)" />
+                  <Button 
+                    icon="pi pi-pencil" 
+                    label="Editar"
+                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="handleEdit(slotProps.data)" 
+                  />
 
-                  <Button icon="pi pi-eye" label="Ver"
-                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer"
-                    v-tooltip.top="'Ver detalles'" @click="handleDetail(slotProps.data)" />
+                  <Button 
+                    icon="pi pi-eye" 
+                    label="Ver"
+                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="handleDetail(slotProps.data)" 
+                  />
 
-                  <Button icon="pi pi-ban" label="Desactivar"
-                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer"
-                    v-tooltip.top="'Desactivar proveedor'" @click="confirmarDesactivar(slotProps.data)" />
+                  <Button 
+                    icon="pi pi-ban" 
+                    label="Desactivar"
+                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="confirmarDesactivar(slotProps.data)" 
+                  />
                 </template>
 
                 <template v-else>
-                  <Button icon="pi pi-eye" label="Ver"
-                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer"
-                    v-tooltip.top="'Ver detalles'" @click="handleDetail(slotProps.data)" />
+                  <Button 
+                    icon="pi pi-eye" 
+                    label="Ver"
+                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="handleDetail(slotProps.data)" 
+                  />
                 </template>
-              </template>
+              </div>
             </div>
           </template>
-        </Column>
-      </DataTable>
+        </DataTable>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 768px)  -->
+      <!-- ======================================================= -->
+      <div class="hidden md:block w-full overflow-x-auto">
+        <DataTable 
+          :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados" 
+          :lazy="false"
+          :totalRecords="totalProveedores" 
+          v-model:filters="filters" 
+          :globalFilterFields="['nombre', 'correo']"
+          responsiveLayout="scroll" 
+          class="p-datatable-custom text-sm w-full min-w-[50rem]" 
+          :paginator="!loading" 
+          :rows="7"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+        >
+          <template #empty>
+            <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+              <i class="pi pi-inbox text-[48px] mb-3 text-gray-300" />
+              <span class="text-[15px] font-medium">No hay proveedores registrados</span>
+            </div>
+          </template>
+
+          <!-- Columna: Nombre -->
+          <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] min-w-[12rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="70%" height="1.2rem" />
+              <span v-else class="capitalize block">{{ slotProps.data.nombre }}</span>
+            </template>
+          </Column>
+
+          <!-- Columna: Correo -->
+          <Column field="correo" header="Correo" class="text-gray-600 min-w-[12rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="80%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.correo || '—' }}</span>
+            </template>
+          </Column>
+
+          <!-- Columna: Teléfono -->
+          <Column field="telefono" header="Teléfono" class="text-gray-600 font-mono min-w-[8.5rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="50%" height="1.2rem" />
+              <span v-else class="whitespace-nowrap">{{ slotProps.data.telefono || '—' }}</span>
+            </template>
+          </Column>
+
+          <!-- Columna: Estado -->
+          <Column field="estado" header="Estado" class="min-w-[7rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="loading" width="5rem" height="1.4rem" borderRadius="20px" />
+              <Tag 
+                v-else 
+                :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
+                :severity="slotProps.data.activo ? 'success' : 'danger'" 
+                rounded 
+                class="!text-xs !px-2.5 whitespace-nowrap" 
+              />
+            </template>
+          </Column>
+
+          <!-- Columna: Acciones -->
+          <Column header="Acciones" class="w-[14rem] shrink-0">
+            <template #body="slotProps">
+              <div class="flex items-center gap-1.5 justify-end whitespace-nowrap">
+                <template v-if="loading">
+                  <Skeleton width="4.5rem" height="2rem" borderRadius="8px" />
+                  <Skeleton width="3.5rem" height="2rem" borderRadius="8px" />
+                </template>
+
+                <template v-else>
+                  <template v-if="slotProps.data.activo">
+                    <Button 
+                      icon="pi pi-pencil" 
+                      label="Editar"
+                      class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
+                      v-tooltip.top="'Editar proveedor'" 
+                      @click="handleEdit(slotProps.data)" 
+                    />
+
+                    <Button 
+                      icon="pi pi-eye" 
+                      label="Ver"
+                      class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
+                      v-tooltip.top="'Ver detalles'" 
+                      @click="handleDetail(slotProps.data)" 
+                    />
+
+                    <Button 
+                      icon="pi pi-ban" 
+                      label="Desactivar"
+                      class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
+                      v-tooltip.top="'Desactivar proveedor'" 
+                      @click="confirmarDesactivar(slotProps.data)" 
+                    />
+                  </template>
+
+                  <template v-else>
+                    <Button 
+                      icon="pi pi-eye" 
+                      label="Ver"
+                      class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
+                      v-tooltip.top="'Ver detalles'" 
+                      @click="handleDetail(slotProps.data)" 
+                    />
+                  </template>
+                </template>
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+
     </div>
   </div>
 </template>
@@ -149,6 +307,8 @@ const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 
 const store = useProveedorStore()
 const { proveedores, cargando: loading, totalRecords: totalProveedores } = storeToRefs(store)
+
+const expandedRows = ref({})
 
 const estadoOptions = ref([
   { label: 'Activo', value: true },
@@ -282,28 +442,29 @@ const confirmarDesactivar = async (proveedor) => {
 }
 </script>
 
-<style scoped>
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #fbfdf9;
-  color: #2b5e3b;
-  font-weight: 600;
-  font-size: 0.8rem;
-  padding: 0.75rem 1rem;
+<style>
+.p-datatable-custom .p-datatable-thead > tr > th {
+  background-color: #fbfdf9 !important;
+  color: #2b5e3b !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid #e2e8dd !important;
+  white-space: nowrap !important;
 }
 
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
+.p-datatable-custom .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid #f1f5f0 !important;
 }
 
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
+.p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f8f3 !important;
 }
 
-:deep(.p-inputtext:enabled:focus),
-:deep(.p-select:focus),
-:deep(.p-dropdown:focus) {
-  box-shadow: none !important;
+.p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 </style>

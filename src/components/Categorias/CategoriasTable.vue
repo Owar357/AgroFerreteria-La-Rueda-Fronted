@@ -1,72 +1,99 @@
 <template>
-  <DataTable :value="store.cargando ? Array.from({ length: store.porPagina }) : store.categorias"
-    responsiveLayout="scroll" class="p-datatable-custom text-[14px]" :paginator="!store.cargando" :lazy="true"
-    :rows="store.porPagina" :totalRecords="store.totalRegistros" :first="(store.paginaActual - 1) * store.porPagina"
-    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías" @page="cambiarPagina">
+  <!-- Contenedor con overflow-x-auto para garantizar scroll horizontal elástico en móvil sin tarjeta repetida -->
+  <div class="w-full overflow-x-auto">
+    <DataTable
+      :value="store.cargando ? Array.from({ length: store.porPagina }) : store.categorias"
+      responsiveLayout="scroll"
+      class="p-datatable-custom text-sm min-w-[35rem] sm:min-w-full"
+      :paginator="!store.cargando"
+      :lazy="true"
+      :rows="store.porPagina"
+      :totalRecords="store.totalRegistros"
+      :first="(store.paginaActual - 1) * store.porPagina"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
+      @page="cambiarPagina"
+    >
+      <template #header>
+        <!-- Disposición Mobile-First (flex-col en móvil, md:flex-row en PC) -->
+        <div class="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+          <IconField class="w-full sm:w-[20rem] md:w-[25rem] lg:w-[35rem]">
+            <InputIcon class="pi pi-search text-[#6b7280]" />
+            <InputText
+              v-model="textoBusqueda"
+              placeholder="Buscar categoría"
+              class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem]"
+              @input="store.buscarCategorias(textoBusqueda)"
+            />
+          </IconField>
 
-    <template #header>
-      <div class="flex items-center justify-between w-full gap-4">
-        <span class="relative w-full max-w-[320px]">
-          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[#8a998e] text-sm"></i>
-          <input type="text" v-model="textoBusqueda" @input="store.buscarCategorias(textoBusqueda)"
-            placeholder="Buscar categoría..."
-            class="w-30rem pl-9 pr-3 py-3 text-[14px] rounded-lg border border-[#dce4d7] bg-[#f9faf8] text-[#1a2e1f] placeholder-[#8a998e] focus:outline-none focus:ring-2 focus:ring-[#2b5e3b]/30 focus:border-[#2b5e3b] transition-colors" />
-        </span>
-
-        <Button label="+ Agregar Nueva Categoría"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-3 rounded-lg border-none cursor-pointer shadow-md transition-colors shrink-0"
-          @click="emit('open-add')" />
-      </div>
-    </template>
-
-    <template #empty>
-      <div class="text-center py-6 text-[#6b7280] text-[14px]">No hay categorías registradas.</div>
-    </template>
-
-    <!-- Columna: Nombre -->
-    <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
-      <template #body="slotProps">
-        <Skeleton v-if="store.cargando" width="70%" height="1.2rem" />
-        <span v-else>{{ slotProps.data.nombre }}</span>
-      </template>
-    </Column>
-
-    <!-- Columna: % Ganancia Mínimo -->
-    <Column header="% Ganancia Mínima" class="text-center w-[180px]">
-      <template #body="slotProps">
-        <Skeleton v-if="store.cargando" width="60%" height="1.2rem" class="mx-auto" />
-        <span v-else
-          class="inline-block px-3 py-1 rounded-full text-[12px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]">
-          {{ slotProps.data.porcentaje_ganancia_minimo !== null ?
-            parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}%
-        </span>
-      </template>
-    </Column>
-
-    <!-- Columna: Acciones -->
-    <Column header="Acciones" class="text-right w-[150px]">
-      <template #body="slotProps">
-        <div class="flex gap-2 justify-end">
-          <Skeleton v-if="store.cargando" width="5.5rem" height="2rem" borderRadius="8px" />
-
-          <Button v-else icon="pi pi-pencil" label="Editar"
-            class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-            v-tooltip.top="'Editar categoría'" @click="emit('open-edit', slotProps.data)" />
+          <Button
+            label="+ Nueva Categoría"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-6 py-3 rounded-lg border-none cursor-pointer shadow-md transition-colors w-full md:w-auto whitespace-nowrap shrink-0"
+            @click="emit('open-add')"
+          />
         </div>
       </template>
-    </Column>
-  </DataTable>
+
+      <template #empty>
+        <div class="text-center py-6 text-[#6b7280] text-sm">
+          No hay categorías registradas.
+        </div>
+      </template>
+
+      <!-- Columna: Nombre -->
+      <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
+        <template #body="slotProps">
+          <Skeleton v-if="store.cargando" width="70%" height="1.2rem" />
+          <span v-else>{{ slotProps.data.nombre }}</span>
+        </template>
+      </Column>
+
+      <!-- Columna: % Ganancia Mínimo -->
+      <Column header="% Ganancia Mínima" class="text-center w-[11.25rem]">
+        <template #body="slotProps">
+          <Skeleton v-if="store.cargando" width="60%" height="1.2rem" class="mx-auto" />
+          <span
+            v-else
+            class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]"
+          >
+            {{ slotProps.data.porcentaje_ganancia_minimo !== null ? parseFloat(slotProps.data.porcentaje_ganancia_minimo).toFixed(2) : '15.00' }}%
+          </span>
+        </template>
+      </Column>
+
+      <!-- Columna: Acciones -->
+      <Column header="Acciones" class="text-right w-[9.375rem]">
+        <template #body="slotProps">
+          <div class="flex gap-2 justify-end">
+            <Skeleton v-if="store.cargando" width="5.5rem" height="2rem" borderRadius="0.5rem" />
+            
+            <Button
+              v-else
+              icon="pi pi-pencil"
+              label="Editar"
+              class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+              v-tooltip.top="'Editar categoría'"
+              @click="emit('open-edit', slotProps.data)"
+            />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+  </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useCategoriaStore } from '../../stores/categoriaStore'
 import Skeleton from 'primevue/skeleton'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import { useCategoriaStore } from '../../stores/categoriaStore'
 
 const textoBusqueda = ref('')
 
@@ -83,7 +110,7 @@ onMounted(() => {
 
 const cambiarPagina = (event) => {
   const page = event.page + 1
-
+  
   if (page !== store.paginaActual) {
     router.push({ query: { ...route.query, page } })
     store.cargarCategorias(page, event.rows)
@@ -95,28 +122,28 @@ const cambiarPagina = (event) => {
 .p-datatable-custom .p-datatable-header {
   background-color: #ffffff !important;
   border: none !important;
-  border-bottom: 2px solid #e2e8dd !important;
+  border-bottom: 0.125rem solid #e2e8dd !important;
   padding: 1.25rem 1.25rem 1rem 1.25rem;
 }
 
-.p-datatable-custom .p-datatable-thead>tr>th {
+.p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
-  border-bottom: 2px solid #e2e8dd !important;
-  font-size: 13px;
+  border-bottom: 0.125rem solid #e2e8dd !important;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 1.25rem 1rem;
 }
 
-.p-datatable-custom .p-datatable-tbody>tr {
+.p-datatable-custom .p-datatable-tbody > tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
-  border-bottom: 1px solid #e2e8dd !important;
+  border-bottom: 0.0625rem solid #e2e8dd !important;
 }
 
-.p-datatable-custom .p-datatable-tbody>tr:hover {
+.p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f7f2 !important;
 }
 </style>
