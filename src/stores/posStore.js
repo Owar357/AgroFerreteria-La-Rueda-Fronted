@@ -1,13 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
-import { 
-  buscarClientePorDocumento, 
-  registerVenta
+import {
+  buscarClientePorDocumento,
+  registerVenta,
+  imprimirTicketPDF,
 } from '@/services/ventaService'
+import authService from '@/services/authService'
 import { useCajaStore } from '@/stores/cajaStore'
 
 const LOCAL_STORAGE_KEY = 'pos_venta_en_proceso'
+
+// El carrito guardado es por usuario: el siguiente cajero no recupera el carrito del anterior
+const claveLocal = () => `${LOCAL_STORAGE_KEY}_${authService.getUser()?.id ?? 'anon'}`
 
 export const usePosStore = defineStore('pos', () => {
   const cajaStore = useCajaStore()
@@ -22,7 +27,7 @@ export const usePosStore = defineStore('pos', () => {
   const efectivoRecibido = ref(0)
   const mostrarModalCliente = ref(false)
 
-  // Computados
+  
   const subtotalGravado = computed(() =>
     productosVenta.value.reduce(
       (acc, p) => (p.aplica_iva ? acc + parseFloat((p.subtotal / 1.13).toFixed(4)) : acc),
@@ -34,6 +39,7 @@ export const usePosStore = defineStore('pos', () => {
   )
   const iva = computed(() => subtotalGravado.value * 0.13)
   const total = computed(() => subtotalGravado.value + subtotalExento.value + iva.value)
+  // Solo para mostrar en pantalla: el cambio real lo calcula y guarda el servidor
   const cambio = computed(() => Math.max(0, efectivoRecibido.value - total.value))
 
   // Métodos de Carrito
@@ -106,13 +112,13 @@ export const usePosStore = defineStore('pos', () => {
     efectivoRecibido.value = 0
     tipoFactura.value = '01'
     tipoPago.value = 'efectivo'
-    localStorage.removeItem(LOCAL_STORAGE_KEY)
+    localStorage.removeItem(claveLocal())
   }
 
   // Persistencia Local
   const guardarVentaLocal = () => {
     if (productosVenta.value.length === 0) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY)
+      localStorage.removeItem(claveLocal())
       return
     }
     const estadoVenta = {
@@ -123,27 +129,27 @@ export const usePosStore = defineStore('pos', () => {
       nombreCliente: nombreCliente.value,
       busquedaCliente: busquedaCliente.value,
     }
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(estadoVenta))
+    localStorage.setItem(claveLocal(), JSON.stringify(estadoVenta))
   }
 
   const recuperarVentaLocal = () => {
-    const datosGuardados = localStorage.getItem(LOCAL_STORAGE_KEY)
+    const datosGuardados = localStorage.getItem(claveLocal())
     if (!datosGuardados) return
     try {
       const estado = JSON.parse(datosGuardados)
       productosVenta.value = estado.productosVenta || []
-      tipoFactura.value = estado.tipoFactura || '01'
+      tipoFactura.value = ['01', '03'].includes(estado.tipoFactura) ? estado.tipoFactura : '01'
       tipoPago.value = estado.tipoPago || 'efectivo'
       clienteId.value = estado.clienteId || null
       nombreCliente.value = estado.nombreCliente || ''
       busquedaCliente.value = estado.busquedaCliente || ''
     } catch (e) {
       console.error('Error al recuperar venta del localStorage:', e)
-      localStorage.removeItem(LOCAL_STORAGE_KEY)
+      localStorage.removeItem(claveLocal())
     }
   }
 
-  // Operaciones de API y Descarga
+  // Operaciones de API
   const buscarCliente = async () => {
     if (!busquedaCliente.value.trim()) return
     try {
@@ -167,20 +173,64 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  const descargarETicket = (ventaId) => {
+  // El ticket exige token: se pide por axios como blob y se abre desde un object URL
+  const imprimirTicket = async (ventaId) => {
     try {
       const idLimpio = parseInt(ventaId, 10)
       if (isNaN(idLimpio)) throw new Error('ID de venta inválido')
 
-      const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
-      return `${baseUrl}/api/reportes/ticket/${idLimpio}`
+      const response = await imprimirTicketPDF(idLimpio)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+
+      const ventana = window.open(url, '_blank')
+
+      // Si el navegador bloqueó la ventana emergente, se descarga el archivo
+      if (!ventana) {
+        const enlace = document.createElement('a')
+        enlace.href = url
+        enlace.download = `Ticket-${idLimpio}.pdf`
+        document.body.appendChild(enlace)
+        enlace.click()
+        enlace.remove()
+      }
+
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (error) {
-      console.error('Error al generar la URL del PDF:', error)
-      return null
+      console.error('Error al obtener el ticket PDF:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo abrir el ticket',
+        text: 'La venta fue registrada correctamente. Puedes reimprimir el ticket desde el historial de ventas.',
+        confirmButtonColor: '#2b5e3b',
+      })
     }
   }
 
+  const irACaja = async (router, texto) => {
+    const resultado = await Swal.fire({
+      icon: 'warning',
+      title: 'Venta no aperturada',
+      text: texto,
+      confirmButtonText: 'Ir a caja',
+      confirmButtonColor: '#e0b354',
+      showCancelButton: true,
+      cancelButtonText: 'Cerrar',
+    })
+
+    if (resultado.isConfirmed) router?.push({ name: 'caja' })
+  }
+
   const procesarVenta = async (router) => {
+    // Sin turno propio abierto no se puede vender (el backend también lo valida)
+    if (!cajaStore.puedeOperar) {
+      const texto = cajaStore.turnoDeOtroCajero
+        ? `El turno está abierto por ${cajaStore.turnoActivo.cajero_nombre}. Solo ese cajero puede registrar ventas.`
+        : 'Debes aperturar la caja y tu venta en el módulo de caja para poder vender.'
+      await irACaja(router, texto)
+      return
+    }
+
     if (productosVenta.value.length === 0) {
       Swal.fire({
         icon: 'warning',
@@ -191,7 +241,7 @@ export const usePosStore = defineStore('pos', () => {
       return
     }
 
-    if (tipoFactura.value === '02' && !clienteId.value) {
+    if (tipoFactura.value === '03' && !clienteId.value) {
       Swal.fire({
         icon: 'warning',
         title: 'Cliente requerido',
@@ -201,16 +251,30 @@ export const usePosStore = defineStore('pos', () => {
       return
     }
 
+    // Comparación en centavos para evitar errores de punto flotante
+    if (
+      tipoPago.value === 'efectivo' &&
+      Math.round((efectivoRecibido.value || 0) * 100) < Math.round(total.value * 100)
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Efectivo insuficiente',
+        text: 'El efectivo recibido no puede ser menor al total de la venta.',
+        confirmButtonColor: '#2b5e3b',
+      })
+      return
+    }
+
+    // 'cambio' no se envía: lo calcula el servidor (efectivo_recibido - total)
     const payload = {
       tipo_pago: tipoPago.value.toUpperCase(),
+      tipo_factura: tipoFactura.value,
       gravado: parseFloat(subtotalGravado.value.toFixed(2)),
       exento: parseFloat(subtotalExento.value.toFixed(2)),
       iva: parseFloat(iva.value.toFixed(2)),
       total: parseFloat(total.value.toFixed(2)),
       efectivo_recibido: tipoPago.value === 'efectivo' ? efectivoRecibido.value : null,
-      cambio: tipoPago.value === 'efectivo' ? cambio.value : null,
       cliente_id: clienteId.value || null,
-      apertura_caja_id: 1,
       detalles: productosVenta.value.map((p) => ({
         nombre_producto: p.nombre,
         presentacion: p.nombre,
@@ -228,8 +292,6 @@ export const usePosStore = defineStore('pos', () => {
     try {
       const response = await registerVenta(payload)
 
-      console.log('RESPUESTA COMPLETA DE VENTA:', response.data)
-
       cajaStore.marcarActualizacionPendiente()
 
       const respuestaBackend = response.data?.data || response.data
@@ -237,8 +299,10 @@ export const usePosStore = defineStore('pos', () => {
 
       const numDoc = respuestaBackend?.num_documento || respuestaBackend?.numero_factura || `#${ventaId}`
       const clienteNombreStr = nombreCliente.value || 'Consumidor Final'
-      const totalVentaStr = total.value.toFixed(2)
-      const cambioVentaStr = cambio.value.toFixed(2)
+      // Importes oficiales: los calculó el servidor (el POS solo los mostraba)
+      const totalVentaStr = parseFloat(respuestaBackend?.total ?? total.value).toFixed(2)
+      const cambioVentaStr = parseFloat(respuestaBackend?.cambio ?? cambio.value).toFixed(2)
+      const fueEfectivo = tipoPago.value === 'efectivo'
 
       const result = await Swal.fire({
         title: '¡Venta realizada con éxito!',
@@ -249,7 +313,7 @@ export const usePosStore = defineStore('pos', () => {
               <p style="margin:4px 0;"><strong>Comprobante:</strong> ${numDoc}</p>
               <p style="margin:4px 0;"><strong>Cliente:</strong> ${clienteNombreStr}</p>
               <p style="margin:4px 0;"><strong>Total a Pagar:</strong> $${totalVentaStr}</p>
-              ${tipoPago.value === 'efectivo' ? `<p style="margin:4px 0;"><strong>Cambio:</strong> $${cambioVentaStr}</p>` : ''}
+              ${fueEfectivo ? `<p style="margin:4px 0;"><strong>Cambio:</strong> $${cambioVentaStr}</p>` : ''}
             </div>
           </div>
         `,
@@ -262,32 +326,17 @@ export const usePosStore = defineStore('pos', () => {
         reverseButtons: true,
       })
 
-      if (result.isConfirmed && ventaId) {
-        const urlTicket = descargarETicket(ventaId)
-        if (urlTicket) {
-          window.open(urlTicket, '_blank')
-        }
-      }
-
       resetVenta()
 
-      if (response.data.apertura_pendiente) {
-        const resApertura = await Swal.fire({
-          icon: 'warning',
-          title: 'Apertura de caja pendiente',
-          text: 'Debes aperturar tu turno en el módulo de caja.',
-          confirmButtonText: 'Ir a aperturar',
-          confirmButtonColor: '#e0b354',
-          showCancelButton: true,
-          cancelButtonText: 'Cerrar',
-        })
-
-        if (resApertura.isConfirmed) {
-          router.push({ name: 'caja' })
-        }
+      if (result.isConfirmed && ventaId) {
+        await imprimirTicket(ventaId)
       }
     } catch (error) {
       console.error('Error al registrar la venta:', error)
+
+      // Por si el turno cambió (por ejemplo, se cerró) mientras se armaba la venta
+      cajaStore.cargarEstadoCaja()
+
       const status = error.response?.status
       const respuesta = error.response?.data
 
