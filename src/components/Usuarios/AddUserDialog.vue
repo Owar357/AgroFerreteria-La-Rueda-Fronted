@@ -3,13 +3,13 @@
     v-model:visible="localVisible"
     modal
     header="AGREGAR USUARIO"
-    :style="{ width: '500px' }"
     :draggable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
     @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
+    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <BaseInput
         v-model="form.name"
         label="Nombre"
@@ -39,26 +39,27 @@
         @input="validateField('password')"
       />
 
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Rol</label>
+      <div class="flex flex-col gap-2 w-full">
+        <label class="text-sm font-medium text-[#1a2e1f]">Rol</label>
         <Select
           v-model="form.role"
           :options="roles"
           placeholder="Seleccionar rol"
           @change="validateField('role')"
-          class="w-full bg-[#f9fafb] border-[#d1d5db] text-[#1a2e1f] text-[14px] h-11 flex items-center px-2 rounded-lg"
-          :class="{ 'border-red-500': errors.role }"
+          class="w-full !bg-[#f9fafb] !border-[#d1d5db] text-[#1a2e1f] text-sm h-[2.75rem] flex items-center px-2 rounded-lg"
+          :class="{ '!border-red-500': errors.role }"
         />
-        <small v-if="errors.role" class="text-red-600 text-[12px] font-medium">{{
-          errors.role
-        }}</small>
+        <small v-if="errors.role" class="text-red-600 text-xs font-medium">
+          {{ errors.role }}
+        </small>
       </div>
 
-      <div class="flex justify-center mt-4">
+      <!-- Botón de acción: ancho completo en celular, centrado en PC exacto al diseño original -->
+      <div class="flex justify-center mt-4 w-full">
         <Button
           label="Guardar"
           :loading="loading"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full sm:w-auto"
           @click="handleSave"
         />
       </div>
@@ -69,6 +70,9 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import Swal from 'sweetalert2'
+import Select from 'primevue/select'
+import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
 import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
@@ -155,6 +159,10 @@ const handleSave = async () => {
       title: 'Formulario vacío',
       text: 'Complete los campos requeridos antes de guardar.',
       confirmButtonColor: '#2b5e3b',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
     return
   }
@@ -186,6 +194,10 @@ const handleSave = async () => {
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Aceptar',
       timerProgressBar: true,
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   } else if (resultado.status === 403) {
     localVisible.value = true
@@ -194,6 +206,10 @@ const handleSave = async () => {
       title: 'Sin autorización',
       text: 'No tienes permisos para crear usuarios.',
       confirmButtonColor: '#2b5e3b',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   } else if (resultado.error) {
     const msg = resultado.error.toLowerCase()
@@ -213,9 +229,9 @@ const handleSave = async () => {
 .custom-dialog .p-dialog-header {
   background-color: #1e3a2f !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 0.0625rem solid #e2e8dd;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
@@ -223,13 +239,13 @@ const handleSave = async () => {
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
 .p-select:not(.p-disabled).p-focus,
 .p-password-input:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 
@@ -240,18 +256,18 @@ const handleSave = async () => {
 
 .p-select-label {
   color: #1a2e1f !important;
-  font-size: 14px !important;
+  font-size: 0.875rem !important;
 }
 
 .p-select-overlay {
   background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
+  border: 0.0625rem solid #cbd5e1 !important;
   z-index: 999992 !important;
 }
 
 .p-select-item {
   color: #1a2e1f !important;
-  font-size: 14px !important;
+  font-size: 0.875rem !important;
 }
 
 .p-select-item:not(.p-highlight):not(.p-disabled):hover {

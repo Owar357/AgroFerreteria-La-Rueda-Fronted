@@ -26,16 +26,18 @@
         <!-- Filtros (Izquierda) -->
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full ">
           <!-- Búsqueda -->
-          <IconField class="w-full sm:w-[500px]">
-            <InputIcon class="pi pi-search text-[#6b7280] text-sm" />
+          <IconField class="w-full lg:w-[70rem]">
+            <InputIcon class="pi pi-search text-[#6b7280]" />
             <InputText v-model="searchQuery" @input="onSearchInput" placeholder="Buscar nombre, código..."
-              class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[40px] focus:!border-[#2b5e3b] !pl-9" />
+              class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-base rounded-lg h-[2.625rem]" />
           </IconField>
+
 
           <!-- Categorías con búsqueda integrada -->
           <Select v-model="filtroCategoria" :options="opcionesCategorias" optionLabel="nombre" optionValue="nombre"
             filter filterPlaceholder="Buscar..." placeholder="Todas las categorías" @change="onCategoriaChange"
-            class="w-full sm:w-[220px] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[40px] flex items-center px-3" />
+            class="w-full sm:w-[13.75rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem] flex items-center px-3" />
+
         </div>
 
         <!-- Botón Acción Principal (Derecha) -->
@@ -215,7 +217,6 @@ const handleDetail = (product) => emit('open-detail', product)
 <style>
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #fcfdfe !important;
-  color: #1e3a2f !important;
   border-bottom: 1px solid #e2e8dd !important;
   font-size: 12px;
   font-weight: 700;

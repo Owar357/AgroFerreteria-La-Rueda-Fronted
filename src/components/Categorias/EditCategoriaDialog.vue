@@ -3,34 +3,34 @@
     v-model:visible="localVisible"
     modal
     header="EDITAR CATEGORÍA"
-    :style="{ width: '450px' }"
     :draggable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
+    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
+      <div class="flex flex-col gap-2 w-full">
+        <label class="text-sm font-medium text-[#1a2e1f]">
           Nombre: <span class="text-red-500">*</span>
         </label>
         <InputText
           v-model="form.nombre"
           placeholder="Modifique el nombre..."
           :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errorNombre ? 'border-red-500 border' : 'border-[#d1d5db]'
+            'w-full !bg-[#f9fafb] text-[#1a2e1f] text-sm h-[2.75rem] px-4 rounded-lg transition-colors',
+            errorNombre ? '!border-red-500 border' : '!border-[#d1d5db]'
           ]"
           @input="validarNombre"
           @keyup.enter="dispararActualizar"
         />
-        <small v-if="errorNombre" class="text-red-500 text-[12px]">{{ errorNombre }}</small>
+        <small v-if="errorNombre" class="text-red-500 text-xs font-medium">{{ errorNombre }}</small>
       </div>
 
       <!-- % Ganancia Mínimo -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
+      <div class="flex flex-col gap-2 w-full">
+        <label class="text-sm font-medium text-[#1a2e1f]">
           % Ganancia Mínimo Deseado:
         </label>
         <InputNumber
@@ -41,31 +41,26 @@
           :max="100"
           :minFractionDigits="1"
           :maxFractionDigits="2"
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 rounded-lg',
-            errorGanancia ? 'border-red-500 border' : 'border-[#d1d5db]',
+          class="w-full"
+          :inputClass="[
+            'w-full !bg-[#f9fafb] text-[#1a2e1f] text-sm h-[2.75rem] px-4 rounded-lg transition-colors',
+            errorGanancia ? '!border-red-500 border' : '!border-[#d1d5db]',
           ]"
           @input="validarGanancia"
           @keyup.enter="dispararActualizar"
         />
-        <small class="text-[#6b7280] text-[14px]">Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicara a todos los productos
-          que pertenezcan a esta categoría
+        <small class="text-[#6b7280] text-xs leading-relaxed">
+          Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría.
         </small>
-        <small v-if="errorGanancia" class="text-red-500 text-[12px]">{{ errorGanancia }}</small>
+        <small v-if="errorGanancia" class="text-red-500 text-xs font-medium">{{ errorGanancia }}</small>
       </div>
 
-      <!-- Acciones -->
-      <div class="flex justify-between gap-4 mt-2">
+      <!-- Botón de Acción Principal (Sección 7: w-full) -->
+      <div class="flex justify-center mt-4 w-full">
         <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="guardando"
-          @click="localVisible = false"
-        />
-        <Button
-          label="Guardar"
+          label="Guardar datos"
           :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
           @click="dispararActualizar"
         />
       </div>
@@ -199,9 +194,9 @@ const dispararActualizar = async () => {
 .custom-dialog .p-dialog-header {
   background-color: #1e3a2f !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 0.0625rem solid #e2e8dd;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
@@ -209,12 +204,12 @@ const dispararActualizar = async () => {
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
-.p-inputnumber:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+.p-inputnumber-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 </style>

@@ -1,29 +1,56 @@
 <template>
-  <Dialog v-model:visible="localVisible" modal header="EDITAR USUARIO" :style="{ width: '500px' }" :draggable="false"
-    class="custom-dialog" :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }" @hide="resetForm">
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      
+  <Dialog
+    v-model:visible="localVisible"
+    modal
+    header="EDITAR USUARIO"
+    :draggable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
+    class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
+    @hide="resetForm"
+  >
+    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- NOMBRE -->
-      <BaseInput v-model.trim="form.name" label="Nombre" placeholder="Ingrese el nombre del usuario" filter="alpha"
-        maxlength="100" autocomplete="name" :error="errors.name" @input="validarNombre" />
+      <BaseInput
+        v-model.trim="form.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre del usuario"
+        filter="alpha"
+        maxlength="100"
+        autocomplete="name"
+        :error="errors.name"
+        @input="validarNombre"
+      />
 
       <!-- CONTRASEÑA NUEVA -->
-      <BasePassword v-model="form.password" label="Contraseña nueva" size="xl" placeholder="********"
-        help="(Opcional — dejar vacío para no cambiar la contraseña)" :error="errors.password"
-        @input="validarPassword" />
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña nueva"
+        size="xl"
+        placeholder="********"
+        help="(Opcional — dejar vacío para no cambiar la contraseña)"
+        :error="errors.password"
+        @input="validarPassword"
+      />
 
       <!-- CONFIRMAR CONTRASEÑA -->
-      <BasePassword v-model="form.confirmPassword" label="Confirmar contraseña" placeholder="********"
-        :error="errors.confirmPassword" @input="validarConfirmPassword" />
+      <BasePassword
+        v-model="form.confirmPassword"
+        label="Confirmar contraseña"
+        placeholder="********"
+        :error="errors.confirmPassword"
+        @input="validarConfirmPassword"
+      />
 
-      <!-- BOTONES -->
-      <div class="flex justify-between mt-6 gap-6">
-        <Button label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-6 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="loading" @click="localVisible = false" />
-        <Button label="Guardar datos" :loading="loading" :disabled="!tieneCambios"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-4 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
-          @click="handleUpdate" />
+      <!-- BOTÓN PRINCIPAL (ANCHO COMPLETO W-FULL) -->
+      <div class="flex justify-center mt-4 w-full">
+        <Button
+          label="Guardar datos"
+          :loading="loading"
+          :disabled="!tieneCambios"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
+          @click="handleUpdate"
+        />
       </div>
     </div>
   </Dialog>
@@ -32,6 +59,8 @@
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
 import Swal from 'sweetalert2'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
@@ -183,6 +212,10 @@ const handleUpdate = async () => {
       text: 'No se editó ningún campo.',
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Entendido',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
     return
   }
@@ -222,6 +255,10 @@ const handleUpdate = async () => {
       text: 'Los datos del usuario fueron actualizados exitosamente.',
       confirmButtonColor: '#2b5e3b',
       confirmButtonText: 'Aceptar',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   } else if (resultado.error) {
     Swal.fire({
@@ -229,6 +266,10 @@ const handleUpdate = async () => {
       title: 'Error al actualizar',
       text: resultado.error,
       confirmButtonColor: '#2b5e3b',
+      customClass: {
+        popup: '!rounded-xl !p-4 sm:!p-6',
+        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
+      },
     })
   }
 }
@@ -242,9 +283,9 @@ const handleUpdate = async () => {
 .custom-dialog .p-dialog-header {
   background-color: #1e3a2f !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 0.0625rem solid #e2e8dd;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   padding: 1.25rem 1.5rem !important;
@@ -252,12 +293,12 @@ const handleUpdate = async () => {
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
 .p-password-input:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 
