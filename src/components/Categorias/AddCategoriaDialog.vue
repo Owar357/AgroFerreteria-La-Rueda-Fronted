@@ -12,51 +12,32 @@
     <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       
       <!-- Nombre de Categoría -->
-      <div class="flex flex-col gap-2 w-full">
-        <label class="text-sm font-medium text-[#1a2e1f]">
-          Nombre: <span class="text-red-500">*</span>
-        </label>
-        <InputText
-          v-model="nombreCategoria"
-          placeholder="Escriba el nombre..."
-          :class="[
-            'w-full !bg-[#f9fafb] text-[#1a2e1f] text-sm h-[2.75rem] px-4 rounded-lg transition-colors',
-            errorNombre ? '!border-red-500 border' : '!border-[#d1d5db]',
-          ]"
-          @input="validarNombre"
-          @keyup.enter="dispararGuardar"
-        />
-        <small v-if="errorNombre" class="text-red-500 text-xs font-medium">{{ errorNombre }}</small>
-      </div>
+      <BaseInput
+        v-model="nombreCategoria"
+        label="Nombre: *"
+        placeholder="Escriba el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararGuardar"
+      />
 
-      <!-- Porcentaje Ganancia Mínimo -->
-      <div class="flex flex-col gap-2 w-full">
-        <label class="text-sm font-medium text-[#1a2e1f]">
-          % Ganancia Mínima Deseada:
-        </label>
-        <InputNumber
-          v-model="porcentajeGananciaMinimo"
-          placeholder="Ej: 15.00"
-          suffix="%"
-          :min="0"
-          :max="100"
-          :minFractionDigits="1"
-          :maxFractionDigits="2"
-          class="w-full"
-          :inputClass="[
-            'w-full !bg-[#f9fafb] text-[#1a2e1f] text-sm h-[2.75rem] px-4 rounded-lg transition-colors',
-            errorGanancia ? '!border-red-500 border' : '!border-[#d1d5db]',
-          ]"
-          @input="validarGanancia"
-          @keyup.enter="dispararGuardar"
-        />
-        <small class="text-[#6b7280] text-xs leading-relaxed">
-          Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría.
-        </small>
-        <small v-if="errorGanancia" class="text-red-500 text-xs font-medium">{{ errorGanancia }}</small>
-      </div>
+      <BaseInputNumber
+  v-model="porcentajeGananciaMinimo"
+  label="% Ganancia Mínima Deseada:"
+  placeholder="Ej: 15.00"
+  suffix="%"
+  :min="1"
+  :max="100"
+  :min-fraction-digits="1"
+  :max-fraction-digits="2"
+  help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+  :error="errorGanancia"
+  @input="validarGanancia"
+  @keyup.enter="dispararGuardar"
+/>
 
-      <!-- Botón de Acción Principal (Sección 7: w-full) -->
+      <!-- Botón de Acción Principal -->
       <div class="flex justify-center mt-4 w-full">
         <Button
           label="Guardar"
@@ -71,12 +52,10 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import { mostrarAccesoDenegado, mostrarError, mostrarExito } from '@/utils/SweetAlertService'
+import BaseInput from '../base/BaseInput.vue'
+import BaseInputNumber from '../base/BaseInputNumber.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },

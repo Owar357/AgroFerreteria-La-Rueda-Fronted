@@ -25,6 +25,7 @@ import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import Password from 'primevue/password'
 import KeyFilter from 'primevue/keyfilter'
+import InputNumber from 'primevue/inputnumber'
 
 export default {
   install: (app) => {
@@ -54,5 +55,6 @@ export default {
     app.component('Checkbox', Checkbox)
     app.component('Password', Password)
     app.directive('keyfilter', KeyFilter)
+    app.component('InputNumber', InputNumber)
   },
 }
