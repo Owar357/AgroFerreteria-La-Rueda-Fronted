@@ -6,7 +6,7 @@
           Registro de Compras Realizadas
         </h1>
         <Button
-        v-if="!isContador"
+          v-if="!isContador"
           label="+ Agregar compra"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-all"
           @click="emit('open-add')"
@@ -26,7 +26,7 @@
         />
 
         <!-- Filtro proveedor -->
-        <AutoComplete 
+        <AutoComplete
           v-model="proveedorSeleccionado"
           optionLabel="nombre"
           :suggestions="proveedoresFiltrados"
@@ -67,7 +67,6 @@
     </div>
 
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- 🔄 Si loading es true, inyectamos un array de 5 filas simuladas y ocultamos la paginación -->
       <DataTable
         :value="loading ? Array.from({ length: 5 }) : compras"
         responsiveLayout="scroll"
@@ -147,13 +146,21 @@
         <!-- Columna: Estado de compra -->
         <Column header="Estado de compra" class="text-center w-[150px]">
           <template #body="slotProps">
-            <Skeleton v-if="loading" width="4.5rem" height="1.5rem" borderRadius="20px" class="mx-auto" />
+            <Skeleton
+              v-if="loading"
+              width="4.5rem"
+              height="1.5rem"
+              borderRadius="20px"
+              class="mx-auto"
+            />
             <span
               v-else
               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
-              :class="slotProps.data.esAnulado
-                ? 'bg-gray-200 text-gray-800'
-                : 'bg-green-100 text-green-800'"
+              :class="
+                slotProps.data.esAnulado
+                  ? 'bg-gray-200 text-gray-800'
+                  : 'bg-green-100 text-green-800'
+              "
             >
               {{ slotProps.data.esAnulado ? 'Anulada' : 'Activa' }}
             </span>
@@ -164,7 +171,6 @@
         <Column header="Acciones" class="text-right w-[200px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-end">
-              
               <!-- Skeletons simétricos imitando la caja de botones -->
               <template v-if="loading">
                 <Skeleton width="3.8rem" height="2.1rem" borderRadius="8px" />
@@ -180,15 +186,14 @@
                   @click="verDetalles(slotProps.data)"
                 />
                 <Button
-                   v-if="!slotProps.data.esAnulado"
-                   icon="pi pi-ban"
-                   label="Anular"
-                   class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                   v-tooltip.top="'Anular compra'"
-                   @click="anularCompra(slotProps.data)"
+                  v-if="!slotProps.data.esAnulado && !isContador"
+                  icon="pi pi-ban"
+                  label="Anular"
+                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                  v-tooltip.top="'Anular compra'"
+                  @click="anularCompra(slotProps.data)"
                 />
               </template>
-
             </div>
           </template>
         </Column>
@@ -196,7 +201,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -210,7 +214,6 @@ import { DatePicker } from 'primevue'
 import { proveedores as getProveedores } from '@/services/proveedorService'
 import authService from '@/services/authService'
 import { mostrarConfirmacion } from '@/utils/SweetAlertService'
-
 
 const props = defineProps({
   compras: { type: Array, default: () => [] },
@@ -265,7 +268,6 @@ const verDetalles = (compra) => {
   emit('ver-detalle', compra)
 }
 
-
 const anularCompra = async (compra) => {
   const confirmacion = await mostrarConfirmacion({
     titulo: '¿Anular compra?',
@@ -292,7 +294,6 @@ const anularCompra = async (compra) => {
     emit('anular-compra', compra.id)
   }
 }
-
 
 onMounted(async () => {
   try {

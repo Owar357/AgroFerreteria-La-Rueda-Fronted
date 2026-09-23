@@ -13,7 +13,7 @@
     </div>
 
    
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-5 items-stretch max-w-[1000px]">
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-5 items-stretch">
 
       <!-- Tarjeta 1: Ventas -->
       <div class="bg-white rounded-2xl p-5 border border-[#e2e8dd] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer grid grid-rows-[auto_1fr_auto] aspect-square max-w-[320px]">

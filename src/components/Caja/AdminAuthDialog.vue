@@ -12,7 +12,7 @@
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <p class="text-[14px] text-[#6b7280]">
-        {{ descripcion }} <!--cambio-->
+        {{ descripcion }}
       </p>
 
       <!-- Email -->
@@ -54,7 +54,6 @@
         <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
       </div>
 
-      
       <div v-if="errorGeneral" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
         <small class="text-red-600 text-[13px] font-medium">{{ errorGeneral }}</small>
       </div>
@@ -66,7 +65,7 @@
           :disabled="cargando"
           @click="localVisible = false"
         />
-        
+
         <Button
           :label="labelBoton"
           icon="pi pi-unlock"

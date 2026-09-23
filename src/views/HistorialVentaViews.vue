@@ -2,8 +2,13 @@
   <div>
     <HistorialVentasTable
       :ventas="ventas"
+      :cargando="cargando"
+      :total-registros="totalRegistros"
+      :filas="porPagina"
+      :primero="primero"
       @ver-detalle="abrirDetalle"
-      @anular-venta="confirmarAnulacion"
+      @cambiar-pagina="onCambiarPagina"
+      @cambiar-filtros="onCambiarFiltros"
     />
 
     <DetalleVentasDialog v-model:visible="mostrarDetalle" :venta="ventaSeleccionada" />
@@ -18,61 +23,67 @@ import DetalleVentasDialog from '../components/Ventas/DetalleVentasDialog.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
 import { useRoute } from 'vue-router'
 
-
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
-const ventas = ref([])
-const cargando = ref(false)
 const route = useRoute()
 
 const clienteId = route.query.clienteId
 
-const aplicarFiltroFechas = async (fechas) => {
-  cargando.value = true
-  try {
-    const response = await getVentas(fechas || {})
-    const data = response.data.data || []
-    ventas.value = data.map((v) => ({
-      id: v.id,
-      vendidoPor: v.vendido_por.name,
-      numeroFactura: v.numero_factura,
-      tipoPago: v.tipo_pago,
-      estado: v.estado,
-      fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }),
-      total: v.total,
-    }))
-  } catch {
-    ventas.value = []
-  } finally {
-    cargando.value = false
-  }
-}
+// --- Estado de la lista (la paginación y los filtros los resuelve el servidor) ---
+const ventas = ref([])
+const cargando = ref(false)
+const totalRegistros = ref(0)
+const pagina = ref(1)
+const porPagina = ref(8)
+const primero = ref(0)
+const filtros = ref({ search: '', estado: '', tipo_pago: '', fecha_desde: '', fecha_hasta: '' })
+
+// Evita que una respuesta lenta y antigua pise a una más reciente
+let peticionActual = 0
+
+const mapearVenta = (v) => ({
+  id: v.id,
+  vendidoPor: v.vendido_por?.name ?? '-',
+  numeroFactura: v.numero_factura,
+  tipoPago: v.tipo_pago,
+  estado: v.estado,
+  fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }),
+  total: v.total,
+  aperturaVentaId: v.apertura_venta_id,
+})
 
 const cargarVentas = async () => {
+  const numeroPeticion = ++peticionActual
   cargando.value = true
+
   try {
-    const params = clienteId ? { cliente: clienteId, per_page: 50 } : {}
+    const params = { page: pagina.value, per_page: porPagina.value }
+
+    if (clienteId) params.cliente = clienteId
+    if (filtros.value.search) params.search = filtros.value.search
+    if (filtros.value.estado) params.estado = filtros.value.estado
+    if (filtros.value.tipo_pago) params.tipo_pago = filtros.value.tipo_pago
+    if (filtros.value.fecha_desde) {
+      params.fecha_desde = filtros.value.fecha_desde
+      params.fecha_hasta = filtros.value.fecha_hasta || filtros.value.fecha_desde
+    }
+
     const response = await getVentas(params)
-    const data = response.data.data || response.data || []
-    ventas.value = data.map((v) => ({
-      id: v.id,
-      vendidoPor: v.vendido_por.name,
-      numeroFactura: v.numero_factura,
-      tipoPago: v.tipo_pago,
-      estado: v.estado,
-      fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }),
-      total: v.total,
-    }))
+
+    if (numeroPeticion !== peticionActual) return
+
+    ventas.value = (response.data.data ?? []).map(mapearVenta)
+    totalRegistros.value = response.data.total ?? 0
   } catch (error) {
+    if (numeroPeticion !== peticionActual) return
+
     console.error(error)
+    ventas.value = []
+    totalRegistros.value = 0
     Swal.fire({
       toast: true,
       position: 'top-end',
@@ -82,8 +93,23 @@ const cargarVentas = async () => {
       timer: 2000,
     })
   } finally {
-    cargando.value = false
+    if (numeroPeticion === peticionActual) cargando.value = false
   }
+}
+
+const onCambiarPagina = ({ page, per_page }) => {
+  pagina.value = page
+  porPagina.value = per_page
+  primero.value = (page - 1) * per_page
+  cargarVentas()
+}
+
+// Al cambiar un filtro se vuelve a la primera página
+const onCambiarFiltros = (nuevosFiltros) => {
+  filtros.value = nuevosFiltros
+  pagina.value = 1
+  primero.value = 0
+  cargarVentas()
 }
 
 const abrirDetalle = async (venta) => {
@@ -93,7 +119,7 @@ const abrirDetalle = async (venta) => {
 
     ventaSeleccionada.value = {
       // Datos de la venta (cabecera)
-      vendidoPor: venta.vendidoPor, // o venta.vendidoPor
+      vendidoPor: venta.vendidoPor,
       numeroFactura: venta.numeroFactura,
       fechaEmision: venta.fecha,
       tipoPago: venta.tipoPago,
@@ -122,6 +148,7 @@ const abrirDetalle = async (venta) => {
   }
 }
 
+// PENDIENTE: la anulación real de ventas se implementará después (hoy solo cambia el estado en pantalla)
 const confirmarAnulacion = (venta) => {
   if (venta.estado === 'ANULADA') return
 
