@@ -58,6 +58,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#5F6B52] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2"
             @click="generarPDF"
           />
@@ -79,6 +80,7 @@
 import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
+import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
 import { generarReporteInventarioValorizado } from '@/services/reporteService'
 
@@ -98,10 +100,24 @@ const cargarCategorias = async () => {
 
 onMounted(cargarCategorias)
 
-const generarPDF = () => {
-  generarReporteInventarioValorizado({
-    categoriaId: categoriaId.value,
-  })
+const generandoPDF = ref(false)
+
+const generarPDF = async () => {
+  generandoPDF.value = true
+  try {
+    await generarReporteInventarioValorizado({
+      categoriaId: categoriaId.value,
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {
