@@ -74,6 +74,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#5F6B52] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2"
             @click="generarPDF"
           />
@@ -111,7 +112,9 @@ const formatFechaParam = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const generarPDF = () => {
+const generandoPDF = ref(false)
+
+const generarPDF = async () => {
   if (!fechaInicio.value || !fechaFin.value) {
     Swal.fire({
       icon: 'warning',
@@ -122,11 +125,23 @@ const generarPDF = () => {
     return
   }
 
-  generarReporteProductosMasVendidos({
-    fechaInicio: formatFechaParam(fechaInicio.value),
-    fechaFin: formatFechaParam(fechaFin.value),
-    limite: limite.value,
-  })
+  generandoPDF.value = true
+  try {
+    await generarReporteProductosMasVendidos({
+      fechaInicio: formatFechaParam(fechaInicio.value),
+      fechaFin: formatFechaParam(fechaFin.value),
+      limite: limite.value,
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

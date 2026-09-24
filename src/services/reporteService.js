@@ -1,30 +1,62 @@
 import { api } from '@/services/authService'
 
-
 function construirUrlReporte(path, params = {}) {
   const query = new URLSearchParams(
     Object.entries(params).filter(
       ([, value]) => value !== null && value !== undefined && value !== ''
     )
   ).toString()
- 
-  return `${api.defaults.baseURL}${path}${query ? `?${query}` : ''}`
+
+  return `${path}${query ? `?${query}` : ''}`
 }
 
-function abrirReporte(path, params = {}) {
+/**
+ * Pide el PDF al backend usando axios (así sí viaja el header Authorization),
+ * lo recibe como blob binario y lo abre en una pestaña nueva mediante un
+ * Object URL. window.open(url) directo NO sirve para endpoints protegidos
+ * por JWT porque una navegación de navegador no puede llevar headers
+ * personalizados.
+ */
+async function abrirReporte(path, params = {}) {
   const url = construirUrlReporte(path, params)
-  window.open(url, '_blank')
-}
 
+  try {
+    const response = await api.get(url, {
+      responseType: 'blob',
+    })
+
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    const blobUrl = window.URL.createObjectURL(blob)
+    window.open(blobUrl, '_blank')
+
+    setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60_000)
+  } catch (error) {
+    // Si el backend devuelve un error (401, 404, 500...), con responseType
+    // 'blob' axios también entrega ese error como Blob. Lo convertimos a
+    // texto/JSON para poder mostrar el mensaje real en vez de un blob roto.
+    if (error.response?.data instanceof Blob) {
+      const texto = await error.response.data.text()
+      let mensaje = texto
+      try {
+        mensaje = JSON.parse(texto).message ?? texto
+      } catch {
+        // el cuerpo no era JSON, dejamos el texto tal cual
+      }
+      console.error('Error al generar el reporte:', mensaje)
+      throw new Error(mensaje)
+    }
+    console.error('Error al generar el reporte:', error)
+    throw error
+  }
+}
 
 //genera la peticion para generar el reporte de provedores
 export function generarReporteComprasPorProveedor({ fechaInicio, fechaFin }) {
-  abrirReporte('/reportes/compras/por-proveedor', {
+  return abrirReporte('/reportes/compras/por-proveedor', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
   })
 }
-
 
 //Funcion para obtener las compras echas por proveedor (pinta la tabla)
 export async function getComprasPorProveedor(filtros) {
@@ -32,19 +64,17 @@ export async function getComprasPorProveedor(filtros) {
   return res.data.data ?? res.data ?? []
 }
 
-
 //Funcion paa obtener el resumen de las ventas
 export function generarReporteResumenVentas({ fechaInicio, fechaFin }) {
-  abrirReporte('/reportes/ventas/resumen', {
+  return abrirReporte('/reportes/ventas/resumen', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
   })
 }
 
-
 //Funcino para obtener los productos mas vendidos
 export function generarReporteProductosMasVendidos({ fechaInicio, fechaFin, limite }) {
-  abrirReporte('/reportes/ventas/producto-mas-vendidos', {
+  return abrirReporte('/reportes/ventas/producto-mas-vendidos', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
     limite: limite ?? null,
@@ -53,7 +83,7 @@ export function generarReporteProductosMasVendidos({ fechaInicio, fechaFin, limi
 
 //funcion para obeter las ventas por cajero
 export function generarReporteVentasPorUsuario({ fechaInicio, fechaFin }) {
-  abrirReporte('/reportes/ventas/usuarios', {
+  return abrirReporte('/reportes/ventas/usuarios', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
   })
@@ -61,7 +91,7 @@ export function generarReporteVentasPorUsuario({ fechaInicio, fechaFin }) {
 
 //Funccion para obtener las ventas por categoria
 export function generarReporteVentasPorCategoria({ fechaInicio, fechaFin, categoriaId }) {
-  abrirReporte('/reportes/ventas/categorias', {
+  return abrirReporte('/reportes/ventas/categorias', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
     categoria_id: categoriaId ?? null,
@@ -70,7 +100,7 @@ export function generarReporteVentasPorCategoria({ fechaInicio, fechaFin, catego
 
 //funcion para obtener las ventas comparativas
 export function generarReporteComparativoVentas({ fechaInicio1, fechaFin1, fechaInicio2, fechaFin2 }) {
-  abrirReporte('/reportes/ventas/resumen/comparativa', {
+  return abrirReporte('/reportes/ventas/resumen/comparativa', {
     fecha_inicio_1: fechaInicio1,
     fecha_fin_1: fechaFin1,
     fecha_inicio_2: fechaInicio2,
@@ -80,15 +110,15 @@ export function generarReporteComparativoVentas({ fechaInicio1, fechaFin1, fecha
 
 //funccion para el margen de ganancia
 export function generarReporteMargenGanancia({ fechaInicio, fechaFin }) {
-  abrirReporte('/reportes/financieros/margen', {
+  return abrirReporte('/reportes/financieros/margen', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
   })
 }
- 
+
 //funccion para flujo de ventas compras
 export function generarReporteFlujoComprasVentas({ fechaDesde, fechaHasta }) {
-  abrirReporte('/reportes/financieros/flujo', {
+  return abrirReporte('/reportes/financieros/flujo', {
     fecha_desde: fechaDesde,
     fecha_hasta: fechaHasta,
   })
@@ -96,14 +126,14 @@ export function generarReporteFlujoComprasVentas({ fechaDesde, fechaHasta }) {
 
 //funccion para el inveantrio valorizado
 export function generarReporteInventarioValorizado({ categoriaId } = {}) {
-  abrirReporte('/reportes/inventario/valorizado', {
+  return abrirReporte('/reportes/inventario/valorizado', {
     categoria_id: categoriaId ?? null,
   })
 }
 
 //funvcvion para obtener los productos por vences
 export function generarReporteProductosPorVencer({ diasUmbral } = {}) {
-  abrirReporte('/reportes/productos-por-vencer', {
+  return abrirReporte('/reportes/productos-por-vencer', {
     dias_umbral: diasUmbral ?? null,
   })
 }
