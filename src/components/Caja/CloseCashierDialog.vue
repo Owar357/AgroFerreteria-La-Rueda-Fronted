@@ -14,7 +14,7 @@
   >
     <template #header>
       <div class="flex items-center justify-between w-full pr-4">
-        <h2 class="text-[22px] font-semibold text-[#1a2e1f]">Conteo de Cierre de Caja</h2>
+        <h2 class="text-[22px] font-semibold text-[#1a2e1f]">Cuadre final de caja</h2>
         <span class="px-3 py-1 text-[13px] font-medium rounded-[40px] bg-red-100 text-red-700">
           Cierre de turno
         </span>
@@ -55,7 +55,7 @@
               />
             </td>
             <td class="py-2.5 px-4 text-right text-[14px] font-semibold text-[#1a2e1f]">
-              {{ fmt(item.qty * item.value) }}
+              {{ fmt(((item.qty || 0) * item.cents) / 100) }}
             </td>
           </tr>
         </tbody>
@@ -75,7 +75,7 @@
             @click="emit('update:visible', false)"
           />
           <Button
-            label="Cuadrar Caja"
+            label="Abrir cuadre"
             icon="pi pi-check"
             class="!bg-[#2b5e3b] !border-[#2b5e3b] !text-white !text-[14px] !font-semibold !px-5 !py-2.5 !rounded-lg"
             @click="onCuadrar"
@@ -88,38 +88,49 @@
 
 <script setup>
 import { ref, computed, onBeforeUpdate } from 'vue'
-import Dialog      from 'primevue/dialog'
+import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
-import Button      from 'primevue/button'
+import Button from 'primevue/button'
 
-const props = defineProps({
+defineProps({
   visible: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:visible', 'cuadrar'])
 
 const inputRefs = ref([])
-onBeforeUpdate(() => { inputRefs.value = [] })
+onBeforeUpdate(() => {
+  inputRefs.value = []
+})
 
-const denominaciones = ref([
-  { id: 'c1',   label: '$0.01 (centavo)',   value: 0.01,  qty: 0 },
-  { id: 'c5',   label: '$0.05 (centavos)',  value: 0.05,  qty: 0 },
-  { id: 'c10',  label: '$0.10 (centavos)',  value: 0.10,  qty: 0 },
-  { id: 'c25',  label: '$0.25 (centavos)',  value: 0.25,  qty: 0 },
-  { id: 'b1',   label: '$1.00 (dólar)',     value: 1.00,  qty: 0 },
-  { id: 'b5',   label: '$5.00 (dólares)',   value: 5.00,  qty: 0 },
-  { id: 'b10',  label: '$10.00 (dólares)',  value: 10.00, qty: 0 },
-  { id: 'b20',  label: '$20.00 (dólares)',  value: 20.00, qty: 0 },
-  { id: 'b50',  label: '$50.00 (dólares)',  value: 50.00, qty: 0 },
-  { id: 'b100', label: '$100.00 (dólares)', value: 100.00,qty: 0 },
-])
+// 'cents' evita errores de punto flotante: todo se suma en centavos enteros
+const crearDenominaciones = () => [
+  { id: 'c1', label: '$0.01 (centavo)', value: 0.01, cents: 1, qty: 0 },
+  { id: 'c5', label: '$0.05 (centavos)', value: 0.05, cents: 5, qty: 0 },
+  { id: 'c10', label: '$0.10 (centavos)', value: 0.1, cents: 10, qty: 0 },
+  { id: 'c25', label: '$0.25 (centavos)', value: 0.25, cents: 25, qty: 0 },
+  { id: 'b1', label: '$1.00 (dólar)', value: 1, cents: 100, qty: 0 },
+  { id: 'b5', label: '$5.00 (dólares)', value: 5, cents: 500, qty: 0 },
+  { id: 'b10', label: '$10.00 (dólares)', value: 10, cents: 1000, qty: 0 },
+  { id: 'b20', label: '$20.00 (dólares)', value: 20, cents: 2000, qty: 0 },
+  { id: 'b50', label: '$50.00 (dólares)', value: 50, cents: 5000, qty: 0 },
+  { id: 'b100', label: '$100.00 (dólares)', value: 100, cents: 10000, qty: 0 },
+]
 
-const totalContado = computed(() =>
-  denominaciones.value.reduce((acc, item) => acc + (item.qty || 0) * item.value, 0)
+const denominaciones = ref(crearDenominaciones())
+
+const totalCents = computed(() =>
+  denominaciones.value.reduce((acc, item) => acc + (item.qty || 0) * item.cents, 0),
 )
 
+const totalContado = computed(() => totalCents.value / 100)
+
 const fmt = (val) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val)
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(val)
 
 const focusNextInput = (currentIndex) => {
   const next = inputRefs.value[currentIndex + 1]
@@ -127,16 +138,25 @@ const focusNextInput = (currentIndex) => {
   else document.activeElement?.blur()
 }
 
+// Restaura un conteo guardado (al volver desde el resumen del cierre)
 const restaurar = (denom) => {
-  denominaciones.value = denom.map(d => ({ ...d }))
+  denominaciones.value = denom.map((d) => ({ ...d }))
 }
 
-defineExpose({ restaurar })
+// El padre lo llama tras un cierre exitoso para que el siguiente conteo empiece en cero
+const reset = () => {
+  denominaciones.value = crearDenominaciones()
+}
+
+defineExpose({ restaurar, reset })
 
 const onCuadrar = () => {
   emit('cuadrar', {
     monto_contado: totalContado.value,
-    denominaciones: denominaciones.value.map(d => ({ ...d })),
+    // Copia completa para poder restaurar el conteo si se cancela el cierre
+    denominaciones: denominaciones.value.map((d) => ({ ...d })),
+    // Formato que espera el backend: { c1: 0, c5: 2, ..., b100: 1 }
+    conteo: Object.fromEntries(denominaciones.value.map((d) => [d.id, d.qty || 0])),
   })
 }
 </script>

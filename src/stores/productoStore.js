@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { 
-  getProductos, 
-  createProducto, 
-  updateProducto, 
-  getAllCategorias 
+import {
+  getProductos,
+  createProducto,
+  updateProducto,
+  getAllCategorias,
 } from '../services/productoService'
 import { getUnidades } from '@/services/unidadMedidaService'
 
@@ -35,12 +35,12 @@ export const useproductoStore = defineStore('producto', () => {
 
     try {
       const response = await getProductos(page, rows, search, categoria)
-      
+
       if (response.data?.status === 'ok') {
-        productos.value    = response.data.data
+        productos.value = response.data.data
         totalRecords.value = response.data.total
-        currentPage.value  = response.data.current_page
-        perPage.value      = response.data.per_page
+        currentPage.value = response.data.current_page
+        perPage.value = response.data.per_page
       }
 
       return { ok: true }
@@ -53,7 +53,7 @@ export const useproductoStore = defineStore('producto', () => {
       return {
         ok: false,
         status: error.response?.status,
-        error: error.response?.data?.message || 'No se pudo cargar la lista de productos.'
+        error: error.response?.data?.message || 'No se pudo cargar la lista de productos.',
       }
     } finally {
       cargando.value = false
@@ -73,7 +73,7 @@ export const useproductoStore = defineStore('producto', () => {
       return {
         ok: false,
         status: error.response?.status,
-        error: error.response?.data?.message || 'No se pudieron cargar las categorías.'
+        error: error.response?.data?.message || 'No se pudieron cargar las categorías.',
       }
     }
   }
@@ -89,13 +89,13 @@ export const useproductoStore = defineStore('producto', () => {
       const responseData = error.response?.data
 
       if (status === 422) {
-        const mensaje = Object.values(responseData.errors).flat()
-        return { ok: false, status, error: mensaje[0] }
+        const mensajes = Object.values(responseData.errors ?? {}).flat()
+        return { ok: false, status, error: mensajes[0], mensajes }
       }
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error del servidor.'
+        error: responseData?.message || 'Error del servidor.',
       }
     }
   }
@@ -116,13 +116,13 @@ export const useproductoStore = defineStore('producto', () => {
       const responseData = error.response?.data
 
       if (status === 422) {
-        const mensaje = Object.values(responseData.errors).flat()
-        return { ok: false, status, error: mensaje[0] }
+        const mensajes = Object.values(responseData.errors ?? {}).flat()
+        return { ok: false, status, error: mensajes[0], mensajes }
       }
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error del servidor.'
+        error: responseData?.message || 'Error del servidor.',
       }
     }
   }

@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', {
     //aqui se va ha mantener la sesion activa al recaragra la pagina
     persist: true,
 
-    getter: {
+    getters: {
     isAuthenticated: (state) => !!state.token,
 
     //condiciones segun los rolse
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
                 this.user = data.user
                 
                 //los dirigimos segun los roles
-                if (this.isAdmin || this.isContador || this.Cajero) {
+                if (this.isAdmin || this.isContador || this.isCajero) {
                     router.push('/admin/dashboard')
                 }else {
                     router.push('/') 
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
                 const { data } = await api.post('/auth/register', payload)
                 this.token = data.access_token
                 this.user = data.user
-                router.push = data('/')
+                router.push ('/')
             }catch(error) {
                 console.error("error al registrarse", error)
                 throw error;

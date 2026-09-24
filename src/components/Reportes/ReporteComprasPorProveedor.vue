@@ -68,6 +68,7 @@
             label="Generar PDF"
             icon="pi pi-file-pdf"
             :disabled="compras.length === 0"
+            :loading="generandoPDF"
             class="!bg-[#5F6B52] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2"
             @click="generarPDF"
           />
@@ -212,14 +213,28 @@ const filtrarCompras = async () => { //
 }
 
 
-const generarPDF = () => { //
-  if (!fechaInicio.value || !fechaFin.value) return //
+const generandoPDF = ref(false)
 
-  // 3. Generamos el PDF consumiendo la función que ya tenías
-  generarReporteComprasPorProveedor({
-    fechaInicio: formatFechaParam(fechaInicio.value), //
-    fechaFin: formatFechaParam(fechaFin.value), //
-  })
+const generarPDF = async () => {
+  if (!fechaInicio.value || !fechaFin.value) return
+
+  generandoPDF.value = true
+  try {
+    // 3. Generamos el PDF consumiendo la función que ya tenías
+    await generarReporteComprasPorProveedor({
+      fechaInicio: formatFechaParam(fechaInicio.value),
+      fechaFin: formatFechaParam(fechaFin.value),
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => { //

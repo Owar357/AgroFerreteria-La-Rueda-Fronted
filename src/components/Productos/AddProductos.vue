@@ -5,7 +5,7 @@
         <div class="flex items-center gap-6 mb-6">
           <Button label="Regresar" icon="pi pi-arrow-left"
             class="!text-[18px] !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] rounded-xl shadow-sm cursor-pointer transition-all shrink-0"
-            @click="$emit('close')" />  
+            @click="$emit('close')" />
 
           <div>
             <h1 class="text-[36px] font-semibold text-[#1a2e1f] leading-tight m-0">Nuevo Producto</h1>
@@ -145,7 +145,8 @@
                 '!border-red-500': errores.unidadMedidaId,
                 '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
               }" :pt="{ label: { class: '!text-[18px] !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId }}</small>
+            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId
+              }}</small>
 
             <p v-if="!presentacionBaseCreada"
               class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
@@ -318,7 +319,9 @@
               <label class="text-[18px] font-medium text-gray-700">Unidad de Medida</label>
               <InputText :value="nombreUnidadBase" disabled
                 class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-              <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma unidad base)</small>
+              <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma
+                unidad
+                base)</small>
             </div>
 
             <div class="flex flex-col gap-2 w-full min-w-0">
@@ -1051,6 +1054,13 @@ async function eliminarPresentacion(index) {
   }
 }
 
+function escaparHtml(texto) {
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 async function guardarProducto() {
   errores.value = { nombre: '', fabricante: '', categoria: '', unidadMedidaId: '', tipoProducto: '', stockMinimo: '', factorConversion: '' }
   let hayErrores = false
@@ -1114,6 +1124,13 @@ async function guardarProducto() {
     emit('close')
   } else if (resultado.status === 403) {
     mostrarAccesoDenegado()
+  } else if (resultado.mensajes?.length) {
+    const items = resultado.mensajes.map((m) => `<li>${escaparHtml(m)}</li>`).join('')
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Corrige lo siguiente',
+      mensajeHtml: `<ul style="text-align:left; padding-left:1.25rem; list-style:disc">${items}</ul>`,
+    })
   } else if (resultado.error) {
     mostrarError('Error de validación', resultado.error)
   }

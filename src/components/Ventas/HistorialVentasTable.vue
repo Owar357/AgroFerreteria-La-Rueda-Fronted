@@ -2,8 +2,11 @@
   <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <!-- Encabezado -->
     <div class="flex flex-col mb-8 gap-4">
-      <div class="flex justify-between items-center w-full">
+      <div class="flex flex-col w-full">
         <h1 class="text-2xl font-semibold tracking-tight text-black">Historial de ventas</h1>
+        <p class="text-[13px] text-[#6b7280] mt-1">
+          Sin filtro de fechas se muestran las ventas de hoy. Los filtros se aplican sobre todo el historial.
+        </p>
       </div>
 
       <!-- Filtros -->
@@ -12,14 +15,14 @@
         <IconField class="w-80">
           <InputIcon class="pi pi-search text-[#6b7280]" />
           <InputText
-            v-model="filtros.global.value"
+            v-model="busqueda"
             placeholder="Buscar factura, vendedor..."
             class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
           />
         </IconField>
 
         <Select
-          v-model="filtros.estado.value"
+          v-model="estadoSel"
           :options="opcionesEstado"
           showClear
           placeholder="Todos los estados"
@@ -27,7 +30,7 @@
         />
 
         <Select
-          v-model="filtros.tipoPago.value"
+          v-model="pagoSel"
           :options="opcionesPago"
           showClear
           placeholder="Tipo de pago"
@@ -42,30 +45,31 @@
           showIcon
           showButtonBar
           class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px]"
-          @date-select="onFechaSeleccionada"
+          @hide="alCerrarCalendario"
         />
       </div>
     </div>
 
     <!-- Tabla -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- 🔄 Si cargando es true, pasamos un array de 8 filas simuladas (según tus rows) y ocultamos la paginación -->
+      <!-- lazy: el servidor entrega solo la página actual; la paginación y los filtros NO se hacen aquí -->
       <DataTable
-        :value="cargando ? Array.from({ length: 8 }) : ventasFiltradas"
-        v-model:filters="filtros"
-        :globalFilterFields="['vendidoPor', 'numeroFactura']"
+        :value="cargando ? Array.from({ length: filas }) : ventas"
+        lazy
+        paginator
+        :rows="filas"
+        :first="primero"
+        :totalRecords="totalRegistros"
+        :rowsPerPageOptions="[8, 15, 30]"
         responsiveLayout="scroll"
         class="p-datatable-custom text-[14px]"
-        :totalRecords="totalRegistros" 
-        :paginator="!cargando"
-        @page="onPage"
-        :rows="8"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+        @page="onPage"
       >
         <template #empty>
           <div class="text-center py-6 text-[#6b7280] text-[14px]">
-            No hay ventas registradas.
+            No hay ventas para los filtros seleccionados.
           </div>
         </template>
 
@@ -132,33 +136,19 @@
         </Column>
 
         <!-- Columna: Acciones -->
-        <Column header="Acciones" class="text-center w-[130px]">
+        <Column header="Acciones" class="text-center w-[90px]">
           <template #body="slotProps">
             <div class="flex gap-2 justify-center">
-              <!-- Skeletons redondos simulando los botones circulares (w-8 h-8) -->
               <template v-if="cargando">
                 <Skeleton shape="circle" size="2rem" />
-                <Skeleton shape="circle" size="2rem" />
               </template>
-              
+
               <template v-else>
                 <Button
                   icon="pi pi-eye"
                   v-tooltip.top="'Ver detalle'"
                   class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
                   @click="$emit('ver-detalle', slotProps.data)"
-                />
-                <Button
-                  icon="pi pi-ban"
-                  v-tooltip.top="'Anular venta'"
-                  :disabled="slotProps.data.estado === 'ANULADA'"
-                  :class="
-                    slotProps.data.estado === 'ANULADA'
-                      ? '!bg-[#e5e7eb] !text-[#9ca3af] cursor-not-allowed'
-                      : '!bg-[#fee2e2] hover:!bg-[#fca5a5] !text-[#b91c1c]'
-                  "
-                  class="border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                  @click="$emit('anular-venta', slotProps.data)"
                 />
               </template>
             </div>
@@ -169,98 +159,74 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import Skeleton from 'primevue/skeleton'
 
-
-// Props
-const props = defineProps({
-  ventas: {
-    type: Array,
-    required: true,
-    default: () => [],
-  },
-  cargando: {
-    type: Boolean,
-    default: false
-  }
+// Props: la página actual y los totales los entrega el padre (que consulta al servidor)
+defineProps({
+  ventas: { type: Array, required: true, default: () => [] },
+  cargando: { type: Boolean, default: false },
+  totalRegistros: { type: Number, default: 0 }, // total del servidor, no de la página
+  filas: { type: Number, default: 8 },
+  primero: { type: Number, default: 0 }, // índice del primer registro de la página
 })
 
-// Emits
-const emit = defineEmits(['ver-detalle', 'anular-venta', 'cambiar-pagina'])
+const emit = defineEmits(['ver-detalle', 'cambiar-pagina', 'cambiar-filtros'])
 
-// Paginación desde el Servidor (Control de eventos de navegación de PrimeVue)
-const totalRegistros = computed(() => props.ventas?.length || 0)
-
+// --- Paginación ---
 const onPage = (event) => {
-  const paginaDestino = event.page + 1 
-  const limitePorPagina = event.rows
+  emit('cambiar-pagina', { page: event.page + 1, per_page: event.rows })
+}
 
-  emit('cambiar-pagina', { 
-    page: paginaDestino, 
-    per_page: limitePorPagina 
+// --- Filtros (se envían al servidor; aquí no se filtra nada) ---
+const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
+const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
+
+const busqueda = ref('')
+const estadoSel = ref(null)
+const pagoSel = ref(null)
+const rangoDeFechas = ref(null)
+
+// Fecha local en formato YYYY-MM-DD
+const aISO = (fecha) =>
+  `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
+
+const emitirFiltros = () => {
+  const [desde, hasta] = rangoDeFechas.value ?? []
+
+  emit('cambiar-filtros', {
+    search: busqueda.value.trim(),
+    estado: estadoSel.value || '',
+    tipo_pago: pagoSel.value || '',
+    fecha_desde: desde ? aISO(desde) : '',
+    // Si solo se eligió un día, el rango es ese mismo día
+    fecha_hasta: desde ? aISO(hasta ?? desde) : '',
   })
 }
 
-// Opciones de filtros
-const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
-const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
-const rangoDeFechas = ref(null)
+watch([estadoSel, pagoSel], emitirFiltros)
 
-// Filtros reactivos vinculados a los v-model de la interfaz
-const filtros = ref({
-  global: { value: null, matchMode: 'contains' },
-  estado: { value: null, matchMode: 'equals' },
-  tipoPago: { value: null, matchMode: 'equals' },
+// Búsqueda con espera de 400 ms para no consultar en cada tecla
+let temporizador = null
+watch(busqueda, () => {
+  clearTimeout(temporizador)
+  temporizador = setTimeout(emitirFiltros, 400)
+})
+onBeforeUnmount(() => clearTimeout(temporizador))
+
+// Rango completo o limpiado: se consulta de inmediato
+watch(rangoDeFechas, (rango) => {
+  if (!rango || (rango[0] && rango[1])) emitirFiltros()
 })
 
-const ventasFiltradas = computed(() => {
-  let lista = props.ventas ?? []
+// Si se cierra el calendario con una sola fecha elegida, se filtra ese día
+const alCerrarCalendario = () => {
+  const rango = rangoDeFechas.value
+  if (rango?.[0] && !rango[1]) emitirFiltros()
+}
 
-  const textoBusqueda = filtros.value.global.value?.toLowerCase().trim() || ''
-  if (textoBusqueda) {
-    lista = lista.filter((v) => 
-      v.vendidoPor?.toLowerCase().includes(textoBusqueda) ||
-      v.numeroFactura?.toLowerCase().includes(textoBusqueda)
-    )
-  }
-
-  
-  const estadoSeleccionado = filtros.value.estado.value
-  if (estadoSeleccionado) {
-    lista = lista.filter((v) => v.estado === estadoSeleccionado)
-  }
-
- 
-  const pagoSeleccionado = filtros.value.tipoPago.value
-  if (pagoSeleccionado) {
-    lista = lista.filter((v) => v.tipoPago === pagoSeleccionado)
-  }
-
- 
-  if (rangoDeFechas.value?.[0]) {
-    const desde = new Date(rangoDeFechas.value[0])
-    desde.setHours(0, 0, 0, 0) 
-
-    // Si seleccionó la segunda fecha del rango la usamos, si no, igualamos a la primera
-    const hasta = rangoDeFechas.value[1] ? new Date(rangoDeFechas.value[1]) : new Date(desde)
-    hasta.setHours(23, 59, 59, 999)
-
-    lista = lista.filter((v) => {
-      if (!v.fecha) return false
-      
-      const [d, m, a] = v.fecha.split('/')
-      const fechaVenta = new Date(Number(a), Number(m) - 1, Number(d))
-      return fechaVenta >= desde && fechaVenta <= hasta
-    })
-  }
-
-  return lista
-})
-
-// Helpers visuales para estilos e íconos de la tabla
+// --- Helpers visuales ---
 const estiloPago = (tipo) => {
   if (tipo === 'EFECTIVO')
     return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
@@ -283,7 +249,6 @@ const formatearMoneda = (valor) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
-
 
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {
