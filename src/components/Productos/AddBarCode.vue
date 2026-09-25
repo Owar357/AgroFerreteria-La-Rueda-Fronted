@@ -35,15 +35,18 @@
         </table>
       </div>
 
-      <!-- Input + botón agregar -->
-
+      <!-- Inputs y bótones -->
       <div class="flex gap-2">
-        <InputText v-model="nuevoCodigo" placeholder="Ej: 7501234567890"
-          class="flex-1 bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          @keyup.enter="agregarCodigo" />
-        <Button label="Agregar" icon="pi pi-plus"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none !rounded-lg !px-4" @click="agregarCodigo" />
-      </div>
+     <BaseInput
+        v-model="nuevoCodigo"
+        placeholder="Ej: 7501234567890"
+        filter="int"
+        class="flex-1"
+        @keyup.enter="agregarCodigo"
+      />
+      <Button label="Agregar" icon="pi pi-plus"
+        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none !rounded-lg !px-4" @click="agregarCodigo" />
+    </div>
     </div>
 
     <template #footer>
@@ -58,7 +61,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
+import BaseInput from '@/components/base/BaseInput.vue'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
 import {

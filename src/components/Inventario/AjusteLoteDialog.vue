@@ -30,9 +30,11 @@
 
             <!-- Campo Dinámico según el Tipo de Ajuste -->
             <div v-if="form.tipo_ajuste === 'REEVALUACION'" class="flex flex-col gap-1.5">
-                <label class="text-xs font-semibold text-[#4b5563]">Nuevo Costo Unitario ($)</label>
-                <InputNumber v-model="form.costo_nuevo" mode="currency" currency="USD" locale="en-US" :min="0.01"
-                    :minFractionDigits="2" :maxFractionDigits="4" class="w-full" />
+            <BaseInputNumberMoney
+                v-model="form.costo_nuevo"
+                label="Nuevo Costo Unitario ($)"
+                :max-fraction-digits="4"
+            />
             </div>
 
             <div v-else class="flex flex-col gap-1.5">
@@ -85,6 +87,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import Textarea from 'primevue/textarea'
 import Swal from 'sweetalert2'
 import { registrarAjusteInventario } from '@/services/inventarioService'

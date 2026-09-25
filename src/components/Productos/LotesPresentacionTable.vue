@@ -140,15 +140,17 @@
       root: { class: '!rounded-2xl' },
       header: { class: '!pb-2 !border-b !border-gray-100' }
     }">
-      <div class="flex flex-col gap-4 py-4">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-gray-700">Porcentaje de descuento (%)</label>
-          <InputNumber v-model="porcentajeInput" suffix="%" :min="0" :max="100" :minFractionDigits="0"
-            :maxFractionDigits="2" class="w-full" inputClass="!py-2.5 !px-3.5 rounded-xl !text-base" />
-          <small class="text-xs text-gray-500">Este descuento se aplicará directamente al precio de venta del
-            lote.</small>
+      <div class="flex flex-col gap-1.5">
+          <BaseInputPercent
+            v-model="porcentajeInput"
+            label="Porcentaje de descuento (%)"
+            :min="0"
+            :min-fraction-digits="0"
+          />
+          <small class="text-xs text-gray-500">
+            Este descuento se aplicará directamente al precio de venta del lote.
+          </small>
         </div>
-      </div>
       <template #footer>
         <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
           <Button label="Cancelar" icon="pi pi-times" severity="secondary" outlined @click="modalVisible = false"
@@ -172,7 +174,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import Dialog from 'primevue/dialog'
-import InputNumber from 'primevue/inputnumber'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useLoteStore } from '@/stores/loteStore'
 import AjusteLoteDialog from '@/components/Inventario/AjusteLoteDialog.vue'
 

@@ -16,6 +16,7 @@ const props = defineProps({
   min: Number,
   max: Number,
   useGrouping: { type: Boolean, default: false },
+  locale: { type: String, default: 'en-US' }, 
 })
 
 const model = defineModel()
@@ -28,7 +29,6 @@ const sizes = {
   xl: 'h-14 px-5 text-[18px]',
 }
 
-// Solo enteros. Se escribe agregando al final, sin decimales, sin ceros a la izquierda.
 const handleKeyDown = (e) => {
   const controlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Enter', 'Home', 'End']
   if (controlKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
@@ -70,13 +70,14 @@ const handleKeyDown = (e) => {
       <span v-html="label"></span>
     </label>
 
-    <InputNumber
+      <InputNumber
       :input-id="id"
       v-model="model"
       :placeholder="placeholder"
       :min="min"
       :max="max"
       :use-grouping="useGrouping"
+      :locale="locale"
       :max-fraction-digits="0"
       v-bind="{ ...$attrs, class: undefined }"
       class="w-full"

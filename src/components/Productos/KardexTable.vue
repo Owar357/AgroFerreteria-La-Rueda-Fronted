@@ -21,18 +21,15 @@
           <!-- Selector Tipo Movimiento -->
           <div class="flex items-center gap-2 text-sm text-[#1e3a2f]">
             <span class="font-semibold text-gray-700">Tipo:</span>
-            <select v-model="tipoMovimiento" @change="aplicarFiltro"
-              class="bg-white border border-[#cbd5e1] rounded-lg text-sm px-3 py-2 text-[#1a2e1f] focus:outline-none focus:border-[#2b5e3b] cursor-pointer shadow-2xs font-medium min-w-[190px]">
-              <option value="">Todos los movimientos</option>
-              <option value="ENTRADA_COMPRA">Entrada por Compra</option>
-              <option value="SALIDA_VENTA">Salida por Venta</option>
-              <option value="ANULACION_COMPRA">Anulación de Compra</option>
-              <option value="ANULACION_VENTA">Anulación de Venta</option>
-              <option value="AJUSTE_POSITIVO">Ajuste Positivo (+)</option>
-              <option value="AJUSTE_NEGATIVO">Ajuste Negativo (-)</option>
-              <option value="REEVALUACION_COSTO">Reevaluación de Costo</option>
-              <option value="CAMBIO_PRESENTACION">Cambio de Presentación</option>
-            </select>
+            <BaseSelect
+              v-model="tipoMovimiento"
+              :options="opcionesMovimiento"
+              option-label="label"
+              option-value="value"
+              placeholder="Todos los movimientos"
+              class="min-w-[190px]"
+              @update:model-value="aplicarFiltro"
+            />
           </div>
 
           <!-- Fechas -->
@@ -229,6 +226,7 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
 import Swal from 'sweetalert2'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 import { useKardexStore } from '@/stores/kardexStore'
 
 const props = defineProps({
@@ -247,6 +245,18 @@ const obtenerHoy = () => new Date().toISOString().split('T')[0]
 const fechaInicio = ref(obtenerPrimerDiaMes())
 const fechaFin = ref(obtenerHoy())
 const tipoMovimiento = ref('')
+
+const opcionesMovimiento = [
+  { label: 'Todos los movimientos', value: '' },
+  { label: 'Entrada por Compra', value: 'ENTRADA_COMPRA' },
+  { label: 'Salida por Venta', value: 'SALIDA_VENTA' },
+  { label: 'Anulación de Compra', value: 'ANULACION_COMPRA' },
+  { label: 'Anulación de Venta', value: 'ANULACION_VENTA' },
+  { label: 'Ajuste Positivo (+)', value: 'AJUSTE_POSITIVO' },
+  { label: 'Ajuste Negativo (-)', value: 'AJUSTE_NEGATIVO' },
+  { label: 'Reevaluación de Costo', value: 'REEVALUACION_COSTO' },
+  { label: 'Cambio de Presentación', value: 'CAMBIO_PRESENTACION' },
+]
 
 onMounted(async () => {
   await consultarKardex()

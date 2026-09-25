@@ -358,6 +358,8 @@
               placeholder="0"
               size="xl"
               :min="1"
+              :max="999999"
+              :use-grouping="true"
               :error="errores.factorConversion"
             >
               <template #help>

@@ -17,8 +17,9 @@ const props = defineProps({
   max: { type: Number, default: 1000000.99 },
   currency: { type: String, default: 'USD' },
   locale: { type: String, default: 'en-US' },
+  minFractionDigits: { type: Number, default: 2 },
+  maxFractionDigits: { type: Number, default: 2 },
 })
-
 const model = defineModel()
 const id = useId()
 
@@ -71,8 +72,8 @@ const handleBlur = () => {
       :currency="currency"
       :locale="locale"
       :min="0"
-      :min-fraction-digits="2"
-      :max-fraction-digits="2"
+      :min-fraction-digits="minFractionDigits"
+      :max-fraction-digits="maxFractionDigits"
       :use-grouping="true"
       v-bind="{ ...$attrs, class: undefined }"
       class="w-full"
