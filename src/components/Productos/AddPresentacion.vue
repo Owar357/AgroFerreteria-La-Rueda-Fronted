@@ -4,38 +4,31 @@
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre <span class="text-red-500">*</span>
-        </label>
-        <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
-      </div>
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+      />
 
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
-          ¿Cuántos
-          <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
-            {{ unidadBase || '—' }}
-          </span>
-          contiene tu presentación? <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.factor_conversion" :min="1" :useGrouping="false"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
-      </div>
+      <!-- Factor de conversión -->
+      <BaseInputNumber
+        v-model="form.factor_conversion"
+        :label="`¿Cuántos <span class='bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded border border-amber-200 mx-0.5 shadow-sm text-[13px]'>${unidadBase || 'unidades'}</span> contiene tu presentación? *`"
+        placeholder="Ej: 10"
+        :min="1"
+        :max="1000000"
+        :max-fraction-digits="0"
+        :use-grouping="true"
+      />
+
       <!-- Precio -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Precio <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
-      </div>
-
-
-
+      <BaseInputNumberMoney
+        v-model="form.precio"
+        label="Precio *"
+        placeholder="$ 0.00"
+      />
+      
       <!-- Botones -->
       <div class="flex justify-between gap-4 mt-2">
         <Button label="Cancelar"
@@ -52,21 +45,25 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import InputText from 'primevue/inputtext'        
-import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import { añadirPresentacion } from '@/services/productoService'
+import { useproductoStore } from '@/stores/productoStore' // <- Importamos el store de productos/unidades
 import Swal from 'sweetalert2'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   presentacion: { type: Object, default: null },
   unidadBase: { type: String, default: '' },
+  unidadMedidaId: { type: [Number, String], default: null },
   productoId: { type: [Number, String], required: true }
 })
 
 const emit = defineEmits(['update:visible', 'guardar'])
 
+const store = useproductoStore()
 const localVisible = ref(false)
 const guardando = ref(false)
 const form = ref({
@@ -86,7 +83,6 @@ const resetForm = () => {
   guardando.value = false
 }
 
-
 const mostrarAlerta = (tipo, titulo, texto) => {
   Swal.fire({
     icon: tipo,
@@ -105,21 +101,37 @@ const guardar = async () => {
     return
   }
 
+  // 1. Intentamos obtener el ID enviado por prop directas o dentro de presentacion
+  let idUnidad = props.unidadMedidaId || props.presentacion?.unidad_medida_id || props.presentacion?.unidad_medida?.id
+
+  // 2. Si no viene el ID pero tenemos la cadena visual "Libra", lo buscamos en las unidades cargadas del store
+  if (!idUnidad && props.unidadBase) {
+    const unidadEncontrada = store.unidades?.find(
+      (u) => u.nombre.toLowerCase().trim() === props.unidadBase.toLowerCase().trim()
+    )
+    if (unidadEncontrada) {
+      idUnidad = unidadEncontrada.id
+    }
+  }
+
+  if (!idUnidad) {
+    mostrarAlerta('warning', 'Unidad requerida', 'No se pudo determinar el ID de la unidad de medida.')
+    return
+  }
+
   guardando.value = true
 
   const payload = {
     nombre: form.value.nombre,
+    unidad_medida_id: Number(idUnidad), // Mandamos explícitamente el ID recuperado
     factor_conversion: form.value.factor_conversion,
     precio_venta: form.value.precio,
     producto_id: props.productoId
   }
 
   try {
-
     const response = await añadirPresentacion(payload)
-    console.log('respuesta backend:', JSON.stringify(response.data, null, 2))
     const nueva = response.data.data ?? response.data
-    console.log('nueva:', JSON.stringify(nueva, null, 2))
 
     emit('guardar', {
       id: nueva.id,
@@ -176,15 +188,5 @@ const guardar = async () => {
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 1.5rem !important;
-}
-
-:deep(.p-inputnumber-input) {
-  width: 100%;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  border-color: #d1d5db;
-  height: 44px;
-  padding: 0 1rem;
-  font-size: 14px;
 }
 </style>

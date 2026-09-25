@@ -22,33 +22,32 @@
         <div class="flex flex-col gap-5 w-full">
 
           <!-- Nombre del Producto -->
-          <div class="w-full flex flex-col gap-1.5">
-            <label class="text-[14px] font-semibold text-gray-700">
-              Nombre del Producto <span class="text-red-500">*</span>
-            </label>
-            <InputText v-model="nombre"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[14px] !py-2.5 !px-3.5 rounded-xl shadow-xs focus:!border-[#2b5e3b]"
-              :class="{ '!border-red-500': errores.nombre }" />
-            <small v-if="errores.nombre" class="text-red-500 text-[12px]">{{ errores.nombre }}</small>
-          </div>
+          <BaseInput
+            v-model="nombre"
+            label="Nombre del Producto *" 
+            placeholder="Ej: Fertilizante Triple 15"
+            size="xl"
+            filter="alphanum"
+            :error="errores.nombre"
+          />
 
           <!-- Grid: Fabricante, Categoría y % Ganancia -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 w-full">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 w-full items-start">
 
             <!-- Fabricante -->
-            <div class="md:col-span-4 flex flex-col gap-1.5">
-              <label class="text-[14px] font-semibold text-gray-700">
-                Fabricante <span class="text-red-500">*</span>
-              </label>
-              <InputText v-model="fabricante" placeholder="Escriba el fabricante..."
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[14px] !py-2.5 !px-3.5 rounded-xl shadow-xs focus:!border-[#2b5e3b]"
-                :class="{ '!border-red-500': errores.fabricante }" />
-              <small v-if="errores.fabricante" class="text-red-500 text-[12px]">{{ errores.fabricante }}</small>
-            </div>
+            <BaseInput
+              v-model="fabricante"
+              label="Fabricante *"
+              size="xl"
+              placeholder="Escriba el fabricante..."
+              filter="alpha"
+              class="md:col-span-4"
+              :error="errores.fabricante"
+            />
 
-            <!-- Categoría -->
+            <!-- Categoría (AutoComplete de PrimeVue) -->
             <div class="md:col-span-4 flex flex-col gap-1.5">
-              <label class="text-[14px] font-semibold text-gray-700">
+              <label class="text-[14px] font-medium text-[#1a2e1f]">
                 Categoría <span class="text-red-500">*</span>
               </label>
               <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
@@ -72,38 +71,36 @@
                   </div>
                 </template>
               </AutoComplete>
-              <small v-if="errores.categoria" class="text-red-500 text-[12px]">{{ errores.categoria }}</small>
+              <small v-if="errores.categoria" class="text-red-500 text-[12px] font-medium">{{ errores.categoria }}</small>
             </div>
 
-            <!-- % Ganancia Mínimo -->
-            <div class="md:col-span-4 flex flex-col gap-1.5">
-              <label class="text-[14px] font-semibold text-gray-700">
-                % Ganancia Mínimo
-              </label>
-              <InputNumber v-model="porcentajeGananciaMinimo" placeholder="Ej: 20.00" suffix="%" :min="0" :max="100"
-                :minFractionDigits="1" :maxFractionDigits="2" fluid inputClass="!py-2.5 !px-3.5 w-full !text-[14px]"
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] rounded-xl shadow-xs focus:!border-[#2b5e3b]" />
-              <small class="text-[12px] text-gray-500 leading-normal">
-                Solo si este producto tiene un margen especial diferente a su categoría.
-              </small>
-            </div>
+            <!-- % Ganancia Mínima -->
+            
+            <BaseInputPercent
+              v-model="porcentajeGananciaMinimo"
+              label="% Ganancia Mínima"
+              placeholder="Ej: 20.00"
+              size="xl"
+              class="md:col-span-4"
+              help="Solo si este producto tiene un margen especial diferente a su categoría."
+            />
 
           </div>
 
           <!-- Código del Producto -->
-          <div class="w-full flex flex-col gap-1.5">
-            <label class="text-[14px] font-semibold text-gray-700">Código del Producto</label>
-            <InputText v-model="codigoGenerado" readonly fluid
-              class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[14px] !py-2.5 !px-3.5 !cursor-not-allowed rounded-xl font-mono font-semibold" />
-            <small class="text-[12px] text-gray-500">
-              Se genera automáticamente al completar Categoría, Nombre y Fabricante.
-            </small>
-          </div>
+          <BaseInput
+            v-model="codigoGenerado"
+            label="Código del Producto"
+            readonly
+            size="xl"
+            class="font-mono font-semibold"
+            help="Se genera automáticamente al completar Categoría, Nombre y Fabricante."
+          />
 
         </div>
       </div>
 
-      <!-- BARRA DE ACCIONES INFERIOR DENTRO DE LA TARJETA (DISTRIBUIDA) -->
+      <!-- BARRA DE ACCIONES INFERIOR DENTRO DE LA TARJETA -->
       <div class="p-5 border-t border-[#e2e8dd] bg-[#fbfdf9] flex justify-between items-center">
         <!-- Regresar a la Izquierda -->
         <Button label="Regresar" icon="pi pi-arrow-left"
@@ -124,11 +121,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Button from 'primevue/button'
-import AutoComplete from 'primevue/autocomplete'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { mostrarExito, mostrarError } from '@/utils/SweetAlertService'
 

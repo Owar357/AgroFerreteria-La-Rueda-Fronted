@@ -21,21 +21,15 @@
         @input="validarNombre"
         @keyup.enter="dispararGuardar"
       />
-
-      <BaseInputNumber
-  v-model="porcentajeGananciaMinimo"
-  label="% Ganancia Mínima Deseada:"
-  placeholder="Ej: 15.00"
-  suffix="%"
-  :min="1"
-  :max="100"
-  :min-fraction-digits="1"
-  :max-fraction-digits="2"
-  help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
-  :error="errorGanancia"
-  @input="validarGanancia"
-  @keyup.enter="dispararGuardar"
-/>
+      <BaseInputPercent
+        v-model="porcentajeGananciaMinimo"
+        label="% Ganancia Mínima Deseada:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararGuardar"
+      />
 
       <!-- Botón de Acción Principal -->
       <div class="flex justify-center mt-4 w-full">
@@ -55,7 +49,7 @@ import { ref, watch } from 'vue'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import { mostrarAccesoDenegado, mostrarError, mostrarExito } from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
-import BaseInputNumber from '../base/BaseInputNumber.vue'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },

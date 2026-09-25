@@ -4,15 +4,16 @@
     <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- Nombre -->
       <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre <span class="text-red-500">*</span>
-        </label>
-        <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
-        <small v-if="errores.nombre" class="text-red-500 text-[12px]">{{ errores.nombre }}</small>
+        
+        <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+        :error="errores.nombre"
+       />
       </div>
 
-      <!-- Factor de conversión con unidad base -->
       <div class="flex flex-col gap-2">
         <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
           ¿Cuánto equivale esta presentación en
@@ -20,30 +21,36 @@
             {{ presentacion?.unidadMedida?.nombre || '—' }} ?
           </span>
         </label>
-        <InputText v-model="form.factor_conversion" placeholder="0" maxlength="6" :disabled="factorBloqueado"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" />
-        <!-- Mensajes de ayuda -->
-        <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b]">
-          ⚠️ Es la unidad base de este producto, el factor de conversión fijo es (1).
-        </small>
-        <small v-else-if="errores.factor_conversion" class="text-red-500 text-[12px]">
-          {{ errores.factor_conversion }}
-        </small>
-        <small v-else class="text-[12px] text-gray-400">
-          Debe ser un número entero entre 1 y 999,999.
-        </small>
-      </div>
+
+        <BaseInputNumber
+          v-model="form.factor_conversion"
+          placeholder="0"
+          :min="1"
+          :max="999999"
+          :max-fraction-digits="0"
+          :use-grouping="true"
+          :disabled="factorBloqueado"
+        />
+
+          <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b] flex items-center gap-1">
+              <i class="pi pi-lock" style="font-size: 11px"></i>
+              Es la unidad base de este producto, el factor de conversión fijo es (1).
+          </small>
+          <small v-else-if="errores.factor_conversion" class="text-red-500 text-[12px]">
+            {{ errores.factor_conversion }}
+          </small>
+          <small v-else class="text-[12px] text-gray-400">
+            Debe ser un número entero entre 1 y 999,999.
+          </small>
+        </div>
 
       <!-- Precio -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Precio <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
-        <small v-if="errores.precio" class="text-red-500 text-[12px]">{{ errores.precio }}</small>
-      </div>
+     <BaseInputNumberMoney
+      v-model="form.precio"
+      label="Precio *"
+      placeholder="$ 0.00"
+      :error="errores.precio"
+      />
 
       <!-- Botones -->
       <div class="flex justify-between gap-4 mt-2">
@@ -61,11 +68,13 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import Swal from 'sweetalert2'
 import { updatePresentacion } from '@/services/productoService'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
+
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -140,25 +149,6 @@ watch(
   },
   { immediate: true },
 )
-
-// Filtro para solo números y límite 999999 (solo si el factor NO está bloqueado)
-watch(() => form.value.factor_conversion, (nuevoValor) => {
-  if (factorBloqueado.value) return
-
-  if (nuevoValor !== undefined && nuevoValor !== null) {
-    let soloNumeros = nuevoValor.toString().replace(/[^0-9]/g, '')
-    if (soloNumeros === '') {
-      form.value.factor_conversion = ''
-      return
-    }
-    let numeroMaximo = parseInt(soloNumeros, 10)
-    if (numeroMaximo > 999999) {
-      form.value.factor_conversion = 999999
-    } else {
-      form.value.factor_conversion = numeroMaximo
-    }
-  }
-})
 
 const resetForm = () => {
   form.value = { nombre: '', factor_conversion: null, precio: null }
@@ -290,13 +280,4 @@ const guardar = async () => {
   padding: 1.5rem !important;
 }
 
-:deep(.p-inputnumber-input) {
-  width: 100%;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  border-color: #d1d5db;
-  height: 44px;
-  padding: 0 1rem;
-  font-size: 14px;
-}
 </style>

@@ -22,15 +22,10 @@
       />
 
       <!-- % Ganancia Mínimo -->
-      <BaseInputNumber
+      <BaseInputPercent
         v-model="form.porcentaje_ganancia_minimo"
         label="% Ganancia Mínimo Deseado:"
         placeholder="Ej: 15.00"
-        suffix="%"
-        :min="1"
-        :max="100"
-        :min-fraction-digits="1"
-        :max-fraction-digits="2"
         help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
         :error="errorGanancia"
         @input="validarGanancia"
@@ -56,7 +51,7 @@ import { ref, reactive, watch } from 'vue'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito } from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
-import BaseInputNumber from '../base/BaseInputNumber.vue'
+import BaseInputPercent from '../base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible:   { type: Boolean, default: false },

@@ -115,8 +115,13 @@
     </div>
 
     <!-- DIÁLOGOS -->
-    <AñadirPresentacionDialog v-model:visible="AgregarVisible" :unidadBase="unidadBaseProducto"
-      :productoId="producto.id" @guardar="onGuardar" />
+    <AñadirPresentacionDialog 
+      v-model:visible="AgregarVisible" 
+      :unidadBase="unidadBaseProducto"
+      :unidadMedidaId="idUnidadBase"
+      :productoId="producto.id" 
+      @guardar="onGuardar" 
+    />
     <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
       :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
     <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
@@ -124,7 +129,6 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -157,20 +161,30 @@ const AgregarVisible = ref(false)
 const cargando = ref(false)
 const presentaciones = ref([])
 
-const unidadBaseNombre = computed(() => {
-  const um = props.producto.unidad_medida
-  if (um && typeof um === 'object' && um.nombre) return um.nombre
-  if (typeof um === 'string') return um
-  if (props.producto.unidad_base) return props.producto.unidad_base
-  return 'Unidad Base'
-})
-
+// Preservamos el objeto producto con sus IDs de unidad base intactos
 const producto = ref({
   id: props.producto.id,
   nombre: props.producto.nombre,
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
+  unidad_medida_id: props.producto.unidad_medida_id || props.producto.unidad_medida?.id || null,
+  unidad_medida: props.producto.unidad_medida || null,
+})
+
+const idUnidadBase = computed(() => {
+  if (presentaciones.value[0]?.unidadMedida?.id) {
+    return presentaciones.value[0].unidadMedida.id
+  }
+  return producto.value.unidad_medida_id || producto.value.unidad_medida?.id || null
+})
+
+const unidadBaseNombre = computed(() => {
+  const um = props.producto.unidad_medida
+  if (um && typeof um === 'object' && um.nombre) return um.nombre
+  if (typeof um === 'string') return um
+  if (props.producto.unidad_base) return props.producto.unidad_base
+  return 'Unidad Base'
 })
 
 const unidadBaseProducto = computed(() => {

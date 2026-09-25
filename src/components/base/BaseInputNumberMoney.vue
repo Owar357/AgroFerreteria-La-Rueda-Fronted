@@ -13,9 +13,10 @@ const props = defineProps({
     default: 'md',
     validator: (v) => ['sm', 'md', 'lg', 'xl'].includes(v),
   },
-  min: Number,
-  max: Number,
-  useGrouping: { type: Boolean, default: false },
+  min: { type: Number, default: 0.01 },
+  max: { type: Number, default: 1000000.99 },
+  currency: { type: String, default: 'USD' },
+  locale: { type: String, default: 'en-US' },
 })
 
 const model = defineModel()
@@ -28,38 +29,30 @@ const sizes = {
   xl: 'h-14 px-5 text-[18px]',
 }
 
-// Solo enteros. Se escribe agregando al final, sin decimales, sin ceros a la izquierda.
+// Solo bloquea la tecla si haría que el número pasara del máximo.
+// No toca el cursor ni el DOM: el navegador escribe donde ya iba a escribir.
 const handleKeyDown = (e) => {
-  const controlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Enter', 'Home', 'End']
-  if (controlKeys.includes(e.key) || e.ctrlKey || e.metaKey) return
-
-  if (!/^[0-9]$/.test(e.key)) {
-    e.preventDefault()
-    return
-  }
+  if (!/^[0-9]$/.test(e.key)) return
 
   const inputEl = e.target
   const start = inputEl.selectionStart
   const end = inputEl.selectionEnd
   const currentValue = inputEl.value || ''
 
-  const cursorAlFinal = start === end && start === currentValue.length
-  if (!cursorAlFinal) {
+  const soloNumero = (texto) => texto.replace(/[^0-9.]/g, '')
+  const antes = soloNumero(currentValue.slice(0, start))
+  const despues = soloNumero(currentValue.slice(end))
+  const futuro = antes + e.key + despues
+
+  const parsed = parseFloat(futuro)
+  if (!isNaN(parsed) && parsed > props.max) {
     e.preventDefault()
-    return
   }
+}
 
-  const currentDigits = currentValue.replace(/[^0-9]/g, '')
-  const futureDigits = currentDigits + e.key
-
-  if (/^0[0-9]/.test(futureDigits)) {
-    e.preventDefault()
-    return
-  }
-
-  const parsedValue = parseInt(futureDigits, 10)
-  if (props.max !== undefined && parsedValue > props.max) {
-    e.preventDefault()
+const handleBlur = () => {
+  if (model.value === null || model.value === undefined || model.value < props.min) {
+    model.value = props.min
   }
 }
 </script>
@@ -74,10 +67,13 @@ const handleKeyDown = (e) => {
       :input-id="id"
       v-model="model"
       :placeholder="placeholder"
-      :min="min"
-      :max="max"
-      :use-grouping="useGrouping"
-      :max-fraction-digits="0"
+      mode="currency"
+      :currency="currency"
+      :locale="locale"
+      :min="0"
+      :min-fraction-digits="2"
+      :max-fraction-digits="2"
+      :use-grouping="true"
       v-bind="{ ...$attrs, class: undefined }"
       class="w-full"
       :input-class="[
@@ -86,6 +82,7 @@ const handleKeyDown = (e) => {
         { '!border-red-500 focus:!border-red-500': error },
       ]"
       @keydown="handleKeyDown"
+      @blur="handleBlur"
     />
 
     <slot name="help">

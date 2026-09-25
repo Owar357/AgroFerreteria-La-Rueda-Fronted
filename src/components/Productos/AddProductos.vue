@@ -35,6 +35,7 @@
         </div>
       </div>
 
+      <!-- PASO 1 -->
       <div v-show="pasoActual === 1" class="p-8">
         <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
           <div
@@ -45,25 +46,25 @@
         </div>
 
         <div class="grid grid-cols-2 gap-6">
-          <div class="col-span-2 flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
-              Nombre del Producto <span class="text-red-500">*</span>
-            </label>
-            <InputText v-model="nombre" placeholder="Ej: Fertilizante Triple 15"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]"
-              :class="{ '!border-red-500': errores.nombre }" />
-            <small v-if="errores.nombre" class="text-red-500 text-[14px]">{{ errores.nombre }}</small>
-          </div>
+          <BaseInput
+            v-model="nombre"
+            label="Nombre del Producto *"
+            placeholder="Ej: Fertilizante Triple 15"
+            size="xl"
+            filter="alphanum"
+            class="col-span-2"
+            :error="errores.nombre"
+          />
 
-          <div class="col-span-2 flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
-              Fabricante <span class="text-red-500">*</span>
-            </label>
-            <InputText v-model="fabricante" placeholder="Ej: Fertica, Bayer, etc."
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]"
-              :class="{ '!border-red-500': errores.fabricante }" />
-            <small v-if="errores.fabricante" class="text-red-500 text-[14px]">{{ errores.fabricante }}</small>
-          </div>
+          <BaseInput
+            v-model="fabricante"
+            label="Fabricante *"
+            placeholder="Ej: Fertica, Bayer, etc."
+            size="xl"
+            filter="alpha"
+            class="col-span-2"
+            :error="errores.fabricante"
+          />
 
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
@@ -93,29 +94,33 @@
             <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
-              % Ganancia Mínimo Especial (Opcional)
-            </label>
-            <InputNumber v-model="porcentajeGananciaMinimo" placeholder="Ej: 20.00" suffix="%" :min="0" :max="100"
-              :minFractionDigits="1" :maxFractionDigits="2"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
-            <small class="text-[14px] text-gray-500">
-              Si se deja vacío, heredará automáticamente <br> el margen de ganancia de su categoría.
-            </small>
-          </div>
+   <!-- Contenedor Padre que fuerza la alineación perfecta -->
+<div class="grid grid-cols-2 gap-4 items-start w-full">
 
-          <div class="flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">Código del Producto</label>
-            <div class="relative">
-              <InputText v-model="codigoGenerado" readonly
-                class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-default font-mono font-semibold" />
-              <i class="pi pi-sync absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <BaseInputPercent
+              v-model="porcentajeGananciaMinimo"
+              label="% Ganancia Mínimo Especial (Opcional)"
+              placeholder="Ej: 20.00"
+              size="xl"
+            >
+              <template #help>
+                <small class="text-[13px] text-[#6b7280] leading-relaxed">
+                  Si se deja vacío, heredará automáticamente el margen de ganancia de su categoría.
+                </small>
+              </template>
+            </BaseInputPercent>
+
+              <BaseInput
+                v-model="codigoGenerado"
+                label="Código del Producto"
+                size="xl"
+                readonly
+                class="font-mono font-semibold"
+                help="Se genera automáticamente al completar Categoría, Nombre y Fabricante."
+              />
+
             </div>
-            <small class="text-[14px] text-gray-500">
-              Se genera automáticamente al completar Categoría, Nombre y Fabricante.
-            </small>
-          </div>
+
 
           <div class="flex flex-col gap-2">
             <label class="text-[18px] font-medium text-gray-700">
@@ -145,8 +150,7 @@
                 '!border-red-500': errores.unidadMedidaId,
                 '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
               }" :pt="{ label: { class: '!text-[18px] !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId
-              }}</small>
+            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId }}</small>
 
             <p v-if="!presentacionBaseCreada"
               class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
@@ -181,7 +185,9 @@
         </div>
       </div>
 
+      <!-- PASO 2 -->
       <div v-show="pasoActual === 2" class="p-8">
+        <!-- BASE (GRANEL) -->
         <div v-if="tipoProducto === 'GRANEL' && !presentacionBaseCreada" class="mb-8">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
             <div
@@ -212,68 +218,84 @@
           </div>
 
           <div class="grid grid-cols-2 gap-6">
-            <div class="flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">
-                Nombre de la presentación base <span class="text-red-500">*</span>
-              </label>
-              <InputText :value="nombreUnidadBase" disabled
-                class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-              <small class="text-[14px] text-gray-500 flex items-center gap-1">
-                <i class="pi pi-lock text-[12px]"></i> Fijo
-              </small>
-            </div>
+            <BaseInput
+              :model-value="nombreUnidadBase"
+              label="Nombre de la presentación base *"
+              size="xl"
+              disabled
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[13px]"></i> Fijo
+                </small>
+              </template>
+            </BaseInput>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">Unidad de Medida</label>
-              <InputText :value="nombreUnidadBase" disabled
-                class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-              <small class="text-[14px] text-gray-500 flex items-center gap-1">
-                <i class="pi pi-lock text-[12px]"></i> Fijo (es la unidad base del producto)
-              </small>
-            </div>
+            <BaseInput
+              :model-value="nombreUnidadBase"
+              label="Unidad de Medida"
+              size="xl"
+              disabled
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[13px]"></i> Fijo (es la unidad base del producto)
+                </small>
+              </template>
+            </BaseInput>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">Factor de Conversión</label>
-              <InputText value="1.000" disabled
-                class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed font-mono" />
-              <small class="text-[14px] text-gray-500 flex items-center gap-1">
-                <i class="pi pi-lock text-[12px]"></i> Fijo (la base siempre tiene factor 1)
-              </small>
-            </div>
+            <BaseInput
+              model-value="1.000"
+              label="Factor de Conversión"
+              size="xl"
+              disabled
+              class="font-mono"
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[13px]"></i> Fijo (la base siempre tiene factor 1)
+                </small>
+              </template>
+            </BaseInput>
 
-            <div class="flex flex-col gap-2 w-full min-w-0">
-              <label class="text-[18px] font-medium text-gray-700">
-                Stock Mínimo <span class="text-red-500">*</span>
-              </label>
-              <input v-model="formBase.stockMinimo" type="text" placeholder="0" @input="formBase.stockMinimo = formBase.stockMinimo
-                .replace(/[^0-9]/g, '')
-                .replace(/^(\d{1,6})\.?.*/, '$1')
-                .replace(/^0+/, '')"
-                class="!bg-white border border-gray-300 text-[#1a2e1f] text-[18px] py-[16px] px-[20px] rounded-xl shadow-sm w-full focus:outline-none focus:border-[#2b5e3b] transition-colors"
-                :class="{ '!border-red-500': errores.stockMinimo }" />
-              <small class="text-[14px] text-gray-500">
-                Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
-                menos, el sistema te avisará que te queda poca mercadería.
-              </small>
-            </div>
+           <div class="col-span-2 grid grid-cols-3 gap-6">
 
-            <div class="flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">
-                Precio de Venta <span class="text-red-500">*</span>
-              </label>
-              <InputNumber v-model="formBase.precioVenta" fluid placeholder="0.00" :min="0" :minFractionDigits="2"
-                :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
-                inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
-            </div>
+            <BaseInputNumber
+              v-model="formBase.stockMinimo"
+              label="Stock Mínimo *"
+              placeholder="0"
+              size="xl"
+              :min="1"
+              :max="1000000"
+              :max-fraction-digits="0"
+              :use-grouping="true"
+              :error="errores.stockMinimo"
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500">
+                  Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
+                  menos, el sistema te avisará que te queda poca mercadería.
+                </small>
+              </template>
+            </BaseInputNumber>
 
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <label class="text-[18px] font-medium text-gray-700">Código de Barra</label>
-                <i class="pi pi-info-circle text-blue-600 hover:text-blue-800 !text-[18px] cursor-help transition-colors"
-                  v-tooltip="'Opcional (se puede leer con pistola de barras)'"></i>
-              </div>
-              <InputText v-model="formBase.codigoBarra" placeholder="Ej: 7501234567890" maxlength="14"
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
+              <BaseInputNumberMoney
+              v-model="formBase.precioVenta"
+                label="Precio de Venta *"
+                placeholder="0.00"
+                size="xl"
+              />
+
+              <BaseInput
+                v-model="formBase.codigoBarra"
+                label="Código de Barra"
+                placeholder="Ej: 7501234567890"
+                size="xl"
+                maxlength="14"
+                filter="int"
+                help="Opcional (se puede leer con pistola de barras)"
+              />
+
             </div>
           </div>
 
@@ -284,6 +306,7 @@
           </div>
         </div>
 
+        <!-- DERIVADA (GRANEL) -->
         <div v-else-if="tipoProducto === 'GRANEL' && presentacionBaseCreada" class="mb-8">
           <div class="flex items-center gap-3 mb-6 pb-4 border-b border-[#e2e8dd]">
             <span class="text-[26px] font-semibold text-[#1a2e1f]">➕ Agregar Presentación Derivada</span>
@@ -315,43 +338,42 @@
               </p>
             </div>
 
-            <div class="flex flex-col gap-2 mt-[21px]">
-              <label class="text-[18px] font-medium text-gray-700">Unidad de Medida</label>
-              <InputText :value="nombreUnidadBase" disabled
-                class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed" />
-              <small class="text-[14px] text-gray-500">🔒 Fija (todas las presentaciones de GRANEL comparten la misma
-                unidad
-                base)</small>
-            </div>
+            <BaseInput
+              :model-value="nombreUnidadBase"
+              label="Unidad de Medida"
+              size="xl"
+              disabled
+              class="mt-[21px]"
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[13px]"></i> Fija (todas las presentaciones de GRANEL comparten la misma unidad base)
+                </small>
+              </template>
+            </BaseInput>
 
-            <div class="flex flex-col gap-2 w-full min-w-0">
-              <label class="text-[18px] font-medium text-gray-700">
-                Contenido de la presentación <span class="text-red-500">*</span>
-              </label>
-              <div class="flex items-center gap-3 w-full min-w-0">
-                <input v-model="formDerivada.factorConversion" type="text" placeholder="0" @input="formDerivada.factorConversion = formDerivada.factorConversion
-                  .replace(/[^0-9]/g, '')
-                  .replace(/^(\d{1,6}).*/, '$1')"
-                  class="!bg-white border border-gray-300 text-[#1a2e1f] text-[18px] py-[16px] px-[20px] rounded-xl shadow-sm w-full focus:outline-none focus:border-[#2b5e3b] transition-colors"
-                  :class="{ '!border-red-500': errores.factorConversion }" />
-                <span class="text-[18px] font-medium text-green-700 whitespace-nowrap">
-                  {{ nombreUnidadBase }}
-                </span>
-              </div>
-              <small class="text-[14px] text-gray-500">
-                Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.<br>
-                Si tu base es Libra y vendes una Arroba, aquí debes poner 25.
-              </small>
-            </div>
+            <BaseInputNumber
+              v-model="formDerivada.factorConversion"
+              label="Contenido de la presentación *"
+              placeholder="0"
+              size="xl"
+              :min="1"
+              :error="errores.factorConversion"
+            >
+              <template #help>
+                <small class="text-[14px] text-gray-500">
+                  Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.<br>
+                  Si tu base es Libra y vendes una Arroba, aquí debes poner 25.
+                </small>
+              </template>
+            </BaseInputNumber>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">
-                Precio de Venta <span class="text-red-500">*</span>
-              </label>
-              <InputNumber v-model="formDerivada.precioVenta" fluid placeholder="0.00" :min="0" :minFractionDigits="2"
-                :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
-                inputClass="!bg-[#1a2e1f] !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
-            </div>
+           <BaseInputNumberMoney
+            v-model="formDerivada.precioVenta"
+            label="Precio de Venta *"
+            placeholder="0.00"
+            size="xl"
+           />
 
             <div class="bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-4 mt-[0px]">
               <div class="flex items-start gap-3">
@@ -377,6 +399,7 @@
           </div>
         </div>
 
+        <!-- UNIDAD FIJA -->
         <div v-else-if="tipoProducto === 'UNIDAD FIJA'" class="mb-8">
           <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
             <div
@@ -414,46 +437,59 @@
                 </p>
               </div>
 
-              <div class="w-[35%] flex flex-col gap-2 mt-[18px]">
-                <label class="text-[18px] font-medium text-gray-700">Factor de Conversión</label>
-                <InputText value="1.000" disabled
-                  class="w-full !bg-gray-100 !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm !cursor-not-allowed font-mono" />
-                <small class="text-[14px] text-gray-500">🔒 Fijo (unidades fijas no se convierten).</small>
-              </div>
+              <BaseInput
+                model-value="1.000"
+                label="Factor de Conversión"
+                size="xl"
+                disabled
+                class="w-[35%] font-mono mt-[28px]"
+              >
+                <template #help>
+                  <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[13px]"></i> Fijo (unidades fijas no se convierten).
+                  </small>
+                </template>
+              </BaseInput>
             </div>
 
-            <div class="flex flex-col gap-2 mt-[2%]">
-              <label class="text-[18px] font-medium text-gray-700">
-                Stock Mínimo <span class="text-red-500">*</span>
-              </label>
-              <input v-model="formUnidadFija.stockMinimo" type="text" placeholder="0" @input="formUnidadFija.stockMinimo = formUnidadFija.stockMinimo
-                .replace(/[^0-9]/g, '')
-                .replace(/^(\d{1,6}).*/, '$1')"
-                class="!bg-white border border-gray-300 text-[#1a2e1f] text-[18px] py-[16px] px-[20px] rounded-xl shadow-sm w-full focus:outline-none focus:border-[#2b5e3b] transition-colors"
-                :class="{ '!border-red-500': errores.stockMinimo }" />
-              <small class="text-[14px] text-gray-500">
-                Cuando te queden exactamente <strong>{{ formUnidadFija.stockMinimo || 0 }} {{ nombreUnidadBase }}
-                </strong> o menos, el sistema te avisará que te queda poca mercadería.
-              </small>
-            </div>
+             <div class="col-span-2 grid grid-cols-3 gap-6">
 
-            <div class="flex flex-col gap-2 mt-[2%]">
-              <label class="text-[18px] font-medium text-gray-700">
-                Precio de Venta <span class="text-red-500">*</span>
-              </label>
-              <InputNumber v-model="formUnidadFija.precioVenta" fluid placeholder="0.00" :min="0" :minFractionDigits="2"
-                :maxFractionDigits="2" mode="currency" currency="USD" locale="es-SV"
-                inputClass="!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm w-full" />
-            </div>
+              <BaseInputNumber
+                v-model="formBase.stockMinimo"
+                label="Stock Mínimo *"
+                placeholder="0"
+                size="xl"
+                :min="1"
+                :max="1000000"
+                :max-fraction-digits="0"
+                :use-grouping="true"
+                :error="errores.stockMinimo"
+              >
+                <template #help>
+                  <small class="text-[14px] text-gray-500">
+                    Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
+                    menos, el sistema te avisará que te queda poca mercadería.
+                  </small>
+                </template>
+              </BaseInputNumber>
 
-            <div class="flex flex-col gap-2 mt-[2%]">
-              <div class="flex items-center gap-2">
-                <label class="text-[18px] font-medium text-gray-700">Código de Barra</label>
-                <i class="pi pi-info-circle text-blue-600 hover:text-blue-800 !text-[22px] cursor-help transition-all duration-200"
-                  v-tooltip="'Opcional (se puede leer con pistola de barras).'"></i>
-              </div>
-              <InputText v-model="formUnidadFija.codigoBarra" placeholder="Ej: 7501234567890" maxlength="14"
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !py-[16px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]" />
+              <BaseInputNumberMoney
+                v-model="formBase.precioVenta"
+                label="Precio de Venta *"
+                placeholder="0.00"
+                size="xl"
+              />
+
+              <BaseInput
+                v-model="formBase.codigoBarra"
+                label="Código de Barra"
+                placeholder="Ej: 7501234567890"
+                size="xl"
+                maxlength="14"
+                filter="int"
+                help="Opcional (se puede leer con pistola de barras)"
+              />
+
             </div>
           </div>
 
@@ -536,17 +572,11 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Checkbox from 'primevue/checkbox'
-import RadioButton from 'primevue/radiobutton'
-import Button from 'primevue/button'
-import AutoComplete from 'primevue/autocomplete'
-import Select from 'primevue/select'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
 import { mostrarExito, mostrarError, mostrarAccesoDenegado, mostrarConfirmacion, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
@@ -758,24 +788,6 @@ watch(tipoProducto, () => {
     if (!esValida) {
       unidadMedidaId.value = null
     }
-  }
-})
-
-watch(() => formBase.value.codigoBarra, (nuevoValor) => {
-  if (nuevoValor) {
-    formBase.value.codigoBarra = nuevoValor
-      .trim()
-      .replace(/[^0-9]/g, '')
-      .slice(0, 14)
-  }
-})
-
-watch(() => formUnidadFija.value.codigoBarra, (nuevoValor) => {
-  if (nuevoValor) {
-    formUnidadFija.value.codigoBarra = nuevoValor
-      .trim()
-      .replace(/[^0-9]/g, '')
-      .slice(0, 14)
   }
 })
 
