@@ -8,10 +8,10 @@ const props = defineProps({
   placeholder: String,
   help: String,
   error: String,
-  size: {
+   size: {
     type: String,
     default: 'md',
-    validator: (v) => ['sm', 'md', 'lg', 'xl'].includes(v),
+    validator: (v) => ['sm', 'md', 'lg', 'xl', 'responsive'].includes(v),
   },
   min: Number,
   max: Number,
@@ -27,6 +27,7 @@ const sizes = {
   md: 'h-11 px-4 text-[14px]',
   lg: 'h-12 px-4 text-[16px]',
   xl: 'h-14 px-5 text-[18px]',
+  responsive: 'h-11 px-4 text-sm md:h-14 md:px-5 md:text-lg',
 }
 
 const handleKeyDown = (e) => {

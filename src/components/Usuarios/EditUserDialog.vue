@@ -1,13 +1,13 @@
 <template>
   <Dialog
-    v-model:visible="localVisible"
+    v-model:visible="visibleLocal"
     modal
     header="EDITAR USUARIO"
     :draggable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
     :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
-    @hide="resetForm"
+    @hide="reiniciarFormulario"
   >
     <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
       <!-- NOMBRE -->
@@ -30,7 +30,7 @@
         placeholder="********"
         help="(Opcional — dejar vacío para no cambiar la contraseña)"
         :error="errors.password"
-        @input="validarPassword"
+        @input="validarContrasena"
       />
 
       <!-- CONFIRMAR CONTRASEÑA -->
@@ -39,17 +39,17 @@
         label="Confirmar contraseña"
         placeholder="********"
         :error="errors.confirmPassword"
-        @input="validarConfirmPassword"
+        @input="validarConfirmarContrasena"
       />
 
       <!-- BOTÓN PRINCIPAL (ANCHO COMPLETO W-FULL) -->
       <div class="flex justify-center mt-4 w-full">
         <Button
           label="Guardar datos"
-          :loading="loading"
+          :loading="cargando"
           :disabled="!tieneCambios"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
-          @click="handleUpdate"
+          @click="procesarActualizacion"
         />
       </div>
     </div>
@@ -58,12 +58,16 @@
 
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
-import Swal from 'sweetalert2'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -73,8 +77,8 @@ const props = defineProps({
 const emit = defineEmits(['update:visible'])
 
 const store = useUserStore()
-const localVisible = ref(false)
-const loading = ref(false)
+const visibleLocal = ref(false)
+const cargando = ref(false)
 
 const form = reactive({
   name: '',
@@ -100,10 +104,10 @@ const cargarDatosUsuario = () => {
 
 watch(
   () => props.visible,
-  (visible) => {
-    localVisible.value = visible
+  (esVisible) => {
+    visibleLocal.value = esVisible
 
-    if (visible) {
+    if (esVisible) {
       cargarDatosUsuario()
     }
   },
@@ -113,18 +117,18 @@ watch(
 watch(
   () => props.user,
   () => {
-    if (localVisible.value) {
+    if (visibleLocal.value) {
       cargarDatosUsuario()
     }
   },
   { deep: true },
 )
 
-watch(localVisible, (visible) => {
-  emit('update:visible', visible)
+watch(visibleLocal, (esVisible) => {
+  emit('update:visible', esVisible)
 })
 
-const resetForm = () => {
+const reiniciarFormulario = () => {
   form.name = ''
   form.password = ''
   form.confirmPassword = ''
@@ -159,30 +163,30 @@ const validarNombre = () => {
   return true
 }
 
-const validarPassword = () => {
-  const v = form.password
-  if (!v) {
+const validarContrasena = () => {
+  const clave = form.password
+  if (!clave) {
     errors.password = ''
     return true
   }
-  if (v.length < 8) {
+  if (clave.length < 8) {
     errors.password = 'Mínimo 8 caracteres.'
     return false
   }
-  if (/\s/.test(v)) {
+  if (/\s/.test(clave)) {
     errors.password = 'No puede contener espacios.'
     return false
   }
-  if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v)) {
+  if (!/[A-Z]/.test(clave) || !/[a-z]/.test(clave) || !/[0-9]/.test(clave) || !/[^A-Za-z0-9]/.test(clave)) {
     errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
     return false
   }
   errors.password = ''
-  if (form.confirmPassword) validarConfirmPassword()
+  if (form.confirmPassword) validarConfirmarContrasena()
   return true
 }
 
-const validarConfirmPassword = () => {
+const validarConfirmarContrasena = () => {
   if (!form.confirmPassword && !form.password) {
     errors.confirmPassword = ''
     return true
@@ -204,73 +208,47 @@ const tieneCambios = computed(() => {
   return cambioNombre || cambioPassword
 })
 
-const handleUpdate = async () => {
+const procesarActualizacion = async () => {
   if (!tieneCambios.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Sin cambios',
-      text: 'No se editó ningún campo.',
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      },
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Sin cambios',
+      mensajeHtml: 'No se editó ningún campo.'
     })
     return
   }
-  const nombreOk = validarNombre()
-  const passwordOk = validarPassword()
-  const confirmOk = validarConfirmPassword()
+  const nombreValido = validarNombre()
+  const contrasenaValida = validarContrasena()
+  const confirmacionValida = validarConfirmarContrasena()
 
   if (form.password && !form.confirmPassword) {
     errors.confirmPassword = 'Debes confirmar la contraseña.'
     return
   }
 
-  if (!nombreOk || !passwordOk || !confirmOk) return
+  if (!nombreValido || !contrasenaValida || !confirmacionValida) return
 
-  loading.value = true
+  cargando.value = true
 
-  const payload = {
+  const cargaUtil = {
     name: form.name.trim(),
     rol: props.user?.roles?.[0]?.name || '',
   }
 
   if (form.password) {
-    payload.password = form.password
-    payload.password_confirmation = form.confirmPassword
+    cargaUtil.password = form.password
+    cargaUtil.password_confirmation = form.confirmPassword
   }
 
-  const resultado = await store.updateUser(props.user?.id, payload)
+  const resultado = await store.updateUser(props.user?.id, cargaUtil)
 
-  loading.value = false
+  cargando.value = false
 
   if (resultado.ok) {
-    localVisible.value = false
-
-    await Swal.fire({
-      icon: 'success',
-      title: '¡Datos actualizados!',
-      text: 'Los datos del usuario fueron actualizados exitosamente.',
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Aceptar',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      },
-    })
+    visibleLocal.value = false
+    await mostrarExito('¡Datos actualizados!', 'Los datos del usuario fueron actualizados exitosamente.')
   } else if (resultado.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error al actualizar',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      },
-    })
+    mostrarError('Error al actualizar', resultado.error)
   }
 }
 </script>

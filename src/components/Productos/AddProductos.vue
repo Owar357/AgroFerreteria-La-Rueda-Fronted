@@ -1,58 +1,107 @@
 <template>
-  <div class="min-h-screen p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
+  <div class="min-h-screen p-3 sm:p-6 md:p-8 font-['Inter',sans-serif] bg-[#eef2e9] text-[#1a2e1f]">
     <div class="rounded-2xl bg-white border border-[#e2e8dd] shadow-sm overflow-hidden mb-6">
-      <div class="p-8 pb-6 border-b border-[#e2e8dd] bg-[#fbfdf9]">
-        <div class="flex items-center gap-6 mb-6">
+
+        <!-- CABECERA + STEPPER -->
+        <div class="p-4 sm:px-8 sm:pt-6 sm:pb-4 border-b border-[#e2e8dd] bg-[#fbfdf9]">
+
+         <!-- ======================================================= -->
+         <!-- VISTA MÓVIL CABECERA (Solo Teléfono)                    -->
+         <!-- ======================================================= -->
+          <div class="block sm:hidden mb-5">
+            <Button label="Regresar" icon="pi pi-arrow-left"
+              class="!text-sm !py-2.5 !px-4 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] rounded-xl cursor-pointer transition-all w-full flex justify-center mb-3"
+              @click="$emit('close')" />
+
+            <div>
+              <h1 class="text-xl font-semibold text-[#1a2e1f] leading-tight m-0">
+                Nuevo Producto
+              </h1>
+              <p class="text-xs text-gray-500 mt-1 m-0">
+                Completa la información del producto y sus presentaciones de venta
+              </p>
+            </div>
+          </div>
+
+        <!-- ======================================================= -->
+        <!-- VISTA ESCRITORIO CABECERA (Solo PC con tu estilo fixed) -->
+        <!-- ======================================================= -->
+        <div class="hidden sm:flex sm:items-center gap-5 mb-4">
           <Button label="Regresar" icon="pi pi-arrow-left"
-            class="!text-[18px] !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] rounded-xl shadow-sm cursor-pointer transition-all shrink-0"
+            style="min-width: 15.5rem; height: 3.5rem; align-self: center"
+            class="!text-base !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !font-['Inter',sans-serif] rounded-xl cursor-pointer transition-all flex justify-center shrink-0"
             @click="$emit('close')" />
 
           <div>
-            <h1 class="text-[36px] font-semibold text-[#1a2e1f] leading-tight m-0">Nuevo Producto</h1>
-            <p class="text-[16px] text-gray-500 mt-1 m-0">
+            <h1 class="text-3xl md:text-4xl font-semibold text-[#1a2e1f] leading-tight m-0">
+              Nuevo Producto
+            </h1>
+            <p class="text-base text-gray-500 mt-1 m-0">
               Completa la información del producto y sus presentaciones de venta
             </p>
           </div>
         </div>
+        <!-- STEPPER MÓVIL (pestañas simples) -->
+        <div class="flex sm:hidden w-full gap-2 p-1 bg-[#edf2ea] rounded-xl">
+          <button type="button"
+            class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            :class="pasoActual === 1 ? 'bg-[#2b5e3b] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'"
+            @click="pasoActual = 1">
+            <span class="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[12px]">1</span>
+            <span>Info General</span>
+          </button>
 
-        <div class="flex w-full select-none rounded-xl overflow-hidden shadow-sm">
+          <button type="button"
+            class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            :class="pasoActual === 2 ? 'bg-[#2b5e3b] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'"
+            @click="irAPaso2">
+            <span class="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[12px]">2</span>
+            <span>Presentaciones</span>
+          </button>
+        </div>
+
+        <!-- STEPPER ESCRITORIO (flechas con clip-path) -->
+        <div class="hidden sm:flex w-full select-none rounded-xl overflow-hidden shadow-sm">
           <div
             class="flex-1 flex items-center justify-center gap-3 py-3.5 pl-8 pr-6 text-white transition-colors cursor-pointer"
             :class="pasoActual === 1 ? 'bg-[#2b5e3b]' : 'bg-[#7fa389]'"
             style="clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 50%, calc(100% - 24px) 100%, 0 100%)"
             @click="pasoActual = 1">
-            <span class="text-[17px] font-semibold">1.</span>
-            <span class="text-[17px] font-medium">Información general</span>
+            <span class="text-base font-semibold">1.</span>
+            <span class="text-base font-medium">Información general</span>
           </div>
 
           <div
             class="flex-1 flex items-center justify-center gap-3 py-3.5 pl-10 pr-6 text-white transition-colors -ml-5 cursor-pointer"
             :class="pasoActual === 2 ? 'bg-[#2b5e3b]' : 'bg-[#c7d6bd]'" :style="pasoActual === 2 ? '' : 'color:#5b6b57'"
             style="clip-path: polygon(24px 0, 100% 0, 100% 100%, 24px 100%, 0 50%)" @click="irAPaso2">
-            <span class="text-[17px] font-semibold">2.</span>
-            <span class="text-[17px] font-medium">Presentaciones</span>
+            <span class="text-base font-semibold">2.</span>
+            <span class="text-base font-medium">Presentaciones</span>
           </div>
         </div>
       </div>
 
-      <!-- PASO 1 -->
-      <div v-show="pasoActual === 1" class="p-8">
-        <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-          <div
-            class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-            <i class="pi pi-info text-[#2b5e3b] text-2xl font-bold"></i>
+      <!-- PASO 1: INFORMACIÓN PRINCIPAL -->
+      <div v-show="pasoActual === 1" class="p-4 sm:px-8 sm:pt-4 md:pb-6">
+        <div class="flex items-center gap-2.5 mb-4 pb-4 border-b border-[#e2e8dd]">
+          <div class="!w-8 !h-8 sm:!w-10 sm:!h-10 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
+            <i class="pi pi-info text-[#2b5e3b] text-base sm:text-xl font-bold"></i>
           </div>
-          <span class="text-[26px] font-semibold text-[#1a2e1f]">Información Principal del Producto</span>
+          <span class="text-base sm:text-xl font-bold text-[#1a2e1f]">
+            Información Principal del Producto
+          </span>
         </div>
 
-        <div class="grid grid-cols-2 gap-6">
+        <!-- ======================================================= -->
+        <!-- VISTA MÓVIL (Solo Teléfono: block md:hidden)           -->
+        <!-- ======================================================= -->
+        <div class="block md:hidden space-y-4">
           <BaseInput
             v-model="nombre"
             label="Nombre del Producto *"
             placeholder="Ej: Fertilizante Triple 15"
-            size="xl"
             filter="alphanum"
-            class="col-span-2"
+            class="w-full"
             :error="errores.nombre"
           />
 
@@ -60,14 +109,13 @@
             v-model="fabricante"
             label="Fabricante *"
             placeholder="Ej: Fertica, Bayer, etc."
-            size="xl"
             filter="alpha"
-            class="col-span-2"
+            class="w-full"
             :error="errores.fabricante"
           />
 
-          <div class="flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
+          <div class="flex flex-col gap-1.5 w-full">
+            <label class="text-xs font-semibold text-gray-700">
               Categoría <span class="text-red-500">*</span>
             </label>
             <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
@@ -76,138 +124,281 @@
                 pcInputText: {
                   root: {
                     class: [
-                      '!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] !py-[10px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]',
+                      '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-2 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full',
                       { '!border-red-500': errores.categoria }
                     ]
                   }
                 },
-                dropdown: { class: '!bg-white !border-gray-300 rounded-r-xl !h-[60px]' }
+                dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-10 !w-10' }
               }">
               <template #footer>
-                <div v-if="textoBusquedaCategoria" class="px-3 py-3 border-t cursor-pointer hover:bg-gray-100"
+                <div v-if="textoBusquedaCategoria" class="px-3 py-2 border-t cursor-pointer hover:bg-gray-100 text-xs"
                   @click="abrirModalCategoria">
-                  <i class="pi pi-plus mr-2"></i>
-                  Crear nueva categoría <strong>{{ textoBusquedaCategoria }}</strong>
+                  <i class="pi pi-plus mr-1.5"></i>
+                  Crear categoría <strong>{{ textoBusquedaCategoria }}</strong>
                 </div>
               </template>
             </AutoComplete>
-            <small v-if="errores.categoria" class="text-red-500 text-[14px]">{{ errores.categoria }}</small>
+            <small v-if="errores.categoria" class="text-red-500 text-xs">{{ errores.categoria }}</small>
           </div>
-
-   <!-- Contenedor Padre que fuerza la alineación perfecta -->
-<div class="grid grid-cols-2 gap-4 items-start w-full">
 
           <BaseInputPercent
-              v-model="porcentajeGananciaMinimo"
-              label="% Ganancia Mínimo Especial (Opcional)"
-              placeholder="Ej: 20.00"
-              size="xl"
-            >
-              <template #help>
-                <small class="text-[13px] text-[#6b7280] leading-relaxed">
-                  Si se deja vacío, heredará automáticamente el margen de ganancia de su categoría.
-                </small>
-              </template>
-            </BaseInputPercent>
+            v-model="porcentajeGananciaMinimo"
+            label="% Ganancia Mínimo Especial"
+            placeholder="Ej: 20.00"
+            class="w-full"
+          >
+            <template #help>
+              <small class="text-[11px] text-gray-500 leading-tight block mt-1">
+                Si queda vacío hereda el margen de ganancia de su categoría.
+              </small>
+            </template>
+          </BaseInputPercent>
 
-              <BaseInput
-                v-model="codigoGenerado"
-                label="Código del Producto"
-                size="xl"
-                readonly
-                class="font-mono font-semibold"
-                help="Se genera automáticamente al completar Categoría, Nombre y Fabricante."
-              />
+          <BaseInput
+            v-model="codigoGenerado"
+            label="Código del Producto"
+            readonly
+            class="w-full font-mono font-semibold [&_input]:!bg-gray-300"
+            help="Autogenerado."
+          />
 
-            </div>
-
-
-          <div class="flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
+          <div class="flex flex-col gap-1.5 w-full">
+            <label class="text-xs font-semibold text-gray-700">
               Tipo de Venta <span class="text-red-500">*</span>
             </label>
-            <div class="flex gap-4 bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+            <div class="flex items-center justify-around bg-gray-50 px-4 h-12 rounded-lg border border-gray-200 w-full">
               <div class="flex items-center gap-2">
-                <RadioButton v-model="tipoProducto" inputId="venta1" name="tipoProducto" value="UNIDAD FIJA" />
-                <label for="venta1" class="text-[16px] text-[#1a2e1f] cursor-pointer font-medium">Unidad Fija</label>
+                <RadioButton v-model="tipoProducto" inputId="venta1_m" name="tipoProducto_m" value="UNIDAD FIJA" />
+                <label for="venta1_m" class="text-sm text-[#1a2e1f] cursor-pointer font-medium">Unidad Fija</label>
               </div>
               <div class="flex items-center gap-2">
-                <RadioButton v-model="tipoProducto" inputId="venta2" name="tipoProducto" value="GRANEL" />
-                <label for="venta2" class="text-[16px] text-[#1a2e1f] cursor-pointer font-medium">Granel</label>
+                <RadioButton v-model="tipoProducto" inputId="venta2_m" name="tipoProducto_m" value="GRANEL" />
+                <label for="venta2_m" class="text-sm text-[#1a2e1f] cursor-pointer font-medium">Granel</label>
               </div>
             </div>
-            <small v-if="errores.tipoProducto" class="text-red-500 text-[14px]">{{ errores.tipoProducto }}</small>
-          </div>
+            <small v-if="errores.tipoProducto" class="text-red-500 text-xs">{{ errores.tipoProducto }}</small>
+         </div>
 
-          <div class="flex flex-col gap-2">
-            <label class="text-[18px] font-medium text-gray-700">
+          <div class="flex flex-col gap-1.5 w-full">
+            <label class="text-xs font-semibold text-gray-700">
               Unidad Base <span class="text-red-500">*</span>
             </label>
             <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
               placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !py-[16px] rounded-xl shadow-sm focus:!border-[#2b5e3b]"
+              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-10 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
               :class="{
                 '!border-red-500': errores.unidadMedidaId,
                 '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
-              }" :pt="{ label: { class: '!text-[18px] !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-[14px] font-medium">{{ errores.unidadMedidaId }}</small>
+              }" :pt="{ label: { class: '!text-xs !text-[#1a2e1f]' } }" />
+            <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
 
-            <p v-if="!presentacionBaseCreada"
-              class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
-              <i class="pi pi-info-circle text-blue-500 text-[16px] mt-0.5 shrink-0"></i>
-              <span>
-                Elige la medida mínima de venta. Si seleccionas <strong class="text-gray-700">Libras</strong>,
-                servirá como referencia para tasar y definir la equivalencia de presentaciones grandes como arrobas o
-                quintales.
-              </span>
+            <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+              <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+              <span>Elige la medida mínima de venta.</span>
             </p>
-            <p v-else
-              class="text-[15px] text-amber-700 mt-1 leading-normal flex items-start gap-1.5 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-200">
-              <i class="pi pi-lock text-amber-600 text-[16px] mt-0.5 shrink-0"></i>
-              <span>
-                Unidad base bloqueada. Para modificarla, primero debes eliminar todas las presentaciones creadas.
-              </span>
+            <p v-else class="text-[11px] text-amber-700 mt-0.5 leading-tight flex items-start gap-1 font-medium bg-amber-50 p-2 rounded-lg border border-amber-200">
+              <i class="pi pi-lock text-amber-600 text-xs mt-0.5 shrink-0"></i>
+              <span>Unidad base bloqueada. Elimina todas las presentaciones para modificarla.</span>
             </p>
           </div>
 
-          <div class="col-span-2 flex items-center gap-3 py-2 mt-2">
-            <Checkbox v-model="aplicaIva" :binary="true" inputId="ivaGeneral" class="!w-[22px] !h-[22px]" />
-            <label for="ivaGeneral" class="text-[18px] text-[#1a2e1f] cursor-pointer font-medium">
-              Aplica IVA 13% <span class="text-gray-500 font-normal">(para todas las presentaciones)</span>
+          <div class="flex items-center gap-3 py-2 bg-gray-50 px-3.5 rounded-xl border border-gray-200/80 w-full">
+            <Checkbox 
+              v-model="aplicaIva" 
+              :binary="true" 
+              inputId="ivaGeneral_m" 
+              :pt="{
+                root: { class: '!w-5 !h-5 flex items-center justify-center shrink-0' },
+                box: { class: '!w-5 !h-5 !rounded-md border-gray-300' }
+              }"
+            />
+            <label for="ivaGeneral_m" class="text-xs sm:text-sm text-[#1a2e1f] cursor-pointer font-medium leading-tight">
+              Aplica IVA 13% <span class="text-gray-500 font-normal block sm:inline">(para todas las presentaciones)</span>
             </label>
           </div>
         </div>
 
-        <div class="flex justify-end mt-8 pt-4 border-t border-gray-100">
-          <Button label="Siguiente Paso" icon="pi pi-arrow-right" iconPos="right"
-            class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white !font-['Inter',sans-serif] rounded-xl shadow-md transition-all cursor-pointer"
-            @click="irAPaso2" />
+        <!-- ======================================================= -->
+        <!-- VISTA ESCRITORIO (Solo PC: hidden md:block con % intactos) -->
+        <!-- ======================================================= -->
+        <div class="hidden md:block">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Nombre del Producto -->
+            <BaseInput size="responsive"
+              v-model="nombre"
+              label="Nombre del Producto *"
+              placeholder="Ej: Fertilizante Triple 15"
+              filter="alphanum"
+              class="col-span-1 md:col-span-2 w-[145%]"
+              :error="errores.nombre"
+            />
+
+            <!-- Fabricante -->
+            <BaseInput size="responsive"
+              v-model="fabricante"
+              label="Fabricante *"
+              placeholder="Ej: Fertica, Bayer, etc."
+              filter="alpha"
+              class="col-span-1 md:col-span-2 w-[45%]"
+              :error="errores.fabricante"
+            />
+
+            <!-- Categoría -->
+            <div class="flex flex-col gap-1.5 col-span-1 w-[45%]">
+              <label class="text-xs sm:text-sm font-semibold text-gray-700">
+                Categoría <span class="text-red-500">*</span>
+              </label>
+              <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
+                placeholder="Buscar categoría..." @complete="buscarCategorias" :pt="{
+                  root: { class: 'w-full' },
+                  pcInputText: {
+                    root: {
+                      class: [
+                        '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-2 !px-4 md:!px-5 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full',
+                        { '!border-red-500': errores.categoria }
+                      ]
+                    }
+                  },
+                  dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-11 md:!h-14 !w-11 md:!w-14' }
+                }">
+                <template #footer>
+                  <div v-if="textoBusquedaCategoria" class="px-3 py-2 border-t cursor-pointer hover:bg-gray-100 text-xs"
+                    @click="abrirModalCategoria">
+                    <i class="pi pi-plus mr-1.5"></i>
+                    Crear categoría <strong>{{ textoBusquedaCategoria }}</strong>
+                  </div>
+                </template>
+              </AutoComplete>
+              <small v-if="errores.categoria" class="text-red-500 text-xs">{{ errores.categoria }}</small>
+            </div>
+
+            <!-- % Ganancia Especial -->
+            <BaseInputPercent size="responsive"
+              v-model="porcentajeGananciaMinimo"
+              label="% Ganancia Mínimo Especial"
+              placeholder="Ej: 20.00"
+              class="w-[35%] col-span-1 md:col-span-2"
+            >
+              <template #help>
+                <small class="text-[11px] text-gray-500 leading-tight block mt-1">
+                  Si queda vacío hereda el margen de ganancia de su categoría.
+                </small>
+              </template>
+            </BaseInputPercent>
+
+            <!-- Código del Producto -->
+            <BaseInput size="responsive"
+              v-model="codigoGenerado"
+              label="Código del Producto"
+              readonly
+              class="w-[50%] font-semibold col-span-1 md:col-span-2 [&_input]:!bg-gray-300"
+              help="Código autogenerado."
+            />
+
+            <!-- Tipo de Venta -->
+            <div class="flex flex-col gap-1.5 col-span-1 w-[25%]">
+              <label class="text-xs sm:text-sm font-semibold text-gray-700">
+                Tipo de Venta <span class="text-red-500">*</span>
+              </label>
+              <div class="flex items-center gap-4 bg-gray-50 px-3 h-11 md:h-14 rounded-lg border border-gray-200 w-full">
+                <div class="flex items-center gap-2">
+                  <RadioButton v-model="tipoProducto" inputId="venta1" name="tipoProducto" value="UNIDAD FIJA" />
+                  <label for="venta1" class="text-xs sm:text-sm text-[#1a2e1f] cursor-pointer font-medium">Unidad Fija</label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <RadioButton v-model="tipoProducto" inputId="venta2" name="tipoProducto" value="GRANEL" />
+                  <label for="venta2" class="text-xs sm:text-sm text-[#1a2e1f] cursor-pointer font-medium">Granel</label>
+                </div>
+              </div>
+              <small v-if="errores.tipoProducto" class="text-red-500 text-xs">{{ errores.tipoProducto }}</small>
+            </div>
+
+            <!-- Unidad Base -->
+            <div class="flex flex-col gap-1.5 col-span-1 md:col-span-2 w-[40%]">
+              <label class="text-xs sm:text-sm font-semibold text-gray-700">
+                Unidad Base <span class="text-red-500">*</span>
+              </label>
+              <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
+                placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
+                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-11 md:!h-14 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
+                :class="{
+                  '!border-red-500': errores.unidadMedidaId,
+                  '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
+                }" :pt="{ label: { class: '!text-sm md:!text-lg !text-[#1a2e1f]' } }" />
+              <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
+
+              <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+                <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+                <span>Elige la medida mínima de venta.</span>
+              </p>
+              <p v-else class="text-[11px] text-amber-700 mt-0.5 leading-tight flex items-start gap-1 font-medium bg-amber-50 p-2 rounded-lg border border-amber-200">
+                <i class="pi pi-lock text-amber-600 text-xs mt-0.5 shrink-0"></i>
+                <span>Unidad base bloqueada. Elimina todas las presentaciones para modificarla.</span>
+              </p>
+            </div>
+
+            <!-- IVA -->
+            <div class="col-span-1 md:col-span-2 flex items-center gap-3 -mt-4 py-0">
+              <Checkbox 
+                v-model="aplicaIva" 
+                :binary="true" 
+                inputId="ivaGeneral" 
+                :pt="{
+                  root: { class: '!w-6 !h-6 flex items-center justify-center shrink-0' },
+                  box: { class: '!w-6 !h-6 !rounded-md border-gray-300' }
+                }"
+              />
+              <label for="ivaGeneral" class="text-sm md:text-base text-[#1a2e1f] cursor-pointer font-medium select-none">
+                Aplica IVA 13% <span class="text-gray-500 font-normal">(para todas las presentaciones)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÓN SIGUIENTE PASO -->
+        <div class="mt-6 pt-4 border-t border-gray-100">
+          
+          <!-- Vista Móvil (Solo Teléfono) -->
+          <div class="block md:hidden">
+            <Button label="Siguiente Paso" icon="pi pi-arrow-right" iconPos="right"
+              class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
+              @click="irAPaso2" />
+          </div>
+
+          <!-- Vista Escritorio (Solo PC - Medida exacta) -->
+          <div class="hidden md:flex md:justify-end">
+            <Button label="Siguiente Paso" icon="pi pi-arrow-right" iconPos="right"
+              style="min-width: 13.5rem; height: 3.25rem;"
+              class="!text-base !py-2.5 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer flex justify-center items-center"
+              @click="irAPaso2" />
+          </div>
+
         </div>
       </div>
 
-      <!-- PASO 2 -->
-      <div v-show="pasoActual === 2" class="p-8">
+      <!-- PASO 2: PRESENTACIONES -->
+      <div v-show="pasoActual === 2" class="p-4 sm:p-6 md:p-8">
+
         <!-- BASE (GRANEL) -->
-        <div v-if="tipoProducto === 'GRANEL' && !presentacionBaseCreada" class="mb-8">
-          <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-            <div
-              class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-              <i class="pi pi-star-fill text-[#2b5e3b] text-2xl font-bold"></i>
+        <div v-if="tipoProducto === 'GRANEL' && !presentacionBaseCreada" class="mb-6">
+          <div class="flex items-center gap-2.5 mb-3 pb-3 border-b border-[#e2e8dd]">
+            <div class="!w-8 !h-8 sm:!w-10 sm:!h-10 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
+              <i class="pi pi-star-fill text-[#2b5e3b] text-base sm:text-xl font-bold"></i>
             </div>
-            <span class="text-[26px] font-semibold text-[#1a2e1f]">Crear la Presentación Base (Obligatoria)</span>
+            <span class="text-base sm:text-xl font-bold text-[#1a2e1f]">Crear la Presentación Base (Obligatoria)</span>
           </div>
 
-          <div class="bg-blue-50 border-l-4 border-blue-500 p-5 mb-6 rounded-r-xl rounded-l-md shadow-sm">
+          <div class="bg-blue-50 border-l-4 border-blue-500 p-3 sm:p-5 mb-5 rounded-r-xl rounded-l-md shadow-sm">
             <div class="flex items-start">
-              <i class="pi pi-info-circle text-blue-500 !text-[22px] mr-3 mt-0.5"></i>
+              <i class="pi pi-info-circle text-blue-500 text-lg sm:text-xl mr-2.5 sm:mr-3 mt-0.5 shrink-0"></i>
               <div>
-                <h3 class="text-[18px] text-gray-800 font-semibold mb-1">¿Qué es la presentación base?</h3>
-                <p class="text-[16px] text-gray-600 leading-relaxed">
+                <h3 class="text-sm sm:text-lg text-gray-800 font-semibold mb-1">¿Qué es la presentación base?</h3>
+                <p class="text-xs sm:text-base text-gray-600 leading-relaxed">
                   Es la medida más pequeña o suelta que usarás para despachar este producto
                   <strong>a granel o al detalle</strong>.
                 </p>
-                <p
-                  class="text-[15px] text-gray-500 mt-2 leading-relaxed bg-white/60 p-3 rounded-lg border border-blue-100">
+                <p class="text-[11px] sm:text-sm text-gray-500 mt-2 leading-relaxed bg-white/60 p-2.5 sm:p-3 rounded-lg border border-blue-100">
                   <span class="font-semibold text-blue-700">Ejemplo práctico:</span>
                   Si controlas el inventario por <strong class="text-gray-800">{{ nombreUnidadBase }}</strong>,
                   esta será tu unidad de partida (equivale a 1). El sistema la usará automáticamente para calcular
@@ -217,137 +408,180 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-6">
-            <BaseInput
-              :model-value="nombreUnidadBase"
-              label="Nombre de la presentación base *"
-              size="xl"
-              disabled
-            >
+          <!-- ======================================================= -->
+          <!-- VISTA MÓVIL GRANEL BASE (Solo Teléfono: block md:hidden) -->
+          <!-- ======================================================= -->
+          <div class="block md:hidden space-y-4">
+            <BaseInput :model-value="nombreUnidadBase" label="Nombre de la presentación base *" disabled class="w-full">
               <template #help>
-                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
-                  <i class="pi pi-lock text-[13px]"></i> Fijo
+                <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[11px]"></i> Fijo
                 </small>
               </template>
             </BaseInput>
 
-            <BaseInput
-              :model-value="nombreUnidadBase"
-              label="Unidad de Medida"
-              size="xl"
-              disabled
-            >
+            <BaseInput :model-value="nombreUnidadBase" label="Unidad de Medida" disabled class="w-full">
               <template #help>
-                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
-                  <i class="pi pi-lock text-[13px]"></i> Fijo (es la unidad base del producto)
+                <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[11px]"></i> Fijo (es la unidad base del producto)
                 </small>
               </template>
             </BaseInput>
 
-            <BaseInput
-              model-value="1.000"
-              label="Factor de Conversión"
-              size="xl"
-              disabled
-              class="font-mono"
-            >
+            <BaseInput model-value="1.000" label="Factor de Conversión" disabled class="w-full font-mono">
               <template #help>
-                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
-                  <i class="pi pi-lock text-[13px]"></i> Fijo (la base siempre tiene factor 1)
+                <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[11px]"></i> Fijo (la base siempre tiene factor 1)
                 </small>
               </template>
             </BaseInput>
-
-           <div class="col-span-2 grid grid-cols-3 gap-6">
 
             <BaseInputNumber
               v-model="formBase.stockMinimo"
               label="Stock Mínimo *"
               placeholder="0"
-              size="xl"
               :min="1"
               :max="1000000"
               :max-fraction-digits="0"
               :use-grouping="true"
               :error="errores.stockMinimo"
+              class="w-full"
             >
               <template #help>
-                <small class="text-[14px] text-gray-500">
-                  Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
+                <small class="text-xs text-gray-500">
+                  Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }}</strong> o
                   menos, el sistema te avisará que te queda poca mercadería.
                 </small>
               </template>
             </BaseInputNumber>
 
-              <BaseInputNumberMoney
-              v-model="formBase.precioVenta"
-                label="Precio de Venta *"
-                placeholder="0.00"
-                size="xl"
-              />
+            <BaseInputNumberMoney v-model="formBase.precioVenta" label="Precio de Venta *" placeholder="0.00" class="w-full" />
 
-              <BaseInput
-                v-model="formBase.codigoBarra"
-                label="Código de Barra"
-                placeholder="Ej: 7501234567890"
-                size="xl"
-                maxlength="14"
-                filter="int"
-                help="Opcional (se puede leer con pistola de barras)"
-              />
+            <BaseInput
+              v-model="formBase.codigoBarra"
+              label="Código de Barra"
+              placeholder="Ej: 7501234567890"
+              maxlength="14"
+              filter="int"
+              class="w-full"
+              help="Opcional (se puede leer con pistola de barras)"
+            />
+          </div>
 
+          <!-- ======================================================= -->
+          <!-- VISTA ESCRITORIO GRANEL BASE (Solo PC: hidden md:block)  -->
+          <!-- ======================================================= -->
+          <div class="hidden md:block">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <BaseInput size="responsive" :model-value="nombreUnidadBase" label="Nombre de la presentación base *" disabled>
+                <template #help>
+                  <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[11px]"></i> Fijo
+                  </small>
+                </template>
+              </BaseInput>
+
+              <BaseInput size="responsive" :model-value="nombreUnidadBase" label="Unidad de Medida" disabled>
+                <template #help>
+                  <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[11px]"></i> Fijo (es la unidad base del producto)
+                  </small>
+                </template>
+              </BaseInput>
+
+              <BaseInput size="responsive" model-value="1.000" label="Factor de Conversión" disabled class="font-mono">
+                <template #help>
+                  <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[11px]"></i> Fijo (la base siempre tiene factor 1)
+                  </small>
+                </template>
+              </BaseInput>
+
+              <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <BaseInputNumber size="responsive"
+                  v-model="formBase.stockMinimo"
+                  label="Stock Mínimo *"
+                  placeholder="0"
+                  :min="1"
+                  :max="1000000"
+                  :max-fraction-digits="0"
+                  :use-grouping="true"
+                  :error="errores.stockMinimo"
+                >
+                  <template #help>
+                    <small class="text-xs text-gray-500">
+                      Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }}</strong> o
+                      menos, el sistema te avisará que te queda poca mercadería.
+                    </small>
+                  </template>
+                </BaseInputNumber>
+
+                <BaseInputNumberMoney size="responsive" v-model="formBase.precioVenta" label="Precio de Venta *" placeholder="0.00" />
+
+                <BaseInput size="responsive"
+                  v-model="formBase.codigoBarra"
+                  label="Código de Barra"
+                  placeholder="Ej: 7501234567890"
+                  maxlength="14"
+                  filter="int"
+                  help="Opcional (se puede leer con pistola de barras)"
+                />
+              </div>
             </div>
           </div>
 
-          <div class="flex justify-end mt-6">
-            <Button label="Crear Presentación Base" icon="pi pi-check"
-              class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer"
-              @click="crearBase" />
+          <!-- BOTÓN CREAR BASE -->
+          <div class="mt-5">
+            <!-- Vista Móvil -->
+            <div class="block md:hidden">
+              <Button label="Crear Presentación Base" icon="pi pi-check"
+                class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer w-full flex justify-center"
+                @click="crearBase" />
+            </div>
+
+            <!-- Vista Escritorio (Medida exacta) -->
+            <div class="hidden md:flex md:justify-end">
+              <Button label="Crear Presentación Base" icon="pi pi-check"
+                style="min-width: 16.5rem; height: 3.25rem;"
+                class="!text-base !py-2.5 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer flex justify-center items-center"
+                @click="crearBase" />
+            </div>
           </div>
         </div>
 
         <!-- DERIVADA (GRANEL) -->
-        <div v-else-if="tipoProducto === 'GRANEL' && presentacionBaseCreada" class="mb-8">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-[#e2e8dd]">
-            <span class="text-[26px] font-semibold text-[#1a2e1f]">➕ Agregar Presentación Derivada</span>
+        <div v-else-if="tipoProducto === 'GRANEL' && presentacionBaseCreada" class="mb-6">
+          <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-[#e2e8dd]">
+            <span class="text-base sm:text-xl font-bold text-[#1a2e1f]">➕ Agregar Presentación Derivada</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-6">
-            <div class="w-[38%] mt-[20px] flex flex-col gap-2">
-              <label class="text-[18px] font-medium text-gray-700">
+          <!-- ======================================================= -->
+          <!-- VISTA MÓVIL DERIVADA (Solo Teléfono: block md:hidden)   -->
+          <!-- ======================================================= -->
+          <div class="block md:hidden space-y-4">
+            <div class="flex flex-col gap-1.5 w-full">
+              <label class="text-xs font-semibold text-gray-700">
                 Nombre de la presentación <span class="text-red-500">*</span>
               </label>
               <AutoComplete v-model="formDerivada.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
                 optionValue="nombre" dropdown fluid placeholder="Ej: Arroba, Quintal, Saco..."
-                @complete="buscarUnidades" @item-select="onSelectDerivada"
-                class="w-full !bg-white !border-gray-300 !text-[18px] !py-[0px] rounded-xl" :pt="{
+                @complete="buscarUnidades" @item-select="onSelectDerivada" :pt="{
                   root: { class: 'w-full' },
                   pcInputText: {
-                    root: {
-                      class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] !py-[10px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]'
-                    }
+                    root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' }
                   },
-                  dropdown: { class: '!bg-white !border-gray-300 rounded-r-xl !h-[60px]' }
+                  dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-10 !w-10' }
                 }" />
-              <p class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
-                <i class="pi pi-info-circle text-blue-500 text-[16px] mt-0.5 shrink-0"></i>
-                <span>
-                  Busca en la lista o escribe un nombre nuevo si no existe; el sistema lo creará automáticamente
-                  (Ej: <strong class="text-gray-700">Saco de 50 lb</strong>).
-                </span>
+              <p class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+                <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+                <span>Busca en la lista o escribe un nombre nuevo si no existe; el sistema lo creará automáticamente.</span>
               </p>
             </div>
 
-            <BaseInput
-              :model-value="nombreUnidadBase"
-              label="Unidad de Medida"
-              size="xl"
-              disabled
-              class="mt-[21px]"
-            >
+            <BaseInput :model-value="nombreUnidadBase" label="Unidad de Medida" disabled class="w-full">
               <template #help>
-                <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
-                  <i class="pi pi-lock text-[13px]"></i> Fija (todas las presentaciones de GRANEL comparten la misma unidad base)
+                <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[11px]"></i> Fija (comparten la misma unidad base)
                 </small>
               </template>
             </BaseInput>
@@ -356,224 +590,487 @@
               v-model="formDerivada.factorConversion"
               label="Contenido de la presentación *"
               placeholder="0"
-              size="xl"
               :min="1"
               :max="999999"
               :use-grouping="true"
               :error="errores.factorConversion"
+              class="w-full"
             >
               <template #help>
-                <small class="text-[14px] text-gray-500">
-                  Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.<br>
-                  Si tu base es Libra y vendes una Arroba, aquí debes poner 25.
+                <small class="text-xs text-gray-500">
+                  Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.
                 </small>
               </template>
             </BaseInputNumber>
 
-           <BaseInputNumberMoney
-            v-model="formDerivada.precioVenta"
-            label="Precio de Venta *"
-            placeholder="0.00"
-            size="xl"
-           />
+            <BaseInputNumberMoney v-model="formDerivada.precioVenta" label="Precio de Venta *" placeholder="0.00" class="w-full" />
 
-            <div class="bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-4 mt-[0px]">
-              <div class="flex items-start gap-3">
-                <i class="pi pi-info-circle text-[#2b5e3b] text-xl mt-0.5"></i>
-                <div class="text-[14px] text-[#1a2e1f] leading-relaxed">
-                  <span class="font-semibold text-[#1a2e1f] block mb-1">Reglas de la presentación derivada:</span>
+            <div class="bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-3">
+              <div class="flex items-start gap-2.5">
+                <i class="pi pi-info-circle text-[#2b5e3b] text-base mt-0.5 shrink-0"></i>
+                <div class="text-xs text-[#1a2e1f] leading-relaxed">
+                  <span class="font-semibold block mb-1">Reglas de la presentación derivada:</span>
                   <ul class="list-disc pl-4 space-y-1 text-[#223d29]">
-                    <li>No requiere <strong>código de barras</strong> (solo la presentación base).</li>
-                    <li>No maneja <strong>stock mínimo propio</strong> (se controla desde la base).</li>
+                    <li>No requiere <strong>código de barras</strong>.</li>
+                    <li>No maneja <strong>stock mínimo propio</strong>.</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="flex justify-end gap-4 mt-6">
-            <Button label="Cancelar" icon="pi pi-times"
-              class="!text-[18px] !py-3 !px-8 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer"
-              @click="limpiarFormularioDerivada" />
-            <Button label="Agregar" icon="pi pi-plus"
-              class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer"
-              @click="agregarDerivada" />
-          </div>
-        </div>
-
-        <!-- UNIDAD FIJA -->
-        <div v-else-if="tipoProducto === 'UNIDAD FIJA'" class="mb-8">
-          <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-            <div
-              class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-              <i class="pi pi-plus text-[#2b5e3b] text-2xl font-bold"></i>
-            </div>
-            <span class="text-[26px] font-semibold text-[#1a2e1f]">Agregar Presentación</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-6">
-            <div class="col-span-2 flex gap-6 w-full">
-              <div class="w-[65%] flex flex-col gap-2 mt-[1.5%]">
-                <label class="text-[18px] font-medium text-gray-700">
+          <!-- ======================================================= -->
+          <!-- VISTA ESCRITORIO DERIVADA (Solo PC: hidden md:block)    -->
+          <!-- ======================================================= -->
+          <div class="hidden md:block">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+                <label class="text-xs sm:text-sm font-semibold text-gray-700">
                   Nombre de la presentación <span class="text-red-500">*</span>
                 </label>
-                <AutoComplete v-model="formUnidadFija.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
-                  optionValue="nombre" dropdown fluid
-                  placeholder="Buscar o escribir unidad (ej. Botella 1L, Martillo)..." @complete="buscarUnidades"
-                  @item-select="onSelectUnidadFija"
-                  class="w-full !bg-white !border-gray-300 !text-[18px] !py-[0px] rounded-xl" :pt="{
+                <AutoComplete v-model="formDerivada.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
+                  optionValue="nombre" dropdown fluid placeholder="Ej: Arroba, Quintal, Saco..."
+                  @complete="buscarUnidades" @item-select="onSelectDerivada" :pt="{
                     root: { class: 'w-full' },
                     pcInputText: {
-                      root: {
-                        class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-[18px] !h-[60px] !py-[10px] !px-[20px] rounded-xl shadow-sm focus:!border-[#2b5e3b]'
-                      }
+                      root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5 rounded-lg shadow-2xs focus:!border-[#2b5e3b]' }
                     },
-                    dropdown: { class: '!bg-white !border-gray-300 rounded-r-xl !h-[60px]' }
+                    dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-11 md:!h-14' }
                   }" />
-                <p class="text-[15px] text-gray-500 mt-1 leading-normal flex items-start gap-1.5">
-                  <i class="pi pi-info-circle text-blue-500 text-[16px] mt-0.5 shrink-0"></i>
-                  <span>
-                    Busca en la lista o escribe un nombre nuevo si no existe; el sistema lo creará automáticamente
-                    (Ej: <strong class="text-gray-700">Saco de 50 lb</strong>).
-                  </span>
+                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+                  <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+                  <span>Busca en la lista o escribe un nombre nuevo si no existe; el sistema lo creará automáticamente
+                    (Ej: <strong class="text-gray-700">Saco de 50 lb</strong>).</span>
                 </p>
               </div>
 
-              <BaseInput
-                model-value="1.000"
-                label="Factor de Conversión"
-                size="xl"
-                disabled
-                class="w-[35%] font-mono mt-[28px]"
-              >
+              <BaseInput size="responsive" :model-value="nombreUnidadBase" label="Unidad de Medida" disabled>
                 <template #help>
-                  <small class="text-[14px] text-gray-500 flex items-center gap-1.5">
-                    <i class="pi pi-lock text-[13px]"></i> Fijo (unidades fijas no se convierten).
+                  <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[11px]"></i> Fija (todas las presentaciones de GRANEL comparten la misma unidad base)
                   </small>
                 </template>
               </BaseInput>
-            </div>
 
-             <div class="col-span-2 grid grid-cols-3 gap-6">
-
-              <BaseInputNumber
-                v-model="formBase.stockMinimo"
-                label="Stock Mínimo *"
+              <BaseInputNumber size="responsive"
+                v-model="formDerivada.factorConversion"
+                label="Contenido de la presentación *"
                 placeholder="0"
-                size="xl"
                 :min="1"
-                :max="1000000"
-                :max-fraction-digits="0"
+                :max="999999"
                 :use-grouping="true"
-                :error="errores.stockMinimo"
+                :error="errores.factorConversion"
               >
                 <template #help>
-                  <small class="text-[14px] text-gray-500">
-                    Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }} </strong> o
-                    menos, el sistema te avisará que te queda poca mercadería.
+                  <small class="text-xs text-gray-500">
+                    Indica cuántas <strong>{{ nombreUnidadBase }}</strong> trae este empaque.<br>
+                    Si tu base es Libra y vendes una Arroba, aquí debes poner 25.
                   </small>
                 </template>
               </BaseInputNumber>
 
-              <BaseInputNumberMoney
-                v-model="formBase.precioVenta"
-                label="Precio de Venta *"
-                placeholder="0.00"
-                size="xl"
-              />
+              <BaseInputNumberMoney size="responsive" v-model="formDerivada.precioVenta" label="Precio de Venta *" placeholder="0.00" />
 
-              <BaseInput
-                v-model="formBase.codigoBarra"
-                label="Código de Barra"
-                placeholder="Ej: 7501234567890"
-                size="xl"
-                maxlength="14"
-                filter="int"
-                help="Opcional (se puede leer con pistola de barras)"
-              />
-
+              <div class="col-span-1 sm:col-span-2 bg-[#f4f9f5] border border-[#e3efe6] rounded-xl p-3 sm:p-4">
+                <div class="flex items-start gap-2.5 sm:gap-3">
+                  <i class="pi pi-info-circle text-[#2b5e3b] text-base sm:text-xl mt-0.5 shrink-0"></i>
+                  <div class="text-xs sm:text-sm text-[#1a2e1f] leading-relaxed">
+                    <span class="font-semibold text-[#1a2e1f] block mb-1">Reglas de la presentación derivada:</span>
+                    <ul class="list-disc pl-4 space-y-1 text-[#223d29]">
+                      <li>No requiere <strong>código de barras</strong> (solo la presentación base).</li>
+                      <li>No maneja <strong>stock mínimo propio</strong> (se controla desde la base).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="flex justify-end gap-4 mt-6">
-            <Button label="Cancelar" icon="pi pi-times"
-              class="!text-[18px] !py-3 !px-8 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer"
-              @click="limpiarFormularioUnidadFija" />
-            <Button label="Agregar" icon="pi pi-plus"
-              class="!text-[18px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer"
-              @click="agregarUnidadFija" />
+          <!-- BOTONES CANCELAR Y AGREGAR -->
+          <div class="mt-5">
+            <!-- Vista Móvil (Apilados full width) -->
+            <div class="flex flex-col-reverse gap-3 block md:hidden">
+              <Button label="Cancelar" icon="pi pi-times"
+                class="!text-sm !py-3 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer w-full flex justify-center"
+                @click="limpiarFormularioDerivada" />
+              <Button label="Agregar" icon="pi pi-plus"
+                class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer w-full flex justify-center"
+                @click="agregarDerivada" />
+            </div>
+
+            <!-- Vista Escritorio (Medidas controladas en la misma fila) -->
+            <div class="hidden md:flex md:justify-end md:gap-4">
+              <Button label="Cancelar" icon="pi pi-times"
+                style="min-width: 10.5rem; height: 3.25rem;"
+                class="!text-base !py-2.5 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer flex justify-center items-center"
+                @click="limpiarFormularioDerivada" />
+              <Button label="Agregar" icon="pi pi-plus"
+                style="min-width: 11.5rem; height: 3.25rem;"
+                class="!text-base !py-2.5 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer flex justify-center items-center"
+                @click="agregarDerivada" />
+            </div>
           </div>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-[#e2e8dd]">
-          <div class="flex items-center gap-3 mb-3 pb-4 border-b border-[#e2e8dd]">
-            <div
-              class="!w-11 !h-11 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
-              <i class="pi pi-list text-[#2b5e3b] text-2xl font-bold"></i>
+        <!-- UNIDAD FIJA -->
+        <div v-else-if="tipoProducto === 'UNIDAD FIJA'" class="mb-6">
+          <div class="flex items-center gap-2.5 mb-3 pb-3 border-b border-[#e2e8dd]">
+            <div class="!w-8 !h-8 sm:!w-10 sm:!h-10 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
+              <i class="pi pi-plus text-[#2b5e3b] text-base sm:text-xl font-bold"></i>
             </div>
-            <span class="text-[26px] font-semibold text-[#1a2e1f]">Presentaciones Agregadas</span>
+            <span class="text-base sm:text-xl font-bold text-[#1a2e1f]">Agregar Presentación</span>
           </div>
 
-          <DataTable :value="presentaciones" :paginator="presentaciones.length > 5" :rows="5"
-            class="font-['Inter',sans-serif] text-[16px]" emptyMessage="No hay presentaciones agregadas aún">
+          <!-- ======================================================= -->
+          <!-- VISTA MÓVIL UNIDAD FIJA (Solo Teléfono: block md:hidden) -->
+          <!-- ======================================================= -->
+          <div class="block md:hidden space-y-4">
+            <div class="flex flex-col gap-1.5 w-full">
+              <label class="text-xs font-semibold text-gray-700">
+                Nombre de la presentación <span class="text-red-500">*</span>
+              </label>
+              <AutoComplete v-model="formUnidadFija.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
+                optionValue="nombre" dropdown fluid placeholder="Buscar o escribir unidad..."
+                @complete="buscarUnidades" @item-select="onSelectUnidadFija" :pt="{
+                  root: { class: 'w-full' },
+                  pcInputText: {
+                    root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' }
+                  },
+                  dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-10 !w-10' }
+                }" />
+              <p class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+                <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+                <span>Busca en la lista o escribe un nombre nuevo si no existe.</span>
+              </p>
+            </div>
 
-            <Column field="nombre" header="Nombre" class="!text-[16px]" />
-            <Column field="codigoBarra" header="Código Barra" class="!text-[16px]">
-              <template #body="{ data }">{{ data.codigoBarra || '—' }}</template>
-            </Column>
-            <Column field="equivalencia" header="Equivalencia" class="!text-[16px]" />
-            <Column field="unidadBase" header="Unidad Base" class="!text-[16px]">
-              <template #body="{ data }">{{ data.unidadBase || nombreUnidadBase || '—' }}</template>
-            </Column>
-            <Column field="stock_minimo" header="Stock Mínimo" class="!text-[16px]">
-              <template #body="{ data }">{{ data.stock_minimo !== undefined ? data.stock_minimo : '—' }}</template>
-            </Column>
-            <Column header="Base" class="!text-[16px] text-center">
-              <template #body="{ data, index }">
-                <Checkbox v-if="tipoProducto === 'GRANEL' && presentaciones.length > 1" v-model="data.es_base"
-                  :disabled="!puedeEditarBase" @change="onCambiarBase(data, index)" :binary="true" />
-                <Tag v-else-if="data.es_base" value="Base" severity="success" rounded class="text-xs" />
-                <span v-else class="text-gray-300">—</span>
+            <BaseInput model-value="1.000" label="Factor de Conversión" disabled class="font-mono">
+              <template #help>
+                <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                  <i class="pi pi-lock text-[11px]"></i> Fijo (unidades fijas no se convierten).
+                </small>
               </template>
-            </Column>
-            <Column field="precioSinIva" header="Precio (S/IVA)" class="!text-[16px]">
-              <template #body="{ data }">{{ formatCurrency(data.precioSinIva) }}</template>
-            </Column>
-            <Column field="ivaAplicado" header="IVA" class="!text-[16px]">
-              <template #body="{ data }">{{ formatCurrency(data.ivaAplicado) }}</template>
-            </Column>
-            <Column field="precioConIva" header="Precio (C/IVA)" class="!text-[16px]">
-              <template #body="{ data }">{{ formatCurrency(data.precioConIva) }}</template>
-            </Column>
-            <Column header="Acciones" class="!text-[16px]">
-              <template #body="{ index }">
-                <div class="flex gap-2">
-                  <Button icon="pi pi-pencil" severity="secondary" text rounded size="small"
-                    @click="editarPresentacion(index)" />
-                  <Button icon="pi pi-trash" severity="danger" text rounded @click="eliminarPresentacion(index)" />
+            </BaseInput>
+
+            <BaseInputNumber
+              v-model="formBase.stockMinimo"
+              label="Stock Mínimo *"
+              placeholder="0"
+              :min="1"
+              :max="1000000"
+              :max-fraction-digits="0"
+              :use-grouping="true"
+              :error="errores.stockMinimo"
+              class="w-full"
+            >
+              <template #help>
+                <small class="text-xs text-gray-500">
+                  Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }}</strong> o
+                  menos, el sistema te avisará que te queda poca mercadería.
+                </small>
+              </template>
+            </BaseInputNumber>
+
+            <BaseInputNumberMoney v-model="formBase.precioVenta" label="Precio de Venta *" placeholder="0.00" class="w-full" />
+
+            <BaseInput
+              v-model="formBase.codigoBarra"
+              label="Código de Barra"
+              placeholder="Ej: 7501234567890"
+              maxlength="14"
+              filter="int"
+              class="w-full"
+            >
+             <template #help>
+                <small class="text-xs text-gray-500">
+                   Opcional (se puede leer con pistola de barras)
+                </small>
+              </template>
+            </BaseInput>
+          </div>
+
+          <!-- ======================================================= -->
+          <!-- VISTA ESCRITORIO UNIDAD FIJA (Solo PC: hidden md:block) -->
+          <!-- ======================================================= -->
+          <div class="hidden md:block">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div class="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
+                <label class="text-xs sm:text-sm font-semibold text-gray-700">
+                  Nombre de la presentación <span class="text-red-500">*</span>
+                </label>
+                <AutoComplete v-model="formUnidadFija.nombre" :suggestions="unidadesSugeridas" optionLabel="nombre"
+                  optionValue="nombre" dropdown fluid placeholder="Buscar o escribir unidad (ej. Botella 1L, Martillo)..."
+                  @complete="buscarUnidades" @item-select="onSelectUnidadFija" :pt="{
+                    root: { class: 'w-full' },
+                    pcInputText: {
+                      root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5  rounded-lg shadow-2xs focus:!border-[#2b5e3b]' }
+                    },
+                    dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-11 md:!h-14' }
+                  }" />
+                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
+                  <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
+                  <span>Busca en la lista o escribe un nombre nuevo si no existe; el sistema lo creará automáticamente
+                    (Ej: <strong class="text-gray-700">Saco de 50 lb</strong>).</span>
+                </p>
+              </div>
+
+              <BaseInput size="xl" model-value="1.000" label="Factor de Conversión" disabled class="font-mono w-[35%] ">
+                <template #help>
+                  <small class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <i class="pi pi-lock text-[11px]"></i> Fijo (unidades fijas no se convierten).
+                  </small>
+                </template>
+              </BaseInput>
+
+              <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <BaseInputNumber size="xl"
+                  v-model="formBase.stockMinimo"
+                  label="Stock Mínimo *"
+                  class="w-[25%]"
+                  placeholder="0"
+                  :min="1"
+                  :max="1000000"
+                  :max-fraction-digits="0"
+                  :use-grouping="true"
+                  :error="errores.stockMinimo"
+                >
+                  <template #help>
+                    <small class="text-xs text-gray-500">
+                      Cuando te queden exactamente <strong>{{ formBase.stockMinimo || 0 }} {{ nombreUnidadBase }}</strong> o
+                      menos, el sistema te avisará que te queda poca mercadería.
+                    </small>
+                  </template>
+                </BaseInputNumber>
+
+                <BaseInputNumberMoney size="xl" class="w-[30%]" v-model="formBase.precioVenta" label="Precio de Venta *" placeholder="0.00" />
+
+                <BaseInput size="xl"
+                  class="w-[40%]"
+                  v-model="formBase.codigoBarra"
+                  label="Código de Barra"
+                  placeholder="Ej: 7501234567890"
+                  maxlength="14"
+                  filter="int"
+                > 
+                  <template #help>
+                      <small class="text-xs text-gray-500">
+                        Opcional (se puede leer con pistola de barras)
+                      </small>
+                    </template>
+                </BaseInput>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES CANCELAR Y AGREGAR (UNIDAD FIJA) -->
+          <div class="mt-5">
+            <!-- Vista Móvil -->
+            <div class="flex flex-col-reverse gap-3 block md:hidden">
+              <Button label="Cancelar" icon="pi pi-times"
+                class="!text-sm !py-3 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer w-full flex justify-center"
+                @click="limpiarFormularioUnidadFija" />
+              <Button label="Agregar" icon="pi pi-plus"
+                class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer w-full flex justify-center"
+                @click="agregarUnidadFija" />
+            </div>
+
+            <!-- Vista Escritorio -->
+            <div class="hidden md:flex md:justify-end md:gap-4">
+              <Button label="Cancelar" icon="pi pi-times"
+                style="min-width: 10.5rem; height: 3.25rem;"
+                class="!text-base !py-2.5 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer flex justify-center items-center"
+                @click="limpiarFormularioUnidadFija" />
+              <Button label="Agregar" icon="pi pi-plus"
+                style="min-width: 11.5rem; height: 3.25rem;"
+                class="!text-base !py-2.5 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs cursor-pointer flex justify-center items-center"
+                @click="agregarUnidadFija" />
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA: PRESENTACIONES AGREGADAS (Móvil Desplegable + PC Tabla) -->
+        <div class="mt-6 pt-5 border-t border-[#e2e8dd]">
+          <div class="flex items-center gap-2.5 mb-3 pb-3 border-b border-[#e2e8dd]">
+            <div class="!w-8 !h-8 sm:!w-10 sm:!h-10 rounded-lg bg-[#f4f7f2] border border-[#dce4d7] shadow-sm flex items-center justify-center shrink-0">
+              <i class="pi pi-list text-[#2b5e3b] text-base sm:text-xl font-bold"></i>
+            </div>
+            <span class="text-base sm:text-xl font-bold text-[#1a2e1f]">Presentaciones Agregadas</span>
+          </div>
+
+          <!-- MÓVIL: Tabla con Desplegable (#expansion) -->
+          <div class="block sm:hidden w-full border border-[#e2e8dd] rounded-xl overflow-hidden shadow-2xs">
+            <DataTable 
+              v-model:expandedRows="expandedRows" 
+              :value="presentaciones" 
+              dataKey="nombre" 
+              class="p-datatable-custom text-xs w-full"
+            >
+              <template #empty>
+                <div class="text-center py-6 text-gray-400 text-xs">No hay presentaciones agregadas aún</div>
+              </template>
+
+              <!-- Flecha Expansión -->
+              <Column expander style="width: 2.2rem" />
+
+              <!-- Nombre -->
+              <Column field="nombre" header="Nombre" class="font-semibold text-gray-800">
+                <template #body="{ data }">
+                  <span class="capitalize block text-xs leading-tight font-semibold text-[#1a2e1f]">{{ data.nombre }}</span>
+                </template>
+              </Column>
+
+              <!-- Precio (C/IVA) -->
+              <Column header="Precio" class="text-right font-bold text-[#2b5e3b]">
+                <template #body="{ data }">
+                  {{ formatCurrency(data.precioConIva) }}
+                </template>
+              </Column>
+
+              <!-- Desplegable Móvil -->
+              <template #expansion="{ data, index }">
+                <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+                  <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs divide-y divide-gray-100">
+                    
+                    <!-- Fila 1: Código y Equivalencia -->
+                    <div class="flex justify-between items-start pb-2.5">
+                      <div>
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Código Barra</span>
+                        <span class="font-mono text-xs text-gray-800 block">{{ data.codigoBarra || '—' }}</span>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Equivalencia</span>
+                        <span class="text-xs text-gray-800 block font-semibold">{{ data.equivalencia }} {{ data.unidadBase || nombreUnidadBase }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Fila 2: Stock Mínimo y Base -->
+                    <div class="flex justify-between items-center py-2.5">
+                      <div>
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Stock Mínimo</span>
+                        <span class="text-xs text-gray-800 block">{{ data.stock_minimo !== undefined ? data.stock_minimo : '—' }}</span>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Base</span>
+                        <Tag v-if="data.es_base" value="Base" severity="success" rounded class="!text-[10px] !px-2" />
+                        <span v-else class="text-gray-400 text-xs block">—</span>
+                      </div>
+                    </div>
+
+                    <!-- Fila 3: Precios IVA -->
+                    <div class="flex justify-between items-start pt-2.5">
+                      <div>
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Precio S/IVA</span>
+                        <span class="text-xs text-gray-700 block">{{ formatCurrency(data.precioSinIva) }}</span>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">IVA (13%)</span>
+                        <span class="text-xs text-gray-700 block">{{ formatCurrency(data.ivaAplicado) }}</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Botón Eliminar Móvil -->
+                  <div class="mt-2.5 flex justify-end">
+                    <Button icon="pi pi-trash" label="Eliminar" severity="danger" text size="small"
+                      class="!py-1 !px-2.5 !text-xs font-semibold cursor-pointer"
+                      @click="eliminarPresentacion(index)" />
+                  </div>
                 </div>
               </template>
-            </Column>
-          </DataTable>
+            </DataTable>
+          </div>
+
+          <!-- ESCRITORIO: Tabla Completa -->
+          <div class="hidden sm:block">
+            <DataTable :value="presentaciones" :paginator="presentaciones.length > 5" :rows="5"
+              class="font-['Inter',sans-serif] text-sm" emptyMessage="No hay presentaciones agregadas aún">
+
+              <Column field="nombre" header="Nombre" class="!text-sm font-semibold text-[#1a2e1f]" />
+              <Column field="codigoBarra" header="Código Barra" class="!text-sm">
+                <template #body="{ data }">{{ data.codigoBarra || '—' }}</template>
+              </Column>
+              <Column field="equivalencia" header="Equivalencia" class="!text-sm" />
+              <Column field="unidadBase" header="Unidad Base" class="!text-sm">
+                <template #body="{ data }">{{ data.unidadBase || nombreUnidadBase || '—' }}</template>
+              </Column>
+              <Column field="stock_minimo" header="Stock Mínimo" class="!text-sm">
+                <template #body="{ data }">{{ data.stock_minimo !== undefined ? data.stock_minimo : '—' }}</template>
+              </Column>
+              <Column header="Base" class="!text-sm text-center">
+                <template #body="{ data, index }">
+                  <Checkbox v-if="tipoProducto === 'GRANEL' && presentaciones.length > 1" v-model="data.es_base"
+                    :disabled="!puedeEditarBase" @change="onCambiarBase(data, index)" :binary="true" />
+                  <Tag v-else-if="data.es_base" value="Base" severity="success" rounded class="text-xs" />
+                  <span v-else class="text-gray-300">—</span>
+                </template>
+              </Column>
+              <Column field="precioSinIva" header="Precio (S/IVA)" class="!text-sm">
+                <template #body="{ data }">{{ formatCurrency(data.precioSinIva) }}</template>
+              </Column>
+              <Column field="ivaAplicado" header="IVA" class="!text-sm">
+                <template #body="{ data }">{{ formatCurrency(data.ivaAplicado) }}</template>
+              </Column>
+              <Column field="precioConIva" header="Precio (C/IVA)" class="!text-sm font-bold text-[#2b5e3b]">
+                <template #body="{ data }">{{ formatCurrency(data.precioConIva) }}</template>
+              </Column>
+              <Column header="Acciones" class="!text-sm">
+                <template #body="{ index }">
+                  <div class="flex gap-2">
+                    <Button icon="pi pi-pencil" severity="secondary" text rounded size="small" @click="editarPresentacion(index)" />
+                    <Button icon="pi pi-trash" severity="danger" text rounded @click="eliminarPresentacion(index)" />
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
+          </div>
         </div>
 
-        <div class="flex justify-between mt-8 pt-6 border-t border-[#e2e8dd]">
-          <Button label="Atrás" icon="pi pi-arrow-left"
-            class="!text-[18px] !py-3 !px-8 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer"
-            @click="pasoActual = 1" />
-          <Button label="Guardar Producto" icon="pi pi-save" :loading="guardando"
-            class="!text-[22px] !py-3 !px-8 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer"
-            @click="guardarProducto" />
+        <!-- BOTONES FINALES DEL PASO 2 -->
+        <div class="mt-6 pt-5 border-t border-[#e2e8dd]">
+
+          <!-- Vista Móvil (Apilados) -->
+          <div class="flex flex-col-reverse gap-3 block md:hidden">
+            <Button label="Atrás" icon="pi pi-arrow-left"
+              class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+              @click="pasoActual = 1" />
+            <Button label="Guardar Producto" icon="pi pi-save" :loading="guardando"
+              class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
+              @click="guardarProducto" />
+          </div>
+
+          <!-- Vista Escritorio -->
+          <div class="hidden md:flex md:justify-end md:items-center gap-4 w-full">
+            <Button label="Atrás" icon="pi pi-arrow-left"
+              style="min-width: 10.5rem; height: 3.25rem;"
+              class="!text-base !py-2.5 !px-6 !bg-[#eef2e9] !border-[#e2e8dd] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer flex justify-center items-center"
+              @click="pasoActual = 1" />
+
+            <Button label="Guardar Producto" icon="pi pi-save" :loading="guardando"
+              style="min-width: 14.5rem; height: 3.25rem;"
+              class="!text-base !py-2.5 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer flex justify-center items-center"
+              @click="guardarProducto" />
+          </div>
+
         </div>
       </div>
     </div>
-  </div>
 
-  <AddCategoriaDialog v-model:visible="mostrarModalCategoria" @categoria-creada="actualizarCategorias" />
+    <AddCategoriaDialog v-model:visible="mostrarModalCategoria" @categoria-creada="actualizarCategorias" />
+  </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import AutoComplete from 'primevue/autocomplete'
+import Select from 'primevue/select'
+import RadioButton from 'primevue/radiobutton'
+import Checkbox from 'primevue/checkbox'
+import Tag from 'primevue/tag'
+
 import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
@@ -605,6 +1102,7 @@ const errores = ref({ nombre: '', fabricante: '', categoria: '', unidadMedidaId:
 
 const pasoActual = ref(1)
 const presentaciones = ref([])
+const expandedRows = ref({})
 
 const formBase = ref({
   nombre: '',
@@ -1064,7 +1562,7 @@ async function eliminarPresentacion(index) {
   })
   if (resultado.isConfirmed) {
     presentaciones.value.splice(index, 1)
-    mostrarExito('Eliminada', 'La presentación fue removida de la tabla.')
+    mostrarExito('Eliminada', 'La presentación fue removida de la lista.')
   }
 }
 

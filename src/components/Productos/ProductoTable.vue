@@ -59,7 +59,7 @@
       </div>
 
       <!-- ======================================================= -->
-      <!-- VISTA MÓVIL: 2 Columnas + Desplegable (< 768px)          -->
+      <!-- VISTA MÓVIL: (< 768px)          -->
       <!-- ======================================================= -->
       <div class="block md:hidden w-full">
         <DataTable 
@@ -105,48 +105,50 @@
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión (Móvil) -->
+          <!-- Plantilla de Expansión (Móvil) Reorganizada -->
           <template #expansion="slotProps">
-            <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
-                <!-- Tipo de Producto (Ahora en el desplegable) -->
-                <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
-                    Tipo
-                  </span>
-                  <span :class="[
-                    'px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase inline-block whitespace-nowrap',
-                    slotProps.data.tipo_producto === 'GRANEL'
-                      ? 'bg-[#fef9c3] text-[#854d0e] border border-[#fef08a]'
-                      : 'bg-[#dff0e0] text-[#2b5e3b] border border-[#c1e1c2]',
-                  ]">
-                    {{ slotProps.data.tipo_producto }}
-                  </span>
+            <div class="p-3.5 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
+              <div class="bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs space-y-3">
+                
+                <!-- Fila 1: Tipo y Fabricante en Flexbox equilibrado -->
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
+                      Tipo
+                    </span>
+                    <span :class="[
+                      'px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase inline-block whitespace-nowrap',
+                      slotProps.data.tipo_producto === 'GRANEL'
+                        ? 'bg-[#fef9c3] text-[#854d0e] border border-[#fef08a]'
+                        : 'bg-[#dff0e0] text-[#2b5e3b] border border-[#c1e1c2]',
+                    ]">
+                      {{ slotProps.data.tipo_producto }}
+                    </span>
+                  </div>
+
+                  <div class="text-right">
+                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                      Fabricante
+                    </span>
+                    <span class="text-gray-800 font-medium capitalize block">
+                      {{ slotProps.data.fabricante || '—' }}
+                    </span>
+                  </div>
                 </div>
 
-                <!-- Fabricante -->
-                <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                    Fabricante
-                  </span>
-                  <span class="text-gray-800 font-medium capitalize block truncate">
-                    {{ slotProps.data.fabricante || '—' }}
-                  </span>
-                </div>
-
-                <!-- Categoría -->
-                <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                <!-- Fila 2: Categoría sola en su línea para dar espacio a nombres largos -->
+                <div class="pt-2 border-t border-gray-100">
+                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
                     Categoría
                   </span>
-                  <span class="text-gray-800 font-medium block">
+                  <span class="text-gray-800 font-medium block break-words">
                     {{ slotProps.data.categoria?.nombre ?? '—' }}
                   </span>
                 </div>
 
-                <!-- % Ganancia Mínimo -->
-                <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
+                <!-- Fila 3: % Ganancia Mínimo -->
+                <div class="pt-2 border-t border-gray-100">
+                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
                     % Ganancia Mínimo
                   </span>
                   <div>
@@ -161,10 +163,11 @@
                     </span>
                   </div>
                 </div>
+
               </div>
 
               <!-- Botones de Acción Móvil -->
-              <div class="mt-3 pt-2 flex gap-2 justify-end items-center">
+              <div class="mt-3 pt-1 flex gap-2 justify-end items-center">
                 <Button 
                   icon="pi pi-pencil" 
                   label="Editar"

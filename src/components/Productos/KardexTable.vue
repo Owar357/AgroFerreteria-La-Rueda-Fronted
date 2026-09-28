@@ -1,66 +1,80 @@
 <template>
-  <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm p-4 font-['Inter',sans-serif]">
+  <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm p-3 sm:p-5 font-['Inter',sans-serif]">
 
-    <!-- 1. BARRA DE FILTROS (ARRIBA, MÁS AMPLIA Y DISTRIBUIDA) -->
-    <div class="w-full bg-[#fafdf7] p-5 rounded-xl border border-[#e2e8dd] mb-5 shadow-xs">
+    <!-- 1. BARRA DE FILTROS RESPONSIVA -->
+    <div class="w-full bg-[#fafdf7] p-4 sm:p-5 rounded-xl border border-[#e2e8dd] mb-5 shadow-xs">
       <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
 
         <!-- Título y Subtexto -->
         <div class="shrink-0">
-          <h2 class="text-lg font-bold text-[#1e3a2f] flex items-center gap-2 m-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#1e3a2f] flex items-center gap-2 m-0">
             <i class="pi pi-history text-[#2b5e3b] text-xl"></i> Movimientos de Inventario (Kardex)
           </h2>
           <p class="text-xs text-gray-500 m-0 mt-1">
-            Cantidades registradas en <strong class="text-[#2b5e3b] font-semibold">{{ unidadBase || 'Unidad Base'
-              }}</strong>.
+            Cantidades registradas en <strong class="text-[#2b5e3b] font-semibold">{{ unidadBase || 'Unidad Base' }}</strong>.
           </p>
         </div>
 
-        <!-- Controles de Filtrado (más grandes, distribuidos a lo ancho) -->
-        <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto xl:justify-end">
+        <!-- Controles de Filtrado Adaptables a Móvil -->
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full xl:w-auto xl:justify-end">
+          
           <!-- Selector Tipo Movimiento -->
-          <div class="flex items-center gap-2 text-sm text-[#1e3a2f]">
-            <span class="font-semibold text-gray-700">Tipo:</span>
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm text-[#1e3a2f] w-full sm:w-auto">
+            <span class="font-semibold text-gray-700 text-xs sm:text-sm">Tipo:</span>
             <BaseSelect
               v-model="tipoMovimiento"
               :options="opcionesMovimiento"
               option-label="label"
               option-value="value"
               placeholder="Todos los movimientos"
-              class="min-w-[190px]"
+              class="w-full sm:min-w-[190px]"
               @update:model-value="aplicarFiltro"
             />
           </div>
 
-          <!-- Fechas -->
-          <div class="flex items-center gap-2 text-sm text-[#1e3a2f]">
-            <span class="font-semibold text-gray-700">Desde:</span>
-            <input type="date" v-model="fechaInicio"
-              class="bg-white border border-[#cbd5e1] rounded-lg text-sm px-3 py-2 text-[#1a2e1f] focus:outline-none focus:border-[#2b5e3b] shadow-2xs font-medium" />
+          <!-- Fecha Desde -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm text-[#1e3a2f] w-full sm:w-auto">
+            <span class="font-semibold text-gray-700 text-xs sm:text-sm">Desde:</span>
+            <input 
+              type="date" 
+              v-model="fechaInicio"
+              class="w-full sm:w-auto bg-white border border-[#cbd5e1] rounded-lg text-sm px-3 py-2 text-[#1a2e1f] focus:outline-none focus:border-[#2b5e3b] shadow-2xs font-medium" 
+            />
           </div>
 
-          <div class="flex items-center gap-2 text-sm text-[#1e3a2f]">
-            <span class="font-semibold text-gray-700">Hasta:</span>
-            <input type="date" v-model="fechaFin"
-              class="bg-white border border-[#cbd5e1] rounded-lg text-sm px-3 py-2 text-[#1a2e1f] focus:outline-none focus:border-[#2b5e3b] shadow-2xs font-medium" />
+          <!-- Fecha Hasta -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm text-[#1e3a2f] w-full sm:w-auto">
+            <span class="font-semibold text-gray-700 text-xs sm:text-sm">Hasta:</span>
+            <input 
+              type="date" 
+              v-model="fechaFin"
+              class="w-full sm:w-auto bg-white border border-[#cbd5e1] rounded-lg text-sm px-3 py-2 text-[#1a2e1f] focus:outline-none focus:border-[#2b5e3b] shadow-2xs font-medium" 
+            />
           </div>
 
           <!-- Botones de Acción -->
-          <div class="flex items-center gap-2">
-            <Button icon="pi pi-filter" label="Filtrar"
-              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-sm font-semibold px-4 py-2 rounded-lg border-none transition-all cursor-pointer shadow-xs"
-              @click="aplicarFiltro" />
+          <div class="flex items-center gap-2 w-full sm:w-auto pt-1 sm:pt-0">
+            <Button 
+              icon="pi pi-filter" 
+              label="Filtrar"
+              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-sm font-semibold px-4 py-2 rounded-lg border-none transition-all cursor-pointer shadow-xs flex-1 sm:flex-none justify-center"
+              @click="aplicarFiltro" 
+            />
 
-            <Button icon="pi pi-refresh" v-tooltip.top="'Limpiar / Refrescar'"
-              class="!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2] rounded-lg p-2 transition-all cursor-pointer shadow-2xs"
-              @click="limpiarFiltros" />
+            <Button 
+              icon="pi pi-refresh" 
+              v-tooltip.top="'Limpiar / Refrescar'"
+              class="!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2] rounded-lg p-2 transition-all cursor-pointer shadow-2xs shrink-0"
+              @click="limpiarFiltros" 
+            />
           </div>
+
         </div>
 
       </div>
     </div>
 
-    <!-- 2. TARJETAS DE MÉTRICAS GLOBALES (CSS plano, no depende de Tailwind) -->
+    <!-- 2. TARJETAS DE MÉTRICAS GLOBALES (1 Columna en móvil, 2 en sm, 4 en xl) -->
     <div class="kx-metrics">
 
       <!-- Total Entradas -->
@@ -123,99 +137,225 @@
 
     </div>
 
-
-
-    <!-- Tabla Kardex -->
-    <DataTable :value="kardexStore.cargando ? Array.from({ length: 5 }) : kardexStore.movimientos" lazy
-      :paginator="!kardexStore.cargando && kardexStore.totalRecords > 0" :rows="kardexStore.perPage"
-      :totalRecords="kardexStore.totalRecords" responsiveLayout="scroll" class="p-datatable-sm text-xs"
-      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
-      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos" @page="onPageChange">
-
-      <template #empty>
-        <div class="text-center py-8 text-gray-400">
-          No hay movimientos de Kardex registrados con los filtros seleccionados.
-        </div>
-      </template>
-
-      <Column header="Fecha" class="w-[140px]">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="80%" height="1rem" />
-          <span v-else class="text-gray-600 font-medium">
-            {{ formatearFecha(slotProps.data.created_at) }}
-          </span>
-        </template>
-      </Column>
-
-      <Column header="Movimiento">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="6rem" height="1.4rem" borderRadius="12px" />
-          <span v-else
-            :class="['px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider', obtenerBadgeClase(slotProps.data.tipo_movimiento)]">
-            {{ formatearMovimiento(slotProps.data.tipo_movimiento) }}
-          </span>
-        </template>
-      </Column>
-
-      <Column header="Documento / Concepto">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="90%" height="1rem" />
-          <div v-else class="flex flex-col">
-            <span class="font-semibold text-[#1e3a2f]">{{ slotProps.data.numero_documento || 'S/N' }}</span>
-            <span class="text-[11px] text-gray-500 truncate max-w-[200px]">{{ slotProps.data.concepto }}</span>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL: Tabla Kardex Desplegable (< 768px)          -->
+    <!-- ======================================================= -->
+    <div class="block md:hidden w-full border border-[#e2e8dd] rounded-xl overflow-hidden shadow-xs">
+      <DataTable 
+        v-model:expandedRows="expandedRows"
+        :value="kardexStore.cargando ? Array.from({ length: 5 }) : kardexStore.movimientos" 
+        lazy
+        :paginator="!kardexStore.cargando && kardexStore.totalRecords > 0" 
+        :rows="kardexStore.perPage"
+        :totalRecords="kardexStore.totalRecords" 
+        dataKey="id"
+        class="p-datatable-custom text-xs w-full"
+        paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+        currentPageReportTemplate="{first}-{last} de {totalRecords}" 
+        @page="onPageChange"
+      >
+        <template #empty>
+          <div class="text-center py-8 text-gray-400">
+            No hay movimientos de Kardex registrados con los filtros seleccionados.
           </div>
         </template>
-      </Column>
 
-      <Column header="Entrada" class="text-right">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
-          <span v-else
-            :class="{ 'text-emerald-700 font-semibold': Number(slotProps.data.cantidad_entrada) > 0, 'text-gray-400': Number(slotProps.data.cantidad_entrada) === 0 }">
-            {{ Number(slotProps.data.cantidad_entrada) > 0 ? '+' + formatDecimal(slotProps.data.cantidad_entrada, 4) :
-              '—' }} {{ unidadBase || 'Unidad Base' }}
-          </span>
-        </template>
-      </Column>
+        <!-- Flecha de Expansión -->
+        <Column expander style="width: 2.5rem" />
 
-      <Column header="Salida" class="text-right">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
-          <span v-else
-            :class="{ 'text-rose-700 font-semibold': Number(slotProps.data.cantidad_salida) > 0, 'text-gray-400': Number(slotProps.data.cantidad_salida) === 0 }">
-            {{ Number(slotProps.data.cantidad_salida) > 0 ? '-' + formatDecimal(slotProps.data.cantidad_salida, 4) : '—'
-            }} {{ unidadBase || 'Unidad Base' }}
-          </span>
-        </template>
-      </Column>
+        <!-- Columna 1: Fecha -->
+        <Column header="Fecha">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="80%" height="1rem" />
+            <span v-else class="text-gray-700 font-medium block leading-tight text-[11px]">
+              {{ formatearFecha(slotProps.data.created_at) }}
+            </span>
+          </template>
+        </Column>
 
-      <Column header="Saldo Stock" class="text-right font-bold text-[#1e3a2f]">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
-          <span v-else>
-            {{ formatDecimal(slotProps.data.cantidad_saldo, 4) }}
-          </span>
-        </template>
-      </Column>
+        <!-- Columna 2: Movimiento -->
+        <Column header="Movimiento">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="5rem" height="1.2rem" borderRadius="8px" />
+            <span v-else
+              :class="['px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide inline-block whitespace-nowrap', obtenerBadgeClase(slotProps.data.tipo_movimiento)]">
+              {{ formatearMovimiento(slotProps.data.tipo_movimiento) }}
+            </span>
+          </template>
+        </Column>
 
-      <Column header="CPP" class="text-right">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
-          <span v-else class="text-[#3c674b] font-medium">
-            ${{ formatDecimal(slotProps.data.costo_promedio_ponderado, 4) }}
-          </span>
-        </template>
-      </Column>
+        <!-- Plantilla de Expansión (Detalles en Tarjeta Móvil) -->
+        <template #expansion="slotProps">
+          <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+            <div class="bg-white p-3 rounded-lg border border-[#e2e8dd] shadow-xs space-y-2.5">
+              
+              <!-- Documento / Concepto -->
+              <div>
+                <span class="text-[0.6875rem] font-bold uppercase tracking-wider text-gray-500 block mb-0.5">
+                  Documento / Concepto
+                </span>
+                <span class="font-bold text-[#1e3a2f] block">
+                  {{ slotProps.data.numero_documento || 'S/N' }}
+                </span>
+                <span class="text-[11px] text-gray-600 block mt-0.5 break-words">
+                  {{ slotProps.data.concepto || 'Sin concepto registrado' }}
+                </span>
+              </div>
 
-      <Column header="Monto Saldo" class="text-right font-bold text-[#2b5e3b]">
-        <template #body="slotProps">
-          <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
-          <span v-else>
-            ${{ formatDecimal(slotProps.data.monto_saldo, 2) }}
-          </span>
+              <!-- Cantidades Entrada / Salida -->
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100">
+                <div>
+                  <span class="text-[0.6875rem] font-bold uppercase tracking-wider text-gray-500 block mb-0.5">
+                    Entrada
+                  </span>
+                  <span :class="[
+                    'font-bold block',
+                    Number(slotProps.data.cantidad_entrada) > 0 ? 'text-emerald-700' : 'text-gray-400'
+                  ]">
+                    {{ Number(slotProps.data.cantidad_entrada) > 0 ? '+' + formatDecimal(slotProps.data.cantidad_entrada, 4) : '—' }} {{ unidadBase }}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="text-[0.6875rem] font-bold uppercase tracking-wider text-gray-500 block mb-0.5">
+                    Salida
+                  </span>
+                  <span :class="[
+                    'font-bold block',
+                    Number(slotProps.data.cantidad_salida) > 0 ? 'text-rose-700' : 'text-gray-400'
+                  ]">
+                    {{ Number(slotProps.data.cantidad_salida) > 0 ? '-' + formatDecimal(slotProps.data.cantidad_salida, 4) : '—' }} {{ unidadBase }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Saldo Stock, CPP y Monto Saldo -->
+              <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100">
+                <div>
+                  <span class="text-[0.65rem] font-bold uppercase text-gray-500 block mb-0.5">Stock</span>
+                  <span class="font-bold text-[#1e3a2f] block">
+                    {{ formatDecimal(slotProps.data.cantidad_saldo, 2) }}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="text-[0.65rem] font-bold uppercase text-gray-500 block mb-0.5">CPP</span>
+                  <span class="font-semibold text-[#3c674b] block">
+                    ${{ formatDecimal(slotProps.data.costo_promedio_ponderado, 2) }}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="text-[0.65rem] font-bold uppercase text-gray-500 block mb-0.5">Monto Saldo</span>
+                  <span class="font-bold text-[#2b5e3b] block">
+                    ${{ formatDecimal(slotProps.data.monto_saldo, 2) }}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </template>
-      </Column>
-    </DataTable>
+      </DataTable>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 768px)  -->
+    <!-- ======================================================= -->
+    <div class="hidden md:block w-full overflow-x-auto border border-[#e2e8dd] rounded-xl">
+      <DataTable :value="kardexStore.cargando ? Array.from({ length: 5 }) : kardexStore.movimientos" lazy
+        :paginator="!kardexStore.cargando && kardexStore.totalRecords > 0" :rows="kardexStore.perPage"
+        :totalRecords="kardexStore.totalRecords" responsiveLayout="scroll" class="p-datatable-custom text-xs w-full min-w-[50rem]"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos" @page="onPageChange">
+
+        <template #empty>
+          <div class="text-center py-8 text-gray-400">
+            No hay movimientos de Kardex registrados con los filtros seleccionados.
+          </div>
+        </template>
+
+        <Column header="Fecha" class="w-[140px] whitespace-nowrap">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="80%" height="1rem" />
+            <span v-else class="text-gray-600 font-medium">
+              {{ formatearFecha(slotProps.data.created_at) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Movimiento" class="min-w-[9rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="6rem" height="1.4rem" borderRadius="12px" />
+            <span v-else
+              :class="['px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider whitespace-nowrap inline-block', obtenerBadgeClase(slotProps.data.tipo_movimiento)]">
+              {{ formatearMovimiento(slotProps.data.tipo_movimiento) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Documento / Concepto" class="min-w-[12rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="90%" height="1rem" />
+            <div v-else class="flex flex-col">
+              <span class="font-semibold text-[#1e3a2f]">{{ slotProps.data.numero_documento || 'S/N' }}</span>
+              <span class="text-[11px] text-gray-500 truncate max-w-[200px]">{{ slotProps.data.concepto }}</span>
+            </div>
+          </template>
+        </Column>
+
+        <Column header="Entrada" class="text-right min-w-[8rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
+            <span v-else
+              :class="{ 'text-emerald-700 font-semibold': Number(slotProps.data.cantidad_entrada) > 0, 'text-gray-400': Number(slotProps.data.cantidad_entrada) === 0 }"
+              class="whitespace-nowrap">
+              {{ Number(slotProps.data.cantidad_entrada) > 0 ? '+' + formatDecimal(slotProps.data.cantidad_entrada, 4) :
+                '—' }} {{ unidadBase || 'Unidad Base' }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Salida" class="text-right min-w-[8rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
+            <span v-else
+              :class="{ 'text-rose-700 font-semibold': Number(slotProps.data.cantidad_salida) > 0, 'text-gray-400': Number(slotProps.data.cantidad_salida) === 0 }"
+              class="whitespace-nowrap">
+              {{ Number(slotProps.data.cantidad_salida) > 0 ? '-' + formatDecimal(slotProps.data.cantidad_salida, 4) : '—'
+              }} {{ unidadBase || 'Unidad Base' }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Saldo Stock" class="text-right font-bold text-[#1e3a2f] min-w-[7rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
+            <span v-else class="whitespace-nowrap">
+              {{ formatDecimal(slotProps.data.cantidad_saldo, 4) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="CPP" class="text-right min-w-[6.5rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
+            <span v-else class="text-[#3c674b] font-medium whitespace-nowrap">
+              ${{ formatDecimal(slotProps.data.costo_promedio_ponderado, 4) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Monto Saldo" class="text-right font-bold text-[#2b5e3b] min-w-[7.5rem]">
+          <template #body="slotProps">
+            <Skeleton v-if="kardexStore.cargando" width="60%" height="1rem" class="ml-auto" />
+            <span v-else class="whitespace-nowrap">
+              ${{ formatDecimal(slotProps.data.monto_saldo, 2) }}
+            </span>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
@@ -235,6 +375,7 @@ const props = defineProps({
 })
 
 const kardexStore = useKardexStore()
+const expandedRows = ref({})
 
 const obtenerPrimerDiaMes = () => {
   const d = new Date()
@@ -346,31 +487,38 @@ const obtenerBadgeClase = (tipo) => {
 </script>
 
 <style scoped>
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #fafdf7;
-  color: #3c674b;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.75rem 0.5rem;
+:deep(.p-datatable-custom .p-datatable-thead > tr > th) {
+  background-color: #fafdf7 !important;
+  color: #3c674b !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  padding: 0.75rem 0.5rem !important;
+  border-bottom: 1px solid #e2e8dd !important;
 }
 
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.6rem 0.5rem;
-  transition: background-color 0.2s;
+:deep(.p-datatable-custom .p-datatable-tbody > tr > td) {
+  padding: 0.6rem 0.5rem !important;
 }
 
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
+:deep(.p-datatable-custom .p-datatable-tbody > tr:hover) {
   background-color: #eef5e9 !important;
 }
 
-/* --- Tarjetas de métricas: CSS puro, no depende de utilidades de Tailwind --- */
+/* Tarjetas de métricas responsivas */
 .kx-metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
   width: 100%;
   margin-bottom: 1.25rem;
   box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .kx-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -384,33 +532,33 @@ const obtenerBadgeClase = (tipo) => {
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   border-radius: 0.75rem;
   border: 1px solid transparent;
   box-sizing: border-box;
 }
 
 .kx-card-green {
-  background-color: rgba(236, 253, 245, 0.7);
+  background-color: rgba(236, 253, 245, 0.8);
   border-color: #bfe3cf;
 }
 
 .kx-card-rose {
-  background-color: rgba(255, 241, 242, 0.7);
+  background-color: rgba(255, 241, 242, 0.8);
   border-color: #f5d0d5;
 }
 
 .kx-metric-icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  min-width: 2.75rem;
-  max-width: 2.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  max-width: 2.5rem;
   border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   box-sizing: border-box;
 }
 
@@ -467,6 +615,8 @@ const obtenerBadgeClase = (tipo) => {
   display: block;
   margin-top: 0.125rem;
   color: #2b5e3b;
+  font-weight: 800;
+  font-size: 1.1rem;
 }
 
 .kx-value-rose {
