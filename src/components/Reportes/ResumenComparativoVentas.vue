@@ -28,11 +28,11 @@
         <span class="font-semibold text-[#1e3a2f] text-lg">Rangos a comparar</span>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Rango 1 -->
-        <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-4">
+        <div>
           <p class="text-sm font-semibold text-[#1e3a2f] mb-3">Rango 1</p>
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-wrap gap-4">
             <div class="flex flex-col gap-1">
               <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
               <DatePicker
@@ -40,7 +40,7 @@
                 dateFormat="yy-mm-dd"
                 placeholder="Seleccione fecha"
                 showIcon
-                class="w-full"
+                class="w-64"
                 :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white'"
               />
             </div>
@@ -51,7 +51,7 @@
                 dateFormat="yy-mm-dd"
                 placeholder="Seleccione fecha"
                 showIcon
-                class="w-full"
+                class="w-64"
                 :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white'"
               />
             </div>
@@ -59,9 +59,9 @@
         </div>
 
         <!-- Rango 2 -->
-        <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-4">
+        <div>
           <p class="text-sm font-semibold text-[#1e3a2f] mb-3">Rango 2</p>
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-wrap gap-4">
             <div class="flex flex-col gap-1">
               <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
               <DatePicker
@@ -69,7 +69,7 @@
                 dateFormat="yy-mm-dd"
                 placeholder="Seleccione fecha"
                 showIcon
-                class="w-full"
+                class="w-64"
                 :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white'"
               />
             </div>
@@ -80,7 +80,7 @@
                 dateFormat="yy-mm-dd"
                 placeholder="Seleccione fecha"
                 showIcon
-                class="w-full"
+                class="w-64"
                 :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white'"
               />
             </div>

@@ -58,12 +58,6 @@ export function generarReporteComprasPorProveedor({ fechaInicio, fechaFin }) {
   })
 }
 
-//Funcion para obtener las compras echas por proveedor (pinta la tabla)
-export async function getComprasPorProveedor(filtros) {
-  const res = await api.get('/reportes/compras/por-proveedor/datos', { params: filtros })
-  return res.data.data ?? res.data ?? []
-}
-
 //Funcion paa obtener el resumen de las ventas
 export function generarReporteResumenVentas({ fechaInicio, fechaFin }) {
   return abrirReporte('/reportes/ventas/resumen', {
@@ -113,6 +107,22 @@ export function generarReporteMargenGanancia({ fechaInicio, fechaFin }) {
   return abrirReporte('/reportes/financieros/margen', {
     fecha_inicio: fechaInicio,
     fecha_fin: fechaFin,
+  })
+}
+
+//funcion para generar el reporte de arqueo de caja (por fecha y cajero)
+export function generarReporteArqueoCaja({ fecha, cajeroId }) {
+  return abrirReporte('/reportes/caja/arqueo', {
+    fecha: fecha,
+    cajero_id: cajeroId,
+  })
+}
+
+//funcion para generar el reporte general de ventas (listado de facturas)
+export function generarReporteVentas({ fechaDesde, fechaHasta }) {
+  return abrirReporte('/reportes/ventas', {
+    fecha_desde: fechaDesde,
+    fecha_hasta: fechaHasta,
   })
 }
 

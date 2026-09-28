@@ -259,6 +259,27 @@
         </button>
       </div>
     </div>
+    <!-- Tarjeta: Arqueo de Caja -->
+    <div class="bg-white rounded-2xl p-5 border border-[#e2e8dd] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer grid grid-rows-[auto_1fr_auto] aspect-square max-w-[320px]">
+      <div class="flex items-start justify-between mb-3">
+        <div class="bg-[#eef2e9] p-2 rounded-xl">
+          <i class="pi pi-wallet text-[22px] text-[#2b5e3b]"></i>
+        </div>
+        <span class="text-xs bg-[#e0e7ff] text-[#3730a3] font-medium px-2 py-1 rounded-full">caja</span>
+      </div>
+      <div class="mb-4">
+        <h3 class="font-bold text-[#1e3a2f] text-lg">Arqueo Caja Reporte</h3>
+        <p class="text-gray-500 text-sm mt-1 line-clamp-2">Cuadre y verificación del efectivo registrado en caja por turno.</p>
+      </div>
+      <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
+        <button
+          class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+          @click="$emit('ver-arqueo-caja')"
+        >
+          <i class="pi pi-eye text-[11px]"></i> Visualizar
+        </button>
+      </div>
+    </div>
       <!-- Tarjetas Dinámicas -->
       <div
         v-for="card in cardsSoloDiseno"
@@ -305,21 +326,15 @@ const emit = defineEmits([
   'ver-margen-ganancia',
   'ver-flujo-compras-ventas',
   'ver-inventario-valorizado',
-  'ver-productos-por-vencer'
+  'ver-productos-por-vencer',
+  'ver-arqueo-caja'
+  
 ])
 
 
 
 
 const cardsSoloDiseno = [
-  {
-    titulo: 'Arqueo Caja Reporte',
-    icono: 'pi-wallet',
-    tag: 'caja',
-    tagClass: 'bg-[#e0e7ff] text-[#3730a3]',
-    descripcion: 'Cuadre y verificación del efectivo registrado en caja por turno.',
-  },
   
-
 ]
 </script>
