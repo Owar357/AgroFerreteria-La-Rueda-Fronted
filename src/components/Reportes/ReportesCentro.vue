@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <!-- Grid de Tarjetas Móvil (1 Columna Full Width) -->
+      <!-- Grid Móvil (1 Columna Full Width) -->
       <div class="grid grid-cols-1 gap-3.5 w-full">
 
         <!-- Tarjeta 1: Ventas -->
@@ -310,28 +310,26 @@
           </div>
         </div>
 
-        <!-- Tarjetas Dinámicas Solo Diseño Móvil -->
-        <div
-          v-for="card in cardsSoloDiseno"
-          :key="'movil-' + card.titulo"
-          class="bg-white rounded-2xl p-4 border border-[#e2e8dd] shadow-2xs flex flex-col justify-between w-full"
-        >
+        <!-- Tarjeta 12: Arqueo Caja -->
+        <div class="bg-white rounded-2xl p-4 border border-[#e2e8dd] shadow-2xs flex flex-col justify-between w-full">
           <div>
             <div class="flex items-start justify-between mb-2.5">
               <div class="bg-[#f4f7f2] p-2 rounded-xl border border-[#dce4d7]">
-                <i :class="`pi ${card.icono} text-lg text-[#2b5e3b]`"></i>
+                <i class="pi pi-wallet text-lg text-[#2b5e3b]"></i>
               </div>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" :class="card.tagClass">
-                {{ card.tag }}
+              <span class="text-[10px] bg-[#e0e7ff] text-[#3730a3] font-bold px-2 py-0.5 rounded-full uppercase">
+                caja
               </span>
             </div>
-            <h3 class="font-bold text-[#1a2e1f] text-base m-0">{{ card.titulo }}</h3>
-            <p class="text-gray-500 text-xs mt-1 mb-3 line-clamp-2">{{ card.descripcion }}</p>
+            <h3 class="font-bold text-[#1a2e1f] text-base m-0">Arqueo Caja Reporte</h3>
+            <p class="text-gray-500 text-xs mt-1 mb-3 line-clamp-2">
+              Cuadre y verificación del efectivo registrado en caja por turno.
+            </p>
           </div>
           <div class="pt-2.5 border-t border-[#e2e8dd]">
             <button
-              class="w-full text-xs bg-[#2b5e3b] text-white px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 font-semibold opacity-50 cursor-not-allowed"
-              disabled
+              class="w-full text-xs bg-[#2b5e3b] text-white px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 font-semibold cursor-pointer shadow-2xs"
+              @click="$emit('ver-arqueo-caja')"
             >
               <i class="pi pi-eye text-xs"></i> Visualizar
             </button>
@@ -357,7 +355,7 @@
         </div>
       </div>
 
-      <!-- Grid de Tarjetas PC (Tradicional Auto-Fill) -->
+      <!-- Grid PC (Tradicional Auto-Fill) -->
       <div class="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-5 items-stretch">
 
         <!-- Tarjeta 1: Ventas -->
@@ -374,7 +372,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-ventas')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -396,7 +394,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-compras-proveedor')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -418,7 +416,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-resumen-ventas')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -440,7 +438,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-productos-mas-vendidos')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -462,7 +460,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-ventas-cajero')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -484,7 +482,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-ventas-categoria')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -506,7 +504,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-resumen-comparativo')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -528,7 +526,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-margen-ganancia')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -550,7 +548,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-flujo-compras-ventas')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -572,7 +570,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-inventario-valorizado')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -594,7 +592,7 @@
           </div>
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium"
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
               @click="$emit('ver-productos-por-vencer')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
@@ -602,30 +600,22 @@
           </div>
         </div>
 
-        <!-- Tarjetas Dinámicas Solo Diseño PC -->
-        <div
-          v-for="card in cardsSoloDiseno"
-          :key="'pc-' + card.titulo"
-          class="bg-white rounded-2xl p-5 border border-[#e2e8dd] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 grid grid-rows-[auto_1fr_auto] aspect-square max-w-[320px]"
-        >
+        <!-- Tarjeta 12: Arqueo Caja -->
+        <div class="bg-white rounded-2xl p-5 border border-[#e2e8dd] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer grid grid-rows-[auto_1fr_auto] aspect-square max-w-[320px]">
           <div class="!flex !items-center !justify-between !w-full mb-3">
             <div class="bg-[#f4f7f2] p-2 rounded-xl border border-[#dce4d7] shrink-0">
-              <i :class="`pi ${card.icono} text-[20px] text-[#2b5e3b]`"></i>
+              <i class="pi pi-wallet text-[20px] text-[#2b5e3b]"></i>
             </div>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider !ml-auto" :class="card.tagClass">
-              {{ card.tag }}
-            </span>
+            <span class="text-xs bg-[#e0e7ff] text-[#3730a3] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider !ml-auto">caja</span>
           </div>
-
           <div class="mb-4">
-            <h3 class="font-bold text-[#1e3a2f] text-lg">{{ card.titulo }}</h3>
-            <p class="text-gray-500 text-sm mt-1 line-clamp-3">{{ card.descripcion }}</p>
+            <h3 class="font-bold text-[#1e3a2f] text-lg">Arqueo Caja Reporte</h3>
+            <p class="text-gray-500 text-sm mt-1 line-clamp-2">Cuadre y verificación del efectivo registrado en caja por turno.</p>
           </div>
-
           <div class="flex gap-2 pt-3 border-t border-[#e2e8dd]">
             <button
-              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg flex items-center gap-1 font-medium opacity-50 cursor-not-allowed"
-              disabled
+              class="text-xs bg-[#2b5e3b] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f482d] transition-all duration-200 flex items-center gap-1 font-medium cursor-pointer"
+              @click="$emit('ver-arqueo-caja')"
             >
               <i class="pi pi-eye text-[11px]"></i> Visualizar
             </button>
@@ -653,14 +643,4 @@ defineEmits([
   'ver-productos-por-vencer',
   'ver-arqueo-caja'
 ])
-
-const cardsSoloDiseno = [
-  {
-    titulo: 'Arqueo Caja Reporte',
-    icono: 'pi-wallet',
-    tag: 'caja',
-    tagClass: 'bg-[#e0e7ff] text-[#3730a3]',
-    descripcion: 'Cuadre y verificación del efectivo registrado en caja por turno.',
-  },
-]
 </script>
