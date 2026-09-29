@@ -1,313 +1,520 @@
 <template>
-  <div
-    class="p-6"
-    style="font-family: 'Inter', sans-serif; background-color: #eef2e9; min-height: 100vh"
-  >
-    <!-- ENCABEZADO -->
-    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold text-[#1a2e1f]">Turno de caja</h1>
-        <p class="text-sm text-[#6d8f60] mt-1">Control y gestión del turno actual</p>
-      </div>
-      <div class="flex items-center gap-4 flex-wrap">
-        <div
-          class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-[#e8efe1]"
-        >
-          <i class="pi pi-calendar text-[#6d8f60] text-sm"></i>
-          <span class="text-sm text-[#1a2e1f]">{{ currentDate }}</span>
+  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
+
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet)        -->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden mb-4">
+      <div class="flex flex-col gap-3">
+      
+       <!-- Encabezado Móvil -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          <i class="pi pi-chart-line text-[#2b5e3b] text-lg"></i>
         </div>
-        <div
-          class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-[#e8efe1]"
-        >
-          <span class="text-sm text-[#6d8f60]">Estado:</span>
-          <span
-            :class="[
-              'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold',
-              turnoAbierto ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
-            ]"
-          >
-            <i
-              class="pi pi-circle-fill text-[8px]"
-              :class="turnoAbierto ? 'text-green-600' : 'text-red-500'"
-            ></i>
-            {{ turnoAbierto ? 'TURNO ABIERTO' : 'TURNO CERRADO' }}
-          </span>
-          <span v-if="turnoAbierto" class="text-xs text-[#6d8f60]">
+        <div>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+            Turno de Caja
+          </h1>
+          <h2 class="text-xs font-semibold text-[#2b5e3b] mt-0.5 m-0 tracking-wide">
+             Control y gestión del turno actual
+          </h2>
+        </div>
+      </div>
+
+        <!-- Badges Estado y Fecha Móvil (Inline / Ancho Ajustado) -->
+        <div class="flex items-center gap-2">
+          <div class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs">
+            <i class="pi pi-calendar text-[#2b5e3b] text-xs"></i>
+            <span class="text-xs font-medium text-[#1a2e1f]">{{ currentDate }}</span>
+          </div>
+
+          <div class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs">
+            <span class="text-[11px] text-gray-500 font-medium">Estado:</span>
+            <Tag
+              :value="turnoAbierto ? 'ABIERTO' : 'CERRADO'"
+              :severity="turnoAbierto ? 'success' : 'danger'"
+              rounded
+              class="!text-[9px] !px-2 !py-0.5"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:flex items-center justify-between gap-4 mb-6">
+      <!-- Título con Icono PC -->
+      <div class="flex items-center gap-3">
+        <div class="!w-11 !h-11 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-wallet text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Turno de Caja
+          </h1>
+          <h2 class="text-sm font-semibold text-[#2b5e3b] mt-0.5 m-0 tracking-wide">
+            Control y gestión del turno actual
+          </h2>
+        </div>
+      </div>
+
+      <!-- Badges Estado y Fecha PC -->
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs">
+          <i class="pi pi-calendar text-[#2b5e3b] text-xs"></i>
+          <span class="text-xs font-semibold text-[#1a2e1f]">{{ currentDate }}</span>
+        </div>
+
+        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs">
+          <span class="text-xs text-gray-500 font-semibold">Estado:</span>
+          <Tag
+            :value="turnoAbierto ? 'TURNO ABIERTO' : 'TURNO CERRADO'"
+            :severity="turnoAbierto ? 'success' : 'danger'"
+            rounded
+            class="!text-[10px] !px-2.5 !py-0.5"
+          />
+          <span v-if="turnoAbierto" class="text-xs text-gray-500 font-medium">
             · {{ cajaStore.turnoActivo.cajero_nombre }}
           </span>
         </div>
       </div>
     </div>
 
-    <!-- ADMINISTRADOR: 4 tarjetas -->
-    <div v-if="esAdministrador" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 w-full">
-      <div
-        class="bg-white rounded-2xl p-6 border border-[#e8efe1] shadow-sm hover:shadow-md transition-all duration-200"
-      >
-        <p class="text-sm font-medium text-[#6d8f60] mb-3">
-          <i class="pi pi-wallet mr-2"></i> Monto Inicial
-        </p>
-        <p class="text-3xl font-bold text-[#1a2e1f]">${{ formatNumber(cajaStore.montoInicial) }}</p>
-        <p class="text-xs text-[#819b74] mt-2">Efectivo al abrir el turno</p>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL / TABLET (< 1024px)                        -->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden space-y-4">
+      
+      <!-- ADMINISTRADOR MÓVIL: Tarjetas de Monto en Pareja (2x2 Inline) -->
+      <div v-if="esAdministrador" class="grid grid-cols-2 gap-3 ">
+
+        <!-- Monto Inicial -->
+        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="pi pi-wallet text-[#2b5e3b] text-xs"></i> Monto Inicial
+            </p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Efectivo al abrir</p>
+        </div>
+
+        <!-- Monto Esperado -->
+        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%]  shadow-2xs flex flex-col justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="pi pi-chart-line text-[#2b5e3b] text-xs"></i> Monto Esperado
+            </p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(montoEsperado) }}</p>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Estimado en caja</p>
+        </div>
+
+        <!-- Efectivo en Gaveta (Alineado con Fondo Fijo) -->
+        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="pi pi-money-bill text-[#2b5e3b] text-xs"></i> Efectivo Gaveta
+            </p>
+            <p class="text-xl font-bold text-[#2b5e3b] font-mono m-0">${{ formatNumber(montoEnCaja) }}</p>
+          </div>
+          <p class="text-[10px] text-[#2b5e3b] font-medium mt-2 m-0 leading-tight">Ventas + Ent. - Sal.</p>
+        </div>
+
+        <!-- Fondo Fijo (Alineado con Efectivo en Gaveta) -->
+        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd]  w-[48%] shadow-2xs flex flex-col justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="pi pi-lock text-[#2b5e3b] text-xs"></i> Fondo Fijo
+            </p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.fondoFijo) }}</p>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Base obligatoria</p>
+        </div>
       </div>
 
-      <div
-        class="bg-white rounded-2xl p-6 border border-[#e8efe1] shadow-sm hover:shadow-md transition-all duration-200"
-      >
-        <p class="text-sm font-medium text-[#6d8f60] mb-3">
-          <i class="pi pi-chart-line mr-2"></i> Monto Esperado
-        </p>
-        <p class="text-3xl font-bold text-[#1a2e1f]">${{ formatNumber(montoEsperado) }}</p>
-        <p class="text-xs text-[#819b74] mt-2">Cuánto se estima que debe haber en caja</p>
+      <!-- ADMINISTRADOR MÓVIL: Resumen de Movimientos -->
+      <div v-if="esAdministrador" class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden">
+        <div class="bg-[#fbfdf9] px-4 py-3 border-b border-[#e2e8dd]">
+          <h2 class="font-bold text-[#1a2e1f] text-sm flex items-center gap-2 m-0">
+            <i class="pi pi-chart-pie text-[#a17923]"></i> Resumen de Movimientos
+          </h2>
+        </div>
+        <div class="p-3.5 space-y-2.5">
+          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+              <i class="pi pi-dollar text-[#2b5e3b]"></i> Ventas contado:
+            </span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasContado) }}</span>
+          </div>
+
+          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+              <i class="pi pi-credit-card text-[#2b5e3b]"></i> Ventas tarjeta:
+            </span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasTarjeta) }}</span>
+          </div>
+
+          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+              <i class="pi pi-mobile text-[#2b5e3b]"></i> Transferencia:
+            </span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasTransferencia) }}</span>
+          </div>
+
+          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+              <i class="pi pi-plus text-green-600"></i> Otras entradas:
+            </span>
+            <span class="font-bold text-green-700 font-mono text-xs">+${{ formatNumber(entradas) }}</span>
+          </div>
+
+          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+              <i class="pi pi-arrow-down text-red-600"></i> Retiros / Gastos:
+            </span>
+            <span class="font-bold text-red-600 font-mono text-xs">-${{ formatNumber(retiros) }}</span>
+          </div>
+
+          <div class="pt-3 border-t border-[#e2e8dd] flex justify-between items-center">
+            <span class="text-xs font-bold text-[#1a2e1f]">Total Vendido:</span>
+            <span class="text-xl font-bold text-[#2b5e3b] font-mono">${{ formatNumber(totalEnCaja) }}</span>
+          </div>
+        </div>
       </div>
 
-      <div
-        class="bg-white rounded-2xl p-6 border border-[#e8efe1] shadow-sm hover:shadow-md transition-all duration-200"
-      >
-        <p class="text-sm font-medium text-[#6d8f60] mb-3">
-          <i class="pi pi-money-bill mr-2"></i> Efectivo en Gaveta
-        </p>
-        <p class="text-3xl font-bold text-[#2b5e3b]">${{ formatNumber(montoEnCaja) }}</p>
-        <p class="text-xs text-green-600 mt-2">Fondo + ventas en efectivo + entradas - salidas</p>
+      <!-- CAJERO MÓVIL: Acciones -->
+      <div v-if="esCajero" class="space-y-3">
+        <!-- Monto Inicial Cajero -->
+        <div class="bg-white rounded-2xl p-4 border border-[#e2e8dd] shadow-2xs">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
+          </p>
+          <p class="text-2xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="bg-white rounded-2xl p-4 border border-[#e2e8dd] shadow-2xs">
+          <Button
+            v-if="!cajaStore.cajaAbierta"
+            icon="pi pi-unlock"
+            label="Apertura de Caja"
+            class="w-full !bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none rounded-xl py-3 font-semibold text-xs cursor-pointer shadow-2xs"
+            @click="abrirCaja"
+          />
+
+          <div
+            v-else-if="cajaStore.turnoDeOtroCajero"
+            class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2"
+          >
+            <i class="pi pi-user text-amber-600 mt-0.5"></i>
+            <span>Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong>.</span>
+          </div>
+
+          <Button
+            v-else-if="!cajaStore.ventaAbierta"
+            icon="pi pi-shopping-cart"
+            label="Aperturar Venta"
+            class="w-full !bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none rounded-xl py-3 font-semibold text-xs cursor-pointer shadow-2xs"
+            @click="abrirVenta"
+          />
+
+          <Button
+            v-else
+            icon="pi pi-lock"
+            label="Cerrar Caja"
+            class="w-full !bg-red-600 hover:!bg-red-700 !text-white !border-none rounded-xl py-3 font-semibold text-xs cursor-pointer shadow-2xs"
+            @click="cerrarCaja"
+          />
+        </div>
       </div>
 
-      <div
-        class="bg-white rounded-2xl p-6 border border-[#e8efe1] shadow-sm hover:shadow-md transition-all duration-200"
-      >
-        <p class="text-sm font-medium text-[#6d8f60] mb-3">
-          <i class="pi pi-lock mr-2"></i> Fondo Fijo
-        </p>
-        <p class="text-3xl font-bold text-[#1a2e1f]">${{ formatNumber(cajaStore.fondoFijo) }}</p>
-        <p class="text-xs text-[#819b74] mt-2">Base obligatoria para cada turno</p>
+      <!-- MÓVIL: Movimientos en Tarjetas -->
+      <div class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden">
+        <div class="bg-[#fbfdf9] px-4 py-3 border-b border-[#e2e8dd]">
+          <h3 class="font-bold text-[#1a2e1f] text-sm flex items-center gap-2 m-0">
+            <i class="pi pi-history text-[#a17923]"></i> Movimientos del Turno
+          </h3>
+        </div>
+
+        <div class="divide-y divide-[#f1f5f0]">
+          <div
+            v-for="mov in movimientosRecientes"
+            :key="mov.id"
+            class="p-3.5 flex flex-col gap-1"
+            :class="{ 'opacity-50': mov.esAnulado }"
+          >
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-mono font-bold text-gray-500">{{ mov.hora }}</span>
+              <div class="flex items-center gap-1">
+                <Tag
+                  :value="mov.tipo"
+                  :severity="mov.tipo === 'Ingreso' ? 'success' : 'danger'"
+                  rounded
+                  class="!text-[9px] !px-2 !py-0.5"
+                />
+                <Tag v-if="mov.esAnulado" value="Anulado" severity="secondary" rounded class="!text-[9px] !px-2 !py-0.5" />
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-[#1a2e1f] font-medium truncate max-w-[180px]" :class="{ 'line-through': mov.esAnulado }">
+                {{ mov.concepto }}
+              </span>
+              <span
+                class="font-mono text-xs font-bold"
+                :class="[
+                  mov.tipo === 'Ingreso' ? 'text-[#2b5e3b]' : 'text-red-600',
+                  { 'line-through': mov.esAnulado }
+                ]"
+              >
+                {{ mov.monto }}
+              </span>
+            </div>
+          </div>
+
+          <div v-if="movimientosRecientes.length === 0" class="p-8 text-center text-gray-400">
+            <i class="pi pi-inbox text-3xl mb-2 opacity-40 block" />
+            <span class="text-xs font-medium">
+              {{ turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto' }}
+            </span>
+          </div>
+        </div>
       </div>
+
     </div>
 
-    <!-- ADMINISTRADOR: resumen -->
-    <div v-if="esAdministrador" class="mb-8">
-      <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
-        <div class="bg-[#fafdf7] px-6 py-4 border-b border-[#e8efe1]">
-          <h2 class="font-semibold text-[#1a2e1f] text-lg">
-            <i class="pi pi-chart-pie mr-2 text-[#e0b354]"></i> Resumen de movimientos
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO / PC (>= 1024px)                      -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:block space-y-6">
+      
+      <!-- ADMINISTRADOR PC: 4 Tarjetas en 1 Fila -->
+      <div v-if="esAdministrador" class="grid grid-cols-4 gap-4 w-full">
+        <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
+          </p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+          <p class="text-xs text-gray-400 mt-2 m-0">Efectivo al abrir el turno</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <i class="pi pi-chart-line text-[#2b5e3b]"></i> Monto Esperado
+          </p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(montoEsperado) }}</p>
+          <p class="text-xs text-gray-400 mt-2 m-0">Estimado a haber en caja</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <i class="pi pi-money-bill text-[#2b5e3b]"></i> Efectivo en Gaveta
+          </p>
+          <p class="text-3xl font-bold text-[#2b5e3b] font-mono m-0">${{ formatNumber(montoEnCaja) }}</p>
+          <p class="text-xs text-[#2b5e3b] font-medium mt-2 m-0">Fondo + ventas en efectivo + entradas - salidas</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <i class="pi pi-lock text-[#2b5e3b]"></i> Fondo Fijo
+          </p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.fondoFijo) }}</p>
+          <p class="text-xs text-gray-400 mt-2 m-0">Base obligatoria para cada turno</p>
+        </div>
+      </div>
+
+      <!-- ADMINISTRADOR PC: Resumen de Movimientos -->
+      <div v-if="esAdministrador" class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden">
+        <div class="bg-[#fbfdf9] px-6 py-4 border-b border-[#e2e8dd]">
+          <h2 class="font-bold text-[#1a2e1f] text-lg flex items-center gap-2 m-0">
+            <i class="pi pi-chart-pie text-[#a17923]"></i> Resumen de Movimientos
           </h2>
         </div>
 
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div
-              class="flex justify-between items-center p-4 bg-[#f9fbf7] rounded-xl border border-[#dee6d6]"
-            >
-              <span class="text-sm text-[#5f7b58]">
-                <i class="pi pi-dollar mr-2"></i> Ventas al contado:
+        <div class="p-6 space-y-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+              <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <i class="pi pi-dollar text-[#2b5e3b]"></i> Ventas al contado:
               </span>
-              <span class="ml-2 font-semibold text-[#1a2e1f] text-lg">
-                ${{ formatNumber(ventasContado) }}
-              </span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasContado) }}</span>
             </div>
 
-            <div
-              class="flex justify-between items-center p-4 bg-[#f9fbf7] rounded-xl border border-[#dee6d6]"
-            >
-              <span class="text-sm text-[#5f7b58]">
-                <i class="pi pi-credit-card mr-2"></i> Ventas por tarjeta:
+            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+              <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <i class="pi pi-credit-card text-[#2b5e3b]"></i> Ventas por tarjeta:
               </span>
-              <span class="ml-2 font-semibold text-[#1a2e1f] text-lg">
-                ${{ formatNumber(ventasTarjeta) }}
-              </span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasTarjeta) }}</span>
             </div>
 
-            <div
-              class="flex justify-between items-center p-4 bg-[#f9fbf7] rounded-xl border border-[#dee6d6]"
-            >
-              <span class="text-sm text-[#5f7b58]">
-                <i class="pi pi-mobile mr-2"></i> Transferencia bancaria:
+            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+              <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <i class="pi pi-mobile text-[#2b5e3b]"></i> Transferencia bancaria:
               </span>
-              <span class="ml-2 font-semibold text-[#1a2e1f] text-lg">
-                ${{ formatNumber(ventasTransferencia) }}
-              </span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasTransferencia) }}</span>
             </div>
 
-            <div
-              class="flex justify-between items-center p-4 bg-[#fefcf5] rounded-xl border border-[#dee6d6]"
-            >
-              <span class="text-sm text-[#5f7b58]">
-                <i class="pi pi-plus mr-2"></i> Otras entradas
+            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+              <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <i class="pi pi-plus text-green-600"></i> Otras entradas:
               </span>
-              <span class="ml-2 font-semibold text-green-600 text-lg">
-                +${{ formatNumber(entradas) }}
-              </span>
+              <span class="font-bold text-green-700 font-mono text-lg">+${{ formatNumber(entradas) }}</span>
             </div>
 
-            <div
-              class="flex justify-between items-center p-4 bg-[#fefcf5] rounded-xl border border-[#dee6d6] md:col-span-2"
-            >
-              <span class="text-sm text-[#5f7b58]">
-                <i class="pi pi-arrow-down mr-2"></i> Retiros / Gastos:
+            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd] col-span-2">
+              <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <i class="pi pi-arrow-down text-red-600"></i> Retiros / Gastos:
               </span>
-              <span class="ml-2 font-semibold text-red-600 text-lg">
-                -${{ formatNumber(retiros) }}
-              </span>
+              <span class="font-bold text-red-600 font-mono text-lg">-${{ formatNumber(retiros) }}</span>
             </div>
           </div>
 
-          <div class="mt-6 pt-4 border-t-2 border-[#e8efe1] flex justify-between items-center">
-            <span class="text-base font-semibold text-[#1a2e1f]">
-              <i class="pi pi-chart-line mr-2 text-[#e0b354]"></i> Total vendido y movimientos del turno
+          <div class="pt-4 border-t border-[#e2e8dd] flex justify-between items-center">
+            <span class="text-base font-bold text-[#1a2e1f] flex items-center gap-2">
+              <i class="pi pi-chart-line text-[#a17923]"></i> Total vendido y movimientos del turno
             </span>
-            <span class="text-3xl font-bold text-[#2b5e3b]">${{ formatNumber(totalEnCaja) }}</span>
+            <span class="text-3xl font-bold text-[#2b5e3b] font-mono">${{ formatNumber(totalEnCaja) }}</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- CAJERO: acciones + movimientos | ADMIN: solo movimientos -->
-    <div :class="esCajero ? 'grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8' : 'mb-8'">
-      <!-- Columna izquierda (solo cajero) -->
-      <div v-if="esCajero" class="xl:col-span-1 flex flex-col gap-6">
-        <div
-          class="bg-white rounded-2xl p-6 border border-[#e8efe1] shadow-sm hover:shadow-md transition-all duration-200"
-        >
-          <p class="text-sm font-medium text-[#6d8f60] mb-3">
-            <i class="pi pi-wallet mr-2"></i> Monto Inicial
-          </p>
-          <p class="text-3xl font-bold text-[#1a2e1f]">${{ formatNumber(cajaStore.montoInicial) }}</p>
-          <p class="text-xs text-[#819b74] mt-2">Efectivo al abrir el turno</p>
-        </div>
-
-        <div class="bg-white rounded-2xl border border-[#e8efe1] overflow-hidden shadow-sm">
-          <div class="bg-[#fafdf7] px-6 py-4 border-b border-[#e8efe1]">
-            <h2 class="font-semibold text-[#1a2e1f] text-lg">
-              <i class="pi pi-cog mr-2 text-[#e0b354]"></i> Acciones
-            </h2>
-            <p class="text-xs text-[#6d8f60] mt-1">Operaciones del turno</p>
+      <!-- CAJERO / ADMIN PC: Acciones y Tabla de Movimientos -->
+      <div :class="esCajero ? 'grid grid-cols-3 gap-6' : 'w-full'">
+        <!-- Columna Acciones Cajero -->
+        <div v-if="esCajero" class="col-span-1 space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
+            </p>
+            <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+            <p class="text-xs text-gray-400 mt-2 m-0">Efectivo al abrir el turno</p>
           </div>
 
-          <div class="p-5 space-y-3">
-            <button
-              v-if="!cajaStore.cajaAbierta"
-              @click="abrirCaja"
-              class="w-full py-3 rounded-xl font-semibold text-white bg-[#2b5e3b] hover:bg-[#1f482d] transition-all flex items-center justify-center gap-2"
-            >
-              <i class="pi pi-unlock"></i> Apertura de caja
-            </button>
+          <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden">
+            <div class="bg-[#fbfdf9] px-6 py-4 border-b border-[#e2e8dd]">
+              <h2 class="font-bold text-[#1a2e1f] text-base flex items-center gap-2 m-0">
+                <i class="pi pi-cog text-[#a17923]"></i> Acciones
+              </h2>
+            </div>
+            <div class="p-5 space-y-3">
+              <Button
+                v-if="!cajaStore.cajaAbierta"
+                icon="pi pi-unlock"
+                label="Apertura de Caja"
+                class="w-full !bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none rounded-xl py-3 font-semibold text-sm cursor-pointer shadow-2xs"
+                @click="abrirCaja"
+              />
 
-            <!-- Otro cajero tiene el turno abierto -->
-            <div
-              v-else-if="cajaStore.turnoDeOtroCajero"
-              class="w-full py-3 px-4 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm flex items-start gap-2"
-            >
-              <i class="pi pi-user mt-0.5"></i>
-              <span>
-                El turno está abierto por
-                <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong>. Solo ese cajero puede
-                operar y cerrarlo.
-              </span>
+              <div
+                v-else-if="cajaStore.turnoDeOtroCajero"
+                class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2"
+              >
+                <i class="pi pi-user text-amber-600 mt-0.5"></i>
+                <span>Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong>.</span>
+              </div>
+
+              <Button
+                v-else-if="!cajaStore.ventaAbierta"
+                icon="pi pi-shopping-cart"
+                label="Aperturar Venta"
+                class="w-full !bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white !border-none rounded-xl py-3 font-semibold text-sm cursor-pointer shadow-2xs"
+                @click="abrirVenta"
+              />
+
+              <Button
+                v-else
+                icon="pi pi-lock"
+                label="Cerrar Caja"
+                class="w-full !bg-red-600 hover:!bg-red-700 !text-white !border-none rounded-xl py-3 font-semibold text-sm cursor-pointer shadow-2xs"
+                @click="cerrarCaja"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla Movimientos PC -->
+        <div :class="esCajero ? 'col-span-2' : 'w-full'">
+          <div class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden">
+            <div class="bg-[#fbfdf9] px-6 py-4 border-b border-[#e2e8dd]">
+              <h3 class="font-bold text-[#1a2e1f] text-base flex items-center gap-2 m-0">
+                <i class="pi pi-history text-[#a17923]"></i> Movimientos del Turno
+              </h3>
             </div>
 
-            <button
-              v-else-if="!cajaStore.ventaAbierta"
-              @click="abrirVenta"
-              class="w-full py-3 rounded-xl font-semibold text-white bg-[#2b5e3b] hover:bg-[#1f482d] transition-all flex items-center justify-center gap-2"
+            <DataTable
+              :value="movimientosRecientes"
+              responsiveLayout="scroll"
+              class="p-datatable-custom text-sm w-full"
             >
-              <i class="pi pi-shopping-cart"></i> Aperturar venta
-            </button>
+              <template #empty>
+                <div class="flex flex-col items-center justify-center py-10 text-gray-400">
+                  <i class="pi pi-inbox text-4xl mb-2 opacity-40" />
+                  <span class="text-sm font-medium">
+                    {{ turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto' }}
+                  </span>
+                </div>
+              </template>
 
-            <button
-              v-else
-              @click="cerrarCaja"
-              class="w-full py-3 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 transition-all flex items-center justify-center gap-2"
-            >
-              <i class="pi pi-lock"></i> Cerrar caja
-            </button>
-          </div>
-        </div>
-      </div>
+              <Column field="hora" header="Hora" class="min-w-[7rem]">
+                <template #body="slotProps">
+                  <span class="font-mono text-xs text-gray-600 font-semibold">{{ slotProps.data.hora }}</span>
+                </template>
+              </Column>
 
-      <!-- Movimientos del turno (ambos roles) -->
-      <div :class="esCajero ? 'xl:col-span-2' : ''">
-        <div class="bg-white rounded-2xl shadow-sm border border-[#e8efe1] overflow-hidden">
-          <div class="bg-[#fafdf7] px-6 py-4 border-b border-[#e8efe1]">
-            <h3 class="font-semibold text-[#1a2e1f]">
-              <i class="pi pi-history mr-2 text-[#e0b354]"></i> Movimientos del turno
-            </h3>
-          </div>
+              <Column field="concepto" header="Concepto" class="min-w-[14rem]">
+                <template #body="slotProps">
+                  <span class="text-xs text-[#1a2e1f] font-medium" :class="{ 'line-through opacity-60': slotProps.data.esAnulado }">
+                    {{ slotProps.data.concepto }}
+                  </span>
+                </template>
+              </Column>
 
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-[#e8f0e2]">
-              <thead class="bg-[#fafdf7] text-[#3c674b] text-xs font-semibold">
-                <tr>
-                  <th class="px-6 py-4 text-left">Hora</th>
-                  <th class="px-6 py-4 text-left">Concepto</th>
-                  <th class="px-6 py-4 text-left">Monto</th>
-                  <th class="px-6 py-4 text-left">Tipo</th>
-                </tr>
-              </thead>
-
-              <tbody class="divide-y divide-[#f0f5ea] text-sm">
-                <tr
-                  v-for="mov in movimientosRecientes"
-                  :key="mov.id"
-                  class="hover:bg-[#fefcf5] transition-colors"
-                  :class="{ 'opacity-60': mov.esAnulado }"
-                >
-                  <td class="px-6 py-3.5 font-medium text-[#1a2e1f]">
-                    {{ mov.hora }}
-                  </td>
-                  <td class="px-6 py-3.5 text-gray-600" :class="{ 'line-through': mov.esAnulado }">
-                    {{ mov.concepto }}
-                  </td>
-                  <td
-                    class="px-6 py-3.5"
+              <Column field="monto" header="Monto" class="min-w-[9rem]">
+                <template #body="slotProps">
+                  <span
+                    class="font-mono text-xs font-bold"
                     :class="[
-                      mov.tipo === 'Ingreso'
-                        ? 'text-green-700 font-semibold'
-                        : 'text-red-600 font-semibold',
-                      { 'line-through': mov.esAnulado },
+                      slotProps.data.tipo === 'Ingreso' ? 'text-[#2b5e3b]' : 'text-red-600',
+                      { 'line-through opacity-60': slotProps.data.esAnulado }
                     ]"
                   >
-                    {{ mov.monto }}
-                  </td>
-                  <td class="px-6 py-3.5">
-                    <div class="flex items-center gap-2">
-                      <span
-                        :class="[
-                          'text-xs px-2.5 py-1 rounded-full font-medium',
-                          mov.tipo === 'Ingreso'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800',
-                        ]"
-                      >
-                        {{ mov.tipo }}
-                      </span>
-                      <span
-                        v-if="mov.esAnulado"
-                        class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-200 text-gray-700"
-                      >
-                        Anulado
-                      </span>
-                    </div>
-                  </td>
-                </tr>
+                    {{ slotProps.data.monto }}
+                  </span>
+                </template>
+              </Column>
 
-                <tr v-if="movimientosRecientes.length === 0">
-                  <td colspan="4" class="text-center py-10 text-gray-400">
-                    {{ turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto' }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              <Column field="tipo" header="Tipo" class="min-w-[9rem]">
+                <template #body="slotProps">
+                  <div class="flex items-center gap-1.5">
+                    <Tag
+                      :value="slotProps.data.tipo"
+                      :severity="slotProps.data.tipo === 'Ingreso' ? 'success' : 'danger'"
+                      rounded
+                      class="!text-xs !px-2.5"
+                    />
+                    <Tag v-if="slotProps.data.esAnulado" value="Anulado" severity="secondary" rounded class="!text-xs !px-2.5" />
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
           </div>
         </div>
+
       </div>
+
     </div>
 
-    <!-- Credenciales de admin: apertura de caja -->
+    <!-- DIÁLOGOS Y MODALES -->
     <AdminAuthDialog
       ref="adminAuthRef"
       v-model:visible="adminAuthVisible"
       @credenciales-confirmadas="onCredencialesConfirmadas"
     />
 
-    <!-- Denominaciones: apertura de venta -->
     <OpenCashierDialog
       ref="openCashierRef"
       v-model:visible="aperturaVentaVisible"
@@ -317,14 +524,12 @@
       @open-cash-register="onAbrirVenta"
     />
 
-    <!-- Denominaciones: conteo de cierre -->
     <CloseCashierDialog
       ref="closeCashierRef"
       v-model:visible="conteoVisible"
       @cuadrar="onConteoListo"
     />
 
-    <!-- Credenciales de admin: cuadre -->
     <AdminAuthDialog
       ref="adminAuthCierreRef"
       v-model:visible="adminAuthCierreVisible"
@@ -333,19 +538,24 @@
       @credenciales-confirmadas="onCredencialesCierre"
     />
 
-    <!-- Resumen del cuadre y cierre -->
     <CierreCajaDialog
       v-model:visible="cierreVisible"
       :datos="datosCierre"
       @cierre-exitoso="onCierreExitoso"
       @cancelar="onCancelarCierre"
     />
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import Swal from 'sweetalert2'
+import Tag from 'primevue/tag'
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+
 import { useCajaStore } from '@/stores/cajaStore'
 import { usePosStore } from '@/stores/posStore'
 import authService from '@/services/authService'
@@ -368,7 +578,6 @@ const esAdministrador = computed(
 )
 const esCajero = computed(() => rolUsuario.value === 'cajero')
 
-// Hay un turno abierto (de cualquier cajero): es lo que ve el administrador
 const turnoAbierto = computed(() => !!cajaStore.turnoActivo)
 
 const currentDate = ref(
@@ -389,9 +598,8 @@ const closeCashierRef = ref(null)
 
 // --- Datos del cierre ---
 const datosCierre = ref({})
-const denominacionesGuardadas = ref([]) 
-const conteoGuardado = ref({}) 
-
+const denominacionesGuardadas = ref([])
+const conteoGuardado = ref({})
 
 const ventasContado = ref(0)
 const ventasTarjeta = ref(0)
@@ -408,7 +616,7 @@ const totalEnCaja = computed(() => totalEnCajaReal.value)
 
 const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
 
-// --- Movimientos del turno (tabla) ---
+// --- Movimientos del turno ---
 const movimientosRecientes = ref([])
 
 const formatearHora = (fechaISO) =>
@@ -425,7 +633,6 @@ const mapearMovimiento = (mov) => ({
 
 const cargarMovimientosRecientes = async () => {
   try {
-    // turno_actual=1: solo los movimientos del turno abierto (no los de otros turnos o cajeros)
     const { data } = await getMovimientos({ per_page: 5, turno_actual: 1 })
     movimientosRecientes.value = (data.data ?? []).map(mapearMovimiento)
   } catch (error) {
@@ -450,14 +657,12 @@ const cargarResumenTurno = async () => {
   }
 }
 
-// Refresca estado de caja + movimientos + resumen. Llamar tras cualquier acción que cambie los datos.
 const refrescarDatosTurno = async () => {
   await Promise.all([cajaStore.cargarEstadoCaja(), cargarMovimientosRecientes(), cargarResumenTurno()])
 }
 
 onMounted(refrescarDatosTurno)
 
-// Permite refrescar desde fuera (ej. tras registrar un movimiento o una venta en otra vista)
 defineExpose({ refrescarDatosTurno })
 
 watch(
@@ -507,7 +712,6 @@ const abrirVenta = () => {
 }
 
 const onAbrirVenta = async ({ total, denominaciones, justificacion }) => {
-  // El modal permanece abierto hasta que el backend confirme, para no perder el conteo si falla
   const resultado = await cajaStore.abrirTurnoVenta({ denominaciones, justificacion })
 
   if (resultado.ok) {
@@ -526,7 +730,7 @@ const onAbrirVenta = async ({ total, denominaciones, justificacion }) => {
   })
 }
 
-// --- Cierre: conteo -> credenciales -> cuadre -> confirmación ---
+// --- Cierre ---
 const cerrarCaja = () => {
   conteoVisible.value = true
 }
@@ -573,9 +777,30 @@ const onCierreExitoso = async () => {
   conteoGuardado.value = {}
   datosCierre.value = {}
 
-  // El carrito en proceso no debe quedar disponible para el siguiente turno
   posStore.resetVenta()
 
   await refrescarDatosTurno()
 }
 </script>
+
+<style>
+.p-datatable-custom .p-datatable-thead > tr > th {
+  background-color: #fbfdf9 !important;
+  color: #2b5e3b !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid #e2e8dd !important;
+  white-space: nowrap !important;
+}
+
+.p-datatable-custom .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid #f1f5f0 !important;
+}
+
+.p-datatable-custom .p-datatable-tbody > tr:hover {
+  background-color: #f4f8f3 !important;
+}
+</style>

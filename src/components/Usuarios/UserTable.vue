@@ -1,18 +1,42 @@
 <template>
   <div class="bg-[#eef2e9] min-h-full p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <!-- Encabezado de la página -->
-    <div class="flex items-center gap-3 mb-6">
-      <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+              Registro de Usuarios
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">
+              Gestión de cuentas, roles y permisos
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Registro de usuarios
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos del sistema</p>
+
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:flex items-center gap-3 mb-6">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Registro de Usuarios
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">
+            Gestión de cuentas, roles y permisos del sistema
+          </p>
+        </div>
       </div>
-    </div>
 
     <!-- Contenedor Principal -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">

@@ -1,24 +1,44 @@
-<template>
-  <!-- Vista principal responsiva con padding adaptable mobile-first -->
+<template> ]
   <div class="bg-[#eef2e9] min-h-screen p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <!-- Encabezado de la página con dimensiones en rem -->
-    <div class="flex items-center gap-3 mb-6">
-      <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
-      >
-        <i class="pi pi-book text-[#2b5e3b] text-xl"></i>
+     
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+            <i class="pi pi-book text-[#2b5e3b] text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+              Catálogo de Categorías
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">
+              Gestión de categorías y ganancias
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Catálogo de categorías
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">
-          Gestión general de las categorías y ganancias
-        </p>
-      </div>
-    </div>
 
-    <!-- Contenedor único con bordes redondeados y sombra para la tabla -->
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:flex items-center gap-3 mb-6">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-book text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Catálogo de Categorías
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">
+            Gestión general de las categorías y ganancias
+          </p>
+        </div>
+      </div>
+
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
       <CategoriasTable
         :categorias="store.categorias"
@@ -28,7 +48,6 @@
       />
     </div>
 
-    <!-- Modales alineados al estándar -->
     <AddCategoriaDialog v-model:visible="modalAddVisible" />
 
     <EditCategoriaDialog
