@@ -66,7 +66,7 @@
       </div>
 
       <!-- ======================================================= -->
-      <!-- VISTA MÓVIL LOTES (Colores Verdes Institucionales)     -->
+      <!-- VISTA MÓVIL LOTES                                       -->
       <!-- ======================================================= -->
       <div class="block md:hidden">
         <DataTable 
@@ -86,10 +86,8 @@
             <div class="text-center py-8 text-gray-400 text-xs">No hay lotes registrados para esta presentación.</div>
           </template>
 
-          <!-- Flecha de Expansión -->
           <Column expander style="width: 2.2rem" />
 
-          <!-- Cód. Lote / Estado -->
           <Column header="Lote / Estado">
             <template #body="{ data }">
               <div class="flex flex-col gap-1 items-start">
@@ -101,7 +99,6 @@
             </template>
           </Column>
 
-          <!-- Stock Actual y Precio Venta -->
           <Column header="Stock Actual" class="text-right">
             <template #body="{ data }">
               <span class="font-bold text-[#1a2e1f] font-mono text-xs block">{{ formatNumber(data.cantidad_actual) }}</span>
@@ -111,42 +108,37 @@
             </template>
           </Column>
 
-          <!-- Desplegable Móvil Verde Uniforme -->
           <template #expansion="{ data }">
             <div class="p-3 bg-[#f4f7f2]/60 border-y border-[#e2e8dd] text-xs">
               <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2.5">
                 
-                <!-- Fila 1: Cantidades -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
                   <div>
                     <span class="text-[10px] font-bold uppercase text-[#6b7280] block">Cant. Inicial</span>
                     <span class="font-mono text-xs text-[#334155] font-semibold">{{ formatNumber(data.cantidad_inicial) }}</span>
                   </div>
                   <div class="text-right">
-                    <span class="text-[10px] font-bold uppercase text-[#6b7280]  block">Costo Unit.</span>
+                    <span class="text-[10px] font-bold uppercase text-[#6b7280] block">Costo Unit.</span>
                     <span class="font-mono text-xs text-[#334155] font-semibold">${{ formatNumber(data.costo_unitario_compra) }}</span>
                   </div>
                 </div>
 
-                <!-- Fila 2: Descuento y Vencimiento -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
-                <div>
-                  <span class="text-[10px] font-bold uppercase text-[#6b7280] block">Descuento</span>
-                  <span v-if="Number(data.porcentaje_descuento) > 0" class="bg-[#f4f7f2] text-[#2b5e3b] font-bold px-2 py-0.5 rounded text-[10px] border border-[#dce4d7]">
-                    {{ data.porcentaje_descuento }}%
-                  </span>
-                  <!-- Novedad: Etiqueta gris sólida en lugar de texto decolorido -->
-                  <span v-else class="bg-gray-50 text-gray-600 font-medium px-2 py-0.5 rounded text-[10px] border border-gray-200">
-                    Sin desc.
-                  </span>
-                </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#6b7280] block">Descuento</span>
+                    <span v-if="Number(data.porcentaje_descuento) > 0" class="bg-[#f4f7f2] text-[#2b5e3b] font-bold px-2 py-0.5 rounded text-[10px] border border-[#dce4d7]">
+                      {{ data.porcentaje_descuento }}%
+                    </span>
+                    <span v-else class="bg-gray-50 text-gray-600 font-medium px-2 py-0.5 rounded text-[10px] border border-gray-200">
+                      Sin desc.
+                    </span>
+                  </div>
                   <div class="text-right">
                     <span class="text-[10px] font-bold uppercase text-[#6b7280] block">Vencimiento</span>
                     <span class="font-mono text-xs text-[#1a2e1f] font-semibold">{{ formatFecha(data.fecha_vencimiento) }}</span>
                   </div>
                 </div>
 
-                <!-- Fila 3: Botones de Acción Móvil -->
                 <div class="pt-1 flex justify-end gap-2">
                   <Button icon="pi pi-tag" label="Descuento" severity="secondary" outlined size="small"
                     class="!py-1.5 !px-3 !text-xs !text-[#2b5e3b] !border-[#2b5e3b] hover:!bg-[#f4f7f2] rounded-lg cursor-pointer font-medium"
@@ -166,7 +158,7 @@
       </div>
 
       <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO LOTES (Solo PC: hidden md:block)       -->
+      <!-- VISTA ESCRITORIO LOTES                                  -->
       <!-- ======================================================= -->
       <div class="hidden md:block">
         <DataTable :value="loteStore.lotes" :loading="loteStore.cargando" lazy paginator :rows="loteStore.perPage"
@@ -213,7 +205,6 @@
                 class="bg-[#f4f7f2] text-[#2b5e3b] font-bold px-2 py-0.5 rounded-md text-xs border border-[#dce4d7]">
                 {{ data.porcentaje_descuento }}%
               </span>
-              <!-- Novedad: Etiqueta gris sólida para PC -->
               <span v-else class="bg-gray-50 text-gray-600 font-medium px-2 py-0.5 rounded-md text-xs border border-gray-200">
                 0%
               </span>
@@ -256,35 +247,84 @@
 
     </div>
 
-    <!-- MODALES -->
-    <Dialog v-model:visible="modalVisible" header="Gestionar Descuento" :style="{ width: '400px' }" modal :pt="{
-      root: { class: '!rounded-2xl' },
-      header: { class: '!pb-2 !border-b !border-gray-100' }
-    }">
-      <div class="flex flex-col gap-1.5">
-          <BaseInputPercent
-            v-model="porcentajeInput"
-            label="Porcentaje de descuento (%)"
-            :min="0"
-            :min-fraction-digits="0"
+    <!-- ======================================================= -->
+    <!-- DIÁLOGO ESTANDARIZADO: GESTIONAR DESCUENTO              -->
+    <!-- ======================================================= -->
+    <Dialog 
+      v-model:visible="modalVisible" 
+      header="GESTIONAR DESCUENTO" 
+      modal 
+      :draggable="false"
+      :closable="false"
+      :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
+      class="custom-dialog"
+      :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    >
+      <!-- VISTA MÓVIL (< 640px) -->
+      <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+        <BaseInputPercent
+          v-model="porcentajeInput"
+          label="Porcentaje de descuento (%)"
+          :min="0"
+          :min-fraction-digits="0"
+          help="Este descuento se aplicará directamente al precio de venta del lote."
+        />
+
+        <div class="pt-3 flex flex-col gap-2 w-full">
+          <Button 
+            label="Guardar" 
+            :loading="guardando"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+            @click="guardarDescuento" 
           />
-          <small class="text-xs text-gray-500">
-            Este descuento se aplicará directamente al precio de venta del lote.
-          </small>
+          <Button 
+            label="Cerrar" 
+            icon="pi pi-times" 
+            severity="secondary" 
+            outlined 
+            class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+            @click="modalVisible = false" 
+          />
         </div>
-      <template #footer>
-        <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
-          <Button label="Cancelar" icon="pi pi-times" severity="secondary" outlined @click="modalVisible = false"
-            class="!rounded-xl !py-2 !px-4 text-sm cursor-pointer" />
-          <Button label="Guardar" icon="pi pi-check" :loading="guardando"
-            class="!bg-[#2b5e3b] !border-[#2b5e3b] !text-white !rounded-xl !py-2 !px-4 text-sm cursor-pointer"
-            @click="guardarDescuento" />
+      </div>
+
+      <!-- VISTA ESCRITORIO (>= 640px) -->
+      <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+        <BaseInputPercent
+          v-model="porcentajeInput"
+          label="Porcentaje de descuento (%)"
+          :min="0"
+          :min-fraction-digits="0"
+          help="Este descuento se aplicará directamente al precio de venta del lote."
+        />
+
+        <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+          <Button 
+            label="Cerrar" 
+            icon="pi pi-times" 
+            severity="secondary" 
+            outlined 
+            class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+            @click="modalVisible = false" 
+          />
+          <Button 
+            label="Guardar" 
+            :loading="guardando"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
+            @click="guardarDescuento" 
+          />
         </div>
-      </template>
+      </div>
     </Dialog>
 
-    <AjusteLoteDialog v-model="mostrarModalAjuste" :lote="loteSeleccionado" :nombre-presentacion="nombrePresentacion"
-      :unidad-medida="unidadMedida || 'Unidad'" @ajuste-realizado="refrescarTablaLotes" />
+    <!-- MODAL AUXILIAR DE AJUSTE DE LOTE -->
+    <AjusteLoteDialog 
+      v-model="mostrarModalAjuste" 
+      :lote="loteSeleccionado" 
+      :nombre-presentacion="nombrePresentacion"
+      :unidad-medida="unidadMedida || 'Unidad'" 
+      @ajuste-realizado="refrescarTablaLotes" 
+    />
   </div>
 </template>
 
@@ -382,6 +422,35 @@ const severidadEstado = (estado) => {
   return mapa[estado] ?? 'info'
 }
 </script>
+
+<style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
+.custom-dialog .p-dialog-header {
+  background-color: #1a3323 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #2b5e3b !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1.1rem 1.5rem !important;
+}
+
+/* Limpieza del contenedor de contenido */
+.custom-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  padding: 0 !important;
+}
+
+/* Enfoques y bordes para componentes PrimeVue dentro del modal */
+.p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
+}
+</style>
 
 <style scoped>
 :deep(.p-datatable .p-datatable-thead > tr > th) {

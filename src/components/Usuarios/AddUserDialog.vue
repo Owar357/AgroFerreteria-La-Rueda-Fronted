@@ -4,12 +4,83 @@
     modal
     header="AGREGAR USUARIO"
     :draggable="false"
+    :closable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="reiniciarFormulario"
   >
-    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
+    <!-- ======================================================= -->
+    <!-- CONTENIDO - VISTA MÓVIL (< 640px)                       -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model="form.name"
+        label="Nombre"
+        size="xl"
+        placeholder="Nombre completo"
+        filter="alpha"
+        :error="errors.name"
+        @input="validarCampo('name')"
+      />
+
+      <BaseInput
+        v-model="form.email"
+        label="Email"
+        size="xl"
+        placeholder="correo@ejemplo.com"
+        autocomplete="off"
+        :error="errors.email"
+        @input="validarCampo('email')"
+      />
+
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña"
+        size="xl"
+        placeholder="********"
+        :error="errors.password"
+        @input="validarCampo('password')"
+      />
+
+      <div class="flex flex-col gap-1.5 w-full">
+        <label class="text-xs font-semibold text-[#1a2e1f]">Rol</label>
+        <Select
+          v-model="form.role"
+          :options="roles"
+          placeholder="Seleccionar rol"
+          @change="validarCampo('role')"
+          class="w-full !bg-[#f9fafb] !border-[#d1d5db] text-[#1a2e1f] text-xs h-[2.5rem] flex items-center px-2 rounded-xl"
+          :class="{ '!border-red-500': errors.role }"
+        />
+        <small v-if="errors.role" class="text-red-600 text-[11px] font-medium">
+          {{ errors.role }}
+        </small>
+      </div>
+
+      <!-- Botones Móvil (Vertical - Full Width) -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
+        <Button
+          label="Guardar"
+          :loading="cargando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="guardarUsuario"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl  !w-full font-semibold cursor-pointer"
+          @click="visibleLocal = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- CONTENIDO - VISTA ESCRITORIO (>= 640px)                -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
       <BaseInput
         v-model="form.name"
         label="Nombre"
@@ -54,12 +125,20 @@
         </small>
       </div>
 
-      <!-- Botón de acción: ancho completo en celular, centrado en PC exacto al diseño original -->
-      <div class="flex justify-center mt-4 w-full">
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="visibleLocal = false"
+        />
         <Button
           label="Guardar"
           :loading="cargando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full sm:w-auto"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="guardarUsuario"
         />
       </div>
@@ -200,15 +279,16 @@ const guardarUsuario = async () => {
   z-index: 999999 !important;
 }
 
+/* Header del Modal sin botón X */
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 0.0625rem solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
@@ -216,6 +296,7 @@ const guardarUsuario = async () => {
   padding: 0 !important;
 }
 
+/* Form inputs & selects */
 .p-inputtext:enabled:focus,
 .p-select:not(.p-disabled).p-focus,
 .p-password-input:enabled:focus {

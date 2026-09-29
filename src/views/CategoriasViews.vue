@@ -1,4 +1,4 @@
-<template> ]
+<template> 
   <div class="bg-[#eef2e9] min-h-screen p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
      
       <!-- ======================================================= -->

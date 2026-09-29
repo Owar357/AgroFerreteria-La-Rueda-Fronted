@@ -4,13 +4,16 @@
     modal
     header="EDITAR USUARIO"
     :draggable="false"
+    :closable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="reiniciarFormulario"
   >
-    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      <!-- NOMBRE -->
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
       <BaseInput
         v-model.trim="form.name"
         label="Nombre"
@@ -22,7 +25,59 @@
         @input="validarNombre"
       />
 
-      <!-- CONTRASEÑA NUEVA -->
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña nueva"
+        size="xl"
+        placeholder="********"
+        help="(Opcional — dejar vacío para no cambiar)"
+        :error="errors.password"
+        @input="validarContrasena"
+      />
+
+      <BasePassword
+        v-model="form.confirmPassword"
+        label="Confirmar contraseña"
+        placeholder="********"
+        :error="errors.confirmPassword"
+        @input="validarConfirmarContrasena"
+      />
+
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
+        <Button
+          label="Guardar datos"
+          :loading="cargando"
+          :disabled="!tieneCambios"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full disabled:!opacity-50"
+          @click="procesarActualizacion"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="visibleLocal = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model.trim="form.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre del usuario"
+        filter="alpha"
+        maxlength="100"
+        autocomplete="name"
+        :error="errors.name"
+        @input="validarNombre"
+      />
+
       <BasePassword
         v-model="form.password"
         label="Contraseña nueva"
@@ -33,7 +88,6 @@
         @input="validarContrasena"
       />
 
-      <!-- CONFIRMAR CONTRASEÑA -->
       <BasePassword
         v-model="form.confirmPassword"
         label="Confirmar contraseña"
@@ -42,13 +96,21 @@
         @input="validarConfirmarContrasena"
       />
 
-      <!-- BOTÓN PRINCIPAL (ANCHO COMPLETO W-FULL) -->
-      <div class="flex justify-center mt-4 w-full">
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="visibleLocal = false"
+        />
         <Button
           label="Guardar datos"
           :loading="cargando"
           :disabled="!tieneCambios"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center disabled:!opacity-50"
           @click="procesarActualizacion"
         />
       </div>
@@ -138,7 +200,6 @@ const reiniciarFormulario = () => {
   errors.confirmPassword = ''
 }
 
-// Validaciones para el nombre
 const validarNombre = () => {
   const nombre = form.name.trim()
 
@@ -259,14 +320,14 @@ const procesarActualizacion = async () => {
 }
 
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 0.0625rem solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {

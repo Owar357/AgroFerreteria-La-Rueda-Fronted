@@ -1,247 +1,369 @@
 <template>
   <Dialog
     v-model:visible="visible"
-    :modal="true"
-    :closable="true"
-    :style="{ width: '1200px' }"
-    :pt="{
-      root: { class: '!rounded-2xl !border-0 overflow-hidden shadow-2xl bg-white' },
-      header: {
-        class: '!bg-[#1a2e1f] !text-white !px-5 !py-3 !border-0 flex items-center justify-between',
-      },
-      title: { class: '!text-white !font-bold' },
-      closeButton: {
-        class:
-          '!text-white/70 hover:!text-white hover:!bg-white/10 transition-colors rounded-full w-8 h-8 flex items-center justify-center',
-      },
-      content: { class: 'bg-[#eef2e9] p-6 !border-0' },
-      footer: { class: 'bg-white p-4 !border-0' },
-    }"
+    modal
+    header="DETALLE DE COMPRA"
+    :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 68rem)' }"
+    class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
   >
-    <template #header>
-      <div class="flex items-center gap-2.5">
-        <span
-          class="bg-[#2b5e3b] text-white rounded-full p-1.5 flex items-center justify-center shadow-sm"
-        >
-          <i class="pi pi-shopping-cart text-[15px]" />
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div v-if="compra" class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Subcabecera con Nº Documento -->
+      <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
+        <span class="text-xs font-bold uppercase text-[#2b5e3b]">Documento</span>
+        <span class="text-xs font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-2.5 py-1 rounded-md border border-[#dce4d7]">
+          {{ compra.numero_documento }}
         </span>
-        <div>
-          <h2 class="text-[16px] font-bold text-white m-0 tracking-wide">Detalle de Compra</h2>
-          <p class="text-[12px] text-[#a7f3d0] font-mono m-0 opacity-90">
-            {{ compra?.numero_documento }}
-          </p>
+      </div>
+
+      <!-- Resumen General Móvil -->
+      <div class="bg-[#fbfdf9] rounded-xl border border-[#e2e8dd] p-3.5 space-y-2.5 text-xs">
+        <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+          <span class="text-gray-500 font-medium">Proveedor:</span>
+          <span class="font-bold text-[#1a2e1f]">{{ compra.proveedor?.nombre || '—' }}</span>
+        </div>
+        <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+          <span class="text-gray-500 font-medium">Fecha Emisión:</span>
+          <span class="font-semibold text-[#1a2e1f]">{{ formatDate(compra.fecha_emision) }}</span>
+        </div>
+        <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+          <span class="text-gray-500 font-medium">Tipo DTE:</span>
+          <span class="font-semibold text-[#1a2e1f]">{{ compra.tipo_dte }}</span>
+        </div>
+        <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+          <span class="text-gray-500 font-medium">Estado Pago:</span>
+          <span
+            :class="
+              compra.estado_pago === 'PAGADO'
+                ? 'bg-[#dff0e0] text-[#2b5e3b] border-[#c5e3c7]'
+                : 'bg-[#fee2e2] text-[#b91c1c] border-[#fecaca]'
+            "
+            class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border"
+          >
+            {{ compra.estado_pago }}
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500 font-medium">Vencimiento:</span>
+          <span class="font-semibold text-[#1a2e1f]">{{ formatDate(compra.fecha_vencimiento_pago) }}</span>
         </div>
       </div>
-    </template>
 
-    <div v-if="compra" class="flex flex-col gap-6 pt-2">
-      <!-- Información general -->
-      <div class="bg-white rounded-xl border border-[#e2e8dd] p-4 shadow-sm">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <!-- Tabla Desplegable Móvil -->
+      <div class="space-y-2">
+        <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center gap-1.5">
+          <i class="pi pi-box text-[#2b5e3b]" /> Productos y Lotes
+        </p>
+
+        <div class="rounded-xl border border-[#e2e8dd] overflow-hidden bg-white shadow-2xs">
+          <DataTable
+            v-model:expandedRows="expandedRows"
+            :value="compra.detalles_compra"
+            dataKey="id"
+            class="p-datatable-custom text-xs w-full"
+          >
+            <!-- Columna Expansible (Flecha) -->
+            <Column expander style="width: 2.2rem" />
+
+            <Column header="Producto">
+              <template #body="{ data }">
+                <div class="flex flex-col">
+                  <span class="font-bold text-[#1a2e1f] capitalize">
+                    {{ data.lote?.presentacion?.producto?.nombre || '—' }}
+                  </span>
+                  <span class="text-[10px] text-gray-500">
+                    {{ data.lote?.presentacion?.nombre || '—' }}
+                  </span>
+                </div>
+              </template>
+            </Column>
+
+            <Column header="Subtotal" class="text-right">
+              <template #body="{ data }">
+                <span class="font-bold text-[#1a2e1f] font-mono">
+                  ${{ formatCurrency(data.sub_total) }}
+                </span>
+              </template>
+            </Column>
+
+            <!-- Desplegable Móvil -->
+            <template #expansion="{ data }">
+              <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+                <div class="bg-white p-3 rounded-lg border border-[#e2e8dd] space-y-2">
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Lote Interno:</span>
+                    <span class="font-mono font-bold text-[#1a2e1f] bg-gray-100 px-1.5 py-0.5 rounded">
+                      {{ data.lote?.lote_interno || 'Sin lote' }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Lote Fabricante:</span>
+                    <span class="font-mono text-gray-700">{{ data.lote?.lote_fabricante || '—' }}</span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Vencimiento:</span>
+                    <span class="font-mono text-gray-700">
+                      {{ data.lote?.fecha_vencimiento ? formatDate(data.lote.fecha_vencimiento) : '—' }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Cant. Facturada:</span>
+                    <span class="font-mono font-bold">{{ Number(data.cantidad_facturada).toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Bonificado:</span>
+                    <span class="font-mono text-[#2b5e3b] font-semibold">
+                      {{ Number(data.cantidad_bonificada) > 0 ? `+${Number(data.cantidad_bonificada).toFixed(2)}` : '0.00' }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Precio Factura:</span>
+                    <span class="font-mono">${{ formatCurrency(data.precio_unitario_factura) }}</span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">IVA Línea:</span>
+                    <span class="font-mono">${{ formatCurrency(data.iva_linea) }}</span>
+                  </div>
+                  <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                    <span class="text-gray-500 font-medium">Descuento:</span>
+                    <span class="font-mono text-[#b91c1c]">
+                      {{ Number(data.descuento_linea) > 0 ? `-$${formatCurrency(data.descuento_linea)}` : '$0.00' }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 font-medium">Costo Real Lote:</span>
+                    <span class="font-mono font-bold text-[#1a2e1f]">
+                      ${{ formatCurrency(data.lote?.costo_unitario_compra) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </DataTable>
+        </div>
+      </div>
+
+      <!-- Total Móvil -->
+      <div class="bg-[#f4f7f2] border border-[#e2e8dd] rounded-xl p-3.5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase text-[#1e3a2f]">Total Compra:</span>
+        <span class="text-xl font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra.monto_total) }}</span>
+      </div>
+
+      <!-- Botones Móvil -->
+      <div class="pt-2 flex flex-col gap-2 w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="visible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div v-if="compra" class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Subcabecera Nº Documento -->
+      <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-receipt text-[#2b5e3b] text-base" />
+          <span class="text-xs font-bold uppercase tracking-wider text-[#2b5e3b]">Documento N°</span>
+        </div>
+        <span class="text-sm font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-3 py-1 rounded-lg border border-[#dce4d7]">
+          {{ compra.numero_documento }}
+        </span>
+      </div>
+
+      <!-- Información General Grid Escritorio -->
+      <div class="bg-[#fbfdf9] rounded-2xl border border-[#e2e8dd] p-4 shadow-2xs">
+        <div class="grid grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Proveedor
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">
-              {{ compra.proveedor?.nombre }}
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Proveedor</p>
+            <p class="text-sm font-bold text-[#1a2e1f] m-0">{{ compra.proveedor?.nombre || '—' }}</p>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Fecha de Emisión
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">
-              {{ formatDate(compra.fecha_emision) }}
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Fecha Emisión</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0 font-mono">{{ formatDate(compra.fecha_emision) }}</p>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Tipo DTE
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">{{ compra.tipo_dte }}</p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Tipo DTE</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0">{{ compra.tipo_dte }}</p>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Estado de Pago
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Estado Pago</p>
             <span
               :class="
                 compra.estado_pago === 'PAGADO'
                   ? 'bg-[#dff0e0] text-[#2b5e3b] border-[#c5e3c7]'
                   : 'bg-[#fee2e2] text-[#b91c1c] border-[#fecaca]'
               "
-              class="px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wide border inline-block"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border inline-block"
             >
               {{ compra.estado_pago }}
             </span>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Vencimiento pago
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">
-              {{ formatDate(compra.fecha_vencimiento_pago) }}
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Vencimiento Pago</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0 font-mono">{{ formatDate(compra.fecha_vencimiento_pago) }}</p>
           </div>
           <div v-if="compra.usuario">
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Registrado por
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">{{ compra.usuario.nombre }}</p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Registrado por</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0">{{ compra.usuario.nombre }}</p>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              Descuento global
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">
-              ${{ formatCurrency(compra.descuento_global) }}
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">Descuento Global</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0 font-mono">${{ formatCurrency(compra.descuento_global) }}</p>
           </div>
           <div>
-            <p class="text-[11px] uppercase tracking-wider text-[#6b7280] font-bold mb-1">
-              IVA total
-            </p>
-            <p class="text-[14px] font-semibold text-[#1a2e1f] m-0">
-              ${{ formatCurrency(compra.iva_total) }}
-            </p>
+            <p class="text-[10px] uppercase tracking-wider text-[#2b5e3b] font-bold mb-0.5">IVA Total</p>
+            <p class="text-sm font-semibold text-[#1a2e1f] m-0 font-mono">${{ formatCurrency(compra.iva_total) }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Tabla de productos y lotes -->
-      <div>
-        <p
-          class="text-[11px] uppercase tracking-wider text-[#1a2e1f] font-bold mb-2.5 flex items-center gap-1.5"
-        >
-          <i class="pi pi-box text-[12px] text-[#2b5e3b]" />
-          Productos y Lotes
+      <!-- Tabla Completa Desplegable/Expandible para Escritorio -->
+      <div class="space-y-2">
+        <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center gap-1.5">
+          <i class="pi pi-box text-[#2b5e3b]" /> Productos y Lotes
         </p>
-        <div class="rounded-xl border border-[#e2e8dd] overflow-hidden shadow-sm bg-white">
+
+        <div class="rounded-2xl border border-[#e2e8dd] overflow-hidden bg-white shadow-2xs">
           <DataTable
+            v-model:expandedRows="expandedRows"
             :value="compra.detalles_compra"
+            dataKey="id"
             responsiveLayout="scroll"
-            class="p-datatable-detalle text-[13px]"
+            class="p-datatable-custom text-xs w-full"
           >
-            <Column header="Producto">
+            <!-- Columna Expansible (Flecha) -->
+            <Column expander style="width: 2.5rem" />
+
+            <Column header="Producto" class="font-semibold text-[#1a2e1f]">
               <template #body="{ data }">
-                <span class="text-[#1a2e1f] font-medium">{{
-                  data.lote?.presentacion?.producto?.nombre || '—'
-                }}</span>
+                <span class="font-bold text-[#1a2e1f] capitalize">
+                  {{ data.lote?.presentacion?.producto?.nombre || '—' }}
+                </span>
               </template>
             </Column>
+
             <Column header="Presentación">
               <template #body="{ data }">
-                <span class="text-[#4b5563]">{{ data.lote?.presentacion?.nombre || '—' }}</span>
+                <span class="text-gray-700">{{ data.lote?.presentacion?.nombre || '—' }}</span>
               </template>
             </Column>
-            <Column header="Lote interno">
+
+            <Column header="Lote Interno">
               <template #body="{ data }">
-                <span class="text-[#1a2e1f] font-medium">{{
-                  data.lote?.lote_interno || 'Sin lote'
-                }}</span>
-              </template>
-            </Column>
-            <Column header="Lote fabricante">
-              <template #body="{ data }">
-                <span class="text-[#4b5563]">{{ data.lote?.lote_fabricante || '—' }}</span>
-              </template>
-            </Column>
-            <Column header="Vence">
-              <template #body="{ data }">
-                <span class="text-[#4b5563]">{{
-                  data.lote?.fecha_vencimiento ? formatDate(data.lote.fecha_vencimiento) : '—'
-                }}</span>
-              </template>
-            </Column>
-            <Column header="Cant. facturada" class="text-right">
-              <template #body="{ data }">
-                <span class="text-[#4b5563]">{{ Number(data.cantidad_facturada).toFixed(2) }}</span>
-              </template>
-            </Column>
-            <Column header="Bonificado" class="text-right">
-              <template #body="{ data }">
-                <span class="text-[#2b5e3b] font-semibold">
-                  {{
-                    Number(data.cantidad_bonificada) > 0
-                      ? `+${Number(data.cantidad_bonificada).toFixed(2)}`
-                      : '0.00'
-                  }}
+                <span class="font-mono text-xs bg-[#f4f7f2] text-[#1a2e1f] px-2 py-0.5 rounded border border-[#dce4d7] font-bold">
+                  {{ data.lote?.lote_interno || 'Sin lote' }}
                 </span>
               </template>
             </Column>
-            <Column header="Precio factura" class="text-right">
+
+            <Column header="Cant. Facturada" class="text-right">
               <template #body="{ data }">
-                <span class="text-[#4b5563]"
-                  >${{ formatCurrency(data.precio_unitario_factura) }}</span
-                >
+                <span class="font-mono font-semibold">{{ Number(data.cantidad_facturada).toFixed(2) }}</span>
               </template>
             </Column>
-            <Column header="IVA línea" class="text-right">
+
+            <Column header="Precio Factura" class="text-right">
               <template #body="{ data }">
-                <span class="text-[#4b5563]">${{ formatCurrency(data.iva_linea) }}</span>
+                <span class="font-mono">${{ formatCurrency(data.precio_unitario_factura) }}</span>
               </template>
             </Column>
-            <Column header="Descuento" class="text-right">
-              <template #body="{ data }">
-                <span class="text-[#b91c1c]">
-                  {{
-                    Number(data.descuento_linea) > 0
-                      ? `-$${formatCurrency(data.descuento_linea)}`
-                      : '$0.00'
-                  }}
-                </span>
-              </template>
-            </Column>
-            <Column header="Costo real (lote)" class="text-right">
-              <template #body="{ data }">
-                <span class="text-[#1a2e1f]"
-                  >${{ formatCurrency(data.lote?.costo_unitario_compra) }}</span
-                >
-              </template>
-            </Column>
+
             <Column header="Subtotal" class="text-right">
               <template #body="{ data }">
-                <span class="font-bold text-[#1a2e1f]">${{ formatCurrency(data.sub_total) }}</span>
+                <span class="font-bold text-[#1a2e1f] font-mono">${{ formatCurrency(data.sub_total) }}</span>
               </template>
             </Column>
+
+            <!-- Desplegable con Detalle de Valores Secundarios (Escritorio) -->
+            <template #expansion="{ data }">
+              <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+                <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] grid grid-cols-4 gap-4">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Lote Fabricante</span>
+                    <span class="font-mono text-gray-700">{{ data.lote?.lote_fabricante || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Vencimiento</span>
+                    <span class="font-mono text-gray-700">
+                      {{ data.lote?.fecha_vencimiento ? formatDate(data.lote.fecha_vencimiento) : '—' }}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Cant. Bonificada</span>
+                    <span class="font-mono text-[#2b5e3b] font-semibold">
+                      {{ Number(data.cantidad_bonificada) > 0 ? `+${Number(data.cantidad_bonificada).toFixed(2)}` : '0.00' }}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">IVA Línea</span>
+                    <span class="font-mono">${{ formatCurrency(data.iva_linea) }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Descuento Línea</span>
+                    <span class="font-mono text-[#b91c1c]">
+                      {{ Number(data.descuento_linea) > 0 ? `-$${formatCurrency(data.descuento_linea)}` : '$0.00' }}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Costo Real (Lote)</span>
+                    <span class="font-mono font-bold text-[#1a2e1f]">
+                      ${{ formatCurrency(data.lote?.costo_unitario_compra) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </template>
           </DataTable>
         </div>
       </div>
 
-      <!-- Total general -->
-      <div class="flex justify-end">
-        <div
-          class="bg-[#f4f7f2] border border-[#e2e8dd] rounded-xl px-5 py-2.5 flex items-center gap-4 shadow-sm"
-        >
-          <span class="text-[12px] font-bold uppercase tracking-wider text-[#1e3a2f] opacity-80"
-            >Total de la Compra</span
-          >
-          <span class="text-[22px] font-black text-[#2b5e3b]"
-            >${{ formatCurrency(compra.monto_total) }}</span
-          >
+      <!-- Total Compra + Botón de Cierre Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <div class="bg-[#f4f7f2] border border-[#e2e8dd] rounded-xl px-4 py-2 flex items-center gap-3">
+          <span class="text-xs font-bold uppercase text-[#1e3a2f]">Total de la Compra:</span>
+          <span class="text-2xl font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra.monto_total) }}</span>
         </div>
-      </div>
-    </div>
 
-    <template #footer>
-      <div class="flex justify-end w-full">
         <Button
           label="Cerrar"
           icon="pi pi-times"
-          class="!bg-[#1e3a2f] hover:!bg-[#2b5e3b] !text-white border-none text-[13px] font-bold px-6 py-3 rounded-xl transition-colors shadow-sm"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[30%] flex justify-center items-center"
           @click="visible = false"
         />
       </div>
-    </template>
+    </div>
   </Dialog>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+
 const props = defineProps({
   compra: { type: Object, default: null },
 })
 
 const visible = defineModel('visible', { type: Boolean, default: false })
+const expandedRows = ref({})
 
 const formatCurrency = (v) => {
   const num = parseFloat(v)
@@ -256,31 +378,37 @@ const formatDate = (isoDate) => {
 </script>
 
 <style>
-.p-datatable-detalle .p-datatable-thead > tr > th {
-  background-color: #f4f7f2 !important;
-  color: #1e3a2f !important;
+/* Encabezado sin 'X' y paleta AgroFerretería */
+.custom-dialog .p-dialog-header {
+  background-color: #1a3323 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #2b5e3b !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1.1rem 1.5rem !important;
+}
+
+/* Limpieza del contenedor de contenido */
+.custom-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  padding: 0 !important;
+}
+
+/* Estilos de la DataTable personalizada para detalles */
+.p-datatable-custom .p-datatable-thead > tr > th {
+  background-color: #fcfdfe !important;
   border-bottom: 1px solid #e2e8dd !important;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem !important;
 }
 
-.p-datatable-detalle .p-datatable-tbody > tr {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd !important;
-}
-
-.p-datatable-detalle .p-datatable-tbody > tr:last-child {
-  border-bottom: none !important;
-}
-
-.p-datatable-detalle .p-datatable-tbody > tr:nth-child(even) {
-  background-color: #f9fafb !important;
-}
-
-.p-datatable-detalle .p-datatable-tbody > tr:hover {
-  background-color: #eef2e9 !important;
+.p-datatable-custom .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid #f1f5f0 !important;
 }
 </style>
