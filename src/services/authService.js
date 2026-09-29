@@ -4,9 +4,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 // Claves locales
 const TOKEN_KEY = 'auth_token'
-const USER_KEY  = 'auth_user'
-const ROLE_KEY  = 'auth_role'
-
+const USER_KEY = 'auth_user'
+const ROLE_KEY = 'auth_role'
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -26,12 +25,12 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 // aqio se Capturan de forma global sesiones que expriran
 api.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem(TOKEN_KEY)
@@ -42,9 +41,8 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error)
-  }
+  },
 )
-
 
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
@@ -53,8 +51,8 @@ function normalizeRole(roles) {
 
 function saveSession(token, user, role) {
   localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(USER_KEY,  JSON.stringify(user))
-  localStorage.setItem(ROLE_KEY,  role)
+  localStorage.setItem(USER_KEY, JSON.stringify(user))
+  localStorage.setItem(ROLE_KEY, role)
 }
 
 function clearSession() {
@@ -65,14 +63,18 @@ function clearSession() {
 
 function getHomeRouteByRole(role) {
   switch (role) {
-    case 'ADMIN':    return '/admin/usuarios'
-    case 'CONTADOR': return '/admin/reportes'
-    case 'CAJERO':   return 'admin/venta/venta'
-    default:         return '/login'
+    case 'ADMIN':
+      return '/admin/usuarios'
+    case 'CONTADOR':
+      return '/admin/reportes'
+    case 'CAJERO':
+      return 'admin/venta/venta'
+    default:
+      return '/login'
   }
 }
 
-//  API pública 
+//  API pública
 const authService = {
   async login(identity, password) {
     try {
@@ -127,5 +129,25 @@ const authService = {
     return getHomeRouteByRole(this.getUserRole())
   },
 }
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status
+    const mensaje = (error.response?.data?.message || '').toLowerCase()
+    const esTokenInvalido =
+      status === 401 ||
+      mensaje.includes('token expirado') ||
+      mensaje.includes('token inválido') ||
+      mensaje.includes('no autenticado')
+
+    if (esTokenInvalido) {
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
+      localStorage.removeItem(ROLE_KEY)
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  },
+)
 
 export default authService

@@ -76,6 +76,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             :disabled="compras.length === 0"
             class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer disabled:!opacity-50"
             @click="generarPDF"
@@ -220,6 +221,7 @@
             <Button
               label="Generar PDF"
               icon="pi pi-file-pdf"
+              :loading="generandoPDF"
               :disabled="compras.length === 0"
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer disabled:!opacity-50"
               @click="generarPDF"
@@ -296,7 +298,7 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { DatePicker } from 'primevue'
 import Swal from 'sweetalert2'
-import { generarReporteComprasPorProveedor, getComprasPorProveedor } from '@/services/reporteService'
+import { generarReporteComprasPorProveedor } from '@/services/reporteService'
 
 const emit = defineEmits(['volver'])
 
@@ -304,6 +306,7 @@ const fechaInicio = ref(null)
 const fechaFin = ref(null)
 const compras = ref([])
 const cargando = ref(false)
+const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
   if (!date) return null
@@ -363,13 +366,25 @@ const filtrarCompras = async () => {
   }
 }
 
-const generarPDF = () => {
+const generarPDF = async () => {
   if (!fechaInicio.value || !fechaFin.value) return
 
-  generarReporteComprasPorProveedor({
-    fechaInicio: formatFechaParam(fechaInicio.value),
-    fechaFin: formatFechaParam(fechaFin.value),
-  })
+  generandoPDF.value = true
+  try {
+    await generarReporteComprasPorProveedor({
+      fechaInicio: formatFechaParam(fechaInicio.value),
+      fechaFin: formatFechaParam(fechaFin.value),
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

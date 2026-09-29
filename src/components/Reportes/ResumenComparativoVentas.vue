@@ -101,6 +101,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
@@ -215,6 +216,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
             @click="generarPDF"
           />
@@ -247,6 +249,7 @@ const fechaInicio1 = ref(null)
 const fechaFin1 = ref(null)
 const fechaInicio2 = ref(null)
 const fechaFin2 = ref(null)
+const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
   if (!date) return null
@@ -254,7 +257,7 @@ const formatFechaParam = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const generarPDF = () => {
+const generarPDF = async () => {
   if (!fechaInicio1.value || !fechaFin1.value || !fechaInicio2.value || !fechaFin2.value) {
     Swal.fire({
       icon: 'warning',
@@ -265,12 +268,24 @@ const generarPDF = () => {
     return
   }
 
-  generarReporteComparativoVentas({
-    fechaInicio1: formatFechaParam(fechaInicio1.value),
-    fechaFin1: formatFechaParam(fechaFin1.value),
-    fechaInicio2: formatFechaParam(fechaInicio2.value),
-    fechaFin2: formatFechaParam(fechaFin2.value),
-  })
+  generandoPDF.value = true
+  try {
+    await generarReporteComparativoVentas({
+      fechaInicio1: formatFechaParam(fechaInicio1.value),
+      fechaFin1: formatFechaParam(fechaFin1.value),
+      fechaInicio2: formatFechaParam(fechaInicio2.value),
+      fechaFin2: formatFechaParam(fechaFin2.value),
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

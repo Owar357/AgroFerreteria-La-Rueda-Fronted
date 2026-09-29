@@ -38,13 +38,13 @@
           <span class="font-bold text-[#1a2e1f] text-sm">Filtros de Búsqueda</span>
         </div>
 
-        <p class="text-[0.85rem] text-gray-500  leading-relaxed">
+        <p class="text-xs text-gray-500 m-0 leading-relaxed">
           Este reporte evalúa lotes a partir de un umbral de días hacia adelante.
         </p>
 
         <!-- Días Umbral Móvil -->
-        <div class="flex flex-col gap-3  w-full">
-          <label class="text-[0.85rem] font-semibold text-gray-600">Días a evaluar</label>
+        <div class="flex flex-col gap-1 w-full">
+          <label class="text-xs font-semibold text-gray-600">Días a evaluar</label>
           <InputNumber
             v-model="diasUmbral"
             :min="1"
@@ -62,6 +62,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
@@ -142,6 +143,7 @@
             <Button
               label="Generar PDF"
               icon="pi pi-file-pdf"
+              :loading="generandoPDF"
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
               @click="generarPDF"
             />
@@ -170,16 +172,30 @@
 import { ref } from 'vue'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
+import Swal from 'sweetalert2'
 import { generarReporteProductosPorVencer } from '@/services/reporteService'
 
 const emit = defineEmits(['volver'])
 
 const diasUmbral = ref(null)
+const generandoPDF = ref(false)
 
-const generarPDF = () => {
-  generarReporteProductosPorVencer({
-    diasUmbral: diasUmbral.value,
-  })
+const generarPDF = async () => {
+  generandoPDF.value = true
+  try {
+    await generarReporteProductosPorVencer({
+      diasUmbral: diasUmbral.value,
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

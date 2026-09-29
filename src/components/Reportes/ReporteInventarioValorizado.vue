@@ -38,13 +38,13 @@
           <span class="font-bold text-[#1a2e1f] text-sm">Filtros de Búsqueda</span>
         </div>
 
-        <p class="text-[0.85rem] text-gray-500 ">
+        <p class="text-xs text-gray-500 m-0 leading-relaxed">
           Este reporte es un corte del inventario actual, no requiere seleccionar fechas.
         </p>
 
         <!-- Categoría Móvil -->
-        <div class="flex flex-col gap-3 w-full">
-          <label class="text-[0.85rem] font-semibold text-gray-600">La categoría (opcional)</label>
+        <div class="flex flex-col gap-1 w-full">
+          <label class="text-xs font-semibold text-gray-600">Categoría (opcional)</label>
           <Select
             v-model="categoriaId"
             :options="categorias"
@@ -65,6 +65,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
@@ -144,6 +145,7 @@
             <Button
               label="Generar PDF"
               icon="pi pi-file-pdf"
+              :loading="generandoPDF"
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
               @click="generarPDF"
             />
@@ -168,6 +170,7 @@
 import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
+import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
 import { generarReporteInventarioValorizado } from '@/services/reporteService'
 
@@ -175,6 +178,7 @@ const emit = defineEmits(['volver'])
 
 const categoriaId = ref(null)
 const categorias = ref([])
+const generandoPDF = ref(false)
 
 const cargarCategorias = async () => {
   try {
@@ -187,10 +191,22 @@ const cargarCategorias = async () => {
 
 onMounted(cargarCategorias)
 
-const generarPDF = () => {
-  generarReporteInventarioValorizado({
-    categoriaId: categoriaId.value,
-  })
+const generarPDF = async () => {
+  generandoPDF.value = true
+  try {
+    await generarReporteInventarioValorizado({
+      categoriaId: categoriaId.value,
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

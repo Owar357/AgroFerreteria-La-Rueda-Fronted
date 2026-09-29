@@ -69,6 +69,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
@@ -150,6 +151,7 @@
             <Button
               label="Generar PDF"
               icon="pi pi-file-pdf"
+              :loading="generandoPDF"
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
               @click="generarPDF"
             />
@@ -181,6 +183,7 @@ const emit = defineEmits(['volver'])
 
 const fechaInicio = ref(null)
 const fechaFin = ref(null)
+const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
   if (!date) return null
@@ -188,7 +191,7 @@ const formatFechaParam = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const generarPDF = () => {
+const generarPDF = async () => {
   if (!fechaInicio.value || !fechaFin.value) {
     Swal.fire({
       icon: 'warning',
@@ -199,10 +202,22 @@ const generarPDF = () => {
     return
   }
 
-  generarReporteResumenVentas({
-    fechaInicio: formatFechaParam(fechaInicio.value),
-    fechaFin: formatFechaParam(fechaFin.value),
-  })
+  generandoPDF.value = true
+  try {
+    await generarReporteResumenVentas({
+      fechaInicio: formatFechaParam(fechaInicio.value),
+      fechaFin: formatFechaParam(fechaFin.value),
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {

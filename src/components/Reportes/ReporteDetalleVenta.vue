@@ -76,6 +76,7 @@
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
+            :loading="generandoPDF"
             :disabled="ventas.length === 0"
             class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer disabled:!opacity-50"
             @click="generarPDF"
@@ -228,6 +229,7 @@
             <Button
               label="Generar PDF"
               icon="pi pi-file-pdf"
+              :loading="generandoPDF"
               :disabled="ventas.length === 0"
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer disabled:!opacity-50"
               @click="generarPDF"
@@ -319,6 +321,7 @@ import Tag from 'primevue/tag'
 import { DatePicker } from 'primevue'
 import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
+import { generarReporteVentas } from '@/services/reporteService'
 
 const emit = defineEmits(['volver'])
 
@@ -326,6 +329,7 @@ const fechaDesde = ref(null)
 const fechaHasta = ref(null)
 const ventas = ref([])
 const cargando = ref(false)
+const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
   if (!date) return null
@@ -389,12 +393,22 @@ const filtrarVentas = async () => {
 const generarPDF = async () => {
   if (!fechaDesde.value || !fechaHasta.value) return
 
-  const desde = formatFechaParam(fechaDesde.value)
-  const hasta = formatFechaParam(fechaHasta.value)
-
-  const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
-  const url = `${baseUrl}/api/reportes/ventas?fecha_desde=${desde}&fecha_hasta=${hasta}`
-  window.open(url, '_blank')
+  generandoPDF.value = true
+  try {
+    await generarReporteVentas({
+      fechaDesde: formatFechaParam(fechaDesde.value),
+      fechaHasta: formatFechaParam(fechaHasta.value),
+    })
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte PDF.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } finally {
+    generandoPDF.value = false
+  }
 }
 
 const limpiarFiltros = () => {
