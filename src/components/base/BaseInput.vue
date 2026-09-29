@@ -6,7 +6,7 @@ defineOptions({ inheritAttrs: false })
 const props = defineProps({
   label: String,
   placeholder: String,
-  help: String, // <- Prop para mensajes sencillos
+  help: String,
   filter: {
     type: String,
     validator: (v) => ['int', 'num', 'alpha', 'alphanum', 'percent'].includes(v),
@@ -14,7 +14,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'md',
-    validator: (v) => ['sm', 'md', 'lg', 'xl'].includes(v),
+    validator: (v) => ['sm', 'md', 'lg', 'xl','responsive'].includes(v),
   },
   error: String,
 })
@@ -37,14 +37,18 @@ const sizes = {
   md: 'h-11 px-4 text-[14px]',
   lg: 'h-12 px-4 text-[16px]',
   xl: 'h-14 px-5 text-[18px]',
+  responsive: 'h-11 px-4 text-sm md:h-14 md:px-5 md:text-lg',
 }
+
 </script>
 
 <template>
   <div class="flex flex-col gap-2" :class="$attrs.class">
-    <label v-if="label" :for="id" class="text-[14px] font-medium text-[#1a2e1f]">
-      {{ label }}
-    </label>
+    <slot name="label">
+      <label v-if="label" :for="id" class="text-[14px] font-medium text-[#1a2e1f]">
+        {{ label }}
+      </label>
+    </slot>
 
     <InputText
       :id="id"
@@ -56,9 +60,8 @@ const sizes = {
       :class="[sizes[size], { 'border-red-500 focus:border-red-500': error }]"
     />
 
-    <!-- Si se pasa la prop help, la muestra; si se usa el slot, muestra el slot -->
     <slot name="help">
-      <small v-if="help" class="text-[13px] text-[#6b7280]">{{ help }}</small>
+      <small v-if="help" class="text-[13px] text-[#6b7280] leading-relaxed">{{ help }}</small>
     </slot>
 
     <small v-if="error" class="text-red-600 text-[12px] font-medium">{{ error }}</small>
