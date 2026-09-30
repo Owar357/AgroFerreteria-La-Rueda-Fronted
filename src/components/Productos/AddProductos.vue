@@ -181,17 +181,16 @@
          </div>
 
           <div class="flex flex-col gap-1.5 w-full">
-            <label class="text-xs font-semibold text-gray-700">
-              Unidad Base <span class="text-red-500">*</span>
-            </label>
-            <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
-              placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-10 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
-              :class="{
-                '!border-red-500': errores.unidadMedidaId,
-                '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
-              }" :pt="{ label: { class: '!text-xs !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
+            <BaseSelect
+              v-model="unidadMedidaId"
+              :label="`Unidad Base <span class='text-red-500'>*</span>`"
+              :options="unidadesFiltradas"
+              option-label="nombre"
+              option-value="id"
+              placeholder="Seleccione una unidad base..."
+              :disabled="presentacionBaseCreada"
+              :error="errores.unidadMedidaId"
+            />
 
             <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
               <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
@@ -316,17 +315,17 @@
 
             <!-- Unidad Base -->
             <div class="flex flex-col gap-1.5 col-span-1 md:col-span-2 w-[40%]">
-              <label class="text-xs sm:text-sm font-semibold text-gray-700">
-                Unidad Base <span class="text-red-500">*</span>
-              </label>
-              <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
-                placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-11 md:!h-14 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
-                :class="{
-                  '!border-red-500': errores.unidadMedidaId,
-                  '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
-                }" :pt="{ label: { class: '!text-sm md:!text-lg !text-[#1a2e1f]' } }" />
-              <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
+              <BaseSelect
+                v-model="unidadMedidaId"
+                :label="`Unidad Base <span class='text-red-500'>*</span>`"
+                :options="unidadesFiltradas"
+                option-label="nombre"
+                option-value="id"
+                placeholder="Seleccione una unidad base..."
+                size="xl"
+                :disabled="presentacionBaseCreada"
+                :error="errores.unidadMedidaId"
+              />
 
               <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
                 <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
@@ -1066,7 +1065,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import AutoComplete from 'primevue/autocomplete'
-import Select from 'primevue/select'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import Tag from 'primevue/tag'

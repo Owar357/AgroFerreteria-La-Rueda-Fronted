@@ -31,15 +31,13 @@
 
       <!-- Tipo de Ajuste -->
       <div class="flex flex-col gap-1.5 w-full">
-        <label class="text-xs font-semibold text-[#1a2e1f]">Tipo de Ajuste</label>
-        <Select
-          v-model="form.tipo_ajuste"
-          :options="tiposAjuste"
-          optionLabel="label"
-          optionValue="value"
-          class="w-full text-xs"
-          :pt="{ root: { class: '!rounded-xl !border-gray-300' } }"
-        />
+        <BaseSelect
+        v-model="form.tipo_ajuste"
+        label="Tipo de Ajuste"
+        :options="tiposAjuste"
+        option-label="label"
+        option-value="value"
+      />
       </div>
 
       <!-- Campo Dinámico según Tipo de Ajuste -->
@@ -76,17 +74,14 @@
       </div>
 
       <!-- Motivo -->
-      <div class="flex flex-col gap-1.5 w-full">
-        <label class="text-xs font-semibold text-[#1a2e1f]">Motivo del Ajuste</label>
-        <Select
-          v-model="form.motivo"
-          :options="motivosDisponibles"
-          placeholder="Seleccione motivo"
-          class="w-full text-xs"
-          :pt="{ root: { class: '!rounded-xl !border-gray-300' } }"
-        />
-      </div>
-
+       <BaseSelect
+        v-model="form.motivo"
+        label="Motivo del Ajuste"
+        :options="motivosDisponibles"
+        placeholder="Seleccione motivo"
+      />
+      
+      
       <!-- Observaciones -->
       <div class="flex flex-col gap-1.5 w-full">
         <label class="text-xs font-semibold text-[#1a2e1f]">Observaciones (Opcional)</label>
@@ -137,18 +132,15 @@
         </div>
       </div>
 
-      <!-- Tipo de Ajuste -->
-      <div class="flex flex-col gap-1.5 w-full">
-        <label class="text-sm font-medium text-[#1a2e1f]">Tipo de Ajuste</label>
-        <Select
-          v-model="form.tipo_ajuste"
-          :options="tiposAjuste"
-          optionLabel="label"
-          optionValue="value"
-          class="w-full text-sm"
-          :pt="{ root: { class: '!rounded-xl !border-gray-300' } }"
-        />
-      </div>
+      
+        <BaseSelect
+        v-model="form.tipo_ajuste"
+        label="Tipo de Ajuste"
+        :options="tiposAjuste"
+        option-label="label"
+        option-value="value"
+      />
+      
 
       <!-- Campo Dinámico según Tipo de Ajuste -->
       <div v-if="form.tipo_ajuste === 'REEVALUACION'">
@@ -183,17 +175,14 @@
         </small>
       </div>
 
-      <!-- Motivo -->
-      <div class="flex flex-col gap-1.5 w-full">
-        <label class="text-sm font-medium text-[#1a2e1f]">Motivo del Ajuste</label>
-        <Select
+      
+        <BaseSelect
           v-model="form.motivo"
+          label="Motivo del Ajuste"
           :options="motivosDisponibles"
           placeholder="Seleccione motivo"
-          class="w-full text-sm"
-          :pt="{ root: { class: '!rounded-xl !border-gray-300' } }"
         />
-      </div>
+      
 
       <!-- Observaciones -->
       <div class="flex flex-col gap-1.5 w-full">
@@ -232,7 +221,7 @@
 import { ref, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
-import Select from 'primevue/select'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 import InputNumber from 'primevue/inputnumber'
 import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import Textarea from 'primevue/textarea'
@@ -328,19 +317,15 @@ const diferenciaCalculada = computed(() => {
   return dif
 })
 
-watch(
-  () => props.lote,
-  (nuevoLote) => {
-    if (nuevoLote) {
-      form.value.tipo_ajuste = 'DISMINUCION'
-      form.value.cantidad_fisica = parseFloat(nuevoLote.cantidad_actual || 0)
-      form.value.costo_nuevo = parseFloat(nuevoLote.costo_unitario_compra || 0)
-      form.value.motivo = ''
-      form.value.observaciones = ''
-    }
-  },
-  { immediate: true }
-)
+watch(visible, (abierto) => {
+  if (abierto && props.lote) {
+    form.value.tipo_ajuste = 'DISMINUCION'
+    form.value.cantidad_fisica = parseFloat(props.lote.cantidad_actual || 0)
+    form.value.costo_nuevo = parseFloat(props.lote.costo_unitario_compra || 0)
+    form.value.motivo = ''
+    form.value.observaciones = ''
+  }
+})  
 
 const resetForm = () => {
   form.value = {
@@ -467,7 +452,6 @@ const guardarAjuste = async () => {
 /* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
 .p-inputnumber-input:enabled:focus,
-.p-select:not(.p-disabled).p-focus,
 .p-password-input:enabled:focus {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;

@@ -9,8 +9,8 @@ const props = defineProps({
   help: String, // <- Prop para mensajes sencillos
     size: {
     type: String,
-    default: 'md',
-    validator: (v) => ['sm', 'md', 'lg', 'xl', 'responsive'].includes(v),
+    default: 'xl',
+    validator: (v) => ['sm', 'md', 'lg', 'xl'].includes(v),
   },
   error: String,
   toggleMask: { type: Boolean, default: true },
@@ -25,7 +25,6 @@ const sizes = {
   md: 'h-11 px-4 text-[14px]',
   lg: 'h-12 px-4 text-[16px]',
   xl: 'h-14 px-5 text-[18px]',
-  responsive: 'h-11 px-4 text-sm md:h-14 md:px-5 md:text-lg',
 }
 
 const inputClasses = computed(
