@@ -23,19 +23,18 @@ export const usePosStore = defineStore('pos', () => {
   const busquedaCliente = ref('')
   const clienteId = ref(null)
   const nombreCliente = ref('')
-  const tipoPago = ref('efectivo')
+  const tipoPago = ref('EFECTIVO')
   const efectivoRecibido = ref(0)
   const mostrarModalCliente = ref(false)
 
-  
   const subtotalGravado = computed(() =>
     productosVenta.value.reduce(
       (acc, p) => (p.aplica_iva ? acc + parseFloat((p.subtotal / 1.13).toFixed(4)) : acc),
-      0
-    )
+      0,
+    ),
   )
   const subtotalExento = computed(() =>
-    productosVenta.value.reduce((acc, p) => (!p.aplica_iva ? acc + p.subtotal : acc), 0)
+    productosVenta.value.reduce((acc, p) => (!p.aplica_iva ? acc + p.subtotal : acc), 0),
   )
   const iva = computed(() => subtotalGravado.value * 0.13)
   const total = computed(() => subtotalGravado.value + subtotalExento.value + iva.value)
@@ -63,7 +62,9 @@ export const usePosStore = defineStore('pos', () => {
     }
 
     const precioOriginal = parseFloat(presentacion.precio_venta) || 0
-    const porcentajeDescuento = parseFloat(presentacion.porcentaje_descuento || producto.porcentaje_descuento || 0)
+    const porcentajeDescuento = parseFloat(
+      presentacion.porcentaje_descuento || producto.porcentaje_descuento || 0,
+    )
     const descuentoUnitario = (precioOriginal * porcentajeDescuento) / 100
     const precioFinalUnitario = precioOriginal - descuentoUnitario
     const cantidad = 1
@@ -111,7 +112,7 @@ export const usePosStore = defineStore('pos', () => {
     clienteId.value = null
     efectivoRecibido.value = 0
     tipoFactura.value = '01'
-    tipoPago.value = 'efectivo'
+    tipoPago.value = 'EFECTIVO'
     localStorage.removeItem(claveLocal())
   }
 
@@ -139,7 +140,7 @@ export const usePosStore = defineStore('pos', () => {
       const estado = JSON.parse(datosGuardados)
       productosVenta.value = estado.productosVenta || []
       tipoFactura.value = ['01', '03'].includes(estado.tipoFactura) ? estado.tipoFactura : '01'
-      tipoPago.value = estado.tipoPago || 'efectivo'
+      tipoPago.value = estado.tipoPago ? estado.tipoPago.toUpperCase() : 'EFECTIVO' 
       clienteId.value = estado.clienteId || null
       nombreCliente.value = estado.nombreCliente || ''
       busquedaCliente.value = estado.busquedaCliente || ''
@@ -197,7 +198,6 @@ export const usePosStore = defineStore('pos', () => {
 
       setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (error) {
-      console.error('Error al obtener el ticket PDF:', error)
       Swal.fire({
         icon: 'error',
         title: 'No se pudo abrir el ticket',
@@ -253,7 +253,7 @@ export const usePosStore = defineStore('pos', () => {
 
     // Comparación en centavos para evitar errores de punto flotante
     if (
-      tipoPago.value === 'efectivo' &&
+      tipoPago.value === 'EFECTIVO' &&
       Math.round((efectivoRecibido.value || 0) * 100) < Math.round(total.value * 100)
     ) {
       Swal.fire({
@@ -273,7 +273,7 @@ export const usePosStore = defineStore('pos', () => {
       exento: parseFloat(subtotalExento.value.toFixed(2)),
       iva: parseFloat(iva.value.toFixed(2)),
       total: parseFloat(total.value.toFixed(2)),
-      efectivo_recibido: tipoPago.value === 'efectivo' ? efectivoRecibido.value : null,
+      efectivo_recibido: tipoPago.value === 'EFECTIVO' ? efectivoRecibido.value : null,
       cliente_id: clienteId.value || null,
       detalles: productosVenta.value.map((p) => ({
         nombre_producto: p.nombre,
@@ -297,12 +297,13 @@ export const usePosStore = defineStore('pos', () => {
       const respuestaBackend = response.data?.data || response.data
       const ventaId = parseInt(respuestaBackend?.id || response.data?.id, 10)
 
-      const numDoc = respuestaBackend?.num_documento || respuestaBackend?.numero_factura || `#${ventaId}`
+      const numDoc =
+        respuestaBackend?.num_documento || respuestaBackend?.numero_factura || `#${ventaId}`
       const clienteNombreStr = nombreCliente.value || 'Consumidor Final'
       // Importes oficiales: los calculó el servidor (el POS solo los mostraba)
       const totalVentaStr = parseFloat(respuestaBackend?.total ?? total.value).toFixed(2)
       const cambioVentaStr = parseFloat(respuestaBackend?.cambio ?? cambio.value).toFixed(2)
-      const fueEfectivo = tipoPago.value === 'efectivo'
+      const fueEfectivo = tipoPago.value === 'EFECTIVO'
 
       const result = await Swal.fire({
         title: '¡Venta realizada con éxito!',
@@ -332,7 +333,7 @@ export const usePosStore = defineStore('pos', () => {
         await imprimirTicket(ventaId)
       }
     } catch (error) {
-      console.error('Error al registrar la venta:', error)
+    
 
       // Por si el turno cambió (por ejemplo, se cerró) mientras se armaba la venta
       cajaStore.cargarEstadoCaja()
