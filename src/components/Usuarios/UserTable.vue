@@ -3,20 +3,22 @@
     <!-- Encabezado de la página -->
     <div class="flex items-center gap-3 mb-6">
       <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
+      >
         <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
         <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
           Registro de usuarios
         </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos del sistema</p>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">
+          Gestión de cuentas, roles y permisos del sistema
+        </p>
       </div>
     </div>
 
     <!-- Contenedor Principal -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
-      
       <!-- Apartado de Filtros Estático Superior -->
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-white">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
@@ -70,9 +72,7 @@
           @page="onPageChange"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <!-- Botón de Expansión (Flecha) -->
@@ -107,10 +107,14 @@
           <!-- Plantilla de Expansión (Móvil) con Grid Ordenado -->
           <template #expansion="slotProps">
             <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+              <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
+              >
                 <!-- Email (Ocupa las 2 columnas) -->
                 <div class="col-span-2">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Email
                   </span>
                   <span class="text-gray-800 font-medium break-all block">
@@ -120,7 +124,9 @@
 
                 <!-- Rol -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Rol
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -130,7 +136,9 @@
 
                 <!-- Fecha -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Fecha
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -144,7 +152,9 @@
 
                 <!-- Creado por (Ocupa las 2 columnas) -->
                 <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Creado por
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -177,9 +187,6 @@
         </DataTable>
       </div>
 
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO: Tabla Completa (>= 768px)             -->
-      <!-- ======================================================= -->
       <div class="hidden md:block w-full overflow-x-auto">
         <DataTable
           :value="usuariosFiltrados"
@@ -193,9 +200,7 @@
           @page="onPageChange"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
@@ -262,7 +267,7 @@
                 <Skeleton width="4rem" height="2rem" borderRadius="0.5rem" />
                 <Skeleton width="5rem" height="2rem" borderRadius="0.5rem" />
               </div>
-              
+
               <div v-else class="flex gap-2 justify-center">
                 <template v-if="slotProps.data.activo">
                   <Button
@@ -288,7 +293,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 </template>
@@ -301,7 +305,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
-import Skeleton from 'primevue/skeleton' 
+import Skeleton from 'primevue/skeleton'
 import Column from 'primevue/column'
 import Swal from 'sweetalert2'
 import authService from '@/services/authService'
@@ -332,7 +336,7 @@ const confirmarDesactivar = async (user) => {
       customClass: {
         popup: '!rounded-xl !p-4 sm:!p-6',
         confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
+      },
     })
     return
   }
@@ -352,7 +356,7 @@ const confirmarDesactivar = async (user) => {
       actions: '!gap-3 flex-col sm:flex-row !w-full sm:!w-auto',
       confirmButton: '!w-full sm:!w-auto !px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
       cancelButton: '!w-full sm:!w-auto !px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-    }
+    },
   })
 
   if (!confirmacion.isConfirmed) return
@@ -378,7 +382,7 @@ const confirmarDesactivar = async (user) => {
       customClass: {
         popup: '!rounded-xl !p-4 sm:!p-6',
         confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
+      },
     })
   }
 }
@@ -404,9 +408,9 @@ const usuariosFiltrados = computed(() => {
 const onPageChange = async (event) => {
   const page = event.page + 1
   const rows = event.rows
-  
+
   const resultado = await store.fetchUsers(page, rows)
-  
+
   if (resultado?.status === 403) {
     Swal.fire({
       icon: 'error',
@@ -416,7 +420,7 @@ const onPageChange = async (event) => {
       customClass: {
         popup: '!rounded-xl !p-4 sm:!p-6',
         confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
+      },
     })
   } else if (resultado?.error) {
     Swal.fire({
@@ -427,7 +431,7 @@ const onPageChange = async (event) => {
       customClass: {
         popup: '!rounded-xl !p-4 sm:!p-6',
         confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
+      },
     })
   }
 }
