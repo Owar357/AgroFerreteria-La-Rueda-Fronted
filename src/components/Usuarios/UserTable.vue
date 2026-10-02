@@ -40,7 +40,6 @@
 
     <!-- Contenedor Principal -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
-      
       <!-- Apartado de Filtros Estático Superior -->
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-white">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
@@ -94,9 +93,7 @@
           @page="alCambiarPagina"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <!-- Botón de Expansión (Flecha) -->
@@ -131,10 +128,14 @@
           <!-- Plantilla de Expansión (Móvil) con Grid Ordenado -->
           <template #expansion="slotProps">
             <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+              <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
+              >
                 <!-- Email (Ocupa las 2 columnas) -->
                 <div class="col-span-2">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Email
                   </span>
                   <span class="text-gray-800 font-medium break-all block">
@@ -144,7 +145,9 @@
 
                 <!-- Rol -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Rol
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -154,7 +157,9 @@
 
                 <!-- Fecha -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Fecha
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -168,7 +173,9 @@
 
                 <!-- Creado por (Ocupa las 2 columnas) -->
                 <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Creado por
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -201,9 +208,6 @@
         </DataTable>
       </div>
 
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO: Tabla Completa (>= 768px)             -->
-      <!-- ======================================================= -->
       <div class="hidden md:block w-full overflow-x-auto">
         <DataTable
           :value="usuariosFiltrados"
@@ -217,9 +221,7 @@
           @page="alCambiarPagina"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
@@ -286,7 +288,7 @@
                 <Skeleton width="4rem" height="2rem" borderRadius="0.5rem" />
                 <Skeleton width="5rem" height="2rem" borderRadius="0.5rem" />
               </div>
-              
+
               <div v-else class="flex gap-2 justify-center">
                 <template v-if="slotProps.data.activo">
                   <Button
@@ -312,7 +314,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 </template>
@@ -325,7 +326,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
-import Skeleton from 'primevue/skeleton' 
+import Skeleton from 'primevue/skeleton'
 import Column from 'primevue/column'
 import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
