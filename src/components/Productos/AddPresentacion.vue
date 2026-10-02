@@ -1,72 +1,134 @@
 <template>
-  <Dialog v-model:visible="localVisible" modal header="AÑADIR NUEVA PRESENTACIÓN" :style="{ width: '450px' }"
-    :draggable="false" class="custom-dialog" :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }" @hide="resetForm">
-    <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
+  <Dialog
+    v-model:visible="localVisible"
+    modal
+    header="AÑADIR NUEVA PRESENTACIÓN"
+    :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
+    class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="resetForm"
+  >
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Móvil -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+      />
 
-      <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre <span class="text-red-500">*</span>
-        </label>
-        <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
+      <BaseInputNumber
+      v-model="form.factor_conversion"
+      :label="`¿Cuántas <span class='inline-flex items-center align-baseline whitespace-nowrap bg-amber-100 text-amber-800 font-semibold  py-0.5 rounded border border-amber-200 mx-1 shadow-sm text-[13px]'>${unidadBase || 'unidades'} </span>contiene tu presentación?`"
+      placeholder="Ej: 10"
+      :min="1"
+      :max="1000000"
+      :max-fraction-digits="0"
+      :use-grouping="true"
+      />
+
+      <BaseInputNumberMoney
+        v-model="form.precio"
+        label="Precio *"
+        placeholder="$ 0.00"
+      />
+
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
+        <Button
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="guardar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
       </div>
+    </div>
 
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
-          ¿Cuántos
-          <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
-            {{ unidadBase || '—' }}
-          </span>
-          contiene tu presentación? <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.factor_conversion" :min="1" :useGrouping="false"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Escritorio -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+      />
+
+      <BaseInputNumber
+        v-model="form.factor_conversion"
+        :label="`¿Cuántos <span class='bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded border border-amber-200 mx-0.5 shadow-sm text-[13px]'>${unidadBase || 'unidades'}</span> contiene tu presentación? *`"
+        placeholder="Ej: 10"
+        :min="1"
+        :max="1000000"
+        :max-fraction-digits="0"
+        :use-grouping="true"
+      />
+
+      <BaseInputNumberMoney
+        v-model="form.precio"
+        label="Precio *"
+        placeholder="$ 0.00"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="localVisible = false"
+        />
+        <Button
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
+          @click="guardar"
+        />
       </div>
-      <!-- Precio -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Precio <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
-      </div>
-
-
-
-      <!-- Botones -->
-      <div class="flex justify-between gap-4 mt-2">
-        <Button label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          @click="localVisible = false" />
-        <Button label="Guardar" :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
-          @click="guardar" />
-      </div>
-
     </div>
   </Dialog>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
-import InputText from 'primevue/inputtext'        
-import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import { añadirPresentacion } from '@/services/productoService'
+import { useproductoStore } from '@/stores/productoStore'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   presentacion: { type: Object, default: null },
   unidadBase: { type: String, default: '' },
+  unidadMedidaId: { type: [Number, String], default: null },
   productoId: { type: [Number, String], required: true }
 })
 
 const emit = defineEmits(['update:visible', 'guardar'])
 
+const store = useproductoStore()
 const localVisible = ref(false)
 const guardando = ref(false)
 const form = ref({
@@ -86,7 +148,6 @@ const resetForm = () => {
   guardando.value = false
 }
 
-
 const mostrarAlerta = (tipo, titulo, texto) => {
   Swal.fire({
     icon: tipo,
@@ -105,21 +166,35 @@ const guardar = async () => {
     return
   }
 
+  let idUnidad = props.unidadMedidaId || props.presentacion?.unidad_medida_id || props.presentacion?.unidad_medida?.id
+
+  if (!idUnidad && props.unidadBase) {
+    const unidadEncontrada = store.unidades?.find(
+      (u) => u.nombre.toLowerCase().trim() === props.unidadBase.toLowerCase().trim()
+    )
+    if (unidadEncontrada) {
+      idUnidad = unidadEncontrada.id
+    }
+  }
+
+  if (!idUnidad) {
+    mostrarAlerta('warning', 'Unidad requerida', 'No se pudo determinar el ID de la unidad de medida.')
+    return
+  }
+
   guardando.value = true
 
   const payload = {
     nombre: form.value.nombre,
+    unidad_medida_id: Number(idUnidad),
     factor_conversion: form.value.factor_conversion,
     precio_venta: form.value.precio,
     producto_id: props.productoId
   }
 
   try {
-
     const response = await añadirPresentacion(payload)
-    console.log('respuesta backend:', JSON.stringify(response.data, null, 2))
     const nueva = response.data.data ?? response.data
-    console.log('nueva:', JSON.stringify(nueva, null, 2))
 
     emit('guardar', {
       id: nueva.id,
@@ -162,29 +237,30 @@ const guardar = async () => {
 </script>
 
 <style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
+/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
-:deep(.p-inputnumber-input) {
-  width: 100%;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  border-color: #d1d5db;
-  height: 44px;
-  padding: 0 1rem;
-  font-size: 14px;
+/* Enfoques y bordes para componentes PrimeVue dentro del modal */
+.p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
 }
 </style>

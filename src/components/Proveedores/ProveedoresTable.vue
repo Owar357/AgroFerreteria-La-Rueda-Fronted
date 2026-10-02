@@ -1,21 +1,45 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
-    <!-- ENCABEZADO DE MÓDULO UNIFICADO -->
-    <div class="flex items-center gap-3 mb-6">
-      <div
-        class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+              Registro de Proveedores
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">
+              Gestión de contactos y directorio comercial
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Registro de Proveedores
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de contactos, directorio y comerciales</p>
-      </div>
-    </div>
 
-    <!-- TARJETA CONTENEDORA PRINCIPAL -->
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:flex items-center gap-3 mb-6">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Registro de Proveedores
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">
+            Gestión de contactos, directorio y comerciales
+          </p>
+        </div>
+      </div>
+
+    <!-- TARJETA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
 
       <!-- APARTADO DE FILTROS ESTÁTICO SUPERIOR -->
@@ -80,7 +104,6 @@
             </div>
           </template>
 
-      
           <Column expander style="width: 2.5rem" />
 
           <!-- Columna: Nombre -->
@@ -105,53 +128,56 @@
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión (Móvil) -->
+          <!-- Plantilla de Expansión (Móvil Ajustada) -->
           <template #expansion="slotProps">
-            <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+            <div class="p-3 sm:p-4 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
+              
+              <!-- Contenedor blanco con alineación vertical limpia -->
+              <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-3">
                 
-                <!-- Correo (2 columnas) -->
-                <div class="col-span-2">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                    Correo
+                <!-- Correo -->
+                <div>
+                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">
+                    Correo Electrónico
                   </span>
-                  <span class="text-gray-800 font-medium break-all block">
+                  <span class="text-xs sm:text-sm text-[#334155] font-medium break-all block">
                     {{ slotProps.data.correo || '—' }}
                   </span>
                 </div>
 
-                <!-- Teléfono (2 columnas) -->
-                <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                    Teléfono
+                <!-- Teléfono -->
+                <div class="pt-2 border-t border-[#e2e8dd]/60">
+                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">
+                    Teléfono / Contacto
                   </span>
-                  <span class="text-gray-800 font-mono font-medium block">
+                  <span class="text-xs sm:text-sm text-[#334155] font-mono font-medium block">
                     {{ slotProps.data.telefono || '—' }}
                   </span>
                 </div>
+
               </div>
 
-              <!-- Botones de Acción Móvil -->
-              <div class="mt-3 pt-2 flex gap-2 justify-end items-center flex-wrap">
+              <!-- Botones de Acción Móvil Distribuidos Uniformemente -->
+              <div class="mt-3 flex gap-2 justify-end items-center">
                 <template v-if="slotProps.data.activo">
                   <Button 
                     icon="pi pi-pencil" 
                     label="Editar"
-                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
                     @click="handleEdit(slotProps.data)" 
                   />
 
                   <Button 
                     icon="pi pi-eye" 
                     label="Ver"
-                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
                     @click="handleDetail(slotProps.data)" 
                   />
 
                   <Button 
                     icon="pi pi-ban" 
                     label="Desactivar"
-                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
                     @click="confirmarDesactivar(slotProps.data)" 
                   />
                 </template>
@@ -160,11 +186,12 @@
                   <Button 
                     icon="pi pi-eye" 
                     label="Ver"
-                    class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs w-full justify-center"
                     @click="handleDetail(slotProps.data)" 
                   />
                 </template>
               </div>
+
             </div>
           </template>
         </DataTable>

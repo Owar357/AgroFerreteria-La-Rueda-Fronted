@@ -4,14 +4,16 @@
     modal
     header="AGREGAR CATEGORÍA"
     :draggable="false"
+    :closable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      
-      <!-- Nombre de Categoría -->
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
       <BaseInput
         v-model="nombreCategoria"
         label="Nombre: *"
@@ -21,28 +23,72 @@
         @input="validarNombre"
         @keyup.enter="dispararGuardar"
       />
+      <BaseInputPercent
+        v-model="porcentajeGananciaMinimo"
+        label="% Ganancia Mínima Deseada:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararGuardar"
+      />
 
-      <BaseInputNumber
-  v-model="porcentajeGananciaMinimo"
-  label="% Ganancia Mínima Deseada:"
-  placeholder="Ej: 15.00"
-  suffix="%"
-  :min="1"
-  :max="100"
-  :min-fraction-digits="1"
-  :max-fraction-digits="2"
-  help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
-  :error="errorGanancia"
-  @input="validarGanancia"
-  @keyup.enter="dispararGuardar"
-/>
-
-      <!-- Botón de Acción Principal -->
-      <div class="flex justify-center mt-4 w-full">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
           label="Guardar"
           :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="dispararGuardar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model="nombreCategoria"
+        label="Nombre: *"
+        placeholder="Escriba el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararGuardar"
+      />
+      <BaseInputPercent
+        v-model="porcentajeGananciaMinimo"
+        label="% Ganancia Mínima Deseada:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararGuardar"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="localVisible = false"
+        />
+        <Button
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="dispararGuardar"
         />
       </div>
@@ -52,10 +98,12 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import { mostrarAccesoDenegado, mostrarError, mostrarExito } from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
-import BaseInputNumber from '../base/BaseInputNumber.vue'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -168,14 +216,14 @@ const dispararGuardar = async () => {
 
 <style>
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 0.0625rem solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
