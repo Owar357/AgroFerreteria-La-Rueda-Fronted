@@ -4,13 +4,18 @@
     modal
     header="EDITAR CATEGORÍA"
     :draggable="false"
+    :closable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-4 sm:p-6 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-
-      <!-- Nombre -->
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Móvil -->
       <BaseInput
         v-model="form.nombre"
         label="Nombre: *"
@@ -21,32 +26,78 @@
         @keyup.enter="dispararActualizar"
       />
 
-      <!-- % Ganancia Mínimo -->
-      <BaseInputNumber
+      <BaseInputPercent
         v-model="form.porcentaje_ganancia_minimo"
         label="% Ganancia Mínimo Deseado:"
         placeholder="Ej: 15.00"
-        suffix="%"
-        :min="1"
-        :max="100"
-        :min-fraction-digits="1"
-        :max-fraction-digits="2"
         help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
         :error="errorGanancia"
         @input="validarGanancia"
         @keyup.enter="dispararActualizar"
       />
 
-      <!-- Botón de Acción Principal -->
-      <div class="flex justify-center mt-4 w-full">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
           label="Guardar datos"
           :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-lg transition-colors w-full"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="dispararActualizar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Escritorio -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre: *"
+        placeholder="Modifique el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararActualizar"
+      />
+
+      <BaseInputPercent
+        v-model="form.porcentaje_ganancia_minimo"
+        label="% Ganancia Mínimo Deseado:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararActualizar"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="localVisible = false"
+        />
+        <Button
+          label="Guardar datos"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="dispararActualizar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
@@ -56,7 +107,7 @@ import { ref, reactive, watch } from 'vue'
 import { useCategoriaStore } from '../../stores/categoriaStore'
 import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito } from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
-import BaseInputNumber from '../base/BaseInputNumber.vue'
+import BaseInputPercent from '../base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible:   { type: Boolean, default: false },
@@ -87,6 +138,11 @@ watch(
     }
   }
 )
+
+const resetForm = () => {
+  errorNombre.value = ''
+  errorGanancia.value = ''
+}
 
 const validarNombre = () => {
   const valor = form.nombre
@@ -171,24 +227,29 @@ const dispararActualizar = async () => {
 </script>
 
 <style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 0.0625rem solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
+/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
 }
 
+/* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
-.p-inputnumber-input:enabled:focus {
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }

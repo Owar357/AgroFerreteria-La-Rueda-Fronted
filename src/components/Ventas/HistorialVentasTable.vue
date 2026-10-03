@@ -1,160 +1,374 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <!-- Encabezado -->
-    <div class="flex flex-col mb-8 gap-4">
-      <div class="flex flex-col w-full">
-        <h1 class="text-2xl font-semibold tracking-tight text-black">Historial de ventas</h1>
-        <p class="text-[13px] text-[#6b7280] mt-1">
-          Sin filtro de fechas se muestran las ventas de hoy. Los filtros se aplican sobre todo el historial.
-        </p>
-      </div>
+  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
-      <!-- Filtros -->
-      <div class="flex flex-wrap justify-start items-center w-full gap-4">
-        <!-- buscador -->
-        <IconField class="w-80">
-          <InputIcon class="pi pi-search text-[#6b7280]" />
-          <InputText
-            v-model="busqueda"
-            placeholder="Buscar factura, vendedor..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
-          />
-        </IconField>
-
-        <Select
-          v-model="estadoSel"
-          :options="opcionesEstado"
-          showClear
-          placeholder="Todos los estados"
-          class="w-52 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2"
-        />
-
-        <Select
-          v-model="pagoSel"
-          :options="opcionesPago"
-          showClear
-          placeholder="Tipo de pago"
-          class="w-48 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px] flex items-center px-2"
-        />
-
-        <DatePicker
-          v-model="rangoDeFechas"
-          selectionMode="range"
-          placeholder="Filtrar por fecha"
-          dateFormat="dd/mm/yy"
-          showIcon
-          showButtonBar
-          class="w-64 bg-[#ffffff] border-[#cbd5e1] text-[14px] rounded-lg h-[42px]"
-          @hide="alCerrarCalendario"
-        />
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden mb-4">
+      <div class="flex items-center gap-3">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          <i class="pi pi-receipt text-[#2b5e3b] text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+            Historial de Ventas
+          </h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">
+            Consulta de transacciones e historial general
+          </p>
+        </div>
       </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- lazy: el servidor entrega solo la página actual; la paginación y los filtros NO se hacen aquí -->
-      <DataTable
-        :value="cargando ? Array.from({ length: filas }) : ventas"
-        lazy
-        paginator
-        :rows="filas"
-        :first="primero"
-        :totalRecords="totalRegistros"
-        :rowsPerPageOptions="[8, 15, 30]"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-        @page="onPage"
-      >
-        <template #empty>
-          <div class="text-center py-6 text-[#6b7280] text-[14px]">
-            No hay ventas para los filtros seleccionados.
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:flex items-center gap-3 mb-6">
+      <div
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-receipt text-[#2b5e3b] text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+          Historial de Ventas
+        </h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">
+          Consulta de transacciones del día e historial general
+        </p>
+      </div>
+    </div>
+
+    <!-- TARJETA CONTENEDORA PRINCIPAL -->
+    <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
+
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL FILTROS (Solo Teléfono / Tablet)           -->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden p-4 border-b border-[#e2e8dd] bg-[#fbfdf9] space-y-3">
+        <div class="flex flex-col gap-3">
+          <!-- Buscador Móvil -->
+          <IconField class="grid grid-cols-2 gap-2">
+            <InputIcon class="pi pi-search text-gray-400 " />
+            <InputText
+              v-model="busqueda"
+              placeholder="Buscar factura, vendedor..."
+              class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl h-10 focus:!border-[#2b5e3b]"
+            />
+          </IconField>
+
+          <!-- Estado y Pago Móvil -->
+          <div class="grid grid-cols-2 gap-2">
+            <Select
+              v-model="estadoSel"
+              :options="opcionesEstado"
+              showClear
+              placeholder="Estado..."
+              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10 flex items-center px-2"
+            />
+
+            <Select
+              v-model="pagoSel"
+              :options="opcionesPago"
+              showClear
+              placeholder="Tipo pago..."
+              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10 flex items-center px-2"
+            />
           </div>
-        </template>
 
-        <!-- Columna: Vendido por -->
-        <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f]">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="65%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.vendidoPor }}</span>
-          </template>
-        </Column>
-
-        <!-- Columna: N° Factura -->
-        <Column field="numeroFactura" header="N° Factura">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="5rem" height="1.2rem" />
-            <span v-else class="font-mono text-[13px] text-[#2b5e3b] font-semibold">
-              {{ slotProps.data.numeroFactura }}
+          <!-- Rango Fechas Móvil -->
+          <div class="flex flex-col gap-1 grid grid-cols-2 gap-2 pt-1 border-t border-[#e2e8dd]/60">
+            <span class="text-[11px] font-bold text-[#2b5e3b] uppercase tracking-wider block">
+              Filtrar por fecha:
             </span>
-          </template>
-        </Column>
+            <DatePicker
+              v-model="rangoDeFechas"
+              selectionMode="range"
+              placeholder="Seleccionar rango..."
+              dateFormat="dd/mm/yy"
+              showIcon
+              showButtonBar
+              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10"
+              @hide="alCerrarCalendario"
+            />
+          </div>
+        </div>
+      </div>
 
-        <!-- Columna: Tipo de pago -->
-        <Column field="tipoPago" header="Tipo de pago">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="6.5rem" height="1.5rem" borderRadius="20px" />
-            <span v-else :class="estiloPago(slotProps.data.tipoPago)">
-              <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
-              {{ slotProps.data.tipoPago }}
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO FILTROS (Solo PC - 2 Filas Ordenadas) -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:block p-5 border-b border-[#e2e8dd] bg-[#fbfdf9]">
+        <div class="flex flex-col gap-3.5 w-full">
+          
+          <!-- FILA 1: Buscador, Estado y Tipo de Pago -->
+          <div class="flex items-center gap-3 w-full">
+            <!-- Buscador -->
+            <IconField class="w-[50%] shrink-0">
+              <InputIcon class="pi pi-search text-gray-400 text-sm" />
+              <InputText
+                v-model="busqueda"
+                placeholder="Buscar por nº de factura o nombre de vendedor..."
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 focus:!border-[#2b5e3b]"
+              />
+            </IconField>
+
+            <!-- Estado -->
+            <Select
+              v-model="estadoSel"
+              :options="opcionesEstado"
+              showClear
+              placeholder="Todos los estados"
+              class="w-[25%] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2 shrink-0"
+            />
+
+            <!-- Tipo de Pago -->
+            <Select
+              v-model="pagoSel"
+              :options="opcionesPago"
+              showClear
+              placeholder="Tipo de pago"
+              class="w-[20%] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2 shrink-0"
+            />
+          </div>
+
+          <!-- FILA 2: Rango de Fechas -->
+          <div class="flex items-center gap-3 pt-2 border-t border-[#e2e8dd]/60">
+            <span class="text-xs font-bold text-[#2b5e3b] uppercase tracking-wider shrink-0">
+              Filtrar por fecha:
             </span>
-          </template>
-        </Column>
+            <div class="w-[30%] shrink-0">
+              <DatePicker
+                v-model="rangoDeFechas"
+                selectionMode="range"
+                placeholder="Seleccionar rango de fechas..."
+                dateFormat="dd/mm/yy"
+                showIcon
+                showButtonBar
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
+                @hide="alCerrarCalendario"
+              />
+            </div>
+          </div>
 
-        <!-- Columna: Estado -->
-        <Column field="estado" header="Estado">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="20px" />
-            <span
-              v-else
-              :class="
-                slotProps.data.estado === 'PROCESADA'
-                  ? 'bg-[#dff0e0] text-[#2b5e3b] px-2 py-1 rounded-full text-xs font-medium'
-                  : 'bg-[#fee2e2] text-[#b91c1c] px-2 py-1 rounded-full text-xs font-medium'
-              "
-            >
-              {{ slotProps.data.estado }}
-            </span>
-          </template>
-        </Column>
+        </div>
+      </div>
 
-        <!-- Columna: Fecha -->
-        <Column field="fecha" header="Fecha" class="text-[#6b7280]">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="5.5rem" height="1.2rem" />
-            <span v-else>{{ slotProps.data.fecha }}</span>
-          </template>
-        </Column>
-
-        <!-- Columna: Total -->
-        <Column field="total" header="Total">
-          <template #body="slotProps">
-            <Skeleton v-if="cargando" width="4rem" height="1.2rem" />
-            <span v-else class="font-bold text-[#1a2e1f]">${{ formatearMoneda(slotProps.data.total) }}</span>
-          </template>
-        </Column>
-
-        <!-- Columna: Acciones -->
-        <Column header="Acciones" class="text-center w-[90px]">
-          <template #body="slotProps">
-            <div class="flex gap-2 justify-center">
-              <template v-if="cargando">
-                <Skeleton shape="circle" size="2rem" />
-              </template>
-
-              <template v-else>
-                <Button
-                  icon="pi pi-eye"
-                  v-tooltip.top="'Ver detalle'"
-                  class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm"
-                  @click="$emit('ver-detalle', slotProps.data)"
-                />
-              </template>
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL: Tabla con Desplegable (< 1024px)           -->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden w-full">
+        <DataTable
+          v-model:expandedRows="expandedRows"
+          :value="cargando ? Array.from({ length: filas }) : ventas"
+          lazy
+          paginator
+          :rows="filas"
+          :first="primero"
+          :totalRecords="totalRegistros"
+          dataKey="numeroFactura"
+          class="p-datatable-custom text-sm w-full"
+          currentPageReportTemplate="{first}-{last} de {totalRecords}"
+          paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+          @page="onPage"
+        >
+          <template #empty>
+            <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+              <i class="pi pi-inbox text-3xl mb-2 opacity-40" />
+              <span class="text-sm font-medium">No hay ventas registradas</span>
             </div>
           </template>
-        </Column>
-      </DataTable>
+
+          <Column expander style="width: 2.2rem" />
+
+          <!-- Factura y Vendedor -->
+          <Column header="Factura / Vendedor">
+            <template #body="slotProps">
+              <div v-if="cargando" class="space-y-1">
+                <Skeleton width="60%" height="1rem" />
+                <Skeleton width="40%" height="0.8rem" />
+              </div>
+              <div v-else class="flex flex-col gap-0.5 items-start">
+                <span class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap">
+                  {{ slotProps.data.numeroFactura }}
+                </span>
+                <span class="text-xs text-gray-600 truncate max-w-[150px] block">
+                  {{ slotProps.data.vendidoPor }}
+                </span>
+              </div>
+            </template>
+          </Column>
+
+          <!-- Total y Estado -->
+          <Column header="Total / Estado" class="text-right">
+            <template #body="slotProps">
+              <div v-if="cargando" class="flex flex-col items-end gap-1">
+                <Skeleton width="3.5rem" height="1rem" />
+                <Skeleton width="4rem" height="1.2rem" borderRadius="12px" />
+              </div>
+              <div v-else class="flex flex-col items-end gap-1">
+                <span class="font-bold text-[#1a2e1f] text-xs font-mono">
+                  ${{ formatearMoneda(slotProps.data.total) }}
+                </span>
+                <Tag
+                  :value="slotProps.data.estado"
+                  :severity="slotProps.data.estado === 'PROCESADA' ? 'success' : 'danger'"
+                  rounded
+                  class="!text-[9px] !px-2 !py-0 whitespace-nowrap"
+                />
+              </div>
+            </template>
+          </Column>
+
+          <!-- Plantilla de Expansión Móvil -->
+          <template #expansion="slotProps">
+            <div class="p-3 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
+              <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2.5">
+                
+                <!-- Fecha -->
+                <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+                  <span class="text-[10px] font-bold uppercase text-[#6b7280]">Fecha Registro</span>
+                  <span class="font-mono text-xs text-[#334155] font-semibold">{{ slotProps.data.fecha }}</span>
+                </div>
+
+                <!-- Tipo de Pago -->
+                <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
+                  <span class="text-[10px] font-bold uppercase text-[#6b7280]">Tipo de Pago</span>
+                  <span :class="estiloPago(slotProps.data.tipoPago)">
+                    <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
+                    {{ slotProps.data.tipoPago }}
+                  </span>
+                </div>
+
+                <!-- Vendedor -->
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] font-bold uppercase text-[#6b7280]">Vendedor</span>
+                  <span class="text-xs text-[#334155] font-medium">{{ slotProps.data.vendidoPor }}</span>
+                </div>
+
+              </div>
+
+              <!-- Botones Móvil -->
+              <div class="mt-3 flex justify-end">
+                <Button
+                  icon="pi pi-eye"
+                  label="Ver Detalle"
+                  class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer shadow-2xs w-full justify-center"
+                  @click="$emit('ver-detalle', slotProps.data)"
+                />
+              </div>
+
+            </div>
+          </template>
+        </DataTable>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 1024px)-->
+      <!-- ======================================================= -->
+      <div class="hidden lg:block w-full overflow-x-auto">
+        <DataTable
+          :value="cargando ? Array.from({ length: filas }) : ventas"
+          lazy
+          paginator
+          :rows="filas"
+          :first="primero"
+          :totalRecords="totalRegistros"
+          :rowsPerPageOptions="[8, 15, 30]"
+          responsiveLayout="scroll"
+          class="p-datatable-custom text-sm w-full min-w-[55rem]"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+          @page="onPage"
+        >
+          <template #empty>
+            <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+              <i class="pi pi-inbox text-[48px] mb-3 text-gray-300" />
+              <span class="text-[15px] font-medium">No hay ventas registradas para estos filtros</span>
+            </div>
+          </template>
+
+          <!-- Vendido por -->
+          <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f] min-w-[12rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="65%" height="1.2rem" />
+              <span v-else class="capitalize block">{{ slotProps.data.vendidoPor }}</span>
+            </template>
+          </Column>
+
+          <!-- N° Factura -->
+          <Column field="numeroFactura" header="N° Factura" class="min-w-[9.5rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="5rem" height="1.2rem" />
+              <span v-else class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase">
+                {{ slotProps.data.numeroFactura }}
+              </span>
+            </template>
+          </Column>
+
+          <!-- Tipo de pago -->
+          <Column field="tipoPago" header="Tipo de pago" class="min-w-[10rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="6.5rem" height="1.5rem" borderRadius="20px" />
+              <span v-else :class="estiloPago(slotProps.data.tipoPago)">
+                <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
+                {{ slotProps.data.tipoPago }}
+              </span>
+            </template>
+          </Column>
+
+          <!-- Estado -->
+          <Column field="estado" header="Estado" class="text-center min-w-[8.5rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="20px" class="mx-auto" />
+              <Tag
+                v-else
+                :value="slotProps.data.estado"
+                :severity="slotProps.data.estado === 'PROCESADA' ? 'success' : 'danger'"
+                rounded
+                class="!text-xs !px-2.5 whitespace-nowrap"
+              />
+            </template>
+          </Column>
+
+          <!-- Fecha -->
+          <Column field="fecha" header="Fecha" class="text-gray-600 min-w-[9rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="5.5rem" height="1.2rem" />
+              <span v-else class="font-mono text-xs">{{ slotProps.data.fecha }}</span>
+            </template>
+          </Column>
+
+          <!-- Total -->
+          <Column field="total" header="Total" class="text-right min-w-[8.5rem]">
+            <template #body="slotProps">
+              <Skeleton v-if="cargando" width="4rem" height="1.2rem" class="ml-auto" />
+              <span v-else class="font-bold text-[#1a2e1f] font-mono">${{ formatearMoneda(slotProps.data.total) }}</span>
+            </template>
+          </Column>
+
+          <!-- Acciones -->
+          <Column header="Acción" class="w-[6rem] shrink-0 text-center">
+            <template #body="slotProps">
+              <div class="flex items-center justify-center">
+                <template v-if="cargando">
+                  <Skeleton shape="circle" size="2rem" />
+                </template>
+
+                <template v-else>
+                  <Button
+                    icon="pi pi-eye"
+                    class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm cursor-pointer"
+                    v-tooltip.top="'Ver detalle'"
+                    @click="$emit('ver-detalle', slotProps.data)"
+                  />
+                </template>
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+
     </div>
   </div>
 </template>
@@ -162,24 +376,34 @@
 <script setup>
 import { ref, watch, onBeforeUnmount } from 'vue'
 import Skeleton from 'primevue/skeleton'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import Select from 'primevue/select'
+import DatePicker from 'primevue/datepicker'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Tag from 'primevue/tag'
+import Button from 'primevue/button'
 
-// Props: la página actual y los totales los entrega el padre (que consulta al servidor)
 defineProps({
   ventas: { type: Array, required: true, default: () => [] },
   cargando: { type: Boolean, default: false },
-  totalRegistros: { type: Number, default: 0 }, // total del servidor, no de la página
+  totalRegistros: { type: Number, default: 0 },
   filas: { type: Number, default: 8 },
-  primero: { type: Number, default: 0 }, // índice del primer registro de la página
+  primero: { type: Number, default: 0 },
 })
 
 const emit = defineEmits(['ver-detalle', 'cambiar-pagina', 'cambiar-filtros'])
+
+const expandedRows = ref({})
 
 // --- Paginación ---
 const onPage = (event) => {
   emit('cambiar-pagina', { page: event.page + 1, per_page: event.rows })
 }
 
-// --- Filtros (se envían al servidor; aquí no se filtra nada) ---
+// --- Filtros ---
 const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
 const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 
@@ -188,7 +412,6 @@ const estadoSel = ref(null)
 const pagoSel = ref(null)
 const rangoDeFechas = ref(null)
 
-// Fecha local en formato YYYY-MM-DD
 const aISO = (fecha) =>
   `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
 
@@ -200,14 +423,12 @@ const emitirFiltros = () => {
     estado: estadoSel.value || '',
     tipo_pago: pagoSel.value || '',
     fecha_desde: desde ? aISO(desde) : '',
-    // Si solo se eligió un día, el rango es ese mismo día
     fecha_hasta: desde ? aISO(hasta ?? desde) : '',
   })
 }
 
 watch([estadoSel, pagoSel], emitirFiltros)
 
-// Búsqueda con espera de 400 ms para no consultar en cada tecla
 let temporizador = null
 watch(busqueda, () => {
   clearTimeout(temporizador)
@@ -215,12 +436,10 @@ watch(busqueda, () => {
 })
 onBeforeUnmount(() => clearTimeout(temporizador))
 
-// Rango completo o limpiado: se consulta de inmediato
 watch(rangoDeFechas, (rango) => {
   if (!rango || (rango[0] && rango[1])) emitirFiltros()
 })
 
-// Si se cierra el calendario con una sola fecha elegida, se filtra ese día
 const alCerrarCalendario = () => {
   const rango = rangoDeFechas.value
   if (rango?.[0] && !rango[1]) emitirFiltros()
@@ -229,11 +448,11 @@ const alCerrarCalendario = () => {
 // --- Helpers visuales ---
 const estiloPago = (tipo) => {
   if (tipo === 'EFECTIVO')
-    return 'bg-[#fef9c3] text-[#854d0e] px-2 py-1 rounded-full text-xs font-medium'
+    return 'inline-flex items-center gap-1.5 bg-[#fef9c3] text-[#854d0e] px-2.5 py-1 rounded-full text-xs font-semibold'
   if (tipo === 'TRANSFERENCIA')
-    return 'bg-[#dbeafe] text-[#1d4ed8] px-2 py-1 rounded-full text-xs font-medium'
+    return 'inline-flex items-center gap-1.5 bg-[#dbeafe] text-[#1d4ed8] px-2.5 py-1 rounded-full text-xs font-semibold'
   if (tipo === 'TARJETA')
-    return 'bg-[#f3e8ff] text-[#6b21a8] px-2 py-1 rounded-full text-xs font-medium'
+    return 'inline-flex items-center gap-1.5 bg-[#f3e8ff] text-[#6b21a8] px-2.5 py-1 rounded-full text-xs font-semibold'
   return ''
 }
 
@@ -252,29 +471,22 @@ const formatearMoneda = (valor) => {
 
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {
-  background-color: #ffffff !important;
-  color: #1e3a2f !important;
-  border-bottom: 2px solid #e2e8dd !important;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1.25rem 1rem;
+  background-color: #fbfdf9 !important;
+  color: #2b5e3b !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid #e2e8dd !important;
+  white-space: nowrap !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr {
-  background-color: #ffffff !important;
-  color: #1a2e1f !important;
-  border-bottom: 1px solid #e2e8dd !important;
+.p-datatable-custom .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid #f1f5f0 !important;
 }
 
 .p-datatable-custom .p-datatable-tbody > tr:hover {
-  background-color: #f4f7f2 !important;
-}
-
-.p-inputtext:enabled:focus,
-.p-dropdown:not(.p-disabled).p-focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
-  border-color: #2b5e3b !important;
+  background-color: #f4f8f3 !important;
 }
 </style>

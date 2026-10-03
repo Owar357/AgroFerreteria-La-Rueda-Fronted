@@ -1,22 +1,45 @@
 <template>
   <div class="bg-[#eef2e9] min-h-full p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <!-- Encabezado de la página -->
-    <div class="flex items-center gap-3 mb-6">
-      <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+              Registro de Usuarios
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">
+              Gestión de cuentas, roles y permisos
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Registro de usuarios
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos del sistema</p>
+
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:flex items-center gap-3 mb-6">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Registro de Usuarios
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">
+            Gestión de cuentas, roles y permisos del sistema
+          </p>
+        </div>
       </div>
-    </div>
 
     <!-- Contenedor Principal -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
-      
       <!-- Apartado de Filtros Estático Superior -->
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-white">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
@@ -34,7 +57,7 @@
             <!-- Filtro de Estado -->
             <Select
               v-model="filtroEstado"
-              :options="statusOptions"
+              :options="opcionesEstado"
               optionLabel="label"
               optionValue="value"
               showClear
@@ -57,7 +80,7 @@
       <!-- ======================================================= -->
       <div class="block md:hidden w-full">
         <DataTable
-          v-model:expandedRows="expandedRows"
+          v-model:expandedRows="filasExpandidas"
           :value="usuariosFiltrados"
           lazy
           :rows="store.perPage"
@@ -67,12 +90,10 @@
           class="p-datatable-custom text-sm w-full"
           currentPageReportTemplate="{first}-{last} de {totalRecords}"
           paginatorTemplate="PrevPageLink PageLinks NextPageLink"
-          @page="onPageChange"
+          @page="alCambiarPagina"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <!-- Botón de Expansión (Flecha) -->
@@ -107,10 +128,14 @@
           <!-- Plantilla de Expansión (Móvil) con Grid Ordenado -->
           <template #expansion="slotProps">
             <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+              <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
+              >
                 <!-- Email (Ocupa las 2 columnas) -->
                 <div class="col-span-2">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Email
                   </span>
                   <span class="text-gray-800 font-medium break-all block">
@@ -120,7 +145,9 @@
 
                 <!-- Rol -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Rol
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -130,7 +157,9 @@
 
                 <!-- Fecha -->
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Fecha
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -144,7 +173,9 @@
 
                 <!-- Creado por (Ocupa las 2 columnas) -->
                 <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
                     Creado por
                   </span>
                   <span class="text-gray-800 font-medium block">
@@ -177,9 +208,6 @@
         </DataTable>
       </div>
 
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO: Tabla Completa (>= 768px)             -->
-      <!-- ======================================================= -->
       <div class="hidden md:block w-full overflow-x-auto">
         <DataTable
           :value="usuariosFiltrados"
@@ -190,12 +218,10 @@
           class="p-datatable-custom text-sm w-full"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-          @page="onPageChange"
+          @page="alCambiarPagina"
         >
           <template #empty>
-            <div class="text-center py-6 text-[#6b7280] text-sm">
-              No hay usuarios registrados.
-            </div>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
           <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
@@ -262,7 +288,7 @@
                 <Skeleton width="4rem" height="2rem" borderRadius="0.5rem" />
                 <Skeleton width="5rem" height="2rem" borderRadius="0.5rem" />
               </div>
-              
+
               <div v-else class="flex gap-2 justify-center">
                 <template v-if="slotProps.data.activo">
                   <Button
@@ -288,7 +314,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 </template>
@@ -301,11 +326,15 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
-import Skeleton from 'primevue/skeleton' 
+import Skeleton from 'primevue/skeleton'
 import Column from 'primevue/column'
-import Swal from 'sweetalert2'
 import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
+import { 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarConfirmacion 
+} from '@/utils/SweetAlertService'
 
 const usuarioActual = authService.getUser()
 const store = useUserStore()
@@ -313,73 +342,41 @@ const store = useUserStore()
 const busqueda = ref('')
 const filtroEstado = ref(null)
 
-// Objeto para manejar las filas expandidas en PrimeVue 4
-const expandedRows = ref({})
+const filasExpandidas = ref({})
 
-const statusOptions = ref([
+const opcionesEstado = ref([
   { label: 'Activo', value: true },
   { label: 'Inactivo', value: false },
 ])
 
-const confirmarDesactivar = async (user) => {
-  if (usuarioActual?.id === user.id) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Acción no permitida',
-      text: 'No puedes desactivar tu propio usuario.',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#2b5e3b',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
+const confirmarDesactivar = async (usuario) => {
+  if (usuarioActual?.id === usuario.id) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Acción no permitida',
+      mensajeHtml: 'No puedes desactivar tu propio usuario.'
     })
     return
   }
 
-  const confirmacion = await Swal.fire({
-    icon: 'question',
-    title: '¿Desactivar usuario?',
-    text: `¿Deseas desactivar a ${user.name}? Esta acción no se puede revertir.`,
-    showCancelButton: true,
-    confirmButtonText: 'Confirmar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#9c2a2a',
-    cancelButtonColor: '#6b7280',
-    reverseButtons: true,
-    customClass: {
-      popup: '!rounded-xl !p-4 sm:!p-6',
-      actions: '!gap-3 flex-col sm:flex-row !w-full sm:!w-auto',
-      confirmButton: '!w-full sm:!w-auto !px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      cancelButton: '!w-full sm:!w-auto !px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-    }
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Desactivar usuario?',
+    mensajeHtml: `¿Deseas desactivar a <strong>${usuario.name}</strong>? Esta acción no se puede revertir.`,
+    confirmButtonText: 'Sí, desactivar'
   })
 
   if (!confirmacion.isConfirmed) return
 
-  const resultado = await store.desactivarUsuario(user.id)
+  const resultado = await store.desactivarUsuario(usuario.id)
 
   if (resultado?.ok) {
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: 'Usuario desactivado correctamente',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
+    mostrarAlertaConfirmar({
+      tipo: 'success',
+      titulo: 'Usuario desactivado',
+      mensajeHtml: 'El usuario fue desactivado correctamente.'
     })
   } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: resultado?.error || 'No se pudo desactivar el usuario.',
-      confirmButtonColor: '#2b5e3b',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
-    })
+    mostrarError('Error', resultado?.error || 'No se pudo desactivar el usuario.')
   }
 }
 
@@ -401,34 +398,16 @@ const usuariosFiltrados = computed(() => {
   })
 })
 
-const onPageChange = async (event) => {
-  const page = event.page + 1
-  const rows = event.rows
+const alCambiarPagina = async (evento) => {
+  const pagina = evento.page + 1
+  const filas = evento.rows
   
-  const resultado = await store.fetchUsers(page, rows)
+  const resultado = await store.fetchUsers(pagina, filas)
   
   if (resultado?.status === 403) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Sin autorización',
-      text: 'No tienes permisos para ver los usuarios.',
-      confirmButtonColor: '#2b5e3b',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
-    })
+    mostrarError('Sin autorización', 'No tienes permisos para ver los usuarios.')
   } else if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-      customClass: {
-        popup: '!rounded-xl !p-4 sm:!p-6',
-        confirmButton: '!px-5 !py-2.5 !rounded-lg !text-sm !font-semibold',
-      }
-    })
+    mostrarError('Error de conexión', resultado.error)
   }
 }
 

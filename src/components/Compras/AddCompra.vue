@@ -1,8 +1,23 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-4 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <div
-      class="w-full max-w-[1200px] mx-auto bg-[#ffffff] rounded-3xl border border-[#e2e8dd] shadow-xl overflow-hidden">
-      <div class="bg-[#2b5e3b] p-6 border-b border-[#e2e8dd]">
+  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
+    <div class="w-full max-w-[1200px] mx-auto bg-[#ffffff] rounded-3xl border border-[#e2e8dd] shadow-xl overflow-hidden">
+      
+      <!-- ======================================================= -->
+      <!-- CABECERA MÓVIL (Solo Teléfono)                          -->
+      <!-- ======================================================= -->
+      <div class="block md:hidden bg-[#2b5e3b] p-4 border-b border-[#e2e8dd]">
+        <div>
+          <h1 class="text-xl font-semibold text-white leading-tight m-0">Registro de compra</h1>
+          <p class="text-xs text-[#dff0e0] mt-1 m-0">
+            Documento digitalizado y lotes recibidos del proveedor
+          </p>
+        </div>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- CABECERA ESCRITORIO (Solo PC)                           -->
+      <!-- ======================================================= -->
+      <div class="hidden md:block bg-[#2b5e3b] p-6 border-b border-[#e2e8dd]">
         <div class="flex items-center gap-3">
           <div>
             <h1 class="text-white text-[26px] font-semibold tracking-wide">Registro de compra</h1>
@@ -13,264 +28,552 @@
         </div>
       </div>
 
-      <div class="p-6 flex flex-col gap-6">
+      <div class="p-4 sm:p-6 flex flex-col gap-6">
         <Stepper value="1" class="basis-full">
           <StepList>
             <Step value="1">Documento</Step>
             <Step value="2">Lotes recibidos</Step>
           </StepList>
-          <StepPanels>
-            <!-- Documento -->
-            <StepPanel value="1" v-slot="{ activateCallback }">
-              <div class="flex flex-col gap-4 pt-6">
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-[14px] font-medium text-[#1a2e1f]">Proveedor</label>
-                  <AutoComplete v-model="documentoForm.proveedor" optionLabel="nombre"
-                    :suggestions="proveedoresFiltrados" @complete="buscarProveedor" placeholder="Buscar proveedor..."
-                    class="w-full" fluid />
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de documento</label>
-                    <Select v-model="documentoForm.tipoComprobante" :options="comprobantesOptions" optionLabel="label"
-                      optionValue="value" placeholder="Seleccionar tipo" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+          <StepPanels>
+            <!-- ======================================================= -->
+            <!-- PASO 1: DOCUMENTO                                       -->
+            <!-- ======================================================= -->
+            <StepPanel value="1" v-slot="{ activateCallback }">
+              <div class="flex flex-col gap-4 pt-4 sm:pt-6">
+
+                <!-- VISTA MÓVIL (Solo Teléfono: block md:hidden) -->
+                <div class="block md:hidden space-y-4">
+                  <!-- Proveedor -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Proveedor *</label>
+                    <AutoComplete v-model="documentoForm.proveedor" optionLabel="nombre"
+                      :suggestions="proveedoresFiltrados" @complete="buscarProveedor" placeholder="Buscar proveedor..."
+                      class="w-full" fluid
+                      :pt="{
+                        pcInputText: {
+                          root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 rounded-lg w-full' }
+                        }
+                      }" />
                   </div>
 
-                  <div class="flex flex-col gap-1.5 w-5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Nº comprobante</label>
-                    <div class="flex">
+                  <!-- Tipo Comprobante -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Tipo de documento *</label>
+                    <Select v-model="documentoForm.tipoComprobante" :options="comprobantesOptions" optionLabel="label"
+                      optionValue="value" placeholder="Seleccionar tipo" class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
+                  </div>
+
+                  <!-- Nº Comprobante -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Nº comprobante *</label>
+                    <div class="flex w-full">
                       <span v-if="prefijoComprobante"
-                        class="flex items-center px-3 bg-[#e2e8dd] border border-r-0 border-[#d1d5db] rounded-l-md text-[#6b7280] w-3 text-[14px]">
+                        class="flex items-center px-2.5 bg-[#e2e8dd] border border-r-0 border-gray-300 rounded-l-lg text-[#6b7280] text-xs font-mono shrink-0">
                         {{ prefijoComprobante }}
                       </span>
                       <InputText v-model="documentoForm.numComprobante"
                         :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
-                        :class="prefijoComprobante ? 'rounded-r-md' : 'rounded-md'"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 focus:border-[#2b5e3b] text-[#1a2e1f]" />
+                        :class="prefijoComprobante ? 'rounded-r-lg' : 'rounded-lg'"
+                        class="w-full !bg-white !border-gray-300 h-10 px-3 focus:!border-[#2b5e3b] text-[#1a2e1f] text-xs" />
                     </div>
-                    <small v-if="prefijoComprobante" class="text-[13px] text-[#6b7280] font-normal">
+                    <small v-if="prefijoComprobante" class="text-[11px] text-[#6b7280] font-normal">
                       Aplica para comprobante físico
                     </small>
                   </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de emisión</label>
+                  <!-- Fecha Emisión -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Fecha de emisión *</label>
                     <DatePicker v-model="documentoForm.fechaEmision" dateFormat="dd/mm/yy" showIcon iconDisplay="input"
-                      class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      class="w-full !bg-white !border-gray-300 text-xs rounded-lg h-10" />
                   </div>
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Estado de pago</label>
+
+                  <!-- Estado de Pago -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Estado de pago *</label>
                     <Select v-model="documentoForm.estadoPago" :options="estadosPagoOptions" optionLabel="label"
-                      optionValue="value" placeholder="Seleccionar" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      optionValue="value" placeholder="Seleccionar" class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
                   </div>
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Monto total facturado</label>
+
+                  <!-- Monto Total Facturado -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Monto total facturado *</label>
                     <InputText v-model="documentoForm.montoTotal" placeholder="0.00"
-                      class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md focus:border-[#2b5e3b] text-[#1a2e1f]" />
+                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg focus:!border-[#2b5e3b] text-[#1a2e1f] text-xs font-mono" />
                   </div>
-                  <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex flex-col gap-1.5">
-                    <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento del crédito</label>
+
+                  <!-- Fecha Vencimiento -->
+                  <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Fecha de vencimiento del crédito</label>
                     <DatePicker v-model="documentoForm.fechaVencimiento" dateFormat="dd/mm/yy" showIcon
-                      iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
-                    <small class="text-[13px] text-[#6b7280] font-normal">Desaparece si el estado es "Pagado"</small>
+                      iconDisplay="input" class="w-full !bg-white !border-gray-300 text-xs rounded-lg h-10" />
+                    <small class="text-[11px] text-[#6b7280] font-normal">Desaparece si el estado es "Pagado"</small>
                   </div>
                 </div>
 
-                <!-- Footer paso 1 -->
-                <div class="flex justify-between items-center pt-4 border-t border-[#e2e8dd]">
-                  <Button label="Regresar" icon="pi pi-arrow-left"
-                    class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-4 py-3 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                    @click="emit('close')" />
-                  <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
-                    class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                    @click="activateCallback('2')" />
+                <!-- VISTA ESCRITORIO (Solo PC: hidden md:block) -->
+                <div class="hidden md:block">
+                  <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1.5">
+                      <label class="text-[14px] font-medium text-[#1a2e1f]">Proveedor</label>
+                      <AutoComplete v-model="documentoForm.proveedor" optionLabel="nombre"
+                        :suggestions="proveedoresFiltrados" @complete="buscarProveedor" placeholder="Buscar proveedor..."
+                        class="w-full" fluid />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de documento</label>
+                        <Select v-model="documentoForm.tipoComprobante" :options="comprobantesOptions" optionLabel="label"
+                          optionValue="value" placeholder="Seleccionar tipo" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      </div>
+
+                      <div class="flex flex-col gap-1.5 w-full">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Nº comprobante</label>
+                        <div class="flex">
+                          <span v-if="prefijoComprobante"
+                            class="flex items-center px-3 bg-[#e2e8dd] border border-r-0 border-[#d1d5db] rounded-l-md text-[#6b7280] text-[14px] shrink-0">
+                            {{ prefijoComprobante }}
+                          </span>
+                          <InputText v-model="documentoForm.numComprobante"
+                            :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
+                            :class="prefijoComprobante ? 'rounded-r-md' : 'rounded-md'"
+                            class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 focus:border-[#2b5e3b] text-[#1a2e1f]" />
+                        </div>
+                        <small v-if="prefijoComprobante" class="text-[13px] text-[#6b7280] font-normal">
+                          Aplica para comprobante físico
+                        </small>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de emisión</label>
+                        <DatePicker v-model="documentoForm.fechaEmision" dateFormat="dd/mm/yy" showIcon iconDisplay="input"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Estado de pago</label>
+                        <Select v-model="documentoForm.estadoPago" :options="estadosPagoOptions" optionLabel="label"
+                          optionValue="value" placeholder="Seleccionar" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Monto total facturado</label>
+                        <InputText v-model="documentoForm.montoTotal" placeholder="0.00"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md focus:border-[#2b5e3b] text-[#1a2e1f]" />
+                      </div>
+                      <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento del crédito</label>
+                        <DatePicker v-model="documentoForm.fechaVencimiento" dateFormat="dd/mm/yy" showIcon
+                          iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                        <small class="text-[13px] text-[#6b7280] font-normal">Desaparece si el estado es "Pagado"</small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Footer Paso 1 -->
+                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                  <!-- Vista Móvil -->
+                  <div class="flex flex-col gap-3 block md:hidden">
+                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
+                      @click="activateCallback('2')" />
+                    <Button label="Regresar" icon="pi pi-arrow-left"
+                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                      @click="emit('close')" />
+                  </div>
+
+                  <!-- Vista Escritorio -->
+                  <div class="hidden md:flex md:justify-between md:items-center">
+                    <Button label="Regresar" icon="pi pi-arrow-left"
+                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                      @click="emit('close')" />
+                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                      @click="activateCallback('2')" />
+                  </div>
+                </div>
+
               </div>
             </StepPanel>
 
-            <!-- PASO 2: Lotes recibidos -->
+            <!-- ======================================================= -->
+            <!-- PASO 2: LOTES RECIBIDOS                                 -->
+            <!-- ======================================================= -->
             <StepPanel value="2" v-slot="{ activateCallback }">
-              <div class="flex flex-col gap-6 pt-6">
-                <div class="flex flex-col gap-4">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex flex-col w-7 gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre del producto</label>
-                      <AutoComplete v-model="loteForm.producto" optionLabel="nombre" :suggestions="sugerenciasProductos"
-                        @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
-                        placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid />
-                    </div>
-                    <div class="flex flex-col w-4 gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de presentación que entra</label>
-                      <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
-                        optionLabel="nombre" placeholder="Seleccionar presentación"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db]" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">
-                        Cantidad facturada
-                        {{
-                          loteForm.presentacionFacturada
-                            ? `(en
-                        ${loteForm.presentacionFacturada.nombre})`
-                            : ''
-                        }}
-                      </label>
-                      <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                      <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
-                        class="text-[13px] text-[#2b5e3b] font-medium">
-                        = {{ unidadesFacturadas }}
-                        {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
-                      </small>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo del producto</label>
-                      <div class="flex gap-6 items-center h-[40px]">
-                        <div class="flex items-center gap-2">
-                          <RadioButton v-model="loteForm.tipoProducto" inputId="perecedero" name="tipo"
-                            value="Perecedero" class="p-radiobutton-custom" />
-                          <label for="perecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">Perecedero</label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <RadioButton v-model="loteForm.tipoProducto" inputId="noPerecedero" name="tipo"
-                            value="No perecedero" class="p-radiobutton-custom" />
-                          <label for="noPerecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">No
-                            perecedero</label>
-                        </div>
+              <div class="flex flex-col gap-6 pt-4 sm:pt-6">
+
+                <!-- VISTA MÓVIL LOTES (Solo Teléfono: block md:hidden) -->
+                <div class="block md:hidden space-y-4">
+                  <!-- Producto -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Nombre del producto *</label>
+                    <AutoComplete v-model="loteForm.producto" optionLabel="nombre" :suggestions="sugerenciasProductos"
+                      @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
+                      placeholder="Escribe nombre, cód. interno..." class="w-full" fluid
+                      :pt="{
+                        pcInputText: {
+                          root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 rounded-lg w-full' }
+                        }
+                      }" />
+                  </div>
+
+                  <!-- Presentación -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Tipo de presentación que entra *</label>
+                    <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
+                      optionLabel="nombre" placeholder="Seleccionar presentación"
+                      class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
+                  </div>
+
+                  <!-- Cantidad Facturada -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">
+                      Cantidad facturada {{ loteForm.presentacionFacturada ? `(${loteForm.presentacionFacturada.nombre})` : '' }} *
+                    </label>
+                    <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
+                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
+                    <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
+                      class="text-[11px] text-[#2b5e3b] font-medium">
+                      = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                    </small>
+                  </div>
+
+                  <!-- Tipo de Producto (Perecedero) -->
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Tipo del producto *</label>
+                    <div class="flex items-center justify-around bg-gray-50 px-3 h-10 rounded-lg border border-gray-200 w-full">
+                      <div class="flex items-center gap-2">
+                        <RadioButton v-model="loteForm.tipoProducto" inputId="perecedero_m" name="tipo_m" value="Perecedero" class="p-radiobutton-custom" />
+                        <label for="perecedero_m" class="cursor-pointer text-xs text-[#1a2e1f] font-medium">Perecedero</label>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <RadioButton v-model="loteForm.tipoProducto" inputId="noPerecedero_m" name="tipo_m" value="No perecedero" class="p-radiobutton-custom" />
+                        <label for="noPerecedero_m" class="cursor-pointer text-xs text-[#1a2e1f] font-medium">No perecedero</label>
                       </div>
                     </div>
                   </div>
 
-                  <div class="flex flex-col gap-2">
+                  <!-- Bonificación Checkbox -->
+                  <div class="flex flex-col gap-1.5 py-1">
                     <div class="flex items-center gap-2">
-                      <Checkbox v-model="incluyeBonificacion" inputId="bonificacion" binary />
-                      <label for="bonificacion" class="cursor-pointer text-[14px] font-medium text-[#1a2e1f]">
-                        ¿El proveedor incluyó producto adicional sin costo?
+                      <Checkbox v-model="incluyeBonificacion" inputId="bonificacion_m" binary />
+                      <label for="bonificacion_m" class="cursor-pointer text-xs font-semibold text-[#1a2e1f]">
+                        ¿Incluyó producto adicional gratis?
                       </label>
                     </div>
-                    <small class="text-[13px] text-[#6b7280] font-normal">
-                      Marca esta opción si recibiste unidades extra de regalo o bonificación (ej:
-                      "compra 10 lleva 1 gratis"), sin que se refleje en el precio facturado.
+                    <small class="text-[11px] text-[#6b7280] leading-tight">
+                      Marca si recibiste unidades extra de regalo (ej: 10+1 gratis).
                     </small>
                   </div>
 
-                  <div v-if="incluyeBonificacion"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Presentación bonificada</label>
+                  <!-- Campos Bonificados -->
+                  <div v-if="incluyeBonificacion" class="space-y-3 bg-[#f9fafb] border border-[#e2e8dd] rounded-xl p-3">
+                    <div class="flex flex-col gap-1.5 w-full">
+                      <label class="text-xs font-semibold text-[#1a2e1f]">Presentación bonificada</label>
                       <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote"
                         optionLabel="nombre" placeholder="Seleccionar presentación"
-                        class="w-full bg-[#ffffff] border-[#d1d5db]" />
+                        class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">
-                        Cantidad bonificada
-                        {{
-                          loteForm.presentacionBonificada
-                            ? `(en
-                        ${loteForm.presentacionBonificada.nombre})`
-                            : ''
-                        }}
-                      </label>
+                    <div class="flex flex-col gap-1.5 w-full">
+                      <label class="text-xs font-semibold text-[#1a2e1f]">Cantidad bonificada</label>
                       <InputText v-model="loteForm.cantidadBonificada" placeholder="0"
-                        class="w-full bg-[#ffffff] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                        class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
                       <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
-                        class="text-[13px] text-[#2b5e3b] font-medium">
-                        = {{ unidadesBonificadas }}
-                        {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                        class="text-[11px] text-[#2b5e3b] font-medium">
+                        = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
                       </small>
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Número de lote</label>
-                      <InputText v-model="loteForm.numLote" placeholder="LOT-001"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                  <!-- Datos Lote y Costos -->
+                  <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Número de lote</label>
+                    <InputText v-model="loteForm.numLote" placeholder="LOT-001"
+                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
+                  </div>
+
+                  <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Fecha de vencimiento</label>
+                    <DatePicker v-model="loteForm.fechaVencimientoLote" dateFormat="dd/mm/yy" showIcon
+                      iconDisplay="input" class="w-full !bg-white !border-gray-300 text-xs rounded-lg h-10" />
+                  </div>
+
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">Costo unitario (factura) *</label>
+                    <InputText v-model="loteForm.costoUnitario" placeholder="0.00"
+                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
+                  </div>
+
+                  <div class="flex flex-col gap-1.5 w-full">
+                    <label class="text-xs font-semibold text-[#1a2e1f]">
+                      Descuento en línea <span class="text-[10px] text-gray-400 font-normal">(opcional)</span>
+                    </label>
+                    <InputText v-model="loteForm.descuentoLinea" placeholder="0.00"
+                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
+                  </div>
+
+                  <!-- Resumen Cálculos Móvil -->
+                  <div v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada && loteForm.costoUnitario"
+                    class="bg-[#f4f7f2] border border-[#dce4d7] rounded-xl p-3.5 space-y-1.5 text-xs">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Subtotal (facturado):</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">${{ subTotal.toFixed(2) }}</span>
                     </div>
-                    <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento</label>
-                      <DatePicker v-model="loteForm.fechaVencimientoLote" dateFormat="dd/mm/yy" showIcon
-                        iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Total a pagar:</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">${{ totalPagado.toFixed(2) }}</span>
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">Costo unitario (factura)</label>
-                      <InputText v-model="loteForm.costoUnitario" placeholder="0.00"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Unidades reales bodega:</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">{{ cantidadInicialLote }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[14px] font-medium text-[#1a2e1f]">
-                        Descuento en línea
-                        <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
-                      </label>
-                      <InputText v-model="loteForm.descuentoLinea" placeholder="0.00"
-                        class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                    <div class="flex justify-between border-t border-[#dce4d7] pt-1 mt-1">
+                      <span class="text-[#2b5e3b] font-bold">Costo unitario real:</span>
+                      <span class="font-bold text-[#2b5e3b] font-mono">${{ costoUnitarioReal.toFixed(4) }}</span>
                     </div>
                   </div>
 
-                  <div v-if="
-                    loteForm.presentacionFacturada &&
-                    loteForm.cantidadFacturada &&
-                    loteForm.costoUnitario
-                  " class="bg-[#eef2e9] border border-[#d1d5db] rounded-lg p-4 flex flex-col gap-1 text-[13px]">
-                    <div class="flex justify-between">
-                      <span class="text-[#4b5563]">Subtotal (facturado)</span>
-                      <span class="font-semibold text-[#1a2e1f]">${{ subTotal.toFixed(2) }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-[#4b5563]">Total a pagar (con descuento)</span>
-                      <span class="font-semibold text-[#1a2e1f]">${{ totalPagado.toFixed(2) }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-[#4b5563]">Unidades reales que entran a bodega</span>
-                      <span class="font-semibold text-[#1a2e1f]">{{ cantidadInicialLote }}
-                        {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
-                    </div>
-                    <div class="flex justify-between border-t border-[#d1d5db] pt-1 mt-1">
-                      <span class="text-[#2b5e3b] font-semibold">Costo unitario real (lote)</span>
-                      <span class="font-bold text-[#2b5e3b]">${{ costoUnitarioReal.toFixed(4) }}</span>
-                    </div>
-                  </div>
-
-                  <div class="flex justify-between items-center mt-2">
-                    <Button label="Limpiar Lote" icon="pi pi-refresh"
-                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#d1d5db] px-4 py-3 rounded-lg text-[14px] font-semibold cursor-pointer transition-colors"
-                      @click="limpiarCamposLote" />
+                  <!-- Botones Lote Móvil -->
+                  <div class="flex flex-col gap-2 pt-1">
                     <Button label="Agregar Item" icon="pi pi-plus"
-                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-lg text-[14px] font-semibold cursor-pointer shadow-sm transition-colors"
+                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none h-11 rounded-xl text-sm font-semibold cursor-pointer shadow-xs w-full flex justify-center"
                       @click="agregarItemsATabla" />
+                    <Button label="Limpiar Lote" icon="pi pi-refresh"
+                      class="!bg-gray-100 hover:!bg-gray-200 !text-[#1a2e1f] !border-gray-300 h-10 rounded-xl text-xs font-semibold cursor-pointer w-full flex justify-center"
+                      @click="limpiarCamposLote" />
                   </div>
                 </div>
 
-                <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd]">
-                  <DataTable :value="itemsAgregados" responsiveLayout="scroll" class="p-datatable-custom text-[14px]">
-                    <Column field="producto" header="Producto" />
-                    <Column field="cantFact" header="Cant. fact." />
-                    <Column field="cantidad" header="Cantidad (unid. base)" />
-                    <Column field="costoUnit" header="Costo unit. real" />
-                    <Column field="vencimiento" header="Fecha Vencimiento" />
-                    <Column field="subtotal" header="Subtotal" class="font-semibold text-[#1a2e1f]" />
-                    <Column header="Acción" class="text-center w-[80px]">
-                      <template #body="slotProps">
-                        <Button icon="pi pi-trash"
-                          class="hover:bg-[#fde8e8] border-none text-[#9c2a2a] hover:text-red-600 w-8 h-8 rounded-full p-0 transition-colors"
-                          @click="eliminarItemDeTabla(slotProps.index)" />
-                      </template>
-                    </Column>
-                  </DataTable>
+                <!-- VISTA ESCRITORIO LOTES (Solo PC: hidden md:block) -->
+                <div class="hidden md:block">
+                  <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="flex flex-col w-full gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre del producto</label>
+                        <AutoComplete v-model="loteForm.producto" optionLabel="nombre" :suggestions="sugerenciasProductos"
+                          @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
+                          placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid />
+                      </div>
+                      <div class="flex flex-col w-full gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de presentación que entra</label>
+                        <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
+                          optionLabel="nombre" placeholder="Seleccionar presentación"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">
+                          Cantidad facturada
+                          {{ loteForm.presentacionFacturada ? `(en ${loteForm.presentacionFacturada.nombre})` : '' }}
+                        </label>
+                        <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                        <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
+                          class="text-[13px] text-[#2b5e3b] font-medium">
+                          = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                        </small>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo del producto</label>
+                        <div class="flex gap-6 items-center h-[40px]">
+                          <div class="flex items-center gap-2">
+                            <RadioButton v-model="loteForm.tipoProducto" inputId="perecedero" name="tipo"
+                              value="Perecedero" class="p-radiobutton-custom" />
+                            <label for="perecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">Perecedero</label>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <RadioButton v-model="loteForm.tipoProducto" inputId="noPerecedero" name="tipo"
+                              value="No perecedero" class="p-radiobutton-custom" />
+                            <label for="noPerecedero" class="cursor-pointer text-[14px] text-[#1a2e1f]">No perecedero</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                      <div class="flex items-center gap-2">
+                        <Checkbox v-model="incluyeBonificacion" inputId="bonificacion" binary />
+                        <label for="bonificacion" class="cursor-pointer text-[14px] font-medium text-[#1a2e1f]">
+                          ¿El proveedor incluyó producto adicional sin costo?
+                        </label>
+                      </div>
+                      <small class="text-[13px] text-[#6b7280] font-normal">
+                        Marca esta opción si recibiste unidades extra de regalo o bonificación (ej: "compra 10 lleva 1 gratis").
+                      </small>
+                    </div>
+
+                    <div v-if="incluyeBonificacion"
+                      class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Presentación bonificada</label>
+                        <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote"
+                          optionLabel="nombre" placeholder="Seleccionar presentación"
+                          class="w-full bg-[#ffffff] border-[#d1d5db]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">
+                          Cantidad bonificada {{ loteForm.presentacionBonificada ? `(en ${loteForm.presentacionBonificada.nombre})` : '' }}
+                        </label>
+                        <InputText v-model="loteForm.cantidadBonificada" placeholder="0"
+                          class="w-full bg-[#ffffff] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                        <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
+                          class="text-[13px] text-[#2b5e3b] font-medium">
+                          = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                        </small>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Número de lote</label>
+                        <InputText v-model="loteForm.numLote" placeholder="LOT-001"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                      </div>
+                      <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento</label>
+                        <DatePicker v-model="loteForm.fechaVencimientoLote" dateFormat="dd/mm/yy" showIcon
+                          iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">Costo unitario (factura)</label>
+                        <InputText v-model="loteForm.costoUnitario" placeholder="0.00"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                      </div>
+                      <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-medium text-[#1a2e1f]">
+                          Descuento en línea <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
+                        </label>
+                        <InputText v-model="loteForm.descuentoLinea" placeholder="0.00"
+                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
+                      </div>
+                    </div>
+
+                    <div v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada && loteForm.costoUnitario"
+                      class="bg-[#eef2e9] border border-[#d1d5db] rounded-lg p-4 flex flex-col gap-1 text-[13px]">
+                      <div class="flex justify-between">
+                        <span class="text-[#4b5563]">Subtotal (facturado)</span>
+                        <span class="font-semibold text-[#1a2e1f]">${{ subTotal.toFixed(2) }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-[#4b5563]">Total a pagar (con descuento)</span>
+                        <span class="font-semibold text-[#1a2e1f]">${{ totalPagado.toFixed(2) }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-[#4b5563]">Unidades reales que entran a bodega</span>
+                        <span class="font-semibold text-[#1a2e1f]">{{ cantidadInicialLote }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
+                      </div>
+                      <div class="flex justify-between border-t border-[#d1d5db] pt-1 mt-1">
+                        <span class="text-[#2b5e3b] font-semibold">Costo unitario real (lote)</span>
+                        <span class="font-bold text-[#2b5e3b]">${{ costoUnitarioReal.toFixed(4) }}</span>
+                      </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-2">
+                      <Button label="Limpiar Lote" icon="pi pi-refresh"
+                        class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#d1d5db] px-4 py-3 rounded-lg text-[14px] font-semibold cursor-pointer transition-colors"
+                        @click="limpiarCamposLote" />
+                      <Button label="Agregar Item" icon="pi pi-plus"
+                        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-lg text-[14px] font-semibold cursor-pointer shadow-sm transition-colors"
+                        @click="agregarItemsATabla" />
+                    </div>
+                  </div>
                 </div>
 
-                <div class="flex justify-between items-center pt-4 border-t border-[#e2e8dd]">
-                  <Button label="Atrás" icon="pi pi-arrow-left"
-                    class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-4 py-3 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                    @click="activateCallback('1')" />
-                  <Button label="Registrar compra" icon="pi pi-save"
-                    class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-4 py-3 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                    @click="registrarCompraFinal" />
+                <!-- TABLA DE ITEMS AGREGADOS -->
+                <div class="mt-4 pt-4 border-t border-[#e2e8dd]">
+                  <h3 class="text-base font-bold text-[#1a2e1f] mb-3 block">Items Agregados a la Compra</h3>
+
+                  <!-- MÓVIL: Tarjetas Desplegables -->
+                  <div class="block md:hidden w-full border border-[#e2e8dd] rounded-xl overflow-hidden shadow-2xs">
+                    <DataTable v-model:expandedRows="expandedRows" :value="itemsAgregados" dataKey="producto"
+                      class="p-datatable-custom text-xs w-full">
+                      <template #empty>
+                        <div class="text-center py-6 text-gray-400 text-xs">No hay items agregados aún</div>
+                      </template>
+
+                      <Column expander style="width: 2.2rem" />
+
+                      <Column field="producto" header="Producto">
+                        <template #body="{ data }">
+                          <span class="capitalize block text-xs font-semibold text-[#1a2e1f]">{{ data.producto }}</span>
+                          <span class="text-[10px] text-gray-500 block">{{ data.cantFact }}</span>
+                        </template>
+                      </Column>
+
+                      <Column field="subtotal" header="Subtotal" class="text-right font-bold text-[#2b5e3b]" />
+
+                      <template #expansion="{ data, index }">
+                        <div class="p-3 bg-[#f1f5f0] border-y border-[#e2e8dd] text-xs space-y-2">
+                          <div class="bg-white p-3 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2">
+                            <div class="flex justify-between items-center pb-1.5 border-b border-gray-100">
+                              <span class="text-[10px] uppercase font-bold text-gray-400">Unidades Base</span>
+                              <span class="font-mono text-xs font-semibold text-[#334155]">{{ data.cantidad }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-1.5 border-b border-gray-100">
+                              <span class="text-[10px] uppercase font-bold text-gray-400">Costo Unit. Real</span>
+                              <span class="font-mono text-xs font-semibold text-[#2b5e3b]">{{ data.costoUnit }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                              <span class="text-[10px] uppercase font-bold text-gray-400">Vencimiento</span>
+                              <span class="font-mono text-xs text-gray-700">{{ data.vencimiento }}</span>
+                            </div>
+                          </div>
+
+                          <div class="flex justify-end pt-1">
+                            <Button icon="pi pi-trash" label="Eliminar" severity="danger" text size="small"
+                              class="!py-1 !px-2.5 !text-xs font-semibold cursor-pointer"
+                              @click="eliminarItemDeTabla(index)" />
+                          </div>
+                        </div>
+                      </template>
+                    </DataTable>
+                  </div>
+
+                  <!-- ESCRITORIO: Tabla Completa -->
+                  <div class="hidden md:block bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd]">
+                    <DataTable :value="itemsAgregados" responsiveLayout="scroll" class="p-datatable-custom text-[14px]">
+                      <Column field="producto" header="Producto" />
+                      <Column field="cantFact" header="Cant. fact." />
+                      <Column field="cantidad" header="Cantidad (unid. base)" />
+                      <Column field="costoUnit" header="Costo unit. real" />
+                      <Column field="vencimiento" header="Fecha Vencimiento" />
+                      <Column field="subtotal" header="Subtotal" class="font-semibold text-[#1a2e1f]" />
+                      <Column header="Acción" class="text-center w-[80px]">
+                        <template #body="slotProps">
+                          <Button icon="pi pi-trash"
+                            class="hover:bg-[#fde8e8] border-none text-[#9c2a2a] hover:text-red-600 w-8 h-8 rounded-full p-0 transition-colors"
+                            @click="eliminarItemDeTabla(slotProps.index)" />
+                        </template>
+                      </Column>
+                    </DataTable>
+                  </div>
                 </div>
+
+                <!-- Footer Paso 2 -->
+                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                  <!-- Vista Móvil -->
+                  <div class="flex flex-col-reverse gap-3 block md:hidden">
+                    <Button label="Atrás" icon="pi pi-arrow-left"
+                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                      @click="activateCallback('1')" />
+                    <Button label="Registrar compra" icon="pi pi-save"
+                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
+                      @click="registrarCompraFinal" />
+                  </div>
+
+                  <!-- Vista Escritorio -->
+                  <div class="hidden md:flex md:justify-between md:items-center">
+                    <Button label="Atrás" icon="pi pi-arrow-left"
+                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                      @click="activateCallback('1')" />
+                    <Button label="Registrar compra" icon="pi pi-save"
+                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                      @click="registrarCompraFinal" />
+                  </div>
+                </div>
+
               </div>
             </StepPanel>
           </StepPanels>
@@ -293,8 +596,24 @@ import {
 
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 
+import Stepper from 'primevue/stepper'
+import StepList from 'primevue/steplist'
+import StepPanels from 'primevue/steppanels'
+import Step from 'primevue/step'
+import StepPanel from 'primevue/steppanel'
+import AutoComplete from 'primevue/autocomplete'
+import Select from 'primevue/select'
+import InputText from 'primevue/inputtext'
+import DatePicker from 'primevue/datepicker'
+import Button from 'primevue/button'
+import RadioButton from 'primevue/radiobutton'
+import Checkbox from 'primevue/checkbox'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+
 const emit = defineEmits(['close'])
 
+const expandedRows = ref({})
 const sugerenciasProductos = ref([])
 const presentacionesLote = ref([])
 const itemsAgregados = ref([])
@@ -552,17 +871,13 @@ const registrarCompraFinal = async () => {
   }
 
   try {
-
     const res = await registrarCompra(payload)
 
-
     if (res.data?.status === 'warning' && res.data?.alertas) {
-
       await manejarAlertaGananciaReducida(res.data.alertas)
     } else {
       await mostrarExito('¡Compra registrada!', 'La compra y sus lotes fueron guardados con éxito.')
     }
-
 
     itemsAgregados.value = []
     Object.assign(documentoForm, {

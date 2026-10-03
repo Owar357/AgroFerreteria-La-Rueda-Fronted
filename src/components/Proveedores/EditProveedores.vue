@@ -3,68 +3,135 @@
     v-model:visible="visible"
     modal
     header="EDITAR PROVEEDOR"
-    :style="{ width: '450px' }"
     :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
-
-      <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre: <span class="text-red-500">*</span>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Móvil -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold text-[#1a2e1f]">
+          Nombre *
         </label>
         <InputText
           v-model="form.nombre"
           placeholder="Nombre del proveedor"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
           @keyup.enter="guardar"
         />
       </div>
 
-      <!-- Correo electrónico -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Correo electrónico:
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold text-[#1a2e1f]">
+          Correo electrónico
         </label>
         <InputText
           v-model="form.correo"
           type="email"
           placeholder="correo@ejemplo.com"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
           @keyup.enter="guardar"
         />
       </div>
 
-      <!-- Teléfono -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Teléfono:
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-semibold text-[#1a2e1f]">
+          Teléfono
         </label>
         <InputText
           v-model="form.telefono"
           type="tel"
           placeholder="2222-3333"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
+          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
           @keyup.enter="guardar"
         />
       </div>
 
-      <!-- Acciones (Botones con la misma distancia y tamaño de EditCategoria) -->
-      <div class="flex justify-between gap-4 mt-2">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
+          label="Guardar"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="guardar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="visible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Escritorio -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-[#1a2e1f]">
+          Nombre *
+        </label>
+        <InputText
+          v-model="form.nombre"
+          placeholder="Nombre del proveedor"
+          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
+          @keyup.enter="guardar"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-[#1a2e1f]">
+          Correo electrónico
+        </label>
+        <InputText
+          v-model="form.correo"
+          type="email"
+          placeholder="correo@ejemplo.com"
+          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
+          @keyup.enter="guardar"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-[#1a2e1f]">
+          Teléfono
+        </label>
+        <InputText
+          v-model="form.telefono"
+          type="tel"
+          placeholder="2222-3333"
+          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
+          @keyup.enter="guardar"
+        />
+      </div>
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
           @click="visible = false"
         />
         <Button
           label="Guardar"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="guardar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
@@ -100,7 +167,6 @@ const form = reactive({
   activo:       true,
 })
 
-// Carga los campos al abrir el modal manteniendo la lógica de negocio intacta
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.proveedor) {
     const p = props.proveedor
@@ -117,6 +183,21 @@ watch(() => props.modelValue, (isOpen) => {
   }
 })
 
+function resetForm() {
+  Object.assign(form, {
+    id: null,
+    nombre: '',
+    correo: '',
+    telefono: '',
+    direccion: '',
+    tipo_persona: '',
+    nit: '',
+    nrc: '',
+    dui: null,
+    activo: true,
+  })
+}
+
 function guardar() {
   const payload = { id: form.id }
 
@@ -130,24 +211,30 @@ function guardar() {
 </script>
 
 <style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
+/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
-.p-inputtext:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+/* Enfoques y bordes para componentes PrimeVue dentro del modal */
+.p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 </style>
