@@ -13,7 +13,7 @@
     <!-- VISTA MÓVIL (< 640px)                                   -->
     <!-- ======================================================= -->
     <div v-if="compra" class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
-      
+
       <!-- Subcabecera con Nº Documento -->
       <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
         <span class="text-xs font-bold uppercase text-[#2b5e3b]">Documento</span>
@@ -155,6 +155,34 @@
         <span class="text-xl font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra.monto_total) }}</span>
       </div>
 
+      <!-- Acciones de Pago Móvil -->
+      <div v-if="!compra.es_anulado && (compra.estado_pago === 'PENDIENTE' || compra.estado_pago === 'ABONADO')" class="bg-white border border-[#e2e8dd] rounded-xl p-3.5 shadow-sm space-y-3">
+        <!-- Si es PENDIENTE -->
+        <div v-if="compra.estado_pago === 'PENDIENTE'">
+          <Button label="Marcar como PAGADO" icon="pi pi-check-circle" class="w-full !bg-[#2b5e3b] hover:!bg-[#1f482d] text-white !border-none !rounded-lg" @click="marcarComoPagado" :loading="procesandoPago" />
+        </div>
+
+        <!-- Si es ABONADO -->
+        <div v-else-if="compra.estado_pago === 'ABONADO'" class="space-y-3">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-gray-600">Total Abonado:</span>
+            <span class="font-mono font-bold text-[#2b5e3b]">${{ formatCurrency(compra.abono) }}</span>
+          </div>
+          <div class="flex justify-between items-center text-xs pb-2 border-b border-gray-100">
+            <span class="font-semibold text-gray-600">Saldo Restante:</span>
+            <span class="font-mono font-bold text-[#b91c1c]">${{ formatCurrency(saldoRestante) }}</span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <span class="text-xs font-semibold text-gray-700">Registrar nuevo abono:</span>
+            <div class="flex gap-2">
+              <InputNumber v-model="montoAbono" mode="currency" currency="USD" locale="en-US" :min="0.01" :max="saldoRestante" class="flex-1" :pt="{ root: { class: '!w-full !h-10' }, pcInputText: { root: { class: '!w-full !h-full !text-sm !rounded-lg' } } }" placeholder="0.00" />
+              <Button icon="pi pi-plus" class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white !border-none !h-10 !rounded-lg" @click="registrarAbono" :loading="procesandoPago" :disabled="!montoAbono || montoAbono <= 0 || montoAbono > saldoRestante" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Botones Móvil -->
       <div class="pt-2 flex flex-col gap-2 w-full">
         <Button
@@ -172,7 +200,7 @@
     <!-- VISTA ESCRITORIO (>= 640px)                             -->
     <!-- ======================================================= -->
     <div v-if="compra" class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
-      
+
       <!-- Subcabecera Nº Documento -->
       <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
         <div class="flex items-center gap-2">
@@ -331,6 +359,43 @@
         </div>
       </div>
 
+      <!-- Acciones de Pago Escritorio -->
+      <div v-if="!compra.es_anulado && (compra.estado_pago === 'PENDIENTE' || compra.estado_pago === 'ABONADO')" class="bg-white border border-[#e2e8dd] rounded-xl p-4 shadow-sm">
+
+        <div v-if="compra.estado_pago === 'PENDIENTE'" class="flex items-center justify-between">
+          <div class="text-sm">
+            <span class="text-gray-500">Esta compra está pendiente.</span>
+          </div>
+          <Button label="Marcar como PAGADO " icon="pi pi-check-circle" class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white !border-none !rounded-lg" @click="marcarComoPagado" :loading="procesandoPago" />
+        </div>
+
+        <!-- ABONADO -->
+        <div v-else-if="compra.estado_pago === 'ABONADO'" class="flex items-center justify-between gap-6">
+          <div class="flex flex-col flex-1">
+             <span class="font-bold text-[#1a2e1f] text-sm block mb-1">Gestión de Abonos</span>
+             <div class="flex items-center gap-4 text-xs bg-[#f8faf7] p-2.5 rounded-lg border border-[#e2e8dd]">
+                <div class="flex flex-col">
+                  <span class="text-gray-500 font-semibold uppercase tracking-wider text-[10px]">Total Abonado</span>
+                  <span class="font-bold text-[#2b5e3b] text-base">${{ formatCurrency(compra.abono) }}</span>
+                </div>
+                <div class="w-px h-8 bg-[#e2e8dd]"></div>
+                <div class="flex flex-col">
+                  <span class="text-gray-500 font-semibold uppercase tracking-wider text-[10px]">Saldo Restante</span>
+                  <span class="font-bold text-[#b91c1c] text-base">${{ formatCurrency(saldoRestante) }}</span>
+                </div>
+             </div>
+          </div>
+
+          <div class="flex items-end gap-3 shrink-0">
+             <div class="flex flex-col gap-1.5">
+               <span class="text-xs font-semibold text-gray-700">Registrar nuevo abono</span>
+               <InputNumber v-model="montoAbono" mode="currency" currency="USD" locale="en-US" :min="0.01" :max="saldoRestante" class="w-48" :pt="{ root: { class: '!h-10' }, pcInputText: { root: { class: '!w-full !h-full !text-sm !rounded-lg' } } }" placeholder="0.00" />
+             </div>
+             <Button label="Abonar" icon="pi pi-plus" class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white !border-none !h-10 !rounded-lg !px-5" @click="registrarAbono" :loading="procesandoPago" :disabled="!montoAbono || montoAbono <= 0 || montoAbono > saldoRestante" />
+          </div>
+        </div>
+      </div>
+
       <!-- Total Compra + Botón de Cierre Escritorio -->
       <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
         <div class="bg-[#f4f7f2] border border-[#e2e8dd] rounded-xl px-4 py-2 flex items-center gap-3">
@@ -352,18 +417,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import InputNumber from 'primevue/inputnumber'
+import { actualizarEstadoCompra, abonarCompra } from '@/services/compraService'
+import { mostrarConfirmacion, mostrarExito, mostrarError } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   compra: { type: Object, default: null },
 })
 
 const visible = defineModel('visible', { type: Boolean, default: false })
+const emit = defineEmits(['compra-actualizada'])
 const expandedRows = ref({})
+
+const procesandoPago = ref(false)
+const montoAbono = ref(null)
+
+const saldoRestante = computed(() => {
+  if (!props.compra) return 0
+  const total = parseFloat(props.compra.monto_total || 0)
+  const abono = parseFloat(props.compra.abono || 0)
+  return total - abono
+})
 
 const formatCurrency = (v) => {
   const num = parseFloat(v)
@@ -374,6 +453,53 @@ const formatDate = (isoDate) => {
   if (!isoDate) return '—'
   const date = new Date(isoDate)
   return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+const marcarComoPagado = async () => {
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Marcar como PAGADO?',
+    mensajeHtml: 'Esta acción cambiará el estado de la compra a PAGADO permanentemente.',
+    icono: 'pi-check-circle',
+    confirmButtonText: 'Sí, marcar pagado'
+  })
+
+  if (confirmacion.isConfirmed) {
+    procesandoPago.value = true
+    try {
+      await actualizarEstadoCompra(props.compra.id, { estado_pago: 'PAGADO' })
+      mostrarExito('Compra pagada', 'El estado se ha actualizado a PAGADO.')
+      emit('compra-actualizada')
+    } catch (error) {
+      mostrarError('Error', error.response?.data?.message || 'No se pudo actualizar el estado.')
+    } finally {
+      procesandoPago.value = false
+    }
+  }
+}
+
+const registrarAbono = async () => {
+  if (!montoAbono.value || montoAbono.value <= 0) return
+
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Registrar Abono?',
+    mensajeHtml: `Se registrará un abono por <strong>$${formatCurrency(montoAbono.value)}</strong>.`,
+    icono: 'pi-money-bill',
+    confirmButtonText: 'Sí, registrar'
+  })
+
+  if (confirmacion.isConfirmed) {
+    procesandoPago.value = true
+    try {
+      const resp = await abonarCompra(props.compra.id, { monto_abono: montoAbono.value })
+      mostrarExito('Abono registrado', resp.data.message || 'El abono se registró correctamente.')
+      montoAbono.value = null
+      emit('compra-actualizada')
+    } catch (error) {
+      mostrarError('Error', error.response?.data?.message || 'No se pudo registrar el abono.')
+    } finally {
+      procesandoPago.value = false
+    }
+  }
 }
 </script>
 
