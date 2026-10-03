@@ -14,7 +14,7 @@
     <!-- VISTA MÓVIL (< 640px)                                   -->
     <!-- ======================================================= -->
     <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
-      
+
       <!-- Tipo de persona Móvil -->
       <div class="flex gap-2">
         <button
@@ -45,53 +45,59 @@
         </button>
       </div>
 
-      <!-- Sección Información General -->
-      <p class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100">
-        Información general
-      </p>
 
       <!-- Campos Móvil -->
       <div class="flex flex-col gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#1a2e1f]">Nombre *</label>
-          <InputText v-model="form.nombre" placeholder="Nombre del proveedor" :pt="inputPt" />
-        </div>
+        <BaseInput
+          v-model="form.nombre"
+          label="Nombre *"
+          placeholder="Nombre del proveedor"
+          :error="errores.nombre"
+          @input="validarCampo('nombre')"
+        />
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#1a2e1f]">
-            Dirección
-            <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
-          </label>
-          <InputText
-            v-model="form.direccion"
-            placeholder="Calle, colonia, municipio..."
-            :pt="inputPt"
-          />
-        </div>
+        <BaseInput
+          v-model="form.direccion"
+          placeholder="Calle, colonia, municipio..."
+        >
+          <template #label>
+            <label class="text-xs font-semibold text-[#1a2e1f]">
+              Dirección
+              <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+            </label>
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#1a2e1f]">
-            Correo electrónico
-            <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
-          </label>
-          <InputText
-            v-model="form.correo"
-            type="email"
-            placeholder="correo@ejemplo.com"
-            :pt="inputPt"
-          />
-        </div>
+        <BaseInput
+          v-model="form.correo"
+          type="email"
+          placeholder="correo@ejemplo.com"
+          :error="errores.correo"
+          @input="validarCampo('correo')"
+        >
+          <template #label>
+            <label class="text-xs font-semibold text-[#1a2e1f]">
+              Correo electrónico
+              <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+            </label>
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#1a2e1f]">Teléfono</label>
-          <InputText v-model="form.telefono" type="tel" placeholder="2222-3333" :pt="inputPt" />
-        </div>
+        <BaseInput
+          v-model="form.telefono"
+          label="Teléfono"
+          type="tel"
+          filter="int"
+          placeholder="22223333"
+          maxlength="8"
+        />
       </div>
 
       <!-- Botones Móvil -->
       <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
           label="Guardar proveedor"
+          :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
           @click="guardar"
         />
@@ -100,6 +106,7 @@
           icon="pi pi-times"
           severity="secondary"
           outlined
+          :disabled="cargando"
           class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
           @click="visible = false"
         />
@@ -110,7 +117,7 @@
     <!-- VISTA ESCRITORIO (>= 640px)                             -->
     <!-- ======================================================= -->
     <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
-      
+
       <!-- Tipo de persona Escritorio -->
       <div class="flex gap-3">
         <button
@@ -141,47 +148,52 @@
         </button>
       </div>
 
-      <!-- Sección Información General -->
-      <p class="text-[11px] font-semibold text-gray-400 flex items-center gap-2 m-0 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-100">
-        Información general
-      </p>
 
-      <!-- Campos Escritorio (Grid de 2 columnas) -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="col-span-2 flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-[#1a2e1f]">Nombre *</label>
-          <InputText v-model="form.nombre" placeholder="Nombre del proveedor" :pt="inputPt" />
-        </div>
+      <!-- Campos Escritorio -->
+      <div class="flex flex-col gap-4">
+        <BaseInput
+          v-model="form.nombre"
+          label="Nombre *"
+          placeholder="Nombre del proveedor"
+          :error="errores.nombre"
+          @input="validarCampo('nombre')"
+        />
 
-        <div class="col-span-2 flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-[#1a2e1f]">
-            Dirección
-            <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
-          </label>
-          <InputText
-            v-model="form.direccion"
-            placeholder="Calle, colonia, municipio..."
-            :pt="inputPt"
-          />
-        </div>
+        <BaseInput
+          v-model="form.direccion"
+          placeholder="Calle, colonia, municipio..."
+        >
+          <template #label>
+            <label class="text-sm font-medium text-[#1a2e1f]">
+              Dirección
+              <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+            </label>
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-[#1a2e1f]">
-            Correo electrónico
-            <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
-          </label>
-          <InputText
-            v-model="form.correo"
-            type="email"
-            placeholder="correo@ejemplo.com"
-            :pt="inputPt"
-          />
-        </div>
+        <BaseInput
+          v-model="form.correo"
+          type="email"
+          placeholder="correo@ejemplo.com"
+          :error="errores.correo"
+          @input="validarCampo('correo')"
+        >
+          <template #label>
+            <label class="text-sm font-medium text-[#1a2e1f]">
+              Correo electrónico
+              <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+            </label>
+          </template>
+        </BaseInput>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-[#1a2e1f]">Teléfono</label>
-          <InputText v-model="form.telefono" type="tel" placeholder="2222-3333" :pt="inputPt" />
-        </div>
+        <BaseInput
+          v-model="form.telefono"
+          label="Teléfono"
+          type="tel"
+          filter="int"
+          placeholder="22223333"
+          maxlength="8"
+        />
       </div>
 
       <!-- Botones Escritorio -->
@@ -191,11 +203,13 @@
           icon="pi pi-times"
           severity="secondary"
           outlined
+          :disabled="cargando"
           class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
           @click="visible = false"
         />
         <Button
           label="Guardar proveedor"
+          :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="guardar"
         />
@@ -207,11 +221,12 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import BaseInput from '@/components/base/BaseInput.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
+  cargando: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'guardar'])
@@ -230,6 +245,34 @@ const form = reactive({
   telefono: '',
 })
 
+const errores = reactive({
+  nombre: '',
+  correo: '',
+})
+
+function validarCampo(campo) {
+  if (campo === 'nombre') {
+    errores.nombre = form.nombre.trim() ? '' : 'El nombre es obligatorio.'
+  }
+
+  if (campo === 'correo') {
+    const valor = form.correo.trim()
+    if (!valor) {
+      errores.correo = '' // el correo es opcional: vacío es válido
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
+      errores.correo = 'Formato de correo inválido.'
+    } else {
+      errores.correo = ''
+    }
+  }
+}
+
+function validarFormulario() {
+  validarCampo('nombre')
+  validarCampo('correo')
+  return !errores.nombre && !errores.correo
+}
+
 function resetForm() {
   Object.assign(form, {
     nombre: '',
@@ -238,9 +281,13 @@ function resetForm() {
     telefono: '',
   })
   tipoPersona.value = 'natural'
+  errores.nombre = ''
+  errores.correo = ''
 }
 
 function guardar() {
+  if (!validarFormulario()) return
+
   emit('guardar', {
     nombre: form.nombre,
     direccion: form.direccion,
@@ -249,15 +296,6 @@ function guardar() {
     tipo_persona: tipoPersona.value === 'natural' ? 'NATURAL' : 'JURIDICA',
     activo: true,
   })
-  resetForm()
-  visible.value = false
-}
-
-const inputPt = {
-  root: {
-    class:
-      'w-full bg-white border border-gray-300 text-[#1a2e1f] text-sm rounded-xl py-2 px-3 focus:outline-none focus:border-[#2b5e3b] transition-all font-inter',
-  },
 }
 </script>
 
@@ -280,12 +318,7 @@ const inputPt = {
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
-.p-inputtext:enabled:focus,
-.p-inputnumber-input:enabled:focus,
-.p-select:not(.p-disabled).p-focus,
-.p-password-input:enabled:focus {
-  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
-  border-color: #2b5e3b !important;
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

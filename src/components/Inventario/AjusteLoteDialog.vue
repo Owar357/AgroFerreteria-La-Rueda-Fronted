@@ -225,8 +225,13 @@ import BaseSelect from '@/components/base/BaseSelect.vue'
 import InputNumber from 'primevue/inputnumber'
 import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import Textarea from 'primevue/textarea'
-import Swal from 'sweetalert2'
 import { registrarAjusteInventario } from '@/services/inventarioService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -340,52 +345,46 @@ const resetForm = () => {
 
 const guardarAjuste = async () => {
   if (!form.value.motivo) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Motivo requerido',
-      text: 'Por favor seleccione el motivo del ajuste.',
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[99999]' },
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Motivo requerido',
+      mensajeHtml: 'Por favor selecciona el motivo del ajuste.'
     })
     return
   }
 
   if (form.value.tipo_ajuste !== 'REEVALUACION' && form.value.cantidad_fisica < 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Cantidad inválida',
-      text: 'La cantidad física no puede ser negativa.',
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[99999]' },
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Cantidad inválida',
+      mensajeHtml: 'La cantidad física no puede ser menor a 0.'
     })
     return
   }
 
-  const stockSistema = parseFloat(props.lote?.cantidad_actual || 0)
+  const stockAnterior = parseFloat(props.lote?.cantidad_actual || 0)
+  const stockNuevo = parseFloat(form.value.cantidad_fisica || 0)
 
-  if (form.value.tipo_ajuste === 'INCREMENTO' && form.value.cantidad_fisica <= stockSistema) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Operación no permitida',
-      text: `Eligió "Incremento", por lo que la cantidad física (${form.value.cantidad_fisica}) debe ser mayor al stock actual del sistema (${stockSistema}).`,
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[99999]' },
+  if (form.value.tipo_ajuste === 'INCREMENTO' && stockNuevo <= stockAnterior) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Operación no permitida',
+      mensajeHtml: `Al seleccionar "Incremento", la cantidad contada (${stockNuevo}) debe ser mayor a la registrada en el sistema (${stockAnterior}).`
     })
     return
   }
 
-  if (form.value.tipo_ajuste === 'DISMINUCION' && form.value.cantidad_fisica >= stockSistema) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Operación no permitida',
-      text: `Eligió "Disminución", por lo que la cantidad física (${form.value.cantidad_fisica}) debe ser menor al stock actual del sistema (${stockSistema}).`,
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[99999]' },
+  if (form.value.tipo_ajuste === 'DISMINUCION' && stockNuevo >= stockAnterior) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Operación no permitida',
+      mensajeHtml: `Al seleccionar "Disminución", la cantidad contada (${stockNuevo}) debe ser menor a la registrada en el sistema (${stockAnterior}).`
     })
     return
   }
 
   cargando.value = true
+  mostrarCargando('Procesando ajuste...', 'Actualizando existencias y registros del inventario')
 
   const payload = {
     tipo_ajuste: form.value.tipo_ajuste,
@@ -399,39 +398,85 @@ const guardarAjuste = async () => {
       },
     ],
   }
-
+  
   try {
-    await registrarAjusteInventario(payload)
-
-    Swal.fire({
-      icon: 'success',
-      title: '¡Ajuste Procesado!',
-      text: 'El stock y el Kardex han sido actualizados correctamente.',
-      confirmButtonColor: '#2b5e3b',
-      timer: 2000,
-      customClass: { container: '!z-[99999]' },
-    })
+    await Promise.all([
+      registrarAjusteInventario(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     visible.value = false
     emit('ajuste-realizado')
+
+    const esIncremento = form.value.tipo_ajuste === 'INCREMENTO'
+    const esReevaluacion = form.value.tipo_ajuste === 'REEVALUACION'
+
+    const colorBadgeBg = esReevaluacion ? '#dbeafe' : (esIncremento ? '#dcfce7' : '#fee2e2')
+    const colorBadgeText = esReevaluacion ? '#1e40af' : (esIncremento ? '#166534' : '#991b1b')
+    const colorBadgeBorder = esReevaluacion ? '#bfdbfe' : (esIncremento ? '#bbf7d0' : '#fecaca')
+    
+    const textoAccion = esReevaluacion 
+      ? 'Reevaluación de Costo' 
+      : (esIncremento ? 'Aumento de Stock' : 'Disminución de Stock')
+
+    const iconoAccion = esIncremento ? 'pi-arrow-up' : 'pi-arrow-down'
+    const colorFlecha = esIncremento ? '#15803d' : '#b91c1c'
+
+    const unidadTexto = nombreUnidad.value ? ` ${nombreUnidad.value}` : ''
+
+    const valorAnterior = esReevaluacion 
+      ? `$${parseFloat(props.lote?.costo_unitario_compra || 0).toFixed(2)}` 
+      : `${stockAnterior.toFixed(2)}${unidadTexto}`
+
+    const valorNuevo = esReevaluacion 
+      ? `$${parseFloat(form.value.costo_nuevo || 0).toFixed(2)}` 
+      : `${stockNuevo.toFixed(2)}${unidadTexto}`
+
+    // Layout horizontal amplio y alineado a la par
+    const resumenHtml = `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; margin-top:8px; font-family:'Inter',sans-serif;">
+        
+        <span style="background-color:${colorBadgeBg}; color:${colorBadgeText}; border:1px solid ${colorBadgeBorder}; padding:4px 14px; border-radius:9999px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+          <i class="pi ${iconoAccion}" style="font-size:11px;"></i>
+          ${textoAccion}
+        </span>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; max-width:22rem; background-color:#f8faf7; padding:12px 16px; border-radius:16px; border:1px solid #e2e8dd; box-sizing:border-box;">
+          
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+            <span style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">ANTERIOR</span>
+            <span style="font-size:14px; font-weight:700; color:#4b5563; font-family:monospace; white-space:nowrap;">
+              ${valorAnterior}
+            </span>
+          </div>
+
+          <div style="width:32px; height:32px; border-radius:50%; background-color:#ffffff; border:1px solid #e2e8dd; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin:0 8px;">
+            <i class="pi pi-arrow-right" style="font-size:12px; color:${colorFlecha}; font-weight:bold;"></i>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+            <span style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">NUEVO</span>
+            <span style="font-size:15px; font-weight:800; color:${colorFlecha}; font-family:monospace; white-space:nowrap;">
+              ${valorNuevo}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    `
+
+    mostrarExito('¡Ajuste procesado!', resumenHtml, { timer: 2500 })
+
   } catch (error) {
-    console.error(error)
-    const mensaje = error.response?.data?.message || 'Error al procesar el ajuste.'
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de Ajuste',
-      text: mensaje,
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[99999]' },
-    })
+    const mensaje = error.response?.data?.message || 'No se pudo registrar el ajuste de inventario.'
+    mostrarError('Error al ajustar', mensaje)
   } finally {
-    cargando.value = false
+    guardando.value = false
   }
 }
 </script>
 
 <style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
   background-color: #1a3323 !important;
   color: #ffffff !important;
@@ -443,13 +488,11 @@ const guardarAjuste = async () => {
   padding: 1.1rem 1.5rem !important;
 }
 
-/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
 .p-inputnumber-input:enabled:focus,
 .p-password-input:enabled:focus {

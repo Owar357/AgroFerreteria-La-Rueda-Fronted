@@ -365,9 +365,9 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
-import Swal from 'sweetalert2'
 import BaseSelect from '@/components/base/BaseSelect.vue'
 import { useKardexStore } from '@/stores/kardexStore'
+import { mostrarError, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   productoId: { type: [Number, String], required: true },
@@ -421,11 +421,10 @@ const consultarKardex = async (page = 1) => {
 
   const res = await kardexStore.cargarKardex(props.productoId, page, kardexStore.perPage, filtros)
   if (res?.error) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Atención',
-      text: res.error,
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Atención',
+      mensajeHtml: res.error || 'No se pudieron consultar los movimientos de inventario.'
     })
   }
 }

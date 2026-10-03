@@ -193,23 +193,27 @@ const dispararGuardar = async () => {
     porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : 15.00
   }
 
-  localVisible.value = false
-
   const resultado = await store.crearCategoria(payload)
   guardando.value = false
 
   if (resultado.ok) {
+    localVisible.value = false
     resetForm()
     mostrarExito(
       '¡Categoría creada!',
       `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
     )
   } else if (resultado.status === 403) {
+    localVisible.value = false
     resetForm()
     mostrarAccesoDenegado()
   } else if (resultado.error) {
-    resetForm()
-    mostrarError('Error al guardar', resultado.error)
+    const errorMsg = resultado.error.toLowerCase()
+    if (errorMsg.includes('nombre') || errorMsg.includes('existe')) {
+      errorNombre.value = resultado.error
+    } else {
+      mostrarError('Error al guardar', resultado.error)
+    }
   }
 }
 </script>

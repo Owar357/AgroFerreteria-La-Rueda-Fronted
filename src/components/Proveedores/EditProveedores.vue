@@ -14,50 +14,41 @@
     <!-- VISTA MÓVIL (< 640px)                                   -->
     <!-- ======================================================= -->
     <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
-      
-      <!-- Campos del formulario para Móvil -->
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-semibold text-[#1a2e1f]">
-          Nombre *
-        </label>
-        <InputText
-          v-model="form.nombre"
-          placeholder="Nombre del proveedor"
-          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
 
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-semibold text-[#1a2e1f]">
-          Correo electrónico
-        </label>
-        <InputText
-          v-model="form.correo"
-          type="email"
-          placeholder="correo@ejemplo.com"
-          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Nombre del proveedor"
+        :error="errores.nombre"
+        @input="validarCampo('nombre')"
+        @keyup.enter="guardar"
+      />
 
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-semibold text-[#1a2e1f]">
-          Teléfono
-        </label>
-        <InputText
-          v-model="form.telefono"
-          type="tel"
-          placeholder="2222-3333"
-          class="w-full bg-white text-[#1a2e1f] text-xs py-2.5 px-3 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
+      <BaseInput
+        v-model="form.correo"
+        label="Correo electrónico"
+        type="email"
+        placeholder="correo@ejemplo.com"
+        :error="errores.correo"
+        @input="validarCampo('correo')"
+        @keyup.enter="guardar"
+      />
+
+      <BaseInput
+        v-model="form.telefono"
+        label="Teléfono"
+        type="tel"
+        filter="int"
+        maxlength="8"
+        placeholder="22223333"
+        @keyup.enter="guardar"
+      />
 
       <!-- Botones Móvil -->
       <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
           label="Guardar"
+          :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
           @click="guardar"
         />
@@ -66,6 +57,7 @@
           icon="pi pi-times"
           severity="secondary"
           outlined
+          :disabled="cargando"
           class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
           @click="visible = false"
         />
@@ -76,45 +68,35 @@
     <!-- VISTA ESCRITORIO (>= 640px)                             -->
     <!-- ======================================================= -->
     <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
-      
-      <!-- Campos del formulario para Escritorio -->
-      <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-[#1a2e1f]">
-          Nombre *
-        </label>
-        <InputText
-          v-model="form.nombre"
-          placeholder="Nombre del proveedor"
-          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
 
-      <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-[#1a2e1f]">
-          Correo electrónico
-        </label>
-        <InputText
-          v-model="form.correo"
-          type="email"
-          placeholder="correo@ejemplo.com"
-          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Nombre del proveedor"
+        :error="errores.nombre"
+        @input="validarCampo('nombre')"
+        @keyup.enter="guardar"
+      />
 
-      <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-[#1a2e1f]">
-          Teléfono
-        </label>
-        <InputText
-          v-model="form.telefono"
-          type="tel"
-          placeholder="2222-3333"
-          class="w-full bg-white text-[#1a2e1f] text-sm py-2.5 px-3.5 rounded-xl border border-gray-300 focus:border-[#2b5e3b] focus:outline-none"
-          @keyup.enter="guardar"
-        />
-      </div>
+      <BaseInput
+        v-model="form.correo"
+        label="Correo electrónico"
+        type="email"
+        placeholder="correo@ejemplo.com"
+        :error="errores.correo"
+        @input="validarCampo('correo')"
+        @keyup.enter="guardar"
+      />
+
+      <BaseInput
+        v-model="form.telefono"
+        label="Teléfono"
+        type="tel"
+        filter="int"
+        maxlength="8"
+        placeholder="22223333"
+        @keyup.enter="guardar"
+      />
 
       <!-- Botones Escritorio -->
       <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
@@ -123,11 +105,13 @@
           icon="pi pi-times"
           severity="secondary"
           outlined
+          :disabled="cargando"
           class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
           @click="visible = false"
         />
         <Button
           label="Guardar"
+          :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="guardar"
         />
@@ -139,12 +123,13 @@
 <script setup>
 import { reactive, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import BaseInput from '@/components/base/BaseInput.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   proveedor:  { type: Object, default: null },
+  cargando:   { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'actualizar'])
@@ -167,6 +152,34 @@ const form = reactive({
   activo:       true,
 })
 
+const errores = reactive({
+  nombre: '',
+  correo: '',
+})
+
+function validarCampo(campo) {
+  if (campo === 'nombre') {
+    errores.nombre = form.nombre.trim() ? '' : 'El nombre es obligatorio.'
+  }
+
+  if (campo === 'correo') {
+    const valor = form.correo.trim()
+    if (!valor) {
+      errores.correo = '' // el correo es opcional: vacío es válido
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
+      errores.correo = 'Formato de correo inválido.'
+    } else {
+      errores.correo = ''
+    }
+  }
+}
+
+function validarFormulario() {
+  validarCampo('nombre')
+  validarCampo('correo')
+  return !errores.nombre && !errores.correo
+}
+
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.proveedor) {
     const p = props.proveedor
@@ -180,6 +193,8 @@ watch(() => props.modelValue, (isOpen) => {
     form.nrc          = p.nrc          ?? ''
     form.dui          = p.dui          ?? null
     form.activo       = p.activo       ?? true
+    errores.nombre    = ''
+    errores.correo    = ''
   }
 })
 
@@ -196,9 +211,13 @@ function resetForm() {
     dui: null,
     activo: true,
   })
+  errores.nombre = ''
+  errores.correo = ''
 }
 
 function guardar() {
+  if (!validarFormulario()) return
+
   const payload = { id: form.id }
 
   if (form.nombre?.trim())   payload.nombre   = form.nombre.trim()
@@ -206,7 +225,6 @@ function guardar() {
   if (form.telefono?.trim()) payload.telefono = form.telefono.trim()
 
   emit('actualizar', payload)
-  visible.value = false
 }
 </script>
 
@@ -229,12 +247,7 @@ function guardar() {
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
-.p-inputtext:enabled:focus,
-.p-inputnumber-input:enabled:focus,
-.p-select:not(.p-disabled).p-focus,
-.p-password-input:enabled:focus {
-  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
-  border-color: #2b5e3b !important;
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

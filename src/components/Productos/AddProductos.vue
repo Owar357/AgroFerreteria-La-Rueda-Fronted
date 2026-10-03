@@ -1077,7 +1077,14 @@ import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
-import { mostrarExito, mostrarError, mostrarAccesoDenegado, mostrarConfirmacion, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarConfirmacion, 
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
@@ -1549,7 +1556,7 @@ function agregarUnidadFija() {
 }
 
 function editarPresentacion(index) {
-  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: `Funcionalidad en desarrollo. Índice: ${index}` })
+  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: 'Opción en mantenimiento.' })
 }
 
 async function eliminarPresentacion(index) {
@@ -1604,6 +1611,9 @@ async function guardarProducto() {
     return
   }
 
+  guardando.value = true
+  mostrarCargando('Guardando producto...', 'Por favor espera un momento')
+
   const payload = {
     codigo: codigoGenerado.value.toLowerCase(),
     nombre: nombre.value.trim().toLowerCase(),
@@ -1625,25 +1635,32 @@ async function guardarProducto() {
     })),
   }
 
-  guardando.value = true
-  const resultado = await store.crearProducto(payload)
-  guardando.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.crearProducto(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  if (resultado.ok) {
-    resetFormularioCompleto()
-    await mostrarExito('¡Producto guardado!', 'El producto fue guardado con éxito.')
-    emit('close')
-  } else if (resultado.status === 403) {
-    mostrarAccesoDenegado()
-  } else if (resultado.mensajes?.length) {
-    const items = resultado.mensajes.map((m) => `<li>${escaparHtml(m)}</li>`).join('')
-    mostrarAlertaConfirmar({
-      tipo: 'advertencia',
-      titulo: 'Corrige lo siguiente',
-      mensajeHtml: `<ul style="text-align:left; padding-left:1.25rem; list-style:disc">${items}</ul>`,
-    })
-  } else if (resultado.error) {
-    mostrarError('Error de validación', resultado.error)
+    if (resultado.ok) {
+      resetFormularioCompleto()
+      await mostrarExito('¡Producto guardado!', 'El nuevo producto fue registrado exitosamente.')
+      emit('close')
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.mensajes?.length) {
+      const items = resultado.mensajes.map((m) => `<li>${escaparHtml(m)}</li>`).join('')
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Verifica los datos',
+        mensajeHtml: `<ul style="text-align:left; padding-left:1.25rem; list-style:disc">${items}</ul>`,
+      })
+    } else if (resultado.error) {
+      mostrarError('Atención', resultado.error)
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
+  } finally {
+    guardando.value = false
   }
 }
 
@@ -1666,7 +1683,7 @@ function resetFormularioCompleto() {
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    mostrarError('Error', resultado.error)
+    mostrarError('Error', 'No se pudieron cargar las categorías.')
   }
   await cargarUnidades()
   restaurarBorrador()
