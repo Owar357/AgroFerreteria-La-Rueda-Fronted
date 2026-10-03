@@ -216,8 +216,14 @@ import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import Skeleton from 'primevue/skeleton'
-import Swal from 'sweetalert2'
 import { createMovimiento, getResumenTurno } from '@/services/movimientoCajaService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const cargando = ref(false)
 const guardando = ref(false)
@@ -233,16 +239,14 @@ const concepto = ref('')
 
 const visible = computed({
   get: () => props.visible,
-  set: (val) => emit('update:visible', val),
+  set: (val) => emit('update:modelValue', val),
 })
 
-// El origen queda fijo: en la gaveta única todo entra o sale de las ventas del turno
 const origen = ref('VENTAS')
 const opcionesOrigen = [{ label: 'Ventas', value: 'VENTAS' }]
 
 const esEntrada = computed(() => tipoMovimiento.value === 'ENTRADA')
-
-// --- Saldo retirable: fondo fijo protegido, sin excepción posible ---
+  
 const fondoFijo = ref(0)
 const efectivoDisponible = ref(0)
 const saldoRetirable = computed(() => Math.max(0, efectivoDisponible.value - fondoFijo.value))
@@ -256,8 +260,12 @@ const cargarResumenTurno = async () => {
     const { data } = await getResumenTurno()
     efectivoDisponible.value = parseFloat(data.monto_en_caja) || 0
     fondoFijo.value = parseFloat(data.fondo_fijo ?? 75) || 0
-  } catch {
+  } catch (error) {
+    const status = error.response?.status
     efectivoDisponible.value = 0
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    }
   }
 }
 
@@ -270,20 +278,17 @@ const formatearMoneda = (val) =>
     val || 0,
   )
 
-// --- Registro del movimiento ---
 const registrarMovimiento = async () => {
   const montoVacio = monto.value === null || monto.value <= 0
   const conceptoVacio = concepto.value.trim().length < 3
 
   if (montoVacio || conceptoVacio) {
-    Swal.fire({
-      icon: 'warning',
-      title: montoVacio ? 'Monto requerido' : 'Motivo requerido',
-      text: montoVacio
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: montoVacio ? 'Monto requerido' : 'Motivo requerido',
+      mensajeHtml: montoVacio
         ? 'El monto es requerido para registrar el movimiento.'
-        : 'El motivo es obligatorio para registrar el movimiento.',
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
+        : 'El motivo debe tener al menos 3 caracteres.'
     })
     return
   }
@@ -291,40 +296,36 @@ const registrarMovimiento = async () => {
   if (excedeSaldoRetirable.value) return
 
   guardando.value = true
+  mostrarCargando('Registrando movimiento...', 'Procesando entrada/salida de efectivo')
+
   try {
-    await createMovimiento({
-      tipo_movimiento: tipoMovimiento.value,
-      monto: monto.value,
-      motivo: concepto.value.trim(),
-    })
+    const [response] = await Promise.all([
+      createMovimiento({
+        tipo_movimiento: tipoMovimiento.value,
+        monto: monto.value,
+        motivo: concepto.value.trim(),
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     const tipoRegistrado = tipoMovimiento.value
 
     emit('movimientoRegistrado')
     cerrarDialog()
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: tipoRegistrado === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
-      showConfirmButton: false,
-      timer: 2000,
-      background: '#ffffff',
-      color: '#1e3a2f',
-      iconColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
-    })
+
+    mostrarExito(
+      tipoRegistrado === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
+      `El movimiento por $${formatearMoneda(monto.value)} fue guardado correctamente.`
+    )
   } catch (error) {
-    // El backend vuelve a validar el fondo fijo; si el saldo cambió entre que se abrió
-    // el modal y se envió el movimiento, este es el mensaje real y actualizado.
+    const status = error.response?.status
     const msg = error.response?.data?.message || 'Error al registrar el movimiento.'
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: msg,
-      confirmButtonColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
-    })
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al registrar', msg)
+    }
     cargarResumenTurno()
   } finally {
     guardando.value = false
@@ -367,5 +368,10 @@ watch(visible, (nuevoValor) => {
 
 :deep(.p-textarea) {
   border-radius: 0.75rem;
+}
+
+/* Eleva el z-index de SweetAlert2 por encima del modal */
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>

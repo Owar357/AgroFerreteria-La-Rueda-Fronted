@@ -312,7 +312,7 @@
             <Button
               label="Registrar venta"
               icon="pi pi-check"
-              @click="posStore.procesarVenta(router)"
+              @click="procesarVentaConLoading"
               style="
                 background-color: #2b5e3b;
                 border: 1px solid #2b5e3b;
@@ -367,6 +367,10 @@ import DialogAddCliente from '@/components/Clientes/AddClienteDialog.vue'
 import { useCajaStore } from '@/stores/cajaStore'
 import { usePosStore } from '@/stores/posStore'
 import { buscarProductos } from '@/services/ventaService'
+import { 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const router = useRouter()
 const cajaStore = useCajaStore()
@@ -379,6 +383,7 @@ const fechaActual = new Date().toLocaleDateString('es-ES', {
 })
 
 const irACaja = () => router.push({ name: 'caja' })
+
 const bloqueo = computed(() => {
   if (!cajaStore.estadoCargado) {
     return {
@@ -419,6 +424,7 @@ const bloqueo = computed(() => {
     mensaje: 'Debes aperturar tu venta en el módulo de caja para poder vender.',
   }
 })
+
 onMounted(() => {
   cajaStore.cargarEstadoCaja()
   posStore.recuperarVentaLocal()
@@ -460,13 +466,57 @@ const alSeleccionarProducto = (event) => {
 }
 
 const handleAgregarProducto = () => {
-  if (!productoSeleccionado.value || !presentacionSeleccionada.value) return
+  if (!productoSeleccionado.value) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Selecciona un producto',
+      mensajeHtml: 'Por favor busca y selecciona un producto del catálogo.'
+    })
+    return
+  }
+
+  if (!presentacionSeleccionada.value) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Selecciona una presentación',
+      mensajeHtml: 'Debes indicar el tipo de presentación a vender.'
+    })
+    return
+  }
+
   const exito = posStore.agregarProducto(productoSeleccionado.value, presentacionSeleccionada.value)
   if (exito) {
     productoSeleccionado.value = null
     presentacionSeleccionada.value = ''
     presentaciones.value = []
   }
+}
+
+const procesarVentaConLoading = async () => {
+  if (posStore.productosVenta.length === 0) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Carrito vacío',
+      mensajeHtml: 'Agrega al menos un producto antes de registrar la venta.'
+    })
+    return
+  }
+
+  if (posStore.tipoPago === 'efectivo' && posStore.efectivoRecibido < posStore.total) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Efectivo insuficiente',
+      mensajeHtml: `El monto entregado ($${posStore.efectivoRecibido.toFixed(2)}) debe ser igual o mayor al total ($${posStore.total.toFixed(2)}).`
+    })
+    return
+  }
+
+  mostrarCargando('Procesando venta...', 'Generando comprobante y actualizando inventario')
+
+  await Promise.all([
+    posStore.procesarVenta(router),
+    new Promise((resolve) => setTimeout(resolve, 500))
+  ])
 }
 
 const onClienteRegistrado = (cliente) => {

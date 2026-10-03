@@ -223,6 +223,7 @@ import { ref, reactive, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import BaseInput from '@/components/base/BaseInput.vue'
+import { mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -258,9 +259,9 @@ function validarCampo(campo) {
   if (campo === 'correo') {
     const valor = form.correo.trim()
     if (!valor) {
-      errores.correo = '' // el correo es opcional: vacío es válido
+      errores.correo = '' 
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
-      errores.correo = 'Formato de correo inválido.'
+      errores.correo = 'Formato de correo electrónico inválido.'
     } else {
       errores.correo = ''
     }
@@ -286,7 +287,14 @@ function resetForm() {
 }
 
 function guardar() {
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Campos requeridos',
+      mensajeHtml: 'Por favor completa los datos obligatorios del proveedor.'
+    })
+    return
+  }
 
   emit('guardar', {
     nombre: form.nombre,

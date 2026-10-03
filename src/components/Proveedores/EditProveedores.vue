@@ -125,6 +125,12 @@ import { reactive, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import BaseInput from '@/components/base/BaseInput.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -167,7 +173,7 @@ function validarCampo(campo) {
     if (!valor) {
       errores.correo = '' // el correo es opcional: vacío es válido
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
-      errores.correo = 'Formato de correo inválido.'
+      errores.correo = 'Formato de correo electrónico inválido.'
     } else {
       errores.correo = ''
     }
@@ -216,7 +222,14 @@ function resetForm() {
 }
 
 function guardar() {
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Campos requeridos',
+      mensajeHtml: 'Por favor corrige los campos indicados en el formulario.'
+    })
+    return
+  }
 
   const payload = { id: form.id }
 
@@ -229,7 +242,6 @@ function guardar() {
 </script>
 
 <style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
   background-color: #1a3323 !important;
   color: #ffffff !important;
@@ -241,7 +253,6 @@ function guardar() {
   padding: 1.1rem 1.5rem !important;
 }
 
-/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;

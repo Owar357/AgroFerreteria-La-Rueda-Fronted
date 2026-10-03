@@ -304,6 +304,10 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { useClienteStore } from '@/stores/clienteStore'
 import { storeToRefs } from 'pinia'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 defineEmits(['view-detail', 'view-history'])
 
@@ -337,7 +341,14 @@ const clientesFiltrados = computed(() => {
   return lista
 })
 
-onMounted(() => store.cargarClientes())
+onMounted(async () => {
+  const resultado = await store.cargarClientes()
+  if (resultado?.status === 403) {
+    mostrarAccesoDenegado()
+  } else if (resultado?.error) {
+    mostrarError('Error de conexión', resultado.error)
+  }
+})
 </script>
 
 <style>

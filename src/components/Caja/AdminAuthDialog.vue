@@ -88,8 +88,8 @@ import Button    from 'primevue/button'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  labelBoton: {type: String, default: 'Abrir caja' },
-  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrado. '}
+  labelBoton: { type: String, default: 'Abrir caja' },
+  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrador.' }
 })
 
 const emit = defineEmits(['update:visible', 'credenciales-confirmadas'])
@@ -137,20 +137,20 @@ const handleConfirmar = () => {
   errorGeneral.value = ''
   if (!validar()) return
 
-  // Emitimos las credenciales al padre para que las use junto al monto
+
   emit('credenciales-confirmadas', {
     email:    form.email.trim(),
     password: form.password
   })
 }
 
-// El padre puede llamar este método para mostrar un error de credenciales
+
 const mostrarError = (mensaje) => {
   errorGeneral.value = mensaje
   cargando.value     = false
 }
 
-// El padre puede llamar este método para indicar que está cargando
+
 const setLoading = (val) => { cargando.value = val }
 
 defineExpose({ mostrarError, setLoading, resetForm })
@@ -172,4 +172,8 @@ defineExpose({ mostrarError, setLoading, resetForm })
   padding: 1.5rem !important;
 }
 .p-password-toggle-icon { color: #6b7280 !important; }
+
+.swal2-container {
+  z-index: 999999 !important;
+}
 </style>

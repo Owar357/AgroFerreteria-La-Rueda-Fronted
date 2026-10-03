@@ -259,8 +259,14 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { useClienteStore } from '@/stores/clienteStore'
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const store = useClienteStore()
 
@@ -293,6 +299,7 @@ const tiposDocumento = [
   { label: 'Pasaporte', value: '02' },
   { label: 'Carnet de residente', value: '03' },
 ]
+
 const departamentos = [
   { label: 'Chalatenango', value: '04' },
   { label: 'San Salvador', value: '06' },
@@ -307,7 +314,6 @@ const onDepartamentoSeleccionado = () => {
 }
 
 const municipios = {
-
   '06': [
     { label: 'San Salvador Centro', value: '0601' },
     { label: 'San Salvador Oeste', value: '0602' },
@@ -315,13 +321,11 @@ const municipios = {
     { label: 'San Salvador Norte', value: '0604' }, 
     { label: 'San Salvador Sur', value: '0605' },
   ],
-
   '04': [
     { label: 'Chalatenango Centro', value: '0401' },
     { label: 'Chalatenango Norte', value: '0402' },
     { label: 'Chalatenango Sur', value: '0403' },
   ],
-  
   '07': [
     { label: 'Cuscatlán Norte', value: '0701' }, 
     { label: 'Cuscatlán Sur', value: '0702' },
@@ -345,87 +349,80 @@ const form = reactive({
 })
 
 const guardar = async () => {
+
+  if (tipoPersona.value === 'NATURAL' && !form.nombre?.trim()) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Nombre requerido',
+      mensajeHtml: 'Por favor ingresa el nombre del cliente.'
+    })
+    return
+  }
+
+  if (tipoPersona.value === 'JURIDICA' && !form.razon_social?.trim()) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Razón social requerida',
+      mensajeHtml: 'Por favor ingresa la razón social de la empresa.'
+    })
+    return
+  }
+
+  const payload = {
+    tipo_persona:              tipoPersona.value,
+    correo:                    form.correo || null,
+    tipo_documento_receptor:   form.tipo_documento_receptor || null,
+    numero_documento:          form.numero_documento || null,
+    cod_departamento:          departamentoSeleccionado.value?.value || null,
+    cod_municipio:             municipioSeleccionado.value?.value || null,
+    complemento:               form.direccion_complemento || null,
+  }
+
+  if (tipoPersona.value === 'NATURAL') {
+    payload.nombre = form.nombre.trim()
+  } else {
+    payload.razon_social    = form.razon_social.trim()
+    payload.nrc             = form.nrc?.trim() || null
+    payload.giro_actividad  = form.giro_actividad?.trim() || null
+  }
+
+  mostrarCargando('Guardando cliente...', 'Registrando la información en el sistema')
+
   try {
-    const payload = {
-      tipo_persona:              tipoPersona.value,
-      correo:                    form.correo || null,
-      tipo_documento_receptor:   form.tipo_documento_receptor || null,
-      numero_documento:          form.numero_documento || null,
-      cod_departamento:          departamentoSeleccionado.value?.value || null,
-      cod_municipio:             municipioSeleccionado.value?.value || null,
-      complemento:               form.direccion_complemento || null,
-    }
-
-    if (tipoPersona.value === 'NATURAL') {
-      payload.nombre = form.nombre
-    } else {
-      payload.razon_social    = form.razon_social
-      payload.nrc             = form.nrc
-      payload.giro_actividad  = form.giro_actividad
-    }
-
-    const resultado = await store.crearCliente(payload)
+    const [resultado] = await Promise.all([
+      store.crearCliente(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     if (resultado.ok) {
       emit('cliente-registrado', resultado.cliente)
       visible.value = false
 
-      Swal.fire({
-        icon: 'success',
-        title: '¡Cliente registrado!',
-        text: `${resultado.cliente?.nombre || resultado.cliente?.razon_social} fue registrado exitosamente.`,
-        confirmButtonColor: '#2b5e3b',
-        timer: 3000,
-        timerProgressBar: true,
-      })
+      const nombreCliente = resultado.cliente?.nombre || resultado.cliente?.razon_social || 'El cliente'
+      mostrarExito('¡Cliente registrado!', `"${nombreCliente}" fue registrado exitosamente.`)
 
     } else if (resultado.status === 422) {
-      
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error de validación',
-        text: resultado.error,
-        confirmButtonColor: '#2b5e3b',
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Error de validación',
+        mensajeHtml: resultado.error || 'Revisa que los datos ingresados sean válidos.'
       })
 
     } else if (resultado.status === 403) {
-    
-      Swal.fire({
-        html: `
-          <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-            <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-              <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-            </div>
-            <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-            <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
-          </div>
-        `,
-        showConfirmButton: true,
-        confirmButtonColor: '#2b5e3b',
-        confirmButtonText: 'Entendido',
-        customClass: {
-          confirmButton: '!rounded-lg !font-semibold !text-sm',
-          popup: '!rounded-2xl',
-        },
-      })
+      mostrarAccesoDenegado()
 
     } else {
-      
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: resultado.error || 'No se pudo registrar el cliente.',
-        confirmButtonColor: '#2b5e3b',
-      })
+      mostrarError('Error', resultado.error || 'No se pudo registrar el cliente.')
     }
 
-  } catch {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error inesperado',
-      text: 'Ocurrió un error inesperado.',
-      confirmButtonColor: '#2b5e3b',
-    })
+  } catch (err) {
+    mostrarError('Error inesperado', 'Ocurrió un problema de conexión al guardar el cliente.')
   }
 }
 </script>
+
+<style>
+.swal2-container {
+  z-index: 999999 !important;
+}
+</style>

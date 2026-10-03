@@ -666,6 +666,7 @@ import {
   mostrarError,
   mostrarAccesoDenegado,
   mostrarAlertaConfirmar,
+  mostrarCargando,
   manejarAlertaGananciaReducida
 } from '@/utils/SweetAlertService'
 
@@ -948,8 +949,13 @@ const registrarCompraFinal = async () => {
     }),
   }
 
+  mostrarCargando('Registrando compra...', 'Guardando documento y procesando entrada de lotes')
+
   try {
-    const res = await registrarCompra(payload)
+    const [res] = await Promise.all([
+      registrarCompra(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     if (res.data?.status === 'warning' && res.data?.alertas) {
       await manejarAlertaGananciaReducida(res.data.alertas)
@@ -993,7 +999,6 @@ onMounted(async () => {
   }
 })
 </script>
-
 <style>
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;
