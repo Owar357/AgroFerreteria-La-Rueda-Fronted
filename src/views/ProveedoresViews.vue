@@ -28,17 +28,21 @@
 <script setup>
 import { ref } from 'vue'
 import { useProveedorStore } from '@/stores/proveedorStore'
-import ProveedoresTable    from '../components/Proveedores/ProveedoresTable.vue'
-import AddProveedores    from '../components/Proveedores/AddProveedores.vue'
-import EditProveedores    from '../components/Proveedores/EditProveedores.vue'
-import DetalleProveedores    from '@/components/Proveedores/DetalleProveedores.vue'
-import Swal from 'sweetalert2'
+import ProveedoresTable from '../components/Proveedores/ProveedoresTable.vue'
+import AddProveedores from '../components/Proveedores/AddProveedores.vue'
+import EditProveedores from '../components/Proveedores/EditProveedores.vue'
+import DetalleProveedores from '@/components/Proveedores/DetalleProveedores.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 const store = useProveedorStore()
 
-const showAddForm          = ref(false)
-const showEditForm         = ref(false)
-const detalleVisible       = ref(false)
+const showAddForm = ref(false)
+const showEditForm = ref(false)
+const detalleVisible = ref(false)
 const proveedorSeleccionado = ref(null)
 
 function abrirModalEditar(proveedor) {
@@ -62,55 +66,24 @@ async function onGuardarNuevo(payload) {
 
   if (result?.ok) {
     showAddForm.value = false
-    Swal.fire({
-      icon: 'success',
-      title: 'Proveedor creado',
-      text: 'El proveedor se registró correctamente.',
-      confirmButtonColor: '#2b5e3b',
-      timerProgressBar: true,
-    })
+    mostrarExito('Proveedor creado', 'El proveedor se registró correctamente.')
   } else if (result?.status === 403) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Sin autorización',
-      text: 'No tienes permisos para crear proveedores.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarAccesoDenegado()
   } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: result?.error || 'No se pudo crear el proveedor.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error al crear', result?.error || 'No se pudo crear el proveedor.')
   }
 }
 
 async function onActualizarExistente(payload) {
   const result = await store.actualizarProveedor(payload.id, payload)
+  
   if (result?.ok) {
     showEditForm.value = false
-    Swal.fire({
-      icon: 'success',
-      title: 'Proveedor actualizado',
-      text: 'Los datos se actualizaron correctamente.',
-      confirmButtonColor: '#2b5e3b',
-      timerProgressBar: true,
-    })
+    mostrarExito('Proveedor actualizado', 'Los datos se actualizaron correctamente.')
   } else if (result?.status === 403) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Sin autorización',
-      text: 'No tienes permisos para editar proveedores.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarAccesoDenegado()
   } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: result?.error || 'No se pudo actualizar el proveedor.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error al actualizar', result?.error || 'No se pudo actualizar el proveedor.')
   }
 }
 </script>
