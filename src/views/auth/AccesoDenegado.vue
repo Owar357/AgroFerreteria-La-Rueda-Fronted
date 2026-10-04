@@ -18,7 +18,7 @@
         label="Volver al inicio"
         icon="pi pi-arrow-left"
         @click="volver"
-        class="w-full !bg-[#14291d] hover:!bg-[#1f482d] text-white text-[14px] font-semibold py-3 px-6 rounded-xl border-none"
+        class="w-full !bg-[#14291d] hover:!bg-[#1f482d] text-white text-[14px] font-semibold py-3 px-6 rounded-xl border-none cursor-pointer"
       />
     </div>
   </div>
@@ -28,7 +28,7 @@
 import { onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import authService from '@/services/authService'
-import { mostrarError } from '@/utils/SweetAlertService'
+import { mostrarAccesoDenegado } from '@/utils/SweetAlertService'
 import Button from 'primevue/button'
 
 const route = useRoute()
@@ -37,10 +37,7 @@ const router = useRouter()
 const modulo = computed(() => route.query.intento || null)
 
 onMounted(() => {
-  mostrarError(
-    'Acceso denegado',
-    'No tenés permisos para ver esta sección.'
-  )
+  mostrarAccesoDenegado()
 })
 
 function volver() {
