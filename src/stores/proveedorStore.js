@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getProveedores, createProveedor, updateProveedor, desactivarProveedor as desactivarProveedorService } from '../services/proveedorService'
+import {
+  getProveedores,
+  createProveedor,
+  updateProveedor,
+  desactivarProveedor as desactivarProveedorService,
+} from '../services/proveedorService'
 
 export const useProveedorStore = defineStore('proveedor', () => {
   const proveedores = ref([])
@@ -17,11 +22,13 @@ export const useProveedorStore = defineStore('proveedor', () => {
       totalRecords.value = response.data.total
       currentPage.value = response.data.current_page
       perPage.value = response.data.per_page
+
+      return { ok: true, data: response.data.proveedores }
     } catch (error) {
       if (error.response?.status === 404) {
         proveedores.value = []
         totalRecords.value = 0
-        return
+        return { ok: true, data: [] }
       }
       return {
         ok: false,
@@ -41,7 +48,7 @@ export const useProveedorStore = defineStore('proveedor', () => {
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
-      if (status === 422) {
+      if (status === 422 && responseData?.errors) {
         const mensajes = Object.values(responseData.errors).flat()
         return { ok: false, status, error: mensajes[0] }
       }
@@ -49,45 +56,45 @@ export const useProveedorStore = defineStore('proveedor', () => {
     }
   }
 
- const actualizarProveedor = async (id, data) => {
-  try {
-    const response = await updateProveedor(id, data)
-    const index = proveedores.value.findIndex((p) => p.id === id)
-    if (index !== -1) {
-      proveedores.value[index] = { ...proveedores.value[index], ...response.data.data }
-    }
-    return { ok: true }
-  } catch (error) {
-    const status = error.response?.status
-    const responseData = error.response?.data
+  const actualizarProveedor = async (id, data) => {
+    try {
+      const response = await updateProveedor(id, data)
+      const index = proveedores.value.findIndex((p) => p.id === id)
+      if (index !== -1) {
+        proveedores.value[index] = { ...proveedores.value[index], ...response.data.data }
+      }
+      return { ok: true, proveedor: response.data.data }
+    } catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
 
-    if (status === 422) {
-      const mensajes = Object.values(responseData.errors).flat()
-      return { ok: false, status, error: mensajes[0] }
-    }
-    return { ok: false, status, error: responseData?.message || 'Error en el servidor.' }
-  }
-}
-
- const desactivarProveedor = async (id) => {
-  try{
-    await desactivarProveedorService(id)
-
-    const index = proveedores.value.findIndex((p) => p.id === id)
-    if (index !== -1) proveedores.value[index].activo = false
-
-    return {ok: true}
-
-  }catch (error) {
-    const status = error.response?.status
-    const responseData = error.response?.data
-    return {
-      ok: false,
-      status,
-      error: responseData?.message || 'Error al desactivar el proveedor. ',
+      if (status === 422 && responseData?.errors) {
+        const mensajes = Object.values(responseData.errors).flat()
+        return { ok: false, status, error: mensajes[0] }
+      }
+      return { ok: false, status, error: responseData?.message || 'Error en el servidor.' }
     }
   }
- }
+
+  const desactivarProveedor = async (id) => {
+    try {
+      const response = await desactivarProveedorService(id)
+
+      const index = proveedores.value.findIndex((p) => p.id === id)
+      if (index !== -1) proveedores.value[index].activo = false
+
+      return { ok: true, data: response?.data }
+    } catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
+      return {
+        ok: false,
+        status,
+        error: responseData?.message || 'Error al desactivar el proveedor.',
+      }
+    }
+  }
+
   return {
     proveedores,
     cargando,
