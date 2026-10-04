@@ -17,11 +17,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Swal from 'sweetalert2'
 import HistorialVentasTable from '../components/Ventas/HistorialVentasTable.vue'
 import DetalleVentasDialog from '../components/Ventas/DetalleVentasDialog.vue'
 import { getDetallesVenta, getVentas } from '@/services/ventaService.js'
 import { useRoute } from 'vue-router'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 const mostrarDetalle = ref(false)
 const ventaSeleccionada = ref(null)
@@ -29,7 +32,7 @@ const route = useRoute()
 
 const clienteId = route.query.clienteId
 
-// --- Estado de la lista (la paginación y los filtros los resuelve el servidor) ---
+// --- Estado de la lista ---
 const ventas = ref([])
 const cargando = ref(false)
 const totalRegistros = ref(0)
@@ -38,7 +41,6 @@ const porPagina = ref(8)
 const primero = ref(0)
 const filtros = ref({ search: '', estado: '', tipo_pago: '', fecha_desde: '', fecha_hasta: '' })
 
-// Evita que una respuesta lenta y antigua pise a una más reciente
 let peticionActual = 0
 
 const mapearVenta = (v) => ({
@@ -81,17 +83,14 @@ const cargarVentas = async () => {
   } catch (error) {
     if (numeroPeticion !== peticionActual) return
 
-    console.error(error)
     ventas.value = []
     totalRegistros.value = 0
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'error',
-      title: 'Error al cargar el historial',
-      showConfirmButton: false,
-      timer: 2000,
-    })
+    
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error de carga', 'No se pudo obtener el historial de ventas.')
+    }
   } finally {
     if (numeroPeticion === peticionActual) cargando.value = false
   }
@@ -104,7 +103,6 @@ const onCambiarPagina = ({ page, per_page }) => {
   cargarVentas()
 }
 
-// Al cambiar un filtro se vuelve a la primera página
 const onCambiarFiltros = (nuevosFiltros) => {
   filtros.value = nuevosFiltros
   pagina.value = 1
@@ -118,7 +116,6 @@ const abrirDetalle = async (venta) => {
     const detalles = response.data.data || response.data
 
     ventaSeleccionada.value = {
-      // Datos de la venta (cabecera)
       vendidoPor: venta.vendidoPor,
       numeroFactura: venta.numeroFactura,
       fechaEmision: venta.fecha,
@@ -136,72 +133,19 @@ const abrirDetalle = async (venta) => {
     }
     mostrarDetalle.value = true
   } catch (error) {
-    console.error(error)
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'error',
-      title: 'Error al cargar el detalle',
-      showConfirmButton: false,
-      timer: 2000,
-    })
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error', 'No se pudo obtener el detalle de la venta.')
+    }
   }
 }
 
-// PENDIENTE: la anulación real de ventas se implementará después (hoy solo cambia el estado en pantalla)
-const confirmarAnulacion = (venta) => {
-  if (venta.estado === 'ANULADA') return
-
-  Swal.fire({
-    title: '¿Anular esta venta?',
-    html: `
-      <div style="text-align:left;font-size:14px;color:#374151">
-        <p style="margin:0 0 8px 0">Esta acción <strong>no se puede deshacer</strong>.</p>
-        <div style="background:#f9fafb;border:1px solid #e2e8dd;border-radius:8px;padding:12px;margin-top:8px">
-          <p style="margin:0 0 4px 0"><strong>Factura:</strong> ${venta.numeroFactura}</p>
-          <p style="margin:0 0 4px 0"><strong>Vendido por:</strong> ${venta.vendidoPor}</p>
-          <p style="margin:0"><strong>Total:</strong> $${formatearMoneda(venta.total)}</p>
-        </div>
-      </div>`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, anular',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#b91c1c',
-    cancelButtonColor: '#6b7280',
-    reverseButtons: true,
-  }).then((result) => {
-    if (!result.isConfirmed) return
-
-    const idx = ventas.value.findIndex((v) => v.id === venta.id)
-    if (idx !== -1) ventas.value[idx].estado = 'ANULADA'
-
-    Swal.fire({
-      title: '¡Venta anulada!',
-      icon: 'success',
-      text: `La factura ${venta.numeroFactura} fue anulada.`,
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
-    })
-  })
-}
-
 onMounted(() => cargarVentas())
-
-const formatearMoneda = (valor) =>
-  Number(valor)
-    .toFixed(2)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 </script>
 
-<style>
-.swal-custom-popup {
-  border-radius: 16px !important;
-  font-family: 'Inter', sans-serif !important;
-}
-.swal-custom-title {
-  font-size: 18px !important;
-  color: #1a2e1f !important;
+<style scoped>
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>
