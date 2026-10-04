@@ -537,4 +537,8 @@ const registrarAbono = async () => {
   padding: 0.75rem 1rem !important;
   border-bottom: 1px solid #f1f5f0 !important;
 }
+
+.swal2-container {
+  z-index: 999999 !important;
+}
 </style>
