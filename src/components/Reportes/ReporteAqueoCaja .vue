@@ -210,9 +210,15 @@ import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import { DatePicker } from 'primevue'
-import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
 import { generarReporteArqueoCaja } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
@@ -233,6 +239,9 @@ const cargarCajeros = async () => {
     cajeros.value = res.data.data ?? res.data ?? []
   } catch (error) {
     cajeros.value = []
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    }
   }
 }
 
@@ -240,28 +249,39 @@ onMounted(cargarCajeros)
 
 const generarPDF = async () => {
   if (!fecha.value || !cajeroId.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Datos requeridos',
-      text: 'Seleccione la fecha y el cajero para generar el reporte.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Datos requeridos',
+      mensajeHtml: 'Seleccione la <strong>Fecha</strong> y el <strong>Cajero</strong> para generar el reporte.'
     })
     return
   }
 
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando los datos de arqueo de caja para descargar')
+
   try {
-    await generarReporteArqueoCaja({
-      fecha: formatFechaParam(fecha.value),
-      cajeroId: cajeroId.value,
-    })
+    const [resultado] = await Promise.all([
+      generarReporteArqueoCaja({
+        fecha: formatFechaParam(fecha.value),
+        cajeroId: cajeroId.value,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de arqueo de caja en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error?.message || 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const status = error.response?.status
+    const msg = error.response?.data?.message || error?.message || 'No se pudo generar ni descargar el archivo PDF.'
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al generar PDF', msg)
+    }
   } finally {
     generandoPDF.value = false
   }
@@ -280,5 +300,9 @@ const limpiarFiltros = () => {
 :deep(.p-calendar .p-inputtext:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>

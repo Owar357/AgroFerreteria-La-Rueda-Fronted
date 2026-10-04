@@ -460,4 +460,9 @@ defineEmits(['open-add', 'open-edit'])
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
+
+/* Forzar profundidad de SweetAlert2 por encima de capas modales */
+.swal2-container {
+  z-index: 999999 !important;
+}
 </style>

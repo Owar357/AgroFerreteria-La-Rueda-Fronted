@@ -205,14 +205,20 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import { DatePicker } from 'primevue'
-import Swal from 'sweetalert2'
 import { generarReporteProductosMasVendidos } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
 const fechaInicio = ref(null)
 const fechaFin = ref(null)
 const limite = ref(null)
+const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
   if (!date) return null
@@ -220,33 +226,45 @@ const formatFechaParam = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const generandoPDF = ref(false)
-
 const generarPDF = async () => {
   if (!fechaInicio.value || !fechaFin.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Fechas requeridas',
-      text: 'Seleccione fecha inicio y fecha fin para generar el reporte.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Fechas requeridas',
+      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.'
+    })
+    return
+  }
+
+  if (new Date(fechaInicio.value) > new Date(fechaFin.value)) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Rango de fechas inválido',
+      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.'
     })
     return
   }
 
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando el ranking de productos para descargar')
+
   try {
-    await generarReporteProductosMasVendidos({
-      fechaInicio: formatFechaParam(fechaInicio.value),
-      fechaFin: formatFechaParam(fechaFin.value),
-      limite: limite.value,
-    })
+    const [resultado] = await Promise.all([
+      generarReporteProductosMasVendidos({
+        fechaInicio: formatFechaParam(fechaInicio.value),
+        fechaFin: formatFechaParam(fechaFin.value),
+        limite: limite.value,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de productos más vendidos en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+    mostrarError('Error al generar PDF', msg)
   } finally {
     generandoPDF.value = false
   }
@@ -266,5 +284,9 @@ const limpiarFiltros = () => {
 :deep(.p-calendar .p-inputtext:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>

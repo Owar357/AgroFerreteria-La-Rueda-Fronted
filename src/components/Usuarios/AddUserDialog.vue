@@ -139,7 +139,9 @@ import BaseSelect from '../base/BaseSelect.vue'
 import { 
   mostrarExito, 
   mostrarError, 
-  mostrarAlertaConfirmar 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -235,23 +237,33 @@ const guardarUsuario = async () => {
   if (errors.name || errors.email || errors.password || errors.role) return
 
   cargando.value = true
+  mostrarCargando('Registrando usuario...', 'Guardando la nueva cuenta en el sistema')
 
-  const resultado = await store.createUser({
-    name: form.name.trim(),
-    email: form.email.trim(),
-    password: form.password,
-    role: form.role,
-  })
+  try {
+    const [resultado] = await Promise.all([
+      store.createUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        role: form.role,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  cargando.value = false
-
-  if (resultado.ok) {
-    visibleLocal.value = false
-    mostrarExito('¡Usuario creado!', `El usuario "${resultado.user.name}" fue registrado exitosamente.`)
-  } else if (resultado.status === 403) {
-    mostrarError('Sin autorización', 'No tienes permisos para crear usuarios.')
-  } else if (resultado.error) {
-    mostrarError('Error de validación', resultado.error)
+    if (resultado.ok) {
+      visibleLocal.value = false
+      mostrarExito('¡Usuario creado!', `El usuario "${resultado.user.name}" fue registrado exitosamente.`)
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      mostrarError('Error de validación', resultado.error)
+    } else {
+      mostrarError('Error', 'No se pudo crear el usuario.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'Ocurrió un problema de red al guardar el usuario.')
+  } finally {
+    cargando.value = false
   }
 }
 </script>

@@ -170,9 +170,14 @@
 import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
-import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
 import { generarReporteInventarioValorizado } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
@@ -186,6 +191,9 @@ const cargarCategorias = async () => {
     categorias.value = res.data.data ?? []
   } catch (error) {
     categorias.value = []
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    }
   }
 }
 
@@ -193,17 +201,29 @@ onMounted(cargarCategorias)
 
 const generarPDF = async () => {
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando los datos del inventario valorizado')
+
   try {
-    await generarReporteInventarioValorizado({
-      categoriaId: categoriaId.value,
-    })
+    const [resultado] = await Promise.all([
+      generarReporteInventarioValorizado({
+        categoriaId: categoriaId.value,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de inventario valorizado en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const status = error.response?.status
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al generar PDF', msg)
+    }
   } finally {
     generandoPDF.value = false
   }
@@ -213,3 +233,18 @@ const limpiarFiltros = () => {
   categoriaId.value = null
 }
 </script>
+
+<style scoped>
+:deep(.p-select .p-select-label) {
+  border-color: #cbd5e1;
+}
+
+:deep(.p-select:not(.p-disabled).p-focus) {
+  box-shadow: none !important;
+  border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
+}
+</style>

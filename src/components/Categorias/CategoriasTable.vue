@@ -168,7 +168,10 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { mostrarError } from '@/utils/SweetAlertService'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 const textoBusqueda = ref('')
 const expandedRows = ref({})
@@ -184,7 +187,7 @@ onMounted(async () => {
   const resultado = await store.cargarCategorias(pageFromUrl, store.porPagina)
   
   if (resultado?.status === 403) {
-    mostrarError('Sin autorización', 'No tienes permisos para consultar las categorías.')
+    mostrarAccesoDenegado()
   } else if (resultado?.error) {
     mostrarError('Error de conexión', resultado.error)
   }
@@ -198,7 +201,7 @@ const cambiarPagina = async (event) => {
     const resultado = await store.cargarCategorias(page, event.rows)
     
     if (resultado?.status === 403) {
-      mostrarError('Sin autorización', 'No tienes permisos para ver las categorías.')
+      mostrarAccesoDenegado()
     } else if (resultado?.error) {
       mostrarError('Error de conexión', resultado.error)
     }
