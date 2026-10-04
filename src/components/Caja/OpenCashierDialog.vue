@@ -146,19 +146,21 @@ import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import { 
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   isShiftOpen: { type: Boolean, default: false },
-  // Fondo fijo de operación (viene del backend en /caja/estado)
   fondoFijo: { type: [String, Number], default: '75.00' },
-  // true mientras se envía la apertura al backend
   loading: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:visible', 'open-cash-register'])
 
-// 'cents' evita errores de punto flotante: todo se suma en centavos enteros
+
 const crearDenominaciones = () => [
   { id: 'c1', label: '$0.01 (centavo)', value: 0.01, cents: 1, qty: 0 },
   { id: 'c5', label: '$0.05 (centavos)', value: 0.05, cents: 5, qty: 0 },
@@ -200,7 +202,7 @@ const totalCash = computed(() => totalCents.value / 100)
 const fondoFijoNumero = computed(() => parseFloat(props.fondoFijo) || 0)
 const fondoFijoCents = computed(() => Math.round(fondoFijoNumero.value * 100))
 
-// Si el conteo (menor o mayor) es distinto del fondo fijo, la justificación es obligatoria
+
 const requiereJustificacion = computed(
   () => totalCents.value > 0 && totalCents.value !== fondoFijoCents.value,
 )
@@ -230,18 +232,36 @@ const formatCurrency = (val) => {
 }
 
 const handleOpenCash = () => {
+  if (totalCents.value <= 0) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Arqueo en cero',
+      mensajeHtml: 'Ingresa el conteo físico de monedas y billetes para aperturar la caja.'
+    })
+    return
+  }
+
+  if (requiereJustificacion.value && !justificacion.value.trim()) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Justificación obligatoria',
+      mensajeHtml: 'El conteo no coincide con el fondo fijo ($' + fondoFijoNumero.value.toFixed(2) + '). Debes agregar una justificación.'
+    })
+    return
+  }
+
   if (botonDeshabilitado.value) return
+
+  mostrarCargando('Aperturando caja...', 'Registrando el conteo inicial del turno')
 
   emit('open-cash-register', {
     total: totalCash.value,
     details: denominations.value,
-    // Formato que espera el backend: { c1: 0, c5: 2, ..., b100: 1 }
     denominaciones: Object.fromEntries(denominations.value.map((d) => [d.id, d.qty || 0])),
     justificacion: requiereJustificacion.value ? justificacion.value.trim() : '',
   })
 }
 
-// El padre lo llama tras una apertura exitosa para que el siguiente conteo empiece en cero
 const reset = () => {
   denominations.value = crearDenominaciones()
   justificacion.value = ''
@@ -249,3 +269,10 @@ const reset = () => {
 
 defineExpose({ reset })
 </script>
+
+<style>
+
+.swal2-container {
+  z-index: 999999 !important;
+}
+</style>

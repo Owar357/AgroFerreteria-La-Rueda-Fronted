@@ -199,8 +199,13 @@ import { ref, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
-import Swal from 'sweetalert2'
 import { useCajaStore } from '@/stores/cajaStore'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -218,7 +223,7 @@ const cargando = ref(false)
 watch(() => props.visible, (val) => (localVisible.value = val))
 watch(localVisible, (val) => emit('update:visible', val))
 
-// Al abrir se limpia la justificación
+
 watch(
   () => props.visible,
   (val) => {
@@ -236,7 +241,7 @@ const fmt = (val) =>
     minimumFractionDigits: 2,
   }).format(parseFloat(val) || 0)
 
-// Tarjeta + transferencia (en centavos para no arrastrar decimales flotantes)
+
 const ventasDigitales = computed(() => {
   const tarjeta = Math.round((parseFloat(props.datos.total_ventas_tarjeta) || 0) * 100)
   const transferencia = Math.round((parseFloat(props.datos.total_ventas_transferencia) || 0) * 100)
@@ -276,61 +281,72 @@ const onCancelar = () => {
 const onConfirmar = async () => {
   if (hayDiferencia.value && !justificacion.value.trim()) {
     errorJustificacion.value = 'La justificación es obligatoria cuando hay diferencias.'
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Justificación requerida',
+      mensajeHtml: 'Existe un descuadre en caja. Ingresa una justificación para continuar.'
+    })
     return
   }
 
   errorJustificacion.value = ''
-  cargando.value = true
+  mostrarCargando('Cerrando caja...', 'Guardando el arqueo final y liberando el turno')
 
-  // El monto contado NO se envía: el backend lo toma del token del cuadre
-  const resultado = await store.cerrarTurnoVentaCaja({
-    token_autorizacion: props.datos.token_autorizacion,
-    justificacion: justificacion.value.trim() || null,
-  })
+  try {
+    const [resultado] = await Promise.all([
+      store.cerrarTurnoVentaCaja({
+        token_autorizacion: props.datos.token_autorizacion,
+        justificacion: justificacion.value.trim() || null,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  cargando.value = false
+    if (resultado.ok) {
+      localVisible.value = false
 
-  if (resultado.ok) {
-    localVisible.value = false
+      const retiro = fmt(resultado.data?.retiro_efectivo)
+      const fondo = fmt(resultado.data?.fondo_siguiente_turno)
 
-    const retiro = fmt(resultado.data?.retiro_efectivo)
-    const fondo = fmt(resultado.data?.fondo_siguiente_turno)
+      await mostrarExito(
+        '¡Caja cerrada!',
+        `<div style="text-align:left; font-size:14px; color:#374151">
+          <p style="margin:6px 0;"><strong>Efectivo a retirar:</strong> ${retiro}</p>
+          <p style="margin:6px 0;"><strong>Queda en la gaveta (siguiente turno):</strong> ${fondo}</p>
+        </div>`,
+        {
+          timer: undefined,          
+          showConfirmButton: true,   
+          confirmButtonText: 'Entendido, finalizar turno',
+          confirmButtonColor: '#2b5e3b',
+          allowOutsideClick: false,  
+          allowEscapeKey: false      
+        }
+      )
 
-    await Swal.fire({
-      icon: 'success',
-      title: '¡Caja cerrada!',
-      html: `
-        <div style="text-align:left; font-size:14px; color:#374151">
-          <p style="margin:4px 0;"><strong>Efectivo a retirar:</strong> ${retiro}</p>
-          <p style="margin:4px 0;"><strong>Queda en la gaveta (siguiente turno):</strong> ${fondo}</p>
-        </div>
-      `,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Aceptar',
-    })
-    emit('cierre-exitoso')
-    return
+      emit('cierre-exitoso')
+      return
+    }
+    if (resultado.status === 409 || resultado.data?.token_invalido) {
+      await mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Repite el cuadre',
+        mensajeHtml: resultado.error || 'Se detectaron movimientos nuevos en el turno. Es necesario reajustar el conteo.'
+      })
+      localVisible.value = false
+      emit('cancelar')
+      return
+    }
+
+    mostrarError('Error al cerrar caja', resultado.error || 'No se pudo cerrar la caja.')
+
+  } catch (err) {
+    mostrarError('Error de conexión', 'Ocurrió un fallo en la red al procesar el cierre.')
   }
-
-  // 409: hubo ventas o movimientos después del cuadre. 422 con token_invalido: token vencido.
-  // En ambos casos hay que volver al conteo y repetir el cuadre.
-  if (resultado.status === 409 || resultado.data?.token_invalido) {
-    await Swal.fire({
-      icon: 'warning',
-      title: 'Repite el cuadre',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
-    localVisible.value = false
-    emit('cancelar')
-    return
-  }
-
-  Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: resultado.error || 'No se pudo cerrar la caja.',
-    confirmButtonColor: '#2b5e3b',
-  })
 }
 </script>
+
+<style>
+.swal2-container {
+  z-index: 999999 !important;
+}
+</style>

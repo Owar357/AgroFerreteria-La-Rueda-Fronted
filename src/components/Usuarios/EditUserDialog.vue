@@ -128,7 +128,9 @@ import BasePassword from '../base/BasePassword.vue'
 import { 
   mostrarExito, 
   mostrarError, 
-  mostrarAlertaConfirmar 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -290,6 +292,7 @@ const procesarActualizacion = async () => {
   if (!nombreValido || !contrasenaValida || !confirmacionValida) return
 
   cargando.value = true
+  mostrarCargando('Guardando cambios...', 'Actualizando información del usuario')
 
   const cargaUtil = {
     name: form.name.trim(),
@@ -301,15 +304,26 @@ const procesarActualizacion = async () => {
     cargaUtil.password_confirmation = form.confirmPassword
   }
 
-  const resultado = await store.updateUser(props.user?.id, cargaUtil)
+  try {
+    const [resultado] = await Promise.all([
+      store.updateUser(props.user?.id, cargaUtil),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  cargando.value = false
-
-  if (resultado.ok) {
-    visibleLocal.value = false
-    await mostrarExito('¡Datos actualizados!', 'Los datos del usuario fueron actualizados exitosamente.')
-  } else if (resultado.error) {
-    mostrarError('Error al actualizar', resultado.error)
+    if (resultado.ok) {
+      visibleLocal.value = false
+      await mostrarExito('¡Datos actualizados!', 'Los datos del usuario fueron actualizados exitosamente.')
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      mostrarError('Error al actualizar', resultado.error)
+    } else {
+      mostrarError('Error inesperado', 'No se pudieron guardar los cambios.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'Ocurrió un problema de red al procesar la actualización.')
+  } finally {
+    cargando.value = false
   }
 }
 </script>

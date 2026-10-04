@@ -172,8 +172,13 @@
 import { ref } from 'vue'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
-import Swal from 'sweetalert2'
 import { generarReporteProductosPorVencer } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
@@ -182,17 +187,29 @@ const generandoPDF = ref(false)
 
 const generarPDF = async () => {
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando los lotes próximos a vencer')
+
   try {
-    await generarReporteProductosPorVencer({
-      diasUmbral: diasUmbral.value,
-    })
+    const [resultado] = await Promise.all([
+      generarReporteProductosPorVencer({
+        diasUmbral: diasUmbral.value,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de productos próximos a vencer en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const status = error.response?.status
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al generar PDF', msg)
+    }
   } finally {
     generandoPDF.value = false
   }
@@ -202,3 +219,18 @@ const limpiarFiltros = () => {
   diasUmbral.value = null
 }
 </script>
+
+<style scoped>
+:deep(.p-inputnumber-input) {
+  border-color: #cbd5e1;
+}
+
+:deep(.p-inputnumber-input:focus) {
+  box-shadow: none !important;
+  border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
+}
+</style>

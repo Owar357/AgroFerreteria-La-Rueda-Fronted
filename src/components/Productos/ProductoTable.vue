@@ -381,9 +381,15 @@ const onCategoriaChange = (e) => {
   store.cargarProductos(1, store.perPage, searchQuery.value, cat)
 }
 
-const onPageChange = (event) => {
+const onPageChange = async (event) => {
   const cat = filtroCategoria.value === 'Todas las categorías' ? null : filtroCategoria.value
-  store.cargarProductos(event.page + 1, event.rows, searchQuery.value, cat)
+  const resultado = await store.cargarProductos(event.page + 1, event.rows, searchQuery.value, cat)
+
+  if (resultado?.status === 403) {
+    mostrarAccesoDenegado()
+  } else if (resultado?.error) {
+    mostrarError('Error de conexión', resultado.error)
+  }
 }
 
 const handleEdit = (product) => emit('open-edit', product)

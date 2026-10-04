@@ -550,7 +550,6 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import Swal from 'sweetalert2'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -567,10 +566,17 @@ import OpenCashierDialog from '@/components/Caja/OpenCashierDialog.vue'
 import CloseCashierDialog from '@/components/Caja/CloseCashierDialog.vue'
 import CierreCajaDialog from '@/components/Caja/CierreCajaDialog.vue'
 
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
+
 const cajaStore = useCajaStore()
 const posStore = usePosStore()
 
-// --- Rol ---
+
 const rolUsuario = ref((authService.getUserRole() || '').replace(/[^a-zA-Z]/g, '').toLowerCase())
 
 const esAdministrador = computed(
@@ -584,7 +590,7 @@ const currentDate = ref(
   new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
 )
 
-// --- Visibilidad de modales y refs ---
+
 const adminAuthVisible = ref(false)
 const aperturaVentaVisible = ref(false)
 const conteoVisible = ref(false)
@@ -616,7 +622,7 @@ const totalEnCaja = computed(() => totalEnCajaReal.value)
 
 const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
 
-// --- Movimientos del turno ---
+
 const movimientosRecientes = ref([])
 
 const formatearHora = (fechaISO) =>
@@ -636,7 +642,10 @@ const cargarMovimientosRecientes = async () => {
     const { data } = await getMovimientos({ per_page: 5, turno_actual: 1 })
     movimientosRecientes.value = (data.data ?? []).map(mapearMovimiento)
   } catch (error) {
-    console.error('Error al cargar movimientos del turno:', error)
+    const status = error.response?.status
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    }
     movimientosRecientes.value = []
   }
 }
@@ -653,7 +662,10 @@ const cargarResumenTurno = async () => {
     montoEsperadoReal.value = parseFloat(data.monto_esperado)
     totalEnCajaReal.value = parseFloat(data.total_en_caja)
   } catch (error) {
-    console.error('Error al cargar el resumen del turno:', error)
+    const status = error.response?.status
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    }
   }
 }
 
@@ -675,20 +687,6 @@ watch(
   },
 )
 
-const toast = (title) =>
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title,
-    showConfirmButton: false,
-    timer: 2000,
-    background: '#ffffff',
-    color: '#1e3a2f',
-    iconColor: '#2b5e3b',
-  })
-
-// --- Apertura de caja (admin) ---
 const abrirCaja = () => {
   adminAuthVisible.value = true
 }
@@ -700,7 +698,7 @@ const onCredencialesConfirmadas = async (credenciales) => {
 
   if (resultado.ok) {
     adminAuthVisible.value = false
-    toast('Caja aperturada correctamente')
+    mostrarExito('¡Caja aperturada!', 'El turno de caja fue abierto correctamente.')
   } else {
     adminAuthRef.value?.mostrarError(resultado.error)
   }
@@ -718,19 +716,21 @@ const onAbrirVenta = async ({ total, denominaciones, justificacion }) => {
     aperturaVentaVisible.value = false
     openCashierRef.value?.reset()
     await refrescarDatosTurno()
-    toast(`Venta aperturada con $${formatNumber(total)}`)
+    mostrarExito('¡Venta aperturada!', `Se inició la venta con un monto base de $${formatNumber(total)}.`)
     return
   }
 
-  Swal.fire({
-    icon: 'error',
-    title: resultado.requiereJustificacion ? 'Justificación requerida' : 'Error al aperturar venta',
-    text: resultado.error,
-    confirmButtonColor: '#2b5e3b',
-  })
+  if (resultado.requiereJustificacion) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Justificación requerida',
+      mensajeHtml: resultado.error || 'El conteo ingresado difiere del fondo fijo estipulado.'
+    })
+  } else {
+    mostrarError('Error al aperturar venta', resultado.error || 'No se pudo iniciar la venta.')
+  }
 }
 
-// --- Cierre ---
 const cerrarCaja = () => {
   conteoVisible.value = true
 }
@@ -802,5 +802,10 @@ const onCierreExitoso = async () => {
 
 .p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f8f3 !important;
+}
+
+
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

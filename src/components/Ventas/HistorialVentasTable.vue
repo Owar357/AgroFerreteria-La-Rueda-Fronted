@@ -468,7 +468,6 @@ const formatearMoneda = (valor) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
-
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #fbfdf9 !important;

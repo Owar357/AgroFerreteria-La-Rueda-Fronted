@@ -199,7 +199,7 @@ const visible = computed({
 </script>
 
 <style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
+
 .custom-dialog .p-dialog-header {
   background-color: #1a3323 !important;
   color: #ffffff !important;
@@ -211,13 +211,13 @@ const visible = computed({
   padding: 1.1rem 1.5rem !important;
 }
 
-/* Limpieza del contenedor de contenido */
+
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
+
 .p-inputtext:enabled:focus,
 .p-inputnumber-input:enabled:focus,
 .p-select:not(.p-disabled).p-focus,

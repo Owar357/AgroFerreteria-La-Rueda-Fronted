@@ -286,7 +286,12 @@ import AddCategoriaDialog from '@/components/Categorias/AddCategoriaDialog.vue'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useproductoStore } from '@/stores/productoStore'
-import { mostrarExito, mostrarError } from '@/utils/SweetAlertService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   producto: { type: Object, required: true },
@@ -369,7 +374,7 @@ const codigoGenerado = computed(() => {
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    mostrarError('Error', resultado.error)
+    mostrarError('Atención', 'No se pudieron cargar las categorías.')
   }
 
   nombre.value = props.producto.nombre || ''
@@ -432,6 +437,7 @@ const guardarProducto = async () => {
   if (hayErrores) return
 
   guardando.value = true
+  mostrarCargando('Guardando cambios...', 'Actualizando la información del producto')
 
   const payload = {
     nombre: nombre.value.trim().toLowerCase(),
@@ -441,16 +447,29 @@ const guardarProducto = async () => {
     porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : null
   }
 
-  const resultado = await store.actualizarProducto(props.producto.id, payload)
-  guardando.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.actualizarProducto(props.producto.id, payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  if (!resultado.ok) {
-    mostrarError('No se pudo guardar', resultado.error)
-    return
+    if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+      return
+    }
+
+    if (!resultado.ok) {
+      mostrarError('No se pudo guardar', resultado.error || 'Ocurrió un error inesperado al actualizar.')
+      return
+    }
+
+    await mostrarExito('Producto actualizado', 'La información del producto se actualizó con éxito.')
+    emit('close')
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
+  } finally {
+    guardando.value = false
   }
-
-  await mostrarExito('Producto editado', 'La información del producto se actualizó con éxito.')
-  emit('close')
 }
 </script>
 

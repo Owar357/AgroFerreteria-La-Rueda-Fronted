@@ -310,6 +310,11 @@ import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import DetalleFacturaDialogo from './DetalleFacturaDialogo.vue'
 import { getVentas, getDetallesVenta } from '@/services/ventaService'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const route = useRoute()
 const router = useRouter()
@@ -344,15 +349,24 @@ const cargarHistorial = async () => {
       status: venta.estado,
     }))
   } catch (error) {
-    console.error('Error al cargar historial:', error)
+    const status = error.response?.status
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error', 'No se pudo obtener el historial de compras del cliente.')
+    }
   } finally {
     cargando.value = false
   }
 }
 
 async function abrirDetalleCompra(compra) {
+  mostrarCargando('Cargando detalles...', 'Consultando información de la factura')
   try {
-    const { data } = await getDetallesVenta(compra.id)
+    const [{ data }] = await Promise.all([
+      getDetallesVenta(compra.id),
+      new Promise((resolve) => setTimeout(resolve, 300))
+    ])
     const detalles = data.data || data
 
     compraSeleccionada.value = {
@@ -363,9 +377,15 @@ async function abrirDetalleCompra(compra) {
         precio: parseFloat(d.precio_unitario),
       })),
     }
+    Swal.close()
     mostrarDetalleCompra.value = true
   } catch (error) {
-    console.error('Error al cargar detalle:', error)
+    const status = error.response?.status
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error', 'No se pudieron obtener los detalles de la factura.')
+    }
   }
 }
 

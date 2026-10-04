@@ -331,9 +331,12 @@ import Column from 'primevue/column'
 import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
 import { 
+  mostrarExito,
   mostrarError, 
+  mostrarAccesoDenegado,
   mostrarAlertaConfirmar, 
-  mostrarConfirmacion 
+  mostrarConfirmacion,
+  mostrarCargando 
 } from '@/utils/SweetAlertService'
 
 const usuarioActual = authService.getUser()
@@ -361,22 +364,33 @@ const confirmarDesactivar = async (usuario) => {
 
   const confirmacion = await mostrarConfirmacion({
     titulo: '¿Desactivar usuario?',
-    mensajeHtml: `¿Deseas desactivar a <strong>${usuario.name}</strong>? Esta acción no se puede revertir.`,
-    confirmButtonText: 'Sí, desactivar'
+    mensajeHtml: `¿Estás seguro de que deseas desactivar a <strong style="color:#1e3a2f;">${usuario.name}</strong>? Esta acción no se puede revertir.`,
+    icono: 'pi-ban',
+    bgIcono: '#fee2e2',
+    colorIcono: '#b91c1c',
+    confirmButtonText: 'Sí, desactivar',
+    confirmButtonColor: '#b91c1c',
   })
 
   if (!confirmacion.isConfirmed) return
 
-  const resultado = await store.desactivarUsuario(usuario.id)
+  mostrarCargando('Desactivando usuario...', 'Actualizando el estado en el sistema')
 
-  if (resultado?.ok) {
-    mostrarAlertaConfirmar({
-      tipo: 'success',
-      titulo: 'Usuario desactivado',
-      mensajeHtml: 'El usuario fue desactivado correctamente.'
-    })
-  } else {
-    mostrarError('Error', resultado?.error || 'No se pudo desactivar el usuario.')
+  try {
+    const [resultado] = await Promise.all([
+      store.desactivarUsuario(usuario.id),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    if (resultado?.ok) {
+      mostrarExito('¡Usuario desactivado!', `El usuario "${usuario.name}" fue desactivado correctamente.`)
+    } else if (resultado?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al desactivar', resultado?.error || 'No se pudo desactivar el usuario.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
   }
 }
 
@@ -405,7 +419,7 @@ const alCambiarPagina = async (evento) => {
   const resultado = await store.fetchUsers(pagina, filas)
   
   if (resultado?.status === 403) {
-    mostrarError('Sin autorización', 'No tienes permisos para ver los usuarios.')
+    mostrarAccesoDenegado()
   } else if (resultado?.error) {
     mostrarError('Error de conexión', resultado.error)
   }
@@ -446,5 +460,10 @@ defineEmits(['open-add', 'open-edit'])
 .p-inputtext:enabled:focus {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+/* Forzar profundidad de SweetAlert2 por encima de capas modales */
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

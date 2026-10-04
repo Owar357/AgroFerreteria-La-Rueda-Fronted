@@ -181,17 +181,16 @@
          </div>
 
           <div class="flex flex-col gap-1.5 w-full">
-            <label class="text-xs font-semibold text-gray-700">
-              Unidad Base <span class="text-red-500">*</span>
-            </label>
-            <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
-              placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
-              class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-10 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
-              :class="{
-                '!border-red-500': errores.unidadMedidaId,
-                '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
-              }" :pt="{ label: { class: '!text-xs !text-[#1a2e1f]' } }" />
-            <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
+            <BaseSelect
+              v-model="unidadMedidaId"
+              :label="`Unidad Base <span class='text-red-500'>*</span>`"
+              :options="unidadesFiltradas"
+              option-label="nombre"
+              option-value="id"
+              placeholder="Seleccione una unidad base..."
+              :disabled="presentacionBaseCreada"
+              :error="errores.unidadMedidaId"
+            />
 
             <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
               <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
@@ -316,17 +315,17 @@
 
             <!-- Unidad Base -->
             <div class="flex flex-col gap-1.5 col-span-1 md:col-span-2 w-[40%]">
-              <label class="text-xs sm:text-sm font-semibold text-gray-700">
-                Unidad Base <span class="text-red-500">*</span>
-              </label>
-              <Select v-model="unidadMedidaId" :options="unidadesFiltradas" optionLabel="nombre" optionValue="id"
-                placeholder="Seleccione una unidad base..." fluid :disabled="presentacionBaseCreada"
-                class="w-full !bg-white !border-gray-300 !text-[#1a2e1f] !h-11 md:!h-14 rounded-lg shadow-2xs focus:!border-[#2b5e3b] flex items-center px-2"
-                :class="{
-                  '!border-red-500': errores.unidadMedidaId,
-                  '!bg-gray-100 !cursor-not-allowed': presentacionBaseCreada
-                }" :pt="{ label: { class: '!text-sm md:!text-lg !text-[#1a2e1f]' } }" />
-              <small v-if="errores.unidadMedidaId" class="text-red-500 text-xs font-medium">{{ errores.unidadMedidaId }}</small>
+              <BaseSelect
+                v-model="unidadMedidaId"
+                :label="`Unidad Base <span class='text-red-500'>*</span>`"
+                :options="unidadesFiltradas"
+                option-label="nombre"
+                option-value="id"
+                placeholder="Seleccione una unidad base..."
+                size="xl"
+                :disabled="presentacionBaseCreada"
+                :error="errores.unidadMedidaId"
+              />
 
               <p v-if="!presentacionBaseCreada" class="text-[11px] text-gray-500 mt-0.5 leading-tight flex items-start gap-1">
                 <i class="pi pi-info-circle text-blue-500 text-xs mt-0.5 shrink-0"></i>
@@ -1066,7 +1065,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import AutoComplete from 'primevue/autocomplete'
-import Select from 'primevue/select'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import Tag from 'primevue/tag'
@@ -1078,7 +1077,14 @@ import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useproductoStore } from '@/stores/productoStore'
 import { getUnidades } from '@/services/productoService'
-import { mostrarExito, mostrarError, mostrarAccesoDenegado, mostrarConfirmacion, mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarConfirmacion, 
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['close'])
 const store = useproductoStore()
@@ -1550,7 +1556,7 @@ function agregarUnidadFija() {
 }
 
 function editarPresentacion(index) {
-  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: `Funcionalidad en desarrollo. Índice: ${index}` })
+  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: 'Opción en mantenimiento.' })
 }
 
 async function eliminarPresentacion(index) {
@@ -1605,6 +1611,9 @@ async function guardarProducto() {
     return
   }
 
+  guardando.value = true
+  mostrarCargando('Guardando producto...', 'Por favor espera un momento')
+
   const payload = {
     codigo: codigoGenerado.value.toLowerCase(),
     nombre: nombre.value.trim().toLowerCase(),
@@ -1626,25 +1635,32 @@ async function guardarProducto() {
     })),
   }
 
-  guardando.value = true
-  const resultado = await store.crearProducto(payload)
-  guardando.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.crearProducto(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  if (resultado.ok) {
-    resetFormularioCompleto()
-    await mostrarExito('¡Producto guardado!', 'El producto fue guardado con éxito.')
-    emit('close')
-  } else if (resultado.status === 403) {
-    mostrarAccesoDenegado()
-  } else if (resultado.mensajes?.length) {
-    const items = resultado.mensajes.map((m) => `<li>${escaparHtml(m)}</li>`).join('')
-    mostrarAlertaConfirmar({
-      tipo: 'advertencia',
-      titulo: 'Corrige lo siguiente',
-      mensajeHtml: `<ul style="text-align:left; padding-left:1.25rem; list-style:disc">${items}</ul>`,
-    })
-  } else if (resultado.error) {
-    mostrarError('Error de validación', resultado.error)
+    if (resultado.ok) {
+      resetFormularioCompleto()
+      await mostrarExito('¡Producto guardado!', 'El nuevo producto fue registrado exitosamente.')
+      emit('close')
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.mensajes?.length) {
+      const items = resultado.mensajes.map((m) => `<li>${escaparHtml(m)}</li>`).join('')
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Verifica los datos',
+        mensajeHtml: `<ul style="text-align:left; padding-left:1.25rem; list-style:disc">${items}</ul>`,
+      })
+    } else if (resultado.error) {
+      mostrarError('Atención', resultado.error)
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
+  } finally {
+    guardando.value = false
   }
 }
 
@@ -1667,7 +1683,7 @@ function resetFormularioCompleto() {
 onMounted(async () => {
   const resultado = await store.cargarCategorias()
   if (resultado?.error) {
-    mostrarError('Error', resultado.error)
+    mostrarError('Error', 'No se pudieron cargar las categorías.')
   }
   await cargarUnidades()
   restaurarBorrador()

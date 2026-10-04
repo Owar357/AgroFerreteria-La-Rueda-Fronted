@@ -186,8 +186,14 @@
 import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
-import Swal from 'sweetalert2'
 import { generarReporteFlujoComprasVentas } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
@@ -203,28 +209,48 @@ const formatFechaParam = (date) => {
 
 const generarPDF = async () => {
   if (!fechaDesde.value || !fechaHasta.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Fechas requeridas',
-      text: 'Seleccione fecha inicio y fecha fin para generar el reporte.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Fechas requeridas',
+      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.'
+    })
+    return
+  }
+
+  if (new Date(fechaDesde.value) > new Date(fechaHasta.value)) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Rango de fechas inválido',
+      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.'
     })
     return
   }
 
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando los datos de flujo de compras y ventas para descargar')
+
   try {
-    await generarReporteFlujoComprasVentas({
-      fechaDesde: formatFechaParam(fechaDesde.value),
-      fechaHasta: formatFechaParam(fechaHasta.value),
-    })
+    const [resultado] = await Promise.all([
+      generarReporteFlujoComprasVentas({
+        fechaDesde: formatFechaParam(fechaDesde.value),
+        fechaHasta: formatFechaParam(fechaHasta.value),
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de flujo compras vs ventas en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const status = error.response?.status
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al generar PDF', msg)
+    }
   } finally {
     generandoPDF.value = false
   }
@@ -243,5 +269,9 @@ const limpiarFiltros = () => {
 :deep(.p-calendar .p-inputtext:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>

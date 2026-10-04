@@ -57,13 +57,34 @@ function handleEdit(proveedor) {
   showEditForm.value = true
 }
 
-
 async function onGuardarNuevo(payload) {
   const result = await store.crearProveedor(payload)
-  if (result?.ok) showAddForm.value = false
+
+  if (result?.ok) {
+    showAddForm.value = false
+    Swal.fire({
+      icon: 'success',
+      title: 'Proveedor creado',
+      text: 'El proveedor se registró correctamente.',
+      confirmButtonColor: '#2b5e3b',
+      timerProgressBar: true,
+    })
+  } else if (result?.status === 403) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sin autorización',
+      text: 'No tienes permisos para crear proveedores.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: result?.error || 'No se pudo crear el proveedor.',
+      confirmButtonColor: '#2b5e3b',
+    })
+  }
 }
-
-
 
 async function onActualizarExistente(payload) {
   const result = await store.actualizarProveedor(payload.id, payload)
@@ -92,5 +113,4 @@ async function onActualizarExistente(payload) {
     })
   }
 }
-
 </script>

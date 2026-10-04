@@ -213,9 +213,15 @@ import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import { DatePicker } from 'primevue'
-import Swal from 'sweetalert2'
 import { api } from '@/services/authService'
 import { generarReporteVentasPorCategoria } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
@@ -237,6 +243,9 @@ const cargarCategorias = async () => {
     categorias.value = res.data.data ?? []
   } catch (error) {
     categorias.value = []
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    }
   }
 }
 
@@ -244,29 +253,49 @@ onMounted(cargarCategorias)
 
 const generarPDF = async () => {
   if (!fechaInicio.value || !fechaFin.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Fechas requeridas',
-      text: 'Seleccione fecha inicio y fecha fin para generar el reporte.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Fechas requeridas',
+      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.'
+    })
+    return
+  }
+
+  if (new Date(fechaInicio.value) > new Date(fechaFin.value)) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Rango de fechas inválido',
+      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.'
     })
     return
   }
 
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando las ventas por categoría para descargar')
+
   try {
-    await generarReporteVentasPorCategoria({
-      fechaInicio: formatFechaParam(fechaInicio.value),
-      fechaFin: formatFechaParam(fechaFin.value),
-      categoriaId: categoriaId.value,
-    })
+    const [resultado] = await Promise.all([
+      generarReporteVentasPorCategoria({
+        fechaInicio: formatFechaParam(fechaInicio.value),
+        fechaFin: formatFechaParam(fechaFin.value),
+        categoriaId: categoriaId.value,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de ventas por categoría en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const status = error.response?.status
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al generar PDF', msg)
+    }
   } finally {
     generandoPDF.value = false
   }
@@ -286,5 +315,9 @@ const limpiarFiltros = () => {
 :deep(.p-calendar .p-inputtext:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
+}
+
+:global(.swal2-container) {
+  z-index: 999999 !important;
 }
 </style>
