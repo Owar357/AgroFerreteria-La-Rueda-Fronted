@@ -66,7 +66,15 @@ const cargarCompras = async (pagina = 1) => {
       page: pagina,
       ...filtrosActivos.value,
     })
-    compras.value = data.compras
+    compras.value = await Promise.all(data.compras.map(async (compra) => {
+      try {
+        const respuestaDetalle = await VerDetallesCompra(compra.id)
+        const compraCompleta = respuestaDetalle.data.data
+        return { ...compra, esAnulado: Boolean(compraCompleta.es_anulado) }
+      } catch {
+        return { ...compra, esAnulado: false }
+      }
+    }))
     paginacion.value = {
       currentPage: data.current_page,
       lastPage: data.last_page,
