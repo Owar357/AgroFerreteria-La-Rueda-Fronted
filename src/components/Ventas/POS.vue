@@ -281,7 +281,7 @@
           </div>
 
           <!-- Efectivo recibido -->
-          <div v-if="posStore.tipoPago === 'efectivo'" class="flex flex-col gap-1.5">
+          <div v-if="posStore.tipoPago === 'EFECTIVO'" class="flex flex-col gap-1.5">
             <label style="font-size: 13px; font-weight: 500; color: #4b5563"
               >Efectivo entregado</label
             >
@@ -441,9 +441,9 @@ const tiposFactura = [
 ]
 
 const tiposPago = [
-  { label: 'Efectivo', value: 'efectivo' },
-  { label: 'Tarjeta', value: 'tarjeta' },
-  { label: 'Transferencia', value: 'transferencia' },
+  { label: 'Efectivo', value: 'EFECTIVO' },
+  { label: 'Tarjeta', value: 'TARJETA' },
+  { label: 'Transferencia', value: 'TRANSFERENCIA' },
 ]
 
 const buscarProducto = async (event) => {
