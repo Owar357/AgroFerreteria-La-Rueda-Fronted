@@ -168,6 +168,10 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import { useCategoriaStore } from '../../stores/categoriaStore'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 const textoBusqueda = ref('')
 const expandedRows = ref({})
@@ -177,18 +181,30 @@ const store = useCategoriaStore()
 const route = useRoute()
 const router = useRouter()
 
-onMounted(() => {
+onMounted(async () => {
   const pageFromUrl = Number(route.query.page) || 1
   store.paginaActual = pageFromUrl
-  store.cargarCategorias(pageFromUrl, store.porPagina)
+  const resultado = await store.cargarCategorias(pageFromUrl, store.porPagina)
+  
+  if (resultado?.status === 403) {
+    mostrarAccesoDenegado()
+  } else if (resultado?.error) {
+    mostrarError('Error de conexión', resultado.error)
+  }
 })
 
-const cambiarPagina = (event) => {
+const cambiarPagina = async (event) => {
   const page = event.page + 1
   
   if (page !== store.paginaActual) {
     router.push({ query: { ...route.query, page } })
-    store.cargarCategorias(page, event.rows)
+    const resultado = await store.cargarCategorias(page, event.rows)
+    
+    if (resultado?.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado?.error) {
+      mostrarError('Error de conexión', resultado.error)
+    }
   }
 }
 </script>

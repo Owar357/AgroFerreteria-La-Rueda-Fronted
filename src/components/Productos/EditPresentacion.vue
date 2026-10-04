@@ -156,11 +156,16 @@
 import { ref, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { updatePresentacion } from '@/services/productoService'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
 import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -271,14 +276,14 @@ const guardar = async () => {
     errores.value.precio = 'El precio debe ser mayor a 0.'
   }
 
-  if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) {
-    return
-  }
+  if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) return
 
   guardando.value = true
 
-  const factorParaEnviar = factorBloqueado.value ? 1 : Number(form.value.factor_conversion)
 
+  mostrarCargando('Actualizando presentación...', 'Por favor espera un momento')
+
+  const factorParaEnviar = factorBloqueado.value ? 1 : Number(form.value.factor_conversion)
   const payload = {
     nombre: form.value.nombre.trim(),
     factor_conversion: factorParaEnviar,
@@ -286,7 +291,13 @@ const guardar = async () => {
   }
 
   try {
-    const response = await updatePresentacion(props.presentacion.id, payload)
+ 
+
+    const [response] = await Promise.all([
+      updatePresentacion(props.presentacion.id, payload),
+      new Promise((resolve) => setTimeout(resolve, 500)) 
+    ])
+
     const actualizada = response.data.presentación ?? response.data.data ?? response.data
 
     emit('guardar', {
@@ -298,45 +309,22 @@ const guardar = async () => {
 
     localVisible.value = false
 
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: '¡Presentación actualizada!',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-      background: '#ffffff',
-      color: '#1e3a2f',
-      iconColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
-    })
+
+    mostrarExito('¡Presentación actualizada!', 'Los datos se guardaron correctamente.')
+
   } catch (error) {
     const status = error.response?.status
+
     if (status === 422) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error de validación',
-        text: 'Revisa los datos enviados e intenta nuevamente.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Error de validación',
+        mensajeHtml: 'Revisa los datos enviados e intenta nuevamente.'
       })
     } else if (status === 404) {
-      Swal.fire({
-        icon: 'error',
-        title: 'No encontrada',
-        text: 'La presentación ya no existe.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
-      })
+      mostrarError('No encontrada', 'La presentación ya no existe en el sistema.')
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo actualizar la presentación.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
-      })
+      mostrarError('Error al actualizar', error.response?.data?.message || 'No se pudo actualizar la presentación.')
     }
   } finally {
     guardando.value = false
@@ -345,7 +333,6 @@ const guardar = async () => {
 </script>
 
 <style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
   background-color: #1a3323 !important;
   color: #ffffff !important;
@@ -357,13 +344,12 @@ const guardar = async () => {
   padding: 1.1rem 1.5rem !important;
 }
 
-/* Limpieza del contenedor de contenido */
+
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
 .p-inputnumber-input:enabled:focus,
 .p-select:not(.p-disabled).p-focus,

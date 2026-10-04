@@ -42,7 +42,9 @@
             <StepPanel value="1" v-slot="{ activateCallback }">
               <div class="flex flex-col gap-4 pt-4 sm:pt-6">
 
-                <!-- VISTA MÓVIL (Solo Teléfono: block md:hidden) -->
+                <!-- ======================================================= -->
+                <!-- VISTA MÓVIL DOCUMENTO (Solo Teléfono: block md:hidden) -->
+                <!-- ======================================================= -->
                 <div class="block md:hidden space-y-4">
                   <!-- Proveedor -->
                   <div class="flex flex-col gap-1.5 w-full">
@@ -58,11 +60,16 @@
                   </div>
 
                   <!-- Tipo Comprobante -->
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Tipo de documento *</label>
-                    <Select v-model="documentoForm.tipoComprobante" :options="comprobantesOptions" optionLabel="label"
-                      optionValue="value" placeholder="Seleccionar tipo" class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
-                  </div>
+                  <BaseSelect
+                    v-model="documentoForm.tipoComprobante"
+                    label="Tipo de documento *"
+                    :options="comprobantesOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Seleccionar tipo"
+                    size="sm"
+                    class="w-full"
+                  />
 
                   <!-- Nº Comprobante -->
                   <div class="flex flex-col gap-1.5 w-full">
@@ -72,10 +79,13 @@
                         class="flex items-center px-2.5 bg-[#e2e8dd] border border-r-0 border-gray-300 rounded-l-lg text-[#6b7280] text-xs font-mono shrink-0">
                         {{ prefijoComprobante }}
                       </span>
-                      <InputText v-model="documentoForm.numComprobante"
+                      <BaseInput
+                        v-model="documentoForm.numComprobante"
                         :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
-                        :class="prefijoComprobante ? 'rounded-r-lg' : 'rounded-lg'"
-                        class="w-full !bg-white !border-gray-300 h-10 px-3 focus:!border-[#2b5e3b] text-[#1a2e1f] text-xs" />
+                        size="sm"
+                        class="w-full"
+                        :class="prefijoComprobante ? '[&_input]:!rounded-l-none' : ''"
+                      />
                     </div>
                     <small v-if="prefijoComprobante" class="text-[11px] text-[#6b7280] font-normal">
                       Aplica para comprobante físico
@@ -90,18 +100,25 @@
                   </div>
 
                   <!-- Estado de Pago -->
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Estado de pago *</label>
-                    <Select v-model="documentoForm.estadoPago" :options="estadosPagoOptions" optionLabel="label"
-                      optionValue="value" placeholder="Seleccionar" class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
-                  </div>
+                  <BaseSelect
+                    v-model="documentoForm.estadoPago"
+                    label="Estado de pago *"
+                    :options="estadosPagoOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Seleccionar"
+                    size="sm"
+                    class="w-full"
+                  />
 
                   <!-- Monto Total Facturado -->
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Monto total facturado *</label>
-                    <InputText v-model="documentoForm.montoTotal" placeholder="0.00"
-                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg focus:!border-[#2b5e3b] text-[#1a2e1f] text-xs font-mono" />
-                  </div>
+                  <BaseInputNumberMoney
+                    v-model="documentoForm.montoTotal"
+                    label="Monto total facturado *"
+                    placeholder="0.00"
+                    size="sm"
+                    class="w-full font-mono"
+                  />
 
                   <!-- Fecha Vencimiento -->
                   <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex flex-col gap-1.5 w-full">
@@ -112,7 +129,9 @@
                   </div>
                 </div>
 
-                <!-- VISTA ESCRITORIO (Solo PC: hidden md:block) -->
+                <!-- ======================================================= -->
+                <!-- VISTA ESCRITORIO DOCUMENTO (Solo PC: hidden md:block)   -->
+                <!-- ======================================================= -->
                 <div class="hidden md:block">
                   <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-1.5">
@@ -123,23 +142,31 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de documento</label>
-                        <Select v-model="documentoForm.tipoComprobante" :options="comprobantesOptions" optionLabel="label"
-                          optionValue="value" placeholder="Seleccionar tipo" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
-                      </div>
+                      <BaseSelect
+                        v-model="documentoForm.tipoComprobante"
+                        label="Tipo de documento"
+                        :options="comprobantesOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccionar tipo"
+                        size="md"
+                        class="w-[45%]"
+                      />
 
-                      <div class="flex flex-col gap-1.5 w-full">
+                      <div class="flex flex-col gap-1.5 w-[52.5%]">
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Nº comprobante</label>
                         <div class="flex">
                           <span v-if="prefijoComprobante"
                             class="flex items-center px-3 bg-[#e2e8dd] border border-r-0 border-[#d1d5db] rounded-l-md text-[#6b7280] text-[14px] shrink-0">
                             {{ prefijoComprobante }}
                           </span>
-                          <InputText v-model="documentoForm.numComprobante"
+                          <BaseInput
+                            v-model="documentoForm.numComprobante"
                             :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
-                            :class="prefijoComprobante ? 'rounded-r-md' : 'rounded-md'"
-                            class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 focus:border-[#2b5e3b] text-[#1a2e1f]" />
+                            size="md"
+                            class="w-full"
+                            :class="prefijoComprobante ? '[&_input]:!rounded-l-none' : ''"
+                          />
                         </div>
                         <small v-if="prefijoComprobante" class="text-[13px] text-[#6b7280] font-normal">
                           Aplica para comprobante físico
@@ -148,22 +175,29 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div class="flex flex-col gap-1.5">
+                      <div class="flex flex-col gap-1.5 w-[45%]">
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de emisión</label>
                         <DatePicker v-model="documentoForm.fechaEmision" dateFormat="dd/mm/yy" showIcon iconDisplay="input"
                           class="w-full bg-[#f9fafb] border-[#d1d5db]" />
                       </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Estado de pago</label>
-                        <Select v-model="documentoForm.estadoPago" :options="estadosPagoOptions" optionLabel="label"
-                          optionValue="value" placeholder="Seleccionar" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
-                      </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Monto total facturado</label>
-                        <InputText v-model="documentoForm.montoTotal" placeholder="0.00"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md focus:border-[#2b5e3b] text-[#1a2e1f]" />
-                      </div>
-                      <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex flex-col gap-1.5">
+                      <BaseSelect
+                        v-model="documentoForm.estadoPago"
+                        label="Estado de pago"
+                        :options="estadosPagoOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccionar"
+                        size="md"
+                        class="w-[52.5%]"
+                      />
+                      <BaseInputNumberMoney
+                        v-model="documentoForm.montoTotal"
+                        label="Monto total facturado"
+                        placeholder="0.00"
+                        size="md"
+                        class="w-[45%]"
+                      />
+                      <div v-if="documentoForm.estadoPago !== 'PAGADO'" class="flex !flex-col gap-2 w-[52.5%]">
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento del crédito</label>
                         <DatePicker v-model="documentoForm.fechaVencimiento" dateFormat="dd/mm/yy" showIcon
                           iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
@@ -173,29 +207,28 @@
                   </div>
                 </div>
 
-                <!-- Footer Paso 1 -->
-                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
-                  <!-- Vista Móvil -->
-                  <div class="flex flex-col gap-3 block md:hidden">
-                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
-                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
-                      @click="activateCallback('2')" />
-                    <Button label="Regresar" icon="pi pi-arrow-left"
-                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
-                      @click="emit('close')" />
+               
+                  <!-- Footer Paso 1 -->
+                  <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                    <!-- Vista Móvil -->
+                    <div class="flex flex-col gap-3 block md:hidden">
+                      <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                        class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
+                        @click="activateCallback('2')" />
+                      <Button label="Regresar" icon="pi pi-arrow-left"
+                        class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                        @click="emit('close')" />
+                    </div>
+                    <!-- Vista Escritorio -->
+                    <div class="hidden md:flex justify-between items-center w-full">
+                      <Button label="Regresar" icon="pi pi-arrow-left"
+                        class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                        @click="emit('close')" />
+                      <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                        @click="activateCallback('2')" />
+                    </div>
                   </div>
-
-                  <!-- Vista Escritorio -->
-                  <div class="hidden md:flex md:justify-between md:items-center">
-                    <Button label="Regresar" icon="pi pi-arrow-left"
-                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                      @click="emit('close')" />
-                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
-                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                      @click="activateCallback('2')" />
-                  </div>
-                </div>
-
               </div>
             </StepPanel>
 
@@ -205,7 +238,9 @@
             <StepPanel value="2" v-slot="{ activateCallback }">
               <div class="flex flex-col gap-6 pt-4 sm:pt-6">
 
-                <!-- VISTA MÓVIL LOTES (Solo Teléfono: block md:hidden) -->
+                <!-- ======================================================= -->
+                <!-- VISTA MÓVIL LOTES (Solo Teléfono: block md:hidden)     -->
+                <!-- ======================================================= -->
                 <div class="block md:hidden space-y-4">
                   <!-- Producto -->
                   <div class="flex flex-col gap-1.5 w-full">
@@ -221,25 +256,31 @@
                   </div>
 
                   <!-- Presentación -->
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Tipo de presentación que entra *</label>
-                    <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
-                      optionLabel="nombre" placeholder="Seleccionar presentación"
-                      class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
-                  </div>
+                  <BaseSelect
+                    v-model="loteForm.presentacionFacturada"
+                    label="Tipo de presentación que entra *"
+                    :options="presentacionesLote"
+                    optionLabel="nombre"
+                    placeholder="Seleccionar presentación"
+                    size="sm"
+                    class="w-full"
+                  />
 
                   <!-- Cantidad Facturada -->
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">
-                      Cantidad facturada {{ loteForm.presentacionFacturada ? `(${loteForm.presentacionFacturada.nombre})` : '' }} *
-                    </label>
-                    <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
-                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
-                    <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
-                      class="text-[11px] text-[#2b5e3b] font-medium">
-                      = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
-                    </small>
-                  </div>
+                  <BaseInputNumber
+                    v-model="loteForm.cantidadFacturada"
+                    :label="`Cantidad facturada ${loteForm.presentacionFacturada ? `(${loteForm.presentacionFacturada.nombre})` : ''} *`"
+                    placeholder="0"
+                    size="sm"
+                    class="w-full font-mono"
+                  >
+                    <template #help>
+                      <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
+                        class="text-[11px] text-[#2b5e3b] font-medium">
+                        = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                      </small>
+                    </template>
+                  </BaseInputNumber>
 
                   <!-- Tipo de Producto (Perecedero) -->
                   <div class="flex flex-col gap-1.5 w-full">
@@ -271,29 +312,40 @@
 
                   <!-- Campos Bonificados -->
                   <div v-if="incluyeBonificacion" class="space-y-3 bg-[#f9fafb] border border-[#e2e8dd] rounded-xl p-3">
-                    <div class="flex flex-col gap-1.5 w-full">
-                      <label class="text-xs font-semibold text-[#1a2e1f]">Presentación bonificada</label>
-                      <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote"
-                        optionLabel="nombre" placeholder="Seleccionar presentación"
-                        class="w-full !bg-white !border-gray-300 !h-10 rounded-lg flex items-center px-2 text-xs" />
-                    </div>
-                    <div class="flex flex-col gap-1.5 w-full">
-                      <label class="text-xs font-semibold text-[#1a2e1f]">Cantidad bonificada</label>
-                      <InputText v-model="loteForm.cantidadBonificada" placeholder="0"
-                        class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
-                      <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
-                        class="text-[11px] text-[#2b5e3b] font-medium">
-                        = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
-                      </small>
-                    </div>
+                    <BaseSelect
+                      v-model="loteForm.presentacionBonificada"
+                      label="Presentación bonificada"
+                      :options="presentacionesLote"
+                      optionLabel="nombre"
+                      placeholder="Seleccionar presentación"
+                      size="sm"
+                      class="w-full"
+                    />
+                    <BaseInputNumber
+                      v-model="loteForm.cantidadBonificada"
+                      label="Cantidad bonificada"
+                      placeholder="0"
+                      size="sm"
+                      class="w-full font-mono"
+                    >
+                      <template #help>
+                        <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
+                          class="text-[11px] text-[#2b5e3b] font-medium">
+                          = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                        </small>
+                      </template>
+                    </BaseInputNumber>
                   </div>
 
                   <!-- Datos Lote y Costos -->
-                  <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Número de lote</label>
-                    <InputText v-model="loteForm.numLote" placeholder="LOT-001"
-                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
-                  </div>
+                  <BaseInput
+                    v-if="loteForm.tipoProducto === 'Perecedero'"
+                    v-model="loteForm.numLote"
+                    label="Número de lote"
+                    placeholder="LOT-001"
+                    size="sm"
+                    class="w-full font-mono"
+                  />
 
                   <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5 w-full">
                     <label class="text-xs font-semibold text-[#1a2e1f]">Fecha de vencimiento</label>
@@ -301,19 +353,21 @@
                       iconDisplay="input" class="w-full !bg-white !border-gray-300 text-xs rounded-lg h-10" />
                   </div>
 
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">Costo unitario (factura) *</label>
-                    <InputText v-model="loteForm.costoUnitario" placeholder="0.00"
-                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
-                  </div>
+                  <BaseInputNumberMoney
+                    v-model="loteForm.costoUnitario"
+                    label="Costo unitario (factura) *"
+                    placeholder="0.00"
+                    size="sm"
+                    class="w-full font-mono"
+                  />
 
-                  <div class="flex flex-col gap-1.5 w-full">
-                    <label class="text-xs font-semibold text-[#1a2e1f]">
-                      Descuento en línea <span class="text-[10px] text-gray-400 font-normal">(opcional)</span>
-                    </label>
-                    <InputText v-model="loteForm.descuentoLinea" placeholder="0.00"
-                      class="w-full !bg-white !border-gray-300 h-10 px-3 rounded-lg text-[#1a2e1f] text-xs font-mono" />
-                  </div>
+                  <BaseInputNumberMoney
+                    v-model="loteForm.descuentoLinea"
+                    label="Descuento en línea <span class='text-[10px] text-gray-400 font-normal'>(opcional)</span>"
+                    placeholder="0.00"
+                    size="sm"
+                    class="w-full font-mono"
+                  />
 
                   <!-- Resumen Cálculos Móvil -->
                   <div v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada && loteForm.costoUnitario"
@@ -347,7 +401,9 @@
                   </div>
                 </div>
 
-                <!-- VISTA ESCRITORIO LOTES (Solo PC: hidden md:block) -->
+                <!-- ======================================================= -->
+                <!-- VISTA ESCRITORIO LOTES (Solo PC: hidden md:block)       -->
+                <!-- ======================================================= -->
                 <div class="hidden md:block">
                   <div class="flex flex-col gap-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -357,24 +413,29 @@
                           @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
                           placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid />
                       </div>
-                      <div class="flex flex-col w-full gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo de presentación que entra</label>
-                        <Select v-model="loteForm.presentacionFacturada" :options="presentacionesLote"
-                          optionLabel="nombre" placeholder="Seleccionar presentación"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db]" />
-                      </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">
-                          Cantidad facturada
-                          {{ loteForm.presentacionFacturada ? `(en ${loteForm.presentacionFacturada.nombre})` : '' }}
-                        </label>
-                        <InputText v-model="loteForm.cantidadFacturada" placeholder="0"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                        <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
-                          class="text-[13px] text-[#2b5e3b] font-medium">
-                          = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
-                        </small>
-                      </div>
+                      <BaseSelect
+                        v-model="loteForm.presentacionFacturada"
+                        label="Tipo de presentación que entra"
+                        :options="presentacionesLote"
+                        optionLabel="nombre"
+                        placeholder="Seleccionar presentación"
+                        size="md"
+                        class="w-[35%]"
+                      />
+                      <BaseInputNumber
+                        v-model="loteForm.cantidadFacturada"
+                        :label="`Cantidad facturada ${loteForm.presentacionFacturada ? `(en ${loteForm.presentacionFacturada.nombre})` : ''}`"
+                        placeholder="0"
+                        size="md"
+                        class="w-[35%]"
+                      >
+                        <template #help>
+                          <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
+                            class="text-[13px] text-[#2b5e3b] font-medium">
+                            = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                          </small>
+                        </template>
+                      </BaseInputNumber>
                       <div class="flex flex-col gap-2">
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Tipo del producto</label>
                         <div class="flex gap-6 items-center h-[40px]">
@@ -406,48 +467,59 @@
 
                     <div v-if="incluyeBonificacion"
                       class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f9fafb] border border-[#e2e8dd] rounded-lg p-4">
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Presentación bonificada</label>
-                        <Select v-model="loteForm.presentacionBonificada" :options="presentacionesLote"
-                          optionLabel="nombre" placeholder="Seleccionar presentación"
-                          class="w-full bg-[#ffffff] border-[#d1d5db]" />
-                      </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">
-                          Cantidad bonificada {{ loteForm.presentacionBonificada ? `(en ${loteForm.presentacionBonificada.nombre})` : '' }}
-                        </label>
-                        <InputText v-model="loteForm.cantidadBonificada" placeholder="0"
-                          class="w-full bg-[#ffffff] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                        <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
-                          class="text-[13px] text-[#2b5e3b] font-medium">
-                          = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
-                        </small>
-                      </div>
+                      <BaseSelect
+                        v-model="loteForm.presentacionBonificada"
+                        label="Presentación bonificada"
+                        :options="presentacionesLote"
+                        optionLabel="nombre"
+                        placeholder="Seleccionar presentación"
+                        size="md"
+                        class="w-full"
+                      />
+                      <BaseInputNumber
+                        v-model="loteForm.cantidadBonificada"
+                        :label="`Cantidad bonificada ${loteForm.presentacionBonificada ? `(en ${loteForm.presentacionBonificada.nombre})` : ''}`"
+                        placeholder="0"
+                        size="md"
+                        class="w-full"
+                      >
+                        <template #help>
+                          <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
+                            class="text-[13px] text-[#2b5e3b] font-medium">
+                            = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                          </small>
+                        </template>
+                      </BaseInputNumber>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Número de lote</label>
-                        <InputText v-model="loteForm.numLote" placeholder="LOT-001"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                      </div>
+                      <BaseInput
+                        v-if="loteForm.tipoProducto === 'Perecedero'"
+                        v-model="loteForm.numLote"
+                        label="Número de lote"
+                        placeholder="LOT-001"
+                        size="md"
+                        class="w-full"
+                      />
                       <div v-if="loteForm.tipoProducto === 'Perecedero'" class="flex flex-col gap-1.5">
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Fecha de vencimiento</label>
                         <DatePicker v-model="loteForm.fechaVencimientoLote" dateFormat="dd/mm/yy" showIcon
                           iconDisplay="input" class="w-full bg-[#f9fafb] border-[#d1d5db]" />
                       </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">Costo unitario (factura)</label>
-                        <InputText v-model="loteForm.costoUnitario" placeholder="0.00"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                      </div>
-                      <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-medium text-[#1a2e1f]">
-                          Descuento en línea <span class="text-[11px] font-normal text-gray-400 ml-1">(opcional)</span>
-                        </label>
-                        <InputText v-model="loteForm.descuentoLinea" placeholder="0.00"
-                          class="w-full bg-[#f9fafb] border-[#d1d5db] h-[40px] px-3 rounded-md text-[#1a2e1f]" />
-                      </div>
+                      <BaseInputNumberMoney
+                        v-model="loteForm.costoUnitario"
+                        label="Costo unitario (factura)"
+                        placeholder="0.00"
+                        size="md"
+                        class="w-[45%]"
+                      />
+                      <BaseInputNumberMoney
+                        v-model="loteForm.descuentoLinea"
+                        label="Descuento en línea <span class='text-[11px] font-normal text-gray-400 ml-1'>(opcional)</span>"
+                        placeholder="0.00"
+                        size="md"
+                        class="w-[45%]"
+                      />
                     </div>
 
                     <div v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada && loteForm.costoUnitario"
@@ -552,29 +624,32 @@
                 </div>
 
                 <!-- Footer Paso 2 -->
-                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
-                  <!-- Vista Móvil -->
-                  <div class="flex flex-col-reverse gap-3 block md:hidden">
-                    <Button label="Atrás" icon="pi pi-arrow-left"
-                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
-                      @click="activateCallback('1')" />
-                    <Button label="Registrar compra" icon="pi pi-save"
-                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
-                      @click="registrarCompraFinal" />
-                  </div>
+               
+                  <!-- Footer Paso 2 -->
+                    <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                      <!-- Vista Móvil -->
+                      <div class="flex flex-col-reverse gap-3 block md:hidden">
+                        <Button label="Atrás" icon="pi pi-arrow-left"
+                          class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                          @click="activateCallback('1')" />
+                        <Button label="Registrar compra" icon="pi pi-save"
+                          class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
+                          @click="registrarCompraFinal" />
+                      </div>
 
-                  <!-- Vista Escritorio -->
-                  <div class="hidden md:flex md:justify-between md:items-center">
-                    <Button label="Atrás" icon="pi pi-arrow-left"
-                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                      @click="activateCallback('1')" />
-                    <Button label="Registrar compra" icon="pi pi-save"
-                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                      @click="registrarCompraFinal" />
-                  </div>
-                </div>
+                      <!-- Vista Escritorio -->
+                      <div class="hidden md:flex justify-between items-center w-full">
+                        <Button label="Atrás" icon="pi pi-arrow-left"
+                          class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                          @click="activateCallback('1')" />
+                        <Button label="Registrar compra" icon="pi pi-save"
+                          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                          @click="registrarCompraFinal" />
+                      </div>
+                    </div>
+                
 
-              </div>
+              </div>  
             </StepPanel>
           </StepPanels>
         </Stepper>
@@ -591,6 +666,7 @@ import {
   mostrarError,
   mostrarAccesoDenegado,
   mostrarAlertaConfirmar,
+  mostrarCargando,
   manejarAlertaGananciaReducida
 } from '@/utils/SweetAlertService'
 
@@ -602,14 +678,17 @@ import StepPanels from 'primevue/steppanels'
 import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
 import AutoComplete from 'primevue/autocomplete'
-import Select from 'primevue/select'
-import InputText from 'primevue/inputtext'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
 import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 
 const emit = defineEmits(['close'])
 
@@ -870,8 +949,13 @@ const registrarCompraFinal = async () => {
     }),
   }
 
+  mostrarCargando('Registrando compra...', 'Guardando documento y procesando entrada de lotes')
+
   try {
-    const res = await registrarCompra(payload)
+    const [res] = await Promise.all([
+      registrarCompra(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     if (res.data?.status === 'warning' && res.data?.alertas) {
       await manejarAlertaGananciaReducida(res.data.alertas)
@@ -915,7 +999,6 @@ onMounted(async () => {
   }
 })
 </script>
-
 <style>
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;

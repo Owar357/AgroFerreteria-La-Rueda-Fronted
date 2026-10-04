@@ -67,18 +67,10 @@
         <!-- Botones Móvil -->
         <div class="pt-2 flex flex-col gap-2 w-full">
           <Button
-            label="Filtrar"
-            icon="pi pi-search"
-            :loading="cargando"
-            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
-            @click="filtrarVentas"
-          />
-          <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
             :loading="generandoPDF"
-            :disabled="ventas.length === 0"
-            class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer disabled:!opacity-50"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
           <Button
@@ -89,69 +81,6 @@
             class="!text-xs !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
             @click="limpiarFiltros"
           />
-        </div>
-      </div>
-
-      <!-- Tarjetas de Ventas Móvil -->
-      <div class="space-y-3 w-full">
-        <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-bold text-gray-600 uppercase tracking-wider">
-            Ventas Registradas
-          </span>
-          <span v-if="ventas.length > 0" class="text-xs font-semibold text-[#2b5e3b] bg-[#eef7f0] px-2 py-0.5 rounded-full border border-[#c2e3c8]">
-            {{ ventas.length }} registros
-          </span>
-        </div>
-
-        <div v-if="ventas.length === 0 && !cargando" class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs">
-          No hay ventas en el rango seleccionado.
-        </div>
-
-        <div v-if="cargando" class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs">
-          <i class="pi pi-spin pi-spinner text-lg mb-2 block"></i>
-          Cargando ventas...
-        </div>
-
-        <div
-          v-for="venta in ventas"
-          :key="'movil-' + venta.id"
-          class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs p-4 space-y-2.5"
-        >
-          <div class="flex items-center justify-between border-b border-[#f0f4ee] pb-2">
-            <div>
-              <span class="text-gray-400 block text-[10px] uppercase font-semibold">Vendido por</span>
-              <span class="font-bold text-[#1a2e1f] text-sm capitalize">
-                {{ venta.vendido_por?.name ?? '—' }}
-              </span>
-            </div>
-            <Tag
-              :value="venta.estado"
-              :severity="venta.estado === 'COMPLETADA' ? 'success' : 'danger'"
-              class="!text-[10px] !px-2 !py-0.5"
-              rounded
-            />
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <span class="text-gray-400 block text-[10px] uppercase font-semibold">N° Factura</span>
-              <span class="font-medium text-[#1a2e1f]">{{ venta.numero_factura || '—' }}</span>
-            </div>
-            <div>
-              <span class="text-gray-400 block text-[10px] uppercase font-semibold">Tipo de Pago</span>
-              <span
-                class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold mt-0.5"
-                :class="venta.tipo_pago === 'EFECTIVO' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'"
-              >
-                {{ venta.tipo_pago }}
-              </span>
-            </div>
-          </div>
-
-          <div class="pt-2 border-t border-[#f0f4ee] flex items-center justify-between">
-            <span class="text-xs text-gray-500 font-medium">{{ formatFecha(venta.created_at) }}</span>
-            <span class="text-sm font-bold text-[#2b5e3b]">{{ formatCurrency(venta.total) }}</span>
-          </div>
         </div>
       </div>
 
@@ -179,7 +108,7 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Reporte de Ventas</h1>
-          <p class="text-gray-500 text-sm mt-1 m-0">Filtra por rango de fecha y genera el reporte PDF.</p>
+          <p class="text-gray-500 text-sm mt-1 m-0">Seleccione un rango de fechas para exportar el informe detallado en formato PDF.</p>
         </div>
       </div>
 
@@ -187,7 +116,7 @@
       <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm p-6 mb-6">
         <div class="flex items-center gap-2 mb-5 pb-4 border-b border-[#e2e8dd]">
           <i class="pi pi-filter text-[#e0b354] text-[18px]"></i>
-          <span class="font-semibold text-[#1e3a2f] text-lg">Filtros de fecha</span>
+          <span class="font-semibold text-[#1e3a2f] text-lg">Parámetros de consulta</span>
         </div>
 
         <div class="flex flex-wrap items-end gap-4">
@@ -197,7 +126,7 @@
             <DatePicker
               v-model="fechaDesde"
               dateFormat="yy-mm-dd"
-              placeholder="Seleccione fecha"
+              placeholder="Seleccione fecha desde"
               showIcon
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
@@ -210,7 +139,7 @@
             <DatePicker
               v-model="fechaHasta"
               dateFormat="yy-mm-dd"
-              placeholder="Seleccione fecha"
+              placeholder="Seleccione fecha hasta"
               showIcon
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
@@ -220,21 +149,6 @@
           <!-- Botones PC -->
           <div class="flex gap-3">
             <Button
-              label="Filtrar"
-              icon="pi pi-search"
-              :loading="cargando"
-              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-sm !px-5 !py-2 cursor-pointer"
-              @click="filtrarVentas"
-            />
-            <Button
-              label="Generar PDF"
-              icon="pi pi-file-pdf"
-              :loading="generandoPDF"
-              :disabled="ventas.length === 0"
-              class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer disabled:!opacity-50"
-              @click="generarPDF"
-            />
-            <Button
               label="Limpiar"
               icon="pi pi-times"
               severity="secondary"
@@ -242,69 +156,15 @@
               class="!text-sm !px-5 !py-2 !border-gray-300 !text-gray-600 cursor-pointer"
               @click="limpiarFiltros"
             />
+            <Button
+              label="Generar Reporte PDF"
+              icon="pi pi-file-pdf"
+              :loading="generandoPDF"
+              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-sm !px-5 !py-2 cursor-pointer font-semibold shadow-2xs"
+              @click="generarPDF"
+            />
           </div>
         </div>
-      </div>
-
-      <!-- Tabla de Ventas PC -->
-      <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden">
-        <div class="flex items-center gap-2 px-6 py-4 border-b border-[#e2e8dd] bg-[#fafdf7]">
-          <i class="pi pi-list text-[#e0b354] text-[16px]"></i>
-          <span class="font-semibold text-[#1e3a2f]">
-            Ventas
-            <span v-if="ventas.length > 0" class="text-sm font-normal text-gray-500 ml-2">
-              ({{ ventas.length }} registros)
-            </span>
-          </span>
-        </div>
-
-        <DataTable
-          :value="ventas"
-          :loading="cargando"
-          responsiveLayout="scroll"
-          class="p-datatable-sm"
-          emptyMessage="No hay ventas en el rango seleccionado."
-        >
-          <Column header="Vendido por" class="text-sm">
-            <template #body="{ data }">
-              {{ data.vendido_por?.name ?? '—' }}
-            </template>
-          </Column>
-          <Column field="numero_factura" header="N° Factura" class="text-sm" />
-          <Column field="tipo_pago" header="Tipo de pago" class="text-sm">
-            <template #body="{ data }">
-              <span
-                class="px-2 py-1 rounded-full text-xs font-semibold"
-                :class="
-                  data.tipo_pago === 'EFECTIVO'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-blue-100 text-blue-700'
-                "
-              >
-                {{ data.tipo_pago }}
-              </span>
-            </template>
-          </Column>
-          <Column field="estado" header="Estado" class="text-sm">
-            <template #body="{ data }">
-              <Tag
-                :value="data.estado"
-                :severity="data.estado === 'COMPLETADA' ? 'success' : 'danger'"
-                rounded
-              />
-            </template>
-          </Column>
-          <Column field="created_at" header="Fecha" class="text-sm">
-            <template #body="{ data }">
-              {{ formatFecha(data.created_at) }}
-            </template>
-          </Column>
-          <Column field="total" header="Total" class="text-sm">
-            <template #body="{ data }">
-              <span class="font-semibold text-[#1e3a2f]">{{ formatCurrency(data.total) }}</span>
-            </template>
-          </Column>
-        </DataTable>
       </div>
 
     </div>
@@ -315,20 +175,19 @@
 <script setup>
 import { ref } from 'vue'
 import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
 import { DatePicker } from 'primevue'
-import Swal from 'sweetalert2'
-import { api } from '@/services/authService'
 import { generarReporteVentas } from '@/services/reporteService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
 
 const fechaDesde = ref(null)
 const fechaHasta = ref(null)
-const ventas = ref([])
-const cargando = ref(false)
 const generandoPDF = ref(false)
 
 const formatFechaParam = (date) => {
@@ -337,75 +196,44 @@ const formatFechaParam = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-const formatFecha = (val) => {
-  if (!val) return '—'
-  return new Date(val).toLocaleDateString('es-SV', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-  })
-}
-
-const formatCurrency = (val) =>
-  new Intl.NumberFormat('es-SV', { style: 'currency', currency: 'USD' }).format(val || 0)
-
-const filtrarVentas = async () => {
+const generarPDF = async () => {
   if (!fechaDesde.value || !fechaHasta.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Fechas requeridas',
-      text: 'Seleccione fecha desde y fecha hasta para filtrar.',
-      confirmButtonColor: '#2b5e3b',
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Fechas requeridas',
+      mensajeHtml: 'Debes seleccionar la <strong>Fecha desde</strong> y la <strong>Fecha hasta</strong> para generar el reporte.'
     })
     return
   }
 
-  cargando.value = true
-  try {
-    const params = {
-      fecha_desde: formatFechaParam(fechaDesde.value),
-      fecha_hasta: formatFechaParam(fechaHasta.value),
-    }
-
-    const res = await api.get('/ventas', { params })
-    ventas.value = res.data.data ?? res.data ?? []
-
-    if (ventas.value.length === 0) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sin resultados',
-        text: 'No se encontraron ventas en ese rango de fechas.',
-        confirmButtonColor: '#2b5e3b',
-      })
-    }
-  } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudieron cargar las ventas.',
-      confirmButtonColor: '#2b5e3b',
+  if (new Date(fechaDesde.value) > new Date(fechaHasta.value)) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Rango de fechas inválido',
+      mensajeHtml: 'La <strong>Fecha desde</strong> no puede ser posterior a la <strong>Fecha hasta</strong>.'
     })
-  } finally {
-    cargando.value = false
+    return
   }
-}
-
-const generarPDF = async () => {
-  if (!fechaDesde.value || !fechaHasta.value) return
 
   generandoPDF.value = true
+  mostrarCargando('Generando reporte PDF...', 'Procesando los datos de ventas para descargar')
+
   try {
-    await generarReporteVentas({
-      fechaDesde: formatFechaParam(fechaDesde.value),
-      fechaHasta: formatFechaParam(fechaHasta.value),
-    })
+    const [resultado] = await Promise.all([
+      generarReporteVentas({
+        fechaDesde: formatFechaParam(fechaDesde.value),
+        fechaHasta: formatFechaParam(fechaHasta.value),
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    mostrarExito(
+      '¡Reporte generado!',
+      'El reporte de ventas en formato PDF se ha descargado exitosamente.'
+    )
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudo generar el reporte PDF.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'
+    mostrarError('Error al generar PDF', msg)
   } finally {
     generandoPDF.value = false
   }
@@ -414,30 +242,19 @@ const generarPDF = async () => {
 const limpiarFiltros = () => {
   fechaDesde.value = null
   fechaHasta.value = null
-  ventas.value = []
 }
 </script>
 
 <style scoped>
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #fafdf7;
-  color: #3c674b;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.75rem 1rem;
-}
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
-}
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #eef5e9 !important;
-}
 :deep(.p-calendar .p-inputtext) {
   border-color: #d1d5db;
 }
 :deep(.p-calendar .p-inputtext:focus) {
   box-shadow: none !important;
   border-color: #2b5e3b !important;
+}
+
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

@@ -365,7 +365,12 @@ import Tag from 'primevue/tag'
 import { DatePicker } from 'primevue'
 import { proveedores as getProveedores } from '@/services/proveedorService'
 import authService from '@/services/authService'
-import { mostrarConfirmacion } from '@/utils/SweetAlertService'
+import { 
+  mostrarConfirmacion, 
+  mostrarCargando, 
+  mostrarExito, 
+  mostrarError 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   compras: { type: Array, default: () => [] },
@@ -457,10 +462,14 @@ const anularCompra = async (compra) => {
       </div>
     `,
     icono: 'pi-ban',
+    bgIcono: '#fee2e2',
+    colorIcono: '#b91c1c',
     confirmButtonText: 'Sí, anular compra',
+    confirmButtonColor: '#b91c1c',
   })
 
   if (confirmacion.isConfirmed) {
+    mostrarCargando('Anulando compra...', 'Procesando reversión de lotes y montos')
     emit('anular-compra', compra.id)
   }
 }
@@ -474,7 +483,6 @@ onMounted(async () => {
   }
 })
 </script>
-
 <style>
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #fbfdf9 !important;

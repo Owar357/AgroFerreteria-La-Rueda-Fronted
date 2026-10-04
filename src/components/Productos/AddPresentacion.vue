@@ -116,7 +116,12 @@ import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
 import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
 import { añadirPresentacion } from '@/services/productoService'
 import { useproductoStore } from '@/stores/productoStore'
-import Swal from 'sweetalert2'
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -148,21 +153,13 @@ const resetForm = () => {
   guardando.value = false
 }
 
-const mostrarAlerta = (tipo, titulo, texto) => {
-  Swal.fire({
-    icon: tipo,
-    title: titulo,
-    text: texto,
-    confirmButtonColor: '#2b5e3b',
-    customClass: {
-      container: '!z-[9999]',
-    },
-  })
-}
-
 const guardar = async () => {
   if (!form.value.nombre || !form.value.factor_conversion || !form.value.precio) {
-    mostrarAlerta('warning', 'Campos incompletos', 'Completa todos los campos requeridos.')
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Campos incompletos',
+      mensajeHtml: 'Completa todos los campos requeridos.'
+    })
     return
   }
 
@@ -178,11 +175,16 @@ const guardar = async () => {
   }
 
   if (!idUnidad) {
-    mostrarAlerta('warning', 'Unidad requerida', 'No se pudo determinar el ID de la unidad de medida.')
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Unidad requerida',
+      mensajeHtml: 'No se pudo determinar la unidad de medida.'
+    })
     return
   }
 
   guardando.value = true
+  mostrarCargando('Guardando presentación...', 'Por favor espera un momento')
 
   const payload = {
     nombre: form.value.nombre,
@@ -193,7 +195,11 @@ const guardar = async () => {
   }
 
   try {
-    const response = await añadirPresentacion(payload)
+    const [response] = await Promise.all([
+      añadirPresentacion(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
     const nueva = response.data.data ?? response.data
 
     emit('guardar', {
@@ -207,28 +213,17 @@ const guardar = async () => {
     })
 
     localVisible.value = false
-
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: '¡Presentación creada con éxito!',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-      background: '#ffffff',
-      color: '#1e3a2f',
-      iconColor: '#2b5e3b',
-      customClass: {
-        container: '!z-[9999]',
-      },
-    })
+    mostrarExito('¡Presentación creada!', 'La nueva presentación fue registrada exitosamente.')
   } catch (error) {
     const status = error.response?.status
     if (status === 422) {
-      mostrarAlerta('warning', 'Error de validación', 'Revisa los datos enviados e intenta nuevamente.')
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Error de validación',
+        mensajeHtml: 'Revisa los datos enviados e intenta nuevamente.'
+      })
     } else {
-      mostrarAlerta('error', 'Error', 'No se pudo crear la presentación.')
+      mostrarError('Error al guardar', error.response?.data?.message || 'No se pudo crear la presentación.')
     }
   } finally {
     guardando.value = false

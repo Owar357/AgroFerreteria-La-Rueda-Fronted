@@ -102,10 +102,18 @@
   </Dialog>
 </template>
 
+
+
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito } from '@/utils/SweetAlertService'
+import { 
+  mostrarConfirmacion, 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
 import BaseInputPercent from '../base/BaseInputPercent.vue'
 
@@ -197,31 +205,36 @@ const dispararActualizar = async () => {
   if (!confirmacion.isConfirmed) return
 
   guardando.value = true
-  
+  mostrarCargando('Guardando cambios...', 'Actualizando información de la categoría')
+
   const payload = {
     nombre: form.nombre.trim(),
     porcentaje_ganancia_minimo: form.porcentaje_ganancia_minimo !== null ? form.porcentaje_ganancia_minimo : 15.00
   }
 
-  const resultado = await store.actualizarCategoria(form.id, payload)
-  guardando.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.actualizarCategoria(form.id, payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  if (resultado.ok) {
-    localVisible.value = false
-    mostrarExito(
-      '¡Categoría actualizada!',
-      'La categoría fue actualizada exitosamente.'
-    )
-  } else if (resultado.status === 403) {
-    mostrarAlertaConfirmar({
-      tipo: 'ban',
-      icono: 'pi-bell',
-      titulo: 'Sin autorización',
-      mensajeHtml: 'No tiene permisos para editar este registro',
-      confirmButtonText : 'Entendido'
-    })
-  } else if (resultado.error) {
-    errorNombre.value = resultado.error
+    if (resultado.ok) {
+      localVisible.value = false
+      mostrarExito(
+        '¡Categoría actualizada!',
+        'La categoría fue actualizada exitosamente.'
+      )
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      errorNombre.value = resultado.error
+    } else {
+      mostrarError('Error', 'No se pudo actualizar la categoría.')
+    }
+  } catch (err) {
+    mostrarError('Error inesperado', 'Ocurrió un problema de conexión al guardar los datos.')
+  } finally {
+    guardando.value = false
   }
 }
 </script>
@@ -252,5 +265,10 @@ const dispararActualizar = async () => {
 .p-password-input:enabled:focus {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+/* Superposición de SweetAlert2 sobre modales */
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

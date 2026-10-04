@@ -328,7 +328,13 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { useProveedorStore } from '@/stores/proveedorStore'
 import { storeToRefs } from 'pinia'
-import Swal from 'sweetalert2'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarConfirmacion, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 
@@ -370,31 +376,9 @@ const proveedoresFiltrados = computed(() => {
 onMounted(async () => {
   const resultado = await store.cargarProveedores()
   if (resultado?.status === 403) {
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para ver los proveedores.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: {
-        confirmButton: '!rounded-lg !font-semibold !text-sm',
-        popup: '!rounded-2xl',
-      },
-    })
+    mostrarAccesoDenegado()
   } else if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error de conexión', 'No se pudieron cargar los proveedores.')
   }
 })
 
@@ -402,69 +386,35 @@ const handleEdit = (proveedor) => emit('open-edit', proveedor)
 const handleDetail = (proveedor) => emit('open-detail', proveedor)
 
 const confirmarDesactivar = async (proveedor) => {
-  const confirmacion = await Swal.fire({
-    html: `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-        <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-          <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-        </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Desactivar proveedor</h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">
-          ¿Estás seguro de que deseas desactivar a
-          <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>? Esta acción no se puede revertir.
-        </p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: '#b91c1c',
-    cancelButtonColor: '#6b7280',
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Desactivar proveedor?',
+    mensajeHtml: `¿Estás seguro de que deseas desactivar a <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>? Esta acción no se puede revertir.`,
+    icono: 'pi-ban',
+    bgIcono: '#fee2e2',
+    colorIcono: '#b91c1c',
     confirmButtonText: 'Sí, desactivar',
-    cancelButtonText: 'Cancelar',
-    customClass: {
-      confirmButton: '!rounded-lg !font-semibold !text-sm',
-      cancelButton: '!rounded-lg !font-semibold !text-sm',
-      popup: '!rounded-2xl',
-    },
+    confirmButtonColor: '#b91c1c',
   })
 
   if (!confirmacion.isConfirmed) return
 
-  const resultado = await store.desactivarProveedor(proveedor.id)
+  mostrarCargando('Desactivando proveedor...', 'Por favor espera un momento')
 
-  if (resultado.ok) {
-    Swal.fire({
-      icon: 'success',
-      title: 'Proveedor desactivado',
-      text: `"${proveedor.nombre}" ha sido desactivado.`,
-      confirmButtonColor: '#2b5e3b',
-      timerProgressBar: true,
-    })
-  } else if (resultado.status === 403) {
-    Swal.fire({
-      html: `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-          <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center;">
-            <i class="pi pi-ban" style="font-size:24px; color:#b91c1c;"></i>
-          </div>
-          <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">Sin autorización</h3>
-          <p style="font-size:14px; color:#6b7280; margin:0;">No tienes permisos para realizar esta acción.</p>
-        </div>
-      `,
-      showConfirmButton: true,
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido',
-      customClass: {
-        confirmButton: '!rounded-lg !font-semibold !text-sm',
-        popup: '!rounded-2xl',
-      },
-    })
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+  try {
+    const [resultado] = await Promise.all([
+      store.desactivarProveedor(proveedor.id),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    if (resultado.ok) {
+      mostrarExito('¡Proveedor desactivado!', `El proveedor "${proveedor.nombre}" fue desactivado correctamente.`)
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al desactivar', resultado.error || 'No se pudo desactivar al proveedor.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
   }
 }
 </script>

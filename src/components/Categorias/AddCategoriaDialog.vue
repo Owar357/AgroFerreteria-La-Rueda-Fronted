@@ -101,7 +101,12 @@ import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { mostrarAccesoDenegado, mostrarError, mostrarExito } from '@/utils/SweetAlertService'
+import { 
+  mostrarAccesoDenegado, 
+  mostrarError, 
+  mostrarExito, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 
@@ -187,29 +192,44 @@ const dispararGuardar = async () => {
   errorNombre.value = ''
   errorGanancia.value = ''
   guardando.value = true
+  mostrarCargando('Creando categoría...', 'Registrando la nueva categoría en el catálogo')
 
   const payload = {
     nombre: nombreCategoria.value.trim(),
     porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : 15.00
   }
 
-  localVisible.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.crearCategoria(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  const resultado = await store.crearCategoria(payload)
-  guardando.value = false
-
-  if (resultado.ok) {
-    resetForm()
-    mostrarExito(
-      '¡Categoría creada!',
-      `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
-    )
-  } else if (resultado.status === 403) {
-    resetForm()
-    mostrarAccesoDenegado()
-  } else if (resultado.error) {
-    resetForm()
-    mostrarError('Error al guardar', resultado.error)
+    if (resultado.ok) {
+      localVisible.value = false
+      resetForm()
+      mostrarExito(
+        '¡Categoría creada!',
+        `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
+      )
+    } else if (resultado.status === 403) {
+      localVisible.value = false
+      resetForm()
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      const errorMsg = resultado.error.toLowerCase()
+      if (errorMsg.includes('nombre') || errorMsg.includes('existe')) {
+        errorNombre.value = resultado.error
+      } else {
+        mostrarError('Error al guardar', resultado.error)
+      }
+    } else {
+      mostrarError('Error al guardar', 'No se pudo crear la categoría.')
+    }
+  } catch (err) {
+    mostrarError('Error inesperado', 'Ocurrió un problema de red al guardar la categoría.')
+  } finally {
+    guardando.value = false
   }
 }
 </script>
@@ -235,5 +255,10 @@ const dispararGuardar = async () => {
 .p-inputnumber-input:enabled:focus {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

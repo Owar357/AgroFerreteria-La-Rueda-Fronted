@@ -1,4 +1,4 @@
-<template>
+  <template>
   <Dialog
     :visible="visible"
     @update:visible="emit('update:visible', $event)"
@@ -91,6 +91,7 @@ import { ref, computed, onBeforeUpdate } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
+import { mostrarAlertaConfirmar } from '@/utils/SweetAlertService'
 
 defineProps({
   visible: { type: Boolean, default: false },
@@ -151,12 +152,26 @@ const reset = () => {
 defineExpose({ restaurar, reset })
 
 const onCuadrar = () => {
+  if (totalCents.value <= 0) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Conteo en cero',
+      mensajeHtml: 'Por favor ingresa las cantidades físicas de dinero en caja antes de realizar el cuadre final.'
+    })
+    return
+  }
+
   emit('cuadrar', {
     monto_contado: totalContado.value,
-    // Copia completa para poder restaurar el conteo si se cancela el cierre
     denominaciones: denominaciones.value.map((d) => ({ ...d })),
-    // Formato que espera el backend: { c1: 0, c5: 2, ..., b100: 1 }
     conteo: Object.fromEntries(denominaciones.value.map((d) => [d.id, d.qty || 0])),
   })
 }
 </script>
+
+<style>
+/* Forzar a SweetAlert2 a posicionarse por delante del modal de PrimeVue */
+.swal2-container {
+  z-index: 999999 !important;
+}
+</style>

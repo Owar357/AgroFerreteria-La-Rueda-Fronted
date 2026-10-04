@@ -250,8 +250,13 @@ import AñadirPresentacionDialog from '@/components/Productos/AddPresentacion.vu
 import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import KardexTable from '@/components/Productos/KardexTable.vue'
-import Swal from 'sweetalert2'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarConfirmacion, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   producto: { type: Object, required: true },
@@ -328,12 +333,7 @@ const cargarPresentaciones = async () => {
       presentaciones.value = []
       return
     }
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudieron cargar las presentaciones.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Atención', 'No se pudieron cargar las presentaciones registradas.')
   } finally {
     cargando.value = false
   }
@@ -342,63 +342,45 @@ const cargarPresentaciones = async () => {
 const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
 const volver = () => emit('volver')
 
-const toggleEstadoPresentacion = (pres) => {
+const toggleEstadoPresentacion = async (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
-  Swal.fire({
-    html: `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0;">
-        <div style="width:56px; height:56px; border-radius:50%; background:${esActivo ? '#fee2e2' : '#dff0e0'}; display:flex; align-items:center; justify-content:center;">
-          <i class="pi ${esActivo ? 'pi-ban' : 'pi-check-circle'}" style="font-size:24px; color:${esActivo ? '#b91c1c' : '#2b5e3b'};"></i>
-        </div>
-        <h3 style="font-size:17px; font-weight:600; color:#1e3a2f; margin:0;">
-          ${esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?'}
-        </h3>
-        <p style="font-size:14px; color:#6b7280; margin:0;">
-          ${esActivo ? 'La presentación dejará de estar disponible para la venta.' : 'La presentación volverá a estar disponible para la venta.'}
-        </p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: esActivo ? '#b91c1c' : '#2b5e3b',
-    cancelButtonColor: '#e2e8dd',
+  const resultado = await mostrarConfirmacion({
+    titulo: esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?',
+    mensajeHtml: esActivo 
+      ? 'La presentación dejará de estar disponible para la venta.' 
+      : 'La presentación volverá a estar disponible para la venta.',
+    icono: esActivo ? 'pi-ban' : 'pi-check-circle',
+    bgIcono: esActivo ? '#fee2e2' : '#dff0e0',
+    colorIcono: esActivo ? '#b91c1c' : '#2b5e3b',
     confirmButtonText: esActivo ? 'Sí, desactivar' : 'Sí, activar',
-    cancelButtonText: 'Cancelar',
-    customClass: {
-      container: '!z-[9999]',
-      confirmButton: '!rounded-lg !font-semibold !text-sm',
-      cancelButton: '!rounded-lg !font-semibold !text-sm !text-[#1a2e1f]',
-      popup: '!rounded-2xl',
-    },
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const res = await togglePresentacion(pres.id)
-        const index = presentaciones.value.findIndex((p) => p.id === pres.id)
-        if (index !== -1) {
-          presentaciones.value[index].estado = res.data.activo ? 'ACTIVO' : 'INACTIVO'
-        }
-        Swal.fire({
-          toast: true,
-          position: 'top-end',
-          icon: 'success',
-          title: esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          background: '#ffffff',
-          color: '#1e3a2f',
-          iconColor: '#2b5e3b',
-        })
-      } catch {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cambiar el estado.',
-          confirmButtonColor: '#2b5e3b',
-        })
-      }
-    }
+    confirmButtonColor: esActivo ? '#b91c1c' : '#2b5e3b',
   })
+
+  if (!resultado.isConfirmed) return
+
+  mostrarCargando(
+    esActivo ? 'Desactivando presentación...' : 'Activando presentación...', 
+    'Por favor espera un momento'
+  )
+
+  try {
+    const [res] = await Promise.all([
+      togglePresentacion(pres.id),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    const index = presentaciones.value.findIndex((p) => p.id === pres.id)
+    if (index !== -1) {
+      presentaciones.value[index].estado = res.data.activo ? 'ACTIVO' : 'INACTIVO'
+    }
+
+    mostrarExito(
+      esActivo ? '¡Presentación desactivada!' : '¡Presentación activada!',
+      'El estado fue actualizado correctamente.'
+    )
+  } catch {
+    mostrarError('No se pudo cambiar el estado', 'Inténtalo de nuevo en un momento.')
+  }
 }
 
 const abrirAñadir = () => { AgregarVisible.value = true }

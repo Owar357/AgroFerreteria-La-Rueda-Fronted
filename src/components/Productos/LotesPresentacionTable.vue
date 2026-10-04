@@ -338,6 +338,11 @@ import Dialog from 'primevue/dialog'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useLoteStore } from '@/stores/loteStore'
 import AjusteLoteDialog from '@/components/Inventario/AjusteLoteDialog.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   presentacionId: { type: [String, Number], required: true },
@@ -384,22 +389,29 @@ const abrirModalDescuento = (lote) => {
 
 const guardarDescuento = async () => {
   if (!loteSeleccionado.value) return
+  
   guardando.value = true
+  mostrarCargando('Guardando descuento...', 'Actualizando el precio del lote')
+
   try {
-    await loteStore.actualizarDescuento(
-      loteSeleccionado.value.id,
-      porcentajeInput.value,
-      props.presentacionId
-    )
+    await Promise.all([
+      loteStore.actualizarDescuento(
+        loteSeleccionado.value.id,
+        porcentajeInput.value,
+        props.presentacionId
+      ),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
     modalVisible.value = false
-    await refrescarTablaLotes()
+    mostrarExito('¡Descuento aplicado!', 'El porcentaje de descuento se actualizó con éxito.')
   } catch (e) {
-    console.error(e)
+    const msg = e.response?.data?.message || 'No se pudo aplicar el descuento al lote.'
+    mostrarError('Error al guardar', msg)
   } finally {
     guardando.value = false
   }
 }
-
 const volver = () => {
   emit('volver')
 }
@@ -424,7 +436,6 @@ const severidadEstado = (estado) => {
 </script>
 
 <style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
   background-color: #1a3323 !important;
   color: #ffffff !important;
@@ -436,13 +447,11 @@ const severidadEstado = (estado) => {
   padding: 1.1rem 1.5rem !important;
 }
 
-/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
 }
 
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
 .p-inputnumber-input:enabled:focus,
 .p-select:not(.p-disabled).p-focus,

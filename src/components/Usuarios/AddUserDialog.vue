@@ -17,7 +17,6 @@
       <BaseInput
         v-model="form.name"
         label="Nombre"
-        size="xl"
         placeholder="Nombre completo"
         filter="alpha"
         :error="errors.name"
@@ -27,7 +26,6 @@
       <BaseInput
         v-model="form.email"
         label="Email"
-        size="xl"
         placeholder="correo@ejemplo.com"
         autocomplete="off"
         :error="errors.email"
@@ -37,26 +35,19 @@
       <BasePassword
         v-model="form.password"
         label="Contraseña"
-        size="xl"
         placeholder="********"
         :error="errors.password"
         @input="validarCampo('password')"
       />
 
-      <div class="flex flex-col gap-1.5 w-full">
-        <label class="text-xs font-semibold text-[#1a2e1f]">Rol</label>
-        <Select
-          v-model="form.role"
-          :options="roles"
-          placeholder="Seleccionar rol"
-          @change="validarCampo('role')"
-          class="w-full !bg-[#f9fafb] !border-[#d1d5db] text-[#1a2e1f] text-xs h-[2.5rem] flex items-center px-2 rounded-xl"
-          :class="{ '!border-red-500': errors.role }"
-        />
-        <small v-if="errors.role" class="text-red-600 text-[11px] font-medium">
-          {{ errors.role }}
-        </small>
-      </div>
+      <BaseSelect
+        v-model="form.role"
+        label="Rol"
+        :options="roles"
+        placeholder="Seleccionar rol"
+        :error="errors.role"
+        @update:model-value="validarCampo('role')"
+      />
 
       <!-- Botones Móvil (Vertical - Full Width) -->
       <div class="pt-3 flex flex-col gap-2 w-full">
@@ -84,7 +75,6 @@
       <BaseInput
         v-model="form.name"
         label="Nombre"
-        size="xl"
         placeholder="Nombre completo"
         filter="alpha"
         :error="errors.name"
@@ -94,7 +84,6 @@
       <BaseInput
         v-model="form.email"
         label="Email"
-        size="xl"
         placeholder="correo@ejemplo.com"
         autocomplete="off"
         :error="errors.email"
@@ -104,26 +93,19 @@
       <BasePassword
         v-model="form.password"
         label="Contraseña"
-        size="xl"
         placeholder="********"
         :error="errors.password"
         @input="validarCampo('password')"
       />
 
-      <div class="flex flex-col gap-2 w-full">
-        <label class="text-sm font-medium text-[#1a2e1f]">Rol</label>
-        <Select
-          v-model="form.role"
-          :options="roles"
-          placeholder="Seleccionar rol"
-          @change="validarCampo('role')"
-          class="w-full !bg-[#f9fafb] !border-[#d1d5db] text-[#1a2e1f] text-sm h-[2.75rem] flex items-center px-2 rounded-lg"
-          :class="{ '!border-red-500': errors.role }"
-        />
-        <small v-if="errors.role" class="text-red-600 text-xs font-medium">
-          {{ errors.role }}
-        </small>
-      </div>
+      <BaseSelect
+        v-model="form.role"
+        label="Rol"
+        :options="roles"
+        placeholder="Seleccionar rol"
+        :error="errors.role"
+        @update:model-value="validarCampo('role')"
+      />
 
       <!-- Botones Escritorio -->
       <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
@@ -148,16 +130,18 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import Select from 'primevue/select'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
+import BaseSelect from '../base/BaseSelect.vue'
 import { 
   mostrarExito, 
   mostrarError, 
-  mostrarAlertaConfirmar 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -253,23 +237,33 @@ const guardarUsuario = async () => {
   if (errors.name || errors.email || errors.password || errors.role) return
 
   cargando.value = true
+  mostrarCargando('Registrando usuario...', 'Guardando la nueva cuenta en el sistema')
 
-  const resultado = await store.createUser({
-    name: form.name.trim(),
-    email: form.email.trim(),
-    password: form.password,
-    role: form.role,
-  })
+  try {
+    const [resultado] = await Promise.all([
+      store.createUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        role: form.role,
+      }),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  cargando.value = false
-
-  if (resultado.ok) {
-    visibleLocal.value = false
-    mostrarExito('¡Usuario creado!', `El usuario "${resultado.user.name}" fue registrado exitosamente.`)
-  } else if (resultado.status === 403) {
-    mostrarError('Sin autorización', 'No tienes permisos para crear usuarios.')
-  } else if (resultado.error) {
-    mostrarError('Error de validación', resultado.error)
+    if (resultado.ok) {
+      visibleLocal.value = false
+      mostrarExito('¡Usuario creado!', `El usuario "${resultado.user.name}" fue registrado exitosamente.`)
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      mostrarError('Error de validación', resultado.error)
+    } else {
+      mostrarError('Error', 'No se pudo crear el usuario.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'Ocurrió un problema de red al guardar el usuario.')
+  } finally {
+    cargando.value = false
   }
 }
 </script>
@@ -294,42 +288,5 @@ const guardarUsuario = async () => {
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
   padding: 0 !important;
-}
-
-/* Form inputs & selects */
-.p-inputtext:enabled:focus,
-.p-select:not(.p-disabled).p-focus,
-.p-password-input:enabled:focus {
-  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
-  border-color: #2b5e3b !important;
-}
-
-.p-select {
-  background-color: #f9fafb !important;
-  border-color: #d1d5db !important;
-}
-
-.p-select-label {
-  color: #1a2e1f !important;
-  font-size: 0.875rem !important;
-}
-
-.p-select-overlay {
-  background-color: #ffffff !important;
-  border: 0.0625rem solid #cbd5e1 !important;
-  z-index: 999992 !important;
-}
-
-.p-select-item {
-  color: #1a2e1f !important;
-  font-size: 0.875rem !important;
-}
-
-.p-select-item:not(.p-highlight):not(.p-disabled):hover {
-  background-color: #eef2e9 !important;
-}
-
-.p-password-toggle-icon {
-  color: #6b7280 !important;
 }
 </style>
