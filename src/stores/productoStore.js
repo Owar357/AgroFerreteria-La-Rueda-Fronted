@@ -23,9 +23,16 @@ export const useproductoStore = defineStore('producto', () => {
     try {
       const params = magnitud ? { magnitud } : {}
       const response = await getUnidades(params)
-      unidades.value = response.data?.data ?? response.data
+      const data = response.data?.data ?? response.data
+      unidades.value = data
+      return { ok: true, data }
     } catch (error) {
       console.error('Error al cargar unidades:', error)
+      return {
+        ok: false,
+        status: error.response?.status,
+        error: error.response?.data?.message || 'No se pudieron cargar las unidades de medida.',
+      }
     }
   }
 
@@ -36,19 +43,20 @@ export const useproductoStore = defineStore('producto', () => {
     try {
       const response = await getProductos(page, rows, search, categoria)
 
-      if (response.data?.status === 'ok') {
+      if (response.data?.status === 'ok' || response.data?.data) {
         productos.value = response.data.data
         totalRecords.value = response.data.total
         currentPage.value = response.data.current_page
         perPage.value = response.data.per_page
+        return { ok: true, data: response.data.data }
       }
 
-      return { ok: true }
+      return { ok: true, data: [] }
     } catch (error) {
       if (error.response?.status === 404) {
         productos.value = []
         totalRecords.value = 0
-        return { ok: true }
+        return { ok: true, data: [] }
       }
       return {
         ok: false,
@@ -64,11 +72,13 @@ export const useproductoStore = defineStore('producto', () => {
   const cargarCategorias = async () => {
     try {
       const response = await getAllCategorias()
-      categorias.value = response.data?.data ?? response.data
+      const data = response.data?.data ?? response.data
+      categorias.value = data
+      return { ok: true, data }
     } catch (error) {
       if (error.response?.status === 404) {
         categorias.value = []
-        return
+        return { ok: true, data: [] }
       }
       return {
         ok: false,
@@ -81,21 +91,21 @@ export const useproductoStore = defineStore('producto', () => {
   // Crear Producto
   const crearProducto = async (data) => {
     try {
-      await createProducto(data)
+      const response = await createProducto(data)
       await cargarProductos(1, perPage.value)
-      return { ok: true }
+      return { ok: true, data: response.data }
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
 
-      if (status === 422) {
-        const mensajes = Object.values(responseData.errors ?? {}).flat()
+      if (status === 422 && responseData?.errors) {
+        const mensajes = Object.values(responseData.errors).flat()
         return { ok: false, status, error: mensajes[0], mensajes }
       }
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error del servidor.',
+        error: responseData?.message || 'Error del servidor al crear producto.',
       }
     }
   }
@@ -110,19 +120,19 @@ export const useproductoStore = defineStore('producto', () => {
         productos.value[index] = { ...productos.value[index], ...response.data.data }
       }
 
-      return { ok: true }
+      return { ok: true, data: response.data.data }
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
 
-      if (status === 422) {
-        const mensajes = Object.values(responseData.errors ?? {}).flat()
+      if (status === 422 && responseData?.errors) {
+        const mensajes = Object.values(responseData.errors).flat()
         return { ok: false, status, error: mensajes[0], mensajes }
       }
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error del servidor.',
+        error: responseData?.message || 'Error del servidor al actualizar producto.',
       }
     }
   }
