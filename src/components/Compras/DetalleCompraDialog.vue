@@ -75,10 +75,10 @@
               <template #body="{ data }">
                 <div class="flex flex-col">
                   <span class="font-bold text-[#1a2e1f] capitalize">
-                    {{ data.lote?.presentacion?.producto?.nombre || '—' }}
+                    {{ data.presentacion?.producto?.nombre || data.lote?.presentacion?.producto?.nombre || '—' }}
                   </span>
                   <span class="text-[10px] text-gray-500">
-                    {{ data.lote?.presentacion?.nombre || '—' }}
+                    {{ data.presentacion?.nombre || data.lote?.presentacion?.nombre || '—' }}
                   </span>
                 </div>
               </template>
@@ -279,14 +279,14 @@
             <Column header="Producto" class="font-semibold text-[#1a2e1f]">
               <template #body="{ data }">
                 <span class="font-bold text-[#1a2e1f] capitalize">
-                  {{ data.lote?.presentacion?.producto?.nombre || '—' }}
+                  {{ data.presentacion?.producto?.nombre || data.lote?.presentacion?.producto?.nombre || '—' }}
                 </span>
               </template>
             </Column>
 
             <Column header="Presentación">
               <template #body="{ data }">
-                <span class="text-gray-700">{{ data.lote?.presentacion?.nombre || '—' }}</span>
+                <span class="text-gray-700">{{ data.presentacion?.nombre || data.lote?.presentacion?.nombre || '—' }}</span>
               </template>
             </Column>
 
