@@ -15,9 +15,8 @@ export const useUserStore = defineStore('userStore', () => {
   const perPage = ref(5)
 
   const fetchUsers = async (page = 1, rows = perPage.value) => {
-
     if (loading.value) return
-    
+
     loading.value = true
     try {
       const response = await getUsuarios(page, rows)
@@ -25,11 +24,13 @@ export const useUserStore = defineStore('userStore', () => {
       totalRecords.value = response.data.total
       currentPage.value = response.data.current_page
       perPage.value = response.data.per_page
+
+      return { ok: true, data: response.data.data }
     } catch (error) {
       if (error.response?.status === 404) {
         users.value = []
         totalRecords.value = 0
-        return
+        return { ok: true, data: [] }
       }
       return {
         ok: false,
@@ -57,7 +58,29 @@ export const useUserStore = defineStore('userStore', () => {
       const status = error.response?.status
       const responseData = error.response?.data
 
-      if (status === 422) {
+      if (status === 422 && responseData?.errors) {
+        const mensajes = Object.values(responseData.errors).flat()
+        return { ok: false, status, error: mensajes[0] }
+      }
+      return {
+        ok: false,
+        status,
+        error: responseData?.message || 'Error en el servidor.',
+      }
+    }
+  }
+
+  const updateUser = async (id, payload) => {
+    try {
+      const response = await updateUsuario(id, payload)
+      const index = users.value.findIndex((u) => u.id === id)
+      if (index !== -1) users.value[index] = response.data.user
+      return { ok: true, user: response.data.user }
+    } catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
+
+      if (status === 422 && responseData?.errors) {
         const mensajes = Object.values(responseData.errors).flat()
         return { ok: false, status, error: mensajes[0] }
       }
@@ -71,12 +94,12 @@ export const useUserStore = defineStore('userStore', () => {
 
   const desactivarUsuario = async (id) => {
     try {
-      await desactivarUsuarioService(id)
+      const response = await desactivarUsuarioService(id)
 
       const index = users.value.findIndex((u) => u.id === id)
       if (index !== -1) users.value[index].activo = false
 
-      return { ok: true }
+      return { ok: true, data: response?.data }
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
@@ -85,27 +108,6 @@ export const useUserStore = defineStore('userStore', () => {
         ok: false,
         status,
         error: responseData?.message || 'Error al desactivar el usuario.',
-      }
-    }
-  }
-  const updateUser = async (id, payload) => {
-    try {
-      const response = await updateUsuario(id, payload)
-      const index = users.value.findIndex((u) => u.id === id)
-      if (index !== -1) users.value[index] = response.data.user
-      return { ok: true }
-    } catch (error) {
-      const status = error.response?.status
-      const responseData = error.response?.data
-
-      if (status === 422) {
-        const mensajes = Object.values(responseData.errors).flat()
-        return { ok: false, status, error: mensajes[0] }
-      }
-      return {
-        ok: false,
-        status,
-        error: responseData?.message || 'Error en el servidor.',
       }
     }
   }

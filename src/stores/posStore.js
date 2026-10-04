@@ -8,6 +8,13 @@ import {
 } from '@/services/ventaService'
 import authService from '@/services/authService'
 import { useCajaStore } from '@/stores/cajaStore'
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando,
+} from '@/utils/SweetAlertService'
 
 const LOCAL_STORAGE_KEY = 'pos_venta_en_proceso'
 
@@ -52,11 +59,10 @@ export const usePosStore = defineStore('pos', () => {
       null
 
     if (!unidadBase) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Unidad base requerida',
-        text: `El producto "${producto.nombre}" no tiene una unidad de medida configurada.`,
-        confirmButtonColor: '#2b5e3b',
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Unidad base requerida',
+        mensajeHtml: `El producto "<strong>${producto.nombre}</strong>" no tiene una unidad de medida configurada.`,
       })
       return false
     }
@@ -140,7 +146,7 @@ export const usePosStore = defineStore('pos', () => {
       const estado = JSON.parse(datosGuardados)
       productosVenta.value = estado.productosVenta || []
       tipoFactura.value = ['01', '03'].includes(estado.tipoFactura) ? estado.tipoFactura : '01'
-      tipoPago.value = estado.tipoPago ? estado.tipoPago.toUpperCase() : 'EFECTIVO' 
+      tipoPago.value = estado.tipoPago ? estado.tipoPago.toUpperCase() : 'EFECTIVO'
       clienteId.value = estado.clienteId || null
       nombreCliente.value = estado.nombreCliente || ''
       busquedaCliente.value = estado.busquedaCliente || ''
@@ -159,17 +165,19 @@ export const usePosStore = defineStore('pos', () => {
       nombreCliente.value = cliente.nombre || cliente.razon_social
       clienteId.value = cliente.id
     } catch (error) {
-      if (error.response?.status === 404) {
-        const resultado = await Swal.fire({
-          icon: 'question',
-          title: 'Cliente no encontrado',
-          text: '¿Desea registrar un nuevo cliente?',
-          showCancelButton: true,
-          confirmButtonText: 'Registrar',
-          cancelButtonText: 'Cancelar',
-          confirmButtonColor: '#2b5e3b',
+      if (error.response?.status === 403) {
+        mostrarAccesoDenegado()
+      } else if (error.response?.status === 404) {
+        const registrar = await mostrarAlertaConfirmar({
+          tipo: 'pregunta',
+          titulo: 'Cliente no encontrado',
+          mensajeHtml: '¿Desea registrar un nuevo cliente?',
+          textoConfirmar: 'Registrar',
+          textoCancelar: 'Cancelar',
         })
-        if (resultado.isConfirmed) mostrarModalCliente.value = true
+        if (registrar) mostrarModalCliente.value = true
+      } else {
+        mostrarError('Error de consulta', 'Ocurrió un error al buscar la información del cliente.')
       }
     }
   }
@@ -198,55 +206,53 @@ export const usePosStore = defineStore('pos', () => {
 
       setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'No se pudo abrir el ticket',
-        text: 'La venta fue registrada correctamente. Puedes reimprimir el ticket desde el historial de ventas.',
-        confirmButtonColor: '#2b5e3b',
-      })
+      if (error.response?.status === 403) {
+        mostrarAccesoDenegado()
+      } else {
+        mostrarError(
+          'No se pudo abrir el ticket',
+          'La venta fue registrada correctamente. Puedes reimprimir el ticket desde el historial de ventas.',
+        )
+      }
     }
   }
 
   const irACaja = async (router, texto) => {
-    const resultado = await Swal.fire({
-      icon: 'warning',
-      title: 'Venta no aperturada',
-      text: texto,
-      confirmButtonText: 'Ir a caja',
-      confirmButtonColor: '#e0b354',
-      showCancelButton: true,
-      cancelButtonText: 'Cerrar',
+    const ir = await mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Venta no aperturada',
+      mensajeHtml: texto,
+      textoConfirmar: 'Ir a caja',
+      textoCancelar: 'Cerrar',
     })
 
-    if (resultado.isConfirmed) router?.push({ name: 'caja' })
+    if (ir) router?.push({ name: 'caja' })
   }
 
   const procesarVenta = async (router) => {
     // Sin turno propio abierto no se puede vender (el backend también lo valida)
     if (!cajaStore.puedeOperar) {
       const texto = cajaStore.turnoDeOtroCajero
-        ? `El turno está abierto por ${cajaStore.turnoActivo.cajero_nombre}. Solo ese cajero puede registrar ventas.`
+        ? `El turno está abierto por <strong>${cajaStore.turnoActivo.cajero_nombre}</strong>. Solo ese cajero puede registrar ventas.`
         : 'Debes aperturar la caja y tu venta en el módulo de caja para poder vender.'
       await irACaja(router, texto)
       return
     }
 
     if (productosVenta.value.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Sin productos',
-        text: 'Agrega al menos un producto.',
-        confirmButtonColor: '#2b5e3b',
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Sin productos',
+        mensajeHtml: 'Agrega al menos un producto a la venta.',
       })
       return
     }
 
     if (tipoFactura.value === '03' && !clienteId.value) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Cliente requerido',
-        text: 'El crédito fiscal requiere un cliente.',
-        confirmButtonColor: '#2b5e3b',
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Cliente requerido',
+        mensajeHtml: 'El crédito fiscal requiere asociar un cliente registrado.',
       })
       return
     }
@@ -256,16 +262,14 @@ export const usePosStore = defineStore('pos', () => {
       tipoPago.value === 'EFECTIVO' &&
       Math.round((efectivoRecibido.value || 0) * 100) < Math.round(total.value * 100)
     ) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Efectivo insuficiente',
-        text: 'El efectivo recibido no puede ser menor al total de la venta.',
-        confirmButtonColor: '#2b5e3b',
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Efectivo insuficiente',
+        mensajeHtml: 'El efectivo recibido no puede ser menor al total de la venta.',
       })
       return
     }
 
-    // 'cambio' no se envía: lo calcula el servidor (efectivo_recibido - total)
     const payload = {
       tipo_pago: tipoPago.value.toUpperCase(),
       tipo_factura: tipoFactura.value,
@@ -289,8 +293,13 @@ export const usePosStore = defineStore('pos', () => {
       })),
     }
 
+    mostrarCargando('Procesando venta...', 'Registrando la transacción en el sistema')
+
     try {
-      const response = await registerVenta(payload)
+      const [response] = await Promise.all([
+        registerVenta(payload),
+        new Promise((resolve) => setTimeout(resolve, 500)),
+      ])
 
       cajaStore.marcarActualizacionPendiente()
 
@@ -300,69 +309,67 @@ export const usePosStore = defineStore('pos', () => {
       const numDoc =
         respuestaBackend?.num_documento || respuestaBackend?.numero_factura || `#${ventaId}`
       const clienteNombreStr = nombreCliente.value || 'Consumidor Final'
-      // Importes oficiales: los calculó el servidor (el POS solo los mostraba)
       const totalVentaStr = parseFloat(respuestaBackend?.total ?? total.value).toFixed(2)
       const cambioVentaStr = parseFloat(respuestaBackend?.cambio ?? cambio.value).toFixed(2)
       const fueEfectivo = tipoPago.value === 'EFECTIVO'
 
-      const result = await Swal.fire({
+  
+     const result = await Swal.fire({
         title: '¡Venta realizada con éxito!',
         html: `
           <div style="text-align:left; font-size:14px; color:#374151">
             <p>La transacción ha sido registrada correctamente en el sistema.</p>
-            <div style="background:#f9fafb; border:1px solid #e2e8dd; border-radius:8px; padding:12px; margin-top:12px">
-              <p style="margin:4px 0;"><strong>Comprobante:</strong> ${numDoc}</p>
-              <p style="margin:4px 0;"><strong>Cliente:</strong> ${clienteNombreStr}</p>
-              <p style="margin:4px 0;"><strong>Total a Pagar:</strong> $${totalVentaStr}</p>
-              ${fueEfectivo ? `<p style="margin:4px 0;"><strong>Cambio:</strong> $${cambioVentaStr}</p>` : ''}
+            <div style="background:#f9fafb; border:1px solid #e2e8dd; border-radius:12px; padding:14px; margin-top:12px">
+              <p style="margin:4px 0; color:#14291d"><strong>Comprobante:</strong> ${numDoc}</p>
+              <p style="margin:4px 0; color:#14291d"><strong>Cliente:</strong> ${clienteNombreStr}</p>
+              <p style="margin:4px 0; color:#14291d"><strong>Total a Pagar:</strong> $${totalVentaStr}</p>
+              ${fueEfectivo ? `<p style="margin:4px 0; color:#14291d"><strong>Cambio:</strong> $${cambioVentaStr}</p>` : ''}
             </div>
           </div>
         `,
         icon: 'success',
         showCancelButton: true,
-        confirmButtonText: 'Imprimir Ticket PDF',
-        cancelButtonText: 'Siguiente Venta',
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Imprimir Ticket PDF',
         confirmButtonColor: '#2b5e3b',
         cancelButtonColor: '#6b7280',
         reverseButtons: true,
+        customClass: {
+          popup: 'rounded-2xl p-6 border border-[#e2e8dd]',
+          title: 'text-[#1a2e1f] text-xl font-bold',
+          confirmButton: 'px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer',
+          cancelButton: 'px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer',
+        },
       })
-
       resetVenta()
 
-      if (result.isConfirmed && ventaId) {
+      // Si hizo clic en "Imprimir Ticket PDF" (botón cancel/dismiss)
+      if (result.isDismissed && ventaId) {
         await imprimirTicket(ventaId)
       }
     } catch (error) {
-    
-
-      // Por si el turno cambió (por ejemplo, se cerró) mientras se armaba la venta
       cajaStore.cargarEstadoCaja()
 
       const status = error.response?.status
       const respuesta = error.response?.data
 
-      if (status === 422 && respuesta?.errors) {
+      if (status === 403) {
+        mostrarAccesoDenegado()
+      } else if (status === 422 && respuesta?.errors) {
         const mensajes = Object.values(respuesta.errors).flat()
-        Swal.fire({
-          icon: 'warning',
-          title: 'Error de validación',
-          text: mensajes[0],
-          confirmButtonColor: '#2b5e3b',
+        mostrarAlertaConfirmar({
+          tipo: 'advertencia',
+          titulo: 'Error de validación',
+          mensajeHtml: mensajes[0],
         })
       } else if (respuesta?.message) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Atención',
-          text: respuesta.message,
-          confirmButtonColor: '#2b5e3b',
+        mostrarAlertaConfirmar({
+          tipo: 'advertencia',
+          titulo: 'Atención',
+          mensajeHtml: respuesta.message,
         })
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error de servidor',
-          text: 'Ocurrió un problema inesperado al procesar la venta.',
-          confirmButtonColor: '#2b5e3b',
-        })
+        mostrarError('Error de servidor', 'Ocurrió un problema inesperado al procesar la venta.')
       }
     }
   }

@@ -64,7 +64,7 @@
 
         <button
           @click="limpiarFechas"
-          class="px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1 bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-red-600 hover:text-white hover:border-red-600"
+          class="px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1 bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-red-600 hover:text-white hover:border-red-600 cursor-pointer"
         >
           <i class="pi pi-times text-xs"></i> Limpiar fechas
         </button>
@@ -74,7 +74,7 @@
         <button
           @click="filtroTipo = 'todos'"
           :class="[
-            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all',
+            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all cursor-pointer',
             filtroTipo === 'todos'
               ? 'bg-[#e0b354] text-[#1a2e1f] border-[#e0b354]'
               : 'bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-[#f5f9f0]',
@@ -85,7 +85,7 @@
         <button
           @click="filtroTipo = 'ENTRADA'"
           :class="[
-            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1',
+            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1 cursor-pointer',
             filtroTipo === 'ENTRADA'
               ? 'bg-green-600 text-white border-green-600'
               : 'bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-[#f5f9f0]',
@@ -96,7 +96,7 @@
         <button
           @click="filtroTipo = 'SALIDA'"
           :class="[
-            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1',
+            'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-1 cursor-pointer',
             filtroTipo === 'SALIDA'
               ? 'bg-red-600 text-white border-red-600'
               : 'bg-white text-[#6d8f60] border-[#dee6d6] hover:bg-[#f5f9f0]',
@@ -185,7 +185,7 @@
                 <button
                   v-if="puedeAnular(mov)"
                   @click="pedirAnulacion(mov)"
-                  class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-600 hover:text-white transition-all flex items-center gap-1"
+                  class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-600 hover:text-white transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <i class="pi pi-ban text-[10px]"></i> Anular
                 </button>
@@ -213,7 +213,7 @@
         @page="onPagina"
       />
 
-      <!-- Footer: los totales vienen del backend (todo el filtro, sin anulados) -->
+      <!-- Footer: totales -->
       <div
         class="bg-[#fefcf5] px-6 py-3 border-t border-[#e8efe1] flex justify-between items-center flex-wrap gap-3"
       >
@@ -255,11 +255,16 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import Paginator from 'primevue/paginator'
-import Swal from 'sweetalert2'
 import { getMovimientos, anularMovimiento } from '@/services/movimientoCajaService'
 import { useCajaStore } from '@/stores/cajaStore'
 import AddMovimientoCaja from '@/components/Caja/AddMovimientoCajaDialog.vue'
 import AdminAuthDialog from '@/components/Caja/AdminAuthDialog.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarAlertaConfirmar 
+} from '@/utils/SweetAlertService'
 
 const POR_PAGINA = 7
 
@@ -278,7 +283,6 @@ const fechaHasta = ref('')
 
 const dialogVisible = ref(false)
 
-// Totales de TODO el filtro (calculados por el backend, sin movimientos anulados)
 const totales = ref({ entradas: 0, salidas: 0, balance: 0 })
 
 const mensajeSinTurno = computed(() =>
@@ -289,7 +293,6 @@ const mensajeSinTurno = computed(() =>
 
 const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
 
-// Fecha y hora en la zona horaria local (antes la fecha salía en UTC y la hora en local)
 const formatearFecha = (fechaISO) => {
   const d = new Date(fechaISO)
   const dd = String(d.getDate()).padStart(2, '0')
@@ -323,13 +326,12 @@ const cargarMovimientos = async () => {
       esAnulado: !!m.es_anulado,
       turnoId: m.apertura_venta_id,
     }))
-  } catch {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'No se pudieron cargar los movimientos.',
-      confirmButtonColor: '#2b5e3b',
-    })
+  } catch (error) {
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error', 'No se pudieron cargar los movimientos de caja.')
+    }
   } finally {
     cargando.value = false
   }
@@ -339,7 +341,6 @@ onMounted(async () => {
   await Promise.all([cajaStore.cargarEstadoCaja(), cargarMovimientos()])
 })
 
-// Al cambiar cualquier filtro se vuelve a la primera página y se consulta al backend
 watch([filtroTipo, fechaDesde, fechaHasta], () => {
   paginaFirst.value = 0
   paginaActual.value = 1
@@ -356,7 +357,6 @@ const limpiarFechas = () => {
   fechaHasta.value = ''
 }
 
-// La búsqueda de texto solo filtra la página cargada (el backend aún no la soporta)
 const movimientosFiltrados = computed(() => {
   const b = searchText.value.trim().toLowerCase()
   if (!b) return movimientos.value
@@ -376,22 +376,19 @@ const adminAuthAnularVisible = ref(false)
 const adminAuthAnularRef = ref(null)
 const movimientoAAnular = ref(null)
 
-// Solo se anulan movimientos NO anulados del turno que sigue abierto
 const puedeAnular = (mov) =>
   !mov.esAnulado && !!cajaStore.turnoActivo && mov.turnoId === cajaStore.turnoActivo.id
 
 const pedirAnulacion = async (mov) => {
-  const confirmacion = await Swal.fire({
-    icon: 'warning',
-    title: '¿Anular movimiento?',
-    text: `${mov.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'} de $${formatNumber(mov.monto)}: ${mov.concepto}`,
-    showCancelButton: true,
-    confirmButtonText: 'Sí, anular',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#b91c1c',
+  const confirmado = await mostrarAlertaConfirmar({
+    tipo: 'advertencia',
+    titulo: '¿Anular movimiento?',
+    mensajeHtml: `¿Desea anular la <strong>${mov.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}</strong> de <strong>$${formatNumber(mov.monto)}</strong>?<br><span class="text-xs text-gray-500">${mov.concepto}</span>`,
+    textoConfirmar: 'Sí, anular',
+    textoCancelar: 'Cancelar'
   })
 
-  if (!confirmacion.isConfirmed) return
+  if (!confirmado) return
 
   movimientoAAnular.value = mov
   adminAuthAnularVisible.value = true
@@ -403,7 +400,10 @@ const onCredencialesAnular = async (credenciales) => {
   adminAuthAnularRef.value?.setLoading(true)
 
   try {
-    await anularMovimiento(movimientoAAnular.value.id, credenciales)
+    const [resultado] = await Promise.all([
+      anularMovimiento(movimientoAAnular.value.id, credenciales),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
     adminAuthAnularVisible.value = false
     movimientoAAnular.value = null
@@ -411,22 +411,22 @@ const onCredencialesAnular = async (credenciales) => {
     await Promise.all([cargarMovimientos(), cajaStore.cargarEstadoCaja()])
     cajaStore.marcarActualizacionPendiente()
 
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: 'Movimiento anulado',
-      showConfirmButton: false,
-      timer: 2000,
-      iconColor: '#2b5e3b',
-    })
+    mostrarExito('¡Movimiento anulado!', 'El movimiento de caja ha sido anulado exitosamente.')
   } catch (error) {
-    // Credenciales inválidas, turno cerrado o efectivo insuficiente para anular una entrada
-    adminAuthAnularRef.value?.mostrarError(
-      error.response?.data?.message || 'No se pudo anular el movimiento.',
-    )
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      adminAuthAnularRef.value?.mostrarError(
+        error.response?.data?.message || 'No se pudo anular el movimiento.',
+      )
+    }
   } finally {
     adminAuthAnularRef.value?.setLoading(false)
   }
 }
 </script>
+<style scoped>
+:global(.swal2-container) {
+  z-index: 999999 !important;
+}
+</style>

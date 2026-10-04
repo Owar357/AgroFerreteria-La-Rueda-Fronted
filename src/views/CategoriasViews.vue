@@ -63,6 +63,7 @@ import CategoriasTable from '../components/Categorias/CategoriasTable.vue'
 import AddCategoriaDialog from '../components/Categorias/AddCategoriaDialog.vue'
 import EditCategoriaDialog from '../components/Categorias/EditCategoriaDialog.vue'
 import { useCategoriaStore } from '../stores/categoriaStore.js'
+import { mostrarError, mostrarAccesoDenegado } from '@/utils/SweetAlertService'
 
 const store = useCategoriaStore()
 
@@ -75,5 +76,16 @@ const abrirEditar = (categoria) => {
   modalEditarVisible.value = true
 }
 
-onMounted(store.cargarCategorias)
+onMounted(async () => {
+  try {
+    const res = await store.cargarCategorias()
+    if (res && res.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (res && !res.ok && res.error) {
+      mostrarError('Error', res.error)
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudieron cargar las categorías.')
+  }
+})
 </script>

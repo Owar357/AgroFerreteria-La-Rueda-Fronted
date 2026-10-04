@@ -36,13 +36,17 @@ export const useAlertaStore = defineStore('alerta', {
 
       try {
         const response = await obtenerAlertas()
-        if (response.data.status === 'ok') {
+        if (response.data?.status === 'ok') {
           this.alertas = response.data.data
           this.noLeidas = response.data.no_leidas
+          return { ok: true, data: response.data.data }
         }
+        return { ok: false, error: 'Respuesta inesperada del servidor' }
       } catch (error) {
-        console.error('Error en fetchAlertas:', error)
-        this.error = error.message || 'Error al cargar alertas'
+        const status = error.response?.status
+        const msg = error.response?.data?.message || error.message || 'Error al cargar alertas'
+        this.error = msg
+        return { ok: false, status, error: msg }
       } finally {
         this.cargando = false
       }
@@ -51,18 +55,20 @@ export const useAlertaStore = defineStore('alerta', {
     async toggleLeida(id) {
       try {
         const response = await toggleLeida(id)
-        if (response.data.status === 'ok') {
+        if (response.data?.status === 'ok') {
           const index = this.alertas.findIndex((a) => a.id === id)
           if (index !== -1) {
             this.alertas[index].leida = response.data.data.leida
             this.alertas[index].leida_por = response.data.data.leida_por
           }
           this.noLeidas = this.alertas.filter((a) => !a.leida).length
-          return response.data
+          return { ok: true, data: response.data }
         }
+        return { ok: false, error: 'No se pudo actualizar la alerta' }
       } catch (error) {
-        console.error('Error en toggleLeida:', error)
-        throw error
+        const status = error.response?.status
+        const msg = error.response?.data?.message || 'Error al cambiar estado de alerta'
+        return { ok: false, status, error: msg }
       }
     },
 

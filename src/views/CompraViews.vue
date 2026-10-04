@@ -9,9 +9,6 @@
       @cambiar-pagina="cargarCompras"
       @filtrar="aplicarFiltros"
       @ver-detalle="verDetalleCompra"
-      
-      
-
       @anular-compra="anularCompra"
     />
 
@@ -34,9 +31,13 @@ import { ref, onMounted } from 'vue'
 import ComprasTable from '../components/Compras/ComprasTable.vue'
 import AddCompra from '../components/Compras/AddCompra.vue'
 import DetalleCompraDialogo from '../components/Compras/DetalleCompraDialog.vue'
-import Swal from 'sweetalert2'
 import { compras as comprasService, VerDetallesCompra, anularCompra as anularCompraService } from '@/services/compraService.js'
-
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const showForm = ref(false)
 const loading = ref(false)
@@ -73,7 +74,11 @@ const cargarCompras = async (pagina = 1) => {
       total: data.total,
     }
   } catch (error) {
-    console.error('Error al cargar compras:', error)
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error de carga', 'No se pudieron obtener las compras.')
+    }
   } finally {
     loading.value = false
   }
@@ -91,51 +96,55 @@ const cerrarFormulario = () => {
 
 const verDetalleCompra = async (compraRow) => {
   try {
-    const response = await VerDetallesCompra( compraRow.id)
+    const response = await VerDetallesCompra(compraRow.id)
     selectedCompra.value = response.data.data 
     mostrarDetalleDialog.value = true
   } catch (error) {
-    console.error('Error al cargar detalle de compra:', error)
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error', 'No se pudo obtener el detalle de la compra.')
+    }
   }
 }
 
 const onCompraActualizada = async () => {
-  // Refrescar la tabla
   await cargarCompras(paginacion.value.currentPage)
-  // Refrescar el detalle abierto
   if (selectedCompra.value) {
     await verDetalleCompra(selectedCompra.value)
   }
 }
 
-// Funcion para el boton a amular la compra// kathi
 const anularCompra = async (compraId) => {
-  try {
-    await anularCompraService(compraId)
+  const compra = compras.value.find((c) => c.id === compraId)
+  
+  mostrarCargando('Anulando compra...', 'Procesando la anulación del documento')
 
-    const compra = compras.value.find((c) => c.id === compraId)
+  try {
+    const [resultado] = await Promise.all([
+      anularCompraService(compraId),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
     if (compra) {
-      
       compra.esAnulado = true
     }
 
-    Swal.fire({
-      title: 'Anulación de la compra exitosa',
-      html: `La compra con el número de documento: <strong>${compra?.numDocumento ?? ''}</strong> se ha anulado.`,
-      icon: 'success',
-      confirmButtonColor: '#2b5e3b',
-      timer: 3000,
-      timerProgressBar: true,
-    })
+    mostrarExito(
+      'Anulación exitosa',
+      `La compra con número de documento <strong>${compra?.numDocumento ?? ''}</strong> fue anulada.`
+    )
+    
+    await cargarCompras(paginacion.value.currentPage)
   } catch (error) {
-    const mensaje = error.response?.data?.message || 'No se pudo anular la compra'
-    Swal.fire({
-      title: 'No se pudo anular',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#b91c1c',
-    })
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      const mensaje = error.response?.data?.message || 'No se pudo anular la compra.'
+      mostrarError('No se pudo anular', mensaje)
+    }
   }
 }
+
 onMounted(() => cargarCompras())
 </script>
