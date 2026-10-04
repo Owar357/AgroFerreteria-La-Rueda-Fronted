@@ -1,30 +1,120 @@
 <template>
-  <Dialog v-model:visible="localVisible" modal header="EDITAR PRESENTACIÓN" :style="{ width: '450px' }"
-    :draggable="false" class="custom-dialog" :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }" @hide="resetForm">
-    <div class="bg-white p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre <span class="text-red-500">*</span>
-        </label>
-        <InputText v-model="form.nombre" placeholder="Ej: Bolsa 1kg"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]" />
-        <small v-if="errores.nombre" class="text-red-500 text-[12px]">{{ errores.nombre }}</small>
-      </div>
+  <Dialog
+    v-model:visible="localVisible"
+    modal
+    header="EDITAR PRESENTACIÓN"
+    :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
+    class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="resetForm"
+  >
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Móvil -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+        :error="errores.nombre"
+      />
 
-      <!-- Factor de conversión con unidad base -->
       <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
+        <label class="text-xs font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
           ¿Cuánto equivale esta presentación en
-          <span class="inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
+          <span class="whitespace-nowrap inline-block bg-[#dff0e0] text-[#2b5e3b] text-[12px] font-semibold px-2 py-0.5 rounded-md">
             {{ presentacion?.unidadMedida?.nombre || '—' }} ?
           </span>
         </label>
-        <InputText v-model="form.factor_conversion" placeholder="0" maxlength="6" :disabled="factorBloqueado"
-          class="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db] focus:!border-[#2b5e3b]" />
-        <!-- Mensajes de ayuda -->
-        <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b]">
-          ⚠️ Es la unidad base de este producto, el factor de conversión fijo es (1).
+
+        <BaseInputNumber
+          v-model="form.factor_conversion"
+          placeholder="0"
+          :min="1"
+          :max="999999"
+          :max-fraction-digits="0"
+          :use-grouping="true"
+          :disabled="factorBloqueado"
+        />
+
+        <small v-if="factorBloqueado" class="text-[11px] text-[#2b5e3b] flex items-center gap-1">
+          <i class="pi pi-lock" style="font-size: 10px"></i>
+          Es la unidad base de este producto, el factor de conversión fijo es (1).
+        </small>
+        <small v-else-if="errores.factor_conversion" class="text-red-500 text-[11px]">
+          {{ errores.factor_conversion }}
+        </small>
+        <small v-else class="text-[11px] text-gray-400">
+          Debe ser un número entero entre 1 y 999,999.
+        </small>
+      </div>
+
+      <BaseInputNumberMoney
+        v-model="form.precio"
+        label="Precio *"
+        placeholder="$ 0.00"
+        :error="errores.precio"
+      />
+
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
+        <Button
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="guardar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Escritorio -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre *"
+        placeholder="Ej: Bolsa 1kg"
+        filter="alphanum"
+        :error="errores.nombre"
+      />
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-[#1a2e1f] flex items-center gap-1 flex-wrap">
+          ¿Cuánto equivale esta presentación en
+          <span class="whitespace-nowrap inline-block bg-[#dff0e0] text-[#2b5e3b] text-[13px] font-semibold px-2 py-0.5 rounded-md">
+            {{ presentacion?.unidadMedida?.nombre || '—' }} ?
+          </span>
+        </label>
+
+        <BaseInputNumber
+          v-model="form.factor_conversion"
+          placeholder="0"
+          :min="1"
+          :max="999999"
+          :max-fraction-digits="0"
+          :use-grouping="true"
+          :disabled="factorBloqueado"
+        />
+
+        <small v-if="factorBloqueado" class="text-[12px] text-[#2b5e3b] flex items-center gap-1">
+          <i class="pi pi-lock" style="font-size: 11px"></i>
+          Es la unidad base de este producto, el factor de conversión fijo es (1).
         </small>
         <small v-else-if="errores.factor_conversion" class="text-red-500 text-[12px]">
           {{ errores.factor_conversion }}
@@ -34,25 +124,29 @@
         </small>
       </div>
 
-      <!-- Precio -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Precio <span class="text-red-500">*</span>
-        </label>
-        <InputNumber v-model="form.precio" mode="currency" currency="USD" locale="es-US" :min="0.01"
-          inputClass="w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg border-[#d1d5db]"
-          class="w-full" />
-        <small v-if="errores.precio" class="text-red-500 text-[12px]">{{ errores.precio }}</small>
-      </div>
+      <BaseInputNumberMoney
+        v-model="form.precio"
+        label="Precio *"
+        placeholder="$ 0.00"
+        :error="errores.precio"
+      />
 
-      <!-- Botones -->
-      <div class="flex justify-between gap-4 mt-2">
-        <Button label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          @click="localVisible = false" />
-        <Button label="Guardar" :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
-          @click="guardar" />
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="localVisible = false"
+        />
+        <Button
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
+          @click="guardar"
+        />
       </div>
     </div>
   </Dialog>
@@ -61,11 +155,17 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { updatePresentacion } from '@/services/productoService'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
+import BaseInputNumberMoney from '@/components/base/BaseInputNumberMoney.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAlertaConfirmar, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -85,15 +185,11 @@ const form = ref({
   precio: null,
 })
 
-// Determina si el factor de conversión debe quedar bloqueado en 1:
-// - UNIDAD FIJA: siempre bloqueado (Unidad / Pieza)
-// - GRANEL: bloqueado solo si esta presentación es la base (Gramo/Libra/Kilogramo + es_base)
 const factorBloqueado = computed(() => {
   const unidadNombre = (props.presentacion?.unidadMedida?.nombre || '').toLowerCase().trim()
   const esBase = props.presentacion?.es_base === true
 
-
-  const unidadesUnidadFija = ['unidad', 'pieza'];
+  const unidadesUnidadFija = ['unidad', 'pieza']
 
   const unidadesMasaConBase = [
     'gramo',
@@ -106,8 +202,7 @@ const factorBloqueado = computed(() => {
     'galón',
     'centímetro',
     'metro'
-  ];
-
+  ]
 
   if (unidadesUnidadFija.includes(unidadNombre)) return true
   if (unidadesMasaConBase.includes(unidadNombre) && esBase) return true
@@ -140,25 +235,6 @@ watch(
   },
   { immediate: true },
 )
-
-// Filtro para solo números y límite 999999 (solo si el factor NO está bloqueado)
-watch(() => form.value.factor_conversion, (nuevoValor) => {
-  if (factorBloqueado.value) return
-
-  if (nuevoValor !== undefined && nuevoValor !== null) {
-    let soloNumeros = nuevoValor.toString().replace(/[^0-9]/g, '')
-    if (soloNumeros === '') {
-      form.value.factor_conversion = ''
-      return
-    }
-    let numeroMaximo = parseInt(soloNumeros, 10)
-    if (numeroMaximo > 999999) {
-      form.value.factor_conversion = 999999
-    } else {
-      form.value.factor_conversion = numeroMaximo
-    }
-  }
-})
 
 const resetForm = () => {
   form.value = { nombre: '', factor_conversion: null, precio: null }
@@ -200,14 +276,14 @@ const guardar = async () => {
     errores.value.precio = 'El precio debe ser mayor a 0.'
   }
 
-  if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) {
-    return
-  }
+  if (errores.value.nombre || errores.value.factor_conversion || errores.value.precio) return
 
   guardando.value = true
 
-  const factorParaEnviar = factorBloqueado.value ? 1 : Number(form.value.factor_conversion)
 
+  mostrarCargando('Actualizando presentación...', 'Por favor espera un momento')
+
+  const factorParaEnviar = factorBloqueado.value ? 1 : Number(form.value.factor_conversion)
   const payload = {
     nombre: form.value.nombre.trim(),
     factor_conversion: factorParaEnviar,
@@ -215,7 +291,13 @@ const guardar = async () => {
   }
 
   try {
-    const response = await updatePresentacion(props.presentacion.id, payload)
+ 
+
+    const [response] = await Promise.all([
+      updatePresentacion(props.presentacion.id, payload),
+      new Promise((resolve) => setTimeout(resolve, 500)) 
+    ])
+
     const actualizada = response.data.presentación ?? response.data.data ?? response.data
 
     emit('guardar', {
@@ -227,45 +309,22 @@ const guardar = async () => {
 
     localVisible.value = false
 
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: '¡Presentación actualizada!',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-      background: '#ffffff',
-      color: '#1e3a2f',
-      iconColor: '#2b5e3b',
-      customClass: { container: '!z-[9999]' },
-    })
+
+    mostrarExito('¡Presentación actualizada!', 'Los datos se guardaron correctamente.')
+
   } catch (error) {
     const status = error.response?.status
+
     if (status === 422) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error de validación',
-        text: 'Revisa los datos enviados e intenta nuevamente.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'Error de validación',
+        mensajeHtml: 'Revisa los datos enviados e intenta nuevamente.'
       })
     } else if (status === 404) {
-      Swal.fire({
-        icon: 'error',
-        title: 'No encontrada',
-        text: 'La presentación ya no existe.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
-      })
+      mostrarError('No encontrada', 'La presentación ya no existe en el sistema.')
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo actualizar la presentación.',
-        confirmButtonColor: '#2b5e3b',
-        customClass: { container: '!z-[9999]' },
-      })
+      mostrarError('Error al actualizar', error.response?.data?.message || 'No se pudo actualizar la presentación.')
     }
   } finally {
     guardando.value = false
@@ -275,28 +334,27 @@ const guardar = async () => {
 
 <style>
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
+
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
-:deep(.p-inputnumber-input) {
-  width: 100%;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  border-color: #d1d5db;
-  height: 44px;
-  padding: 0 1rem;
-  font-size: 14px;
+.p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
+  border-color: #2b5e3b !important;
 }
 </style>

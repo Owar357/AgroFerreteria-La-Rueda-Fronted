@@ -14,6 +14,9 @@ export const VerDetallesCompra = (id) => {
   return api.get(`/compras/${id}`)
 }
 
+export const actualizarEstadoCompra = (id, data) => api.patch(`/compras/${id}`, data)
+export const abonarCompra = (id, data) => api.post(`/compras/${id}/abonar`, data)
+
 export const actualizarPreciosMasivo = (precios) => {
   return api.post('/presentaciones/actualizar-precios-masivo', { precios })
 }

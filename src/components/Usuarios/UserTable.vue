@@ -1,157 +1,322 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-full p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <div class="flex flex-col mb-8 gap-4">
-      <div class="flex justify-between items-center w-full">
-        <h1 class="text-[26px] font-semibold tracking-tight !text-black">Registro de usuarios</h1>
-        <Button
-          label="+ Agregar"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-7 py-5 rounded-lg border-none cursor-pointer shadow-md transition-all"
-          @click="$emit('open-add')"
-        />
-      </div>
-
-      <div class="flex justify-start items-center w-full gap-8">
-        <IconField class="w-80">
-          <InputIcon class="pi pi-search text-[#6b7280]" />
-          <InputText
-            v-model="busqueda"
-            placeholder="Buscar usuario..."
-            class="w-full bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px]"
-          />
-        </IconField>
-
-        <Select
-          v-model="filtroEstado"
-          :options="statusOptions"
-          optionLabel="label"
-          optionValue="value"
-          showClear
-          placeholder="Todos los estados"
-          class="w-56 bg-[#ffffff] border-[#cbd5e1] text-[#1a2e1f] text-[14px] rounded-lg h-[42px] flex items-center"
-        />
-      </div>
-    </div>
-
-    <div class="bg-[#ffffff] rounded-xl overflow-hidden border border-[#e2e8dd] shadow-lg">
-      <!-- 🔄 EXPLICACIÓN: Si está cargando, le mandamos un array falso de 5 elementos para simular las filas -->
-      <DataTable
-        :value="store.users"
-        lazy
-        :rows="store.perPage"
-        paginator
-        :totalRecords="store.totalRecords"
-        responsiveLayout="scroll"
-        class="p-datatable-custom text-[14px]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
-        @page="onPageChange"
-      >
-        <template #empty>
-          <div class="text-center py-6 text-[#6b7280] text-[14px]">
-            No hay usuarios registrados.
+  <div class="bg-[#eef2e9] min-h-full p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+      <!-- ======================================================= -->
+      <div class="block lg:hidden mb-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
           </div>
-        </template>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
+              Registro de Usuarios
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">
+              Gestión de cuentas, roles y permisos
+            </p>
+          </div>
+        </div>
+      </div>
 
-        <!-- Columna: Nombre -->
-        <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="60%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.name }}</span>
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+      <!-- ======================================================= -->
+      <div class="hidden lg:flex items-center gap-3 mb-6">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+            Registro de Usuarios
+          </h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">
+            Gestión de cuentas, roles y permisos del sistema
+          </p>
+        </div>
+      </div>
+
+    <!-- Contenedor Principal -->
+    <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
+      <!-- Apartado de Filtros Estático Superior -->
+      <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-white">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+            <!-- Búsqueda -->
+            <IconField class="w-full sm:w-[20rem]">
+              <InputIcon class="pi pi-search text-[#6b7280]" />
+              <InputText
+                v-model="busqueda"
+                placeholder="Buscar usuario..."
+                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem]"
+              />
+            </IconField>
+
+            <!-- Filtro de Estado -->
+            <Select
+              v-model="filtroEstado"
+              :options="opcionesEstado"
+              optionLabel="label"
+              optionValue="value"
+              showClear
+              placeholder="Todos los estados"
+              class="w-full sm:w-[14rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem] flex items-center"
+            />
+          </div>
+
+          <!-- Botón de Agregar -->
+          <Button
+            label="+ Agregar"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-md transition-all w-full md:w-auto whitespace-nowrap shrink-0"
+            @click="$emit('open-add')"
+          />
+        </div>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL: Fila Desplegable con Grid Ordenado (< 768px) -->
+      <!-- ======================================================= -->
+      <div class="block md:hidden w-full">
+        <DataTable
+          v-model:expandedRows="filasExpandidas"
+          :value="usuariosFiltrados"
+          lazy
+          :rows="store.perPage"
+          paginator
+          :totalRecords="store.totalRecords"
+          dataKey="id"
+          class="p-datatable-custom text-sm w-full"
+          currentPageReportTemplate="{first}-{last} de {totalRecords}"
+          paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+          @page="alCambiarPagina"
+        >
+          <template #empty>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
-        </Column>
 
-        <!-- Columna: Email -->
-        <Column field="email" header="Email" class="text-[#4b5563]">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="80%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.email }}</span>
-          </template>
-        </Column>
+          <!-- Botón de Expansión (Flecha) -->
+          <Column expander style="width: 3rem" />
 
-        <!-- Columna: Estado -->
-        <Column field="activo" header="Estado">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="4rem" height="1.5rem" borderRadius="4px" />
-            <span
-              v-else
-              :class="[
-                'px-3 py-1 rounded text-[13px] font-semibold uppercase tracking-wide',
-                slotProps.data.activo
-                  ? 'bg-[#dff0e0] text-[#2b5e3b]'
-                  : 'bg-[#fee2e2] text-[#b91c1c]',
-              ]"
-            >
-              {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </template>
-        </Column>
+          <!-- Columna: Nombre -->
+          <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="80%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.name }}</span>
+            </template>
+          </Column>
 
-        <!-- Columna: Rol -->
-        <Column header="Rol">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="50%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.roles?.[0]?.name ?? '—' }}</span>
-          </template>
-        </Column>
+          <!-- Columna: Estado -->
+          <Column field="activo" header="Estado">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="4rem" height="1.5rem" borderRadius="0.25rem" />
+              <span
+                v-else
+                :class="[
+                  'px-2 py-0.5 rounded text-[0.75rem] font-semibold uppercase tracking-wide inline-block',
+                  slotProps.data.activo
+                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
+                    : 'bg-[#fee2e2] text-[#b91c1c]',
+                ]"
+              >
+                {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </template>
+          </Column>
 
-        <!-- Columna: Creado por -->
-        <Column header="Creado por" class="text-[#4b5563]">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="55%" height="1.2rem" />
-            <span v-else>{{ slotProps.data.registrado_por?.name ?? '—' }}</span>
-          </template>
-        </Column>
+          <!-- Plantilla de Expansión (Móvil) con Grid Ordenado -->
+          <template #expansion="slotProps">
+            <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
+              <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
+              >
+                <!-- Email (Ocupa las 2 columnas) -->
+                <div class="col-span-2">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
+                    Email
+                  </span>
+                  <span class="text-gray-800 font-medium break-all block">
+                    {{ slotProps.data.email }}
+                  </span>
+                </div>
 
-        <!-- Columna: Fecha -->
-        <Column field="created_at" header="Fecha" class="text-[#6b7280]">
-          <template #body="slotProps">
-            <Skeleton v-if="store.loading" width="5rem" height="1.2rem" />
-            <span v-else>
-              {{
-                slotProps.data.created_at
-                  ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
-                  : '—'
-              }}
-            </span>
-          </template>
-        </Column>
+                <!-- Rol -->
+                <div class="col-span-1">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
+                    Rol
+                  </span>
+                  <span class="text-gray-800 font-medium block">
+                    {{ slotProps.data.roles?.[0]?.name ?? '—' }}
+                  </span>
+                </div>
 
-        <!-- Columna: Acciones -->
-        <Column header="Acciones" class="text-center w-[180px]">
-          <template #body="slotProps">
-            <div v-if="store.loading" class="flex gap-2 justify-center">
-              <Skeleton width="4rem" height="2rem" borderRadius="8px" />
-              <Skeleton width="5rem" height="2rem" borderRadius="8px" />
+                <!-- Fecha -->
+                <div class="col-span-1">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
+                    Fecha
+                  </span>
+                  <span class="text-gray-800 font-medium block">
+                    {{
+                      slotProps.data.created_at
+                        ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                        : '—'
+                    }}
+                  </span>
+                </div>
+
+                <!-- Creado por (Ocupa las 2 columnas) -->
+                <div class="col-span-2 pt-1 border-t border-gray-100">
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                  >
+                    Creado por
+                  </span>
+                  <span class="text-gray-800 font-medium block">
+                    {{ slotProps.data.registrado_por?.name ?? '—' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Botones de Acción Móvil -->
+              <div class="mt-3 pt-2 flex gap-2 justify-end items-center">
+                <template v-if="slotProps.data.activo">
+                  <Button
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3.5 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="$emit('open-edit', slotProps.data)"
+                  />
+                  <Button
+                    v-if="usuarioActual?.id !== slotProps.data.id"
+                    icon="pi pi-eye-slash"
+                    label="Desactivar"
+                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3.5 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
+                    @click="confirmarDesactivar(slotProps.data)"
+                  />
+                </template>
+                <span v-else class="text-[#9ca3af] text-xs italic">Inactivo</span>
+              </div>
             </div>
-            
-            <div v-else class="flex gap-2 justify-center">
-              <template v-if="slotProps.data.activo">
-                <Button
-                  icon="pi pi-pencil"
-                  label="Editar"
-                  class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Editar usuario'"
-                  @click="$emit('open-edit', slotProps.data)"
-                />
-
-                <Button
-                  v-if="usuarioActual?.id !== slotProps.data.id"
-                  icon="pi pi-eye-slash"
-                  label="Desactivar"
-                  class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
-                  v-tooltip.top="'Desactivar usuario'"
-                  @click="confirmarDesactivar(slotProps.data)"
-                />
-              </template>
-              <span v-else class="text-[#9ca3af] text-sm italic">Inactivo</span>
-            </div>
           </template>
-        </Column>
-      </DataTable>
+        </DataTable>
+      </div>
+
+      <div class="hidden md:block w-full overflow-x-auto">
+        <DataTable
+          :value="usuariosFiltrados"
+          lazy
+          :rows="store.perPage"
+          paginator
+          :totalRecords="store.totalRecords"
+          class="p-datatable-custom text-sm w-full"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+          @page="alCambiarPagina"
+        >
+          <template #empty>
+            <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
+          </template>
+
+          <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="60%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.name }}</span>
+            </template>
+          </Column>
+
+          <Column field="email" header="Email" class="text-[#4b5563]">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="80%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.email }}</span>
+            </template>
+          </Column>
+
+          <Column field="activo" header="Estado">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="4rem" height="1.5rem" borderRadius="0.25rem" />
+              <span
+                v-else
+                :class="[
+                  'px-3 py-1 rounded text-[0.8125rem] font-semibold uppercase tracking-wide',
+                  slotProps.data.activo
+                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
+                    : 'bg-[#fee2e2] text-[#b91c1c]',
+                ]"
+              >
+                {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </template>
+          </Column>
+
+          <Column header="Rol">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="50%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.roles?.[0]?.name ?? '—' }}</span>
+            </template>
+          </Column>
+
+          <Column header="Creado por" class="text-[#4b5563]">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="55%" height="1.2rem" />
+              <span v-else>{{ slotProps.data.registrado_por?.name ?? '—' }}</span>
+            </template>
+          </Column>
+
+          <Column field="created_at" header="Fecha" class="text-[#6b7280]">
+            <template #body="slotProps">
+              <Skeleton v-if="store.loading" width="5rem" height="1.2rem" />
+              <span v-else>
+                {{
+                  slotProps.data.created_at
+                    ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                    : '—'
+                }}
+              </span>
+            </template>
+          </Column>
+
+          <Column header="Acciones" class="text-center w-[11.25rem]">
+            <template #body="slotProps">
+              <div v-if="store.loading" class="flex gap-2 justify-center">
+                <Skeleton width="4rem" height="2rem" borderRadius="0.5rem" />
+                <Skeleton width="5rem" height="2rem" borderRadius="0.5rem" />
+              </div>
+
+              <div v-else class="flex gap-2 justify-center">
+                <template v-if="slotProps.data.activo">
+                  <Button
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Editar usuario'"
+                    @click="$emit('open-edit', slotProps.data)"
+                  />
+
+                  <Button
+                    v-if="usuarioActual?.id !== slotProps.data.id"
+                    icon="pi pi-eye-slash"
+                    label="Desactivar"
+                    class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer"
+                    v-tooltip.top="'Desactivar usuario'"
+                    @click="confirmarDesactivar(slotProps.data)"
+                  />
+                </template>
+                <span v-else class="text-[#9ca3af] text-sm italic">Inactivo</span>
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -161,74 +326,75 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
-import Skeleton from 'primevue/skeleton' 
+import Skeleton from 'primevue/skeleton'
 import Column from 'primevue/column'
-import Swal from 'sweetalert2'
 import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
+import { 
+  mostrarExito,
+  mostrarError, 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar, 
+  mostrarConfirmacion,
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
 
 const usuarioActual = authService.getUser()
-
-const confirmarDesactivar = async (user) => {
-  if (usuarioActual?.id === user.id) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Acción no permitida',
-      text: 'No puedes desactivar tu propio usuario.',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#2b5e3b',
-    })
-    return
-  }
-
-  const confirmacion = await Swal.fire({
-    icon: 'question',
-    title: '¿Desactivar usuario?',
-    text: `¿Deseas desactivar a ${user.name}? Esta acción no se puede revertir.`,
-    showCancelButton: true,
-    confirmButtonText: 'Confirmar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#9c2a2a',
-    cancelButtonColor: '#6b7280',
-    reverseButtons: true,
-  })
-
-  if (!confirmacion.isConfirmed) return
-
-  const resultado = await store.desactivarUsuario(user.id)
-
-  if (resultado?.ok) {
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: 'Usuario desactivado correctamente',
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-    })
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: resultado?.error || 'No se pudo desactivar el usuario.',
-      confirmButtonColor: '#2b5e3b',
-    })
-  }
-}
 const store = useUserStore()
-
-onMounted(async () => {})
-
-
 
 const busqueda = ref('')
 const filtroEstado = ref(null)
 
-const statusOptions = ref([
+const filasExpandidas = ref({})
+
+const opcionesEstado = ref([
   { label: 'Activo', value: true },
   { label: 'Inactivo', value: false },
 ])
+
+const confirmarDesactivar = async (usuario) => {
+  if (usuarioActual?.id === usuario.id) {
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Acción no permitida',
+      mensajeHtml: 'No puedes desactivar tu propio usuario.'
+    })
+    return
+  }
+
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Desactivar usuario?',
+    mensajeHtml: `¿Estás seguro de que deseas desactivar a <strong style="color:#1e3a2f;">${usuario.name}</strong>? Esta acción no se puede revertir.`,
+    icono: 'pi-ban',
+    bgIcono: '#fee2e2',
+    colorIcono: '#b91c1c',
+    confirmButtonText: 'Sí, desactivar',
+    confirmButtonColor: '#b91c1c',
+  })
+
+  if (!confirmacion.isConfirmed) return
+
+  mostrarCargando('Desactivando usuario...', 'Actualizando el estado en el sistema')
+
+  try {
+    const [resultado] = await Promise.all([
+      store.desactivarUsuario(usuario.id),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    if (resultado?.ok) {
+      mostrarExito('¡Usuario desactivado!', `El usuario "${usuario.name}" fue desactivado correctamente.`)
+    } else if (resultado?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al desactivar', resultado?.error || 'No se pudo desactivar el usuario.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
+  }
+}
+
+onMounted(async () => {})
 
 const usuariosFiltrados = computed(() => {
   return (store.users ?? []).filter((u) => {
@@ -246,26 +412,16 @@ const usuariosFiltrados = computed(() => {
   })
 })
 
-const onPageChange = async (event) => {
-  const page = event.page + 1
-  const rows = event.rows
+const alCambiarPagina = async (evento) => {
+  const pagina = evento.page + 1
+  const filas = evento.rows
   
-  const resultado = await store.fetchUsers(page, rows)
+  const resultado = await store.fetchUsers(pagina, filas)
   
   if (resultado?.status === 403) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Sin autorización',
-      text: 'No tienes permisos para ver los usuarios.',
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarAccesoDenegado()
   } else if (resultado?.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+    mostrarError('Error de conexión', resultado.error)
   }
 }
 
@@ -273,11 +429,18 @@ defineEmits(['open-add', 'open-edit'])
 </script>
 
 <style>
+.p-datatable-custom .p-datatable-header {
+  background-color: #ffffff !important;
+  border: none !important;
+  border-bottom: 0.125rem solid #e2e8dd !important;
+  padding: 1.25rem 1.25rem 1rem 1.25rem;
+}
+
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #ffffff !important;
   color: #1e3a2f !important;
-  border-bottom: 2px solid #e2e8dd !important;
-  font-size: 13px;
+  border-bottom: 0.125rem solid #e2e8dd !important;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -287,7 +450,7 @@ defineEmits(['open-add', 'open-edit'])
 .p-datatable-custom .p-datatable-tbody > tr {
   background-color: #ffffff !important;
   color: #1a2e1f !important;
-  border-bottom: 1px solid #e2e8dd !important;
+  border-bottom: 0.0625rem solid #e2e8dd !important;
 }
 
 .p-datatable-custom .p-datatable-tbody > tr:hover {
@@ -295,7 +458,12 @@ defineEmits(['open-add', 'open-edit'])
 }
 
 .p-inputtext:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+/* Forzar profundidad de SweetAlert2 por encima de capas modales */
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

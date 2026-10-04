@@ -4,7 +4,10 @@ export const getMovimientos = (params) => api.get('/caja/movimientoExterno', { p
 
 export const createMovimiento = (data) => api.post('/caja/movimientoExterno', data)
 
-//Agregada
-export const getResumenTurno = () => api.get('/caja/resumen-turno')
 
+
+
+//para anulra un movimiento, se piden las credencial es del admin por medio del modal
 export const anularMovimiento = (id, data) => api.patch(`/caja/movimientos/${id}/anular`, data)
+
+export { getResumenTurno } from './cajaService'

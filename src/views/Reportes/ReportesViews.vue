@@ -16,6 +16,7 @@
           @ver-flujo-compras-ventas="abrircompraventa"
           @ver-inventario-valorizado="abririnventariovalorizado"
           @ver-productos-por-vencer="abrirproductosporvencer"
+          @ver-arqueo-caja="abriraqueocaja"
         />
 
         <ReporteDetalleVenta
@@ -72,6 +73,11 @@
         @volver="volver"
         />
 
+        <ReporteAqueoCaja 
+        v-else-if="vistaActual == 'arqueo-caja'"
+        @volver="volver"
+        />
+
       </div>
     </transition>
   </div>
@@ -91,6 +97,8 @@ import ReporteMargenGanancia from '@/components/Reportes/ReporteMargenGanancia.v
 import ReporteComprasVentas from '@/components/Reportes/ReporteComprasVentas.vue'
 import ReporteInventarioValorizado from '@/components/Reportes/ReporteInventarioValorizado.vue'
 import ReporteProductosPorVencer from '@/components/Reportes/ReporteProductosPorVencer.vue'
+import ReporteAqueoCaja from '@/components/Reportes/ReporteAqueoCaja .vue'
+import { TreeSelect } from 'primevue'
 
 const vistaActual   = ref('centro')
 const transitionName = ref('slide-forward')
@@ -164,6 +172,12 @@ const abririnventariovalorizado = () => {
 const abrirproductosporvencer = () => {
   transitionName.value = 'slide-forward'
   vistaActual.value = 'productos-por-vencer'
+}
+
+//funccion para le queo de la caja
+const abriraqueocaja = () => {
+  transitionName.value = 'slide-forward'
+  vistaActual.value = 'arqueo-caja'
 }
 </script>
 

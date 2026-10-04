@@ -96,6 +96,10 @@ import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { getDetallesVenta } from '@/services/ventaService'
+import { 
+  mostrarError, 
+  mostrarAccesoDenegado 
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: Boolean,
@@ -112,14 +116,20 @@ watch(() => props.visible, async (val) => {
     cargando.value = true
     try {
       const { data } = await getDetallesVenta(props.compra.id)
-      productos.value = data.data.map(d => ({
+      const lista = data.data || data
+      productos.value = lista.map(d => ({
         nombre: d.nombre_producto,
         cantidad: parseFloat(d.cantidad),
         precio: parseFloat(d.precio_unitario)
       }))
     } catch (error) {
-      console.error('Error al cargar detalle:', error)
+      const status = error.response?.status
       productos.value = []
+      if (status === 403) {
+        mostrarAccesoDenegado()
+      } else {
+        mostrarError('Error de carga', 'No se pudieron consultar los productos de la factura.')
+      }
     } finally {
       cargando.value = false
     }

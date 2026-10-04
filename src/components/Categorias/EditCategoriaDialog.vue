@@ -3,85 +3,119 @@
     v-model:visible="localVisible"
     modal
     header="EDITAR CATEGORÍA"
-    :style="{ width: '450px' }"
     :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Móvil -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre: *"
+        placeholder="Modifique el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararActualizar"
+      />
 
-      <!-- Nombre -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre: <span class="text-red-500">*</span>
-        </label>
-        <InputText
-          v-model="form.nombre"
-          placeholder="Modifique el nombre..."
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errorNombre ? 'border-red-500 border' : 'border-[#d1d5db]'
-          ]"
-          @input="validarNombre"
-          @keyup.enter="dispararActualizar"
-        />
-        <small v-if="errorNombre" class="text-red-500 text-[12px]">{{ errorNombre }}</small>
-      </div>
+      <BaseInputPercent
+        v-model="form.porcentaje_ganancia_minimo"
+        label="% Ganancia Mínimo Deseado:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararActualizar"
+      />
 
-      <!-- % Ganancia Mínimo -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          % Ganancia Mínimo Deseado:
-        </label>
-        <InputNumber
-          v-model="form.porcentaje_ganancia_minimo"
-          placeholder="Ej: 15.00"
-          suffix="%"
-          :min="0"
-          :max="100"
-          :minFractionDigits="1"
-          :maxFractionDigits="2"
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 rounded-lg',
-            errorGanancia ? 'border-red-500 border' : 'border-[#d1d5db]',
-          ]"
-          @input="validarGanancia"
-          @keyup.enter="dispararActualizar"
-        />
-        <small class="text-[#6b7280] text-[14px]">Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicara a todos los productos
-          que pertenezcan a esta categoría
-        </small>
-        <small v-if="errorGanancia" class="text-red-500 text-[12px]">{{ errorGanancia }}</small>
-      </div>
-
-      <!-- Acciones -->
-      <div class="flex justify-between gap-4 mt-2">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="guardando"
+          label="Guardar datos"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="dispararActualizar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      
+      <!-- Campos del formulario para Escritorio -->
+      <BaseInput
+        v-model="form.nombre"
+        label="Nombre: *"
+        placeholder="Modifique el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararActualizar"
+      />
+
+      <BaseInputPercent
+        v-model="form.porcentaje_ganancia_minimo"
+        label="% Ganancia Mínimo Deseado:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararActualizar"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
           @click="localVisible = false"
         />
         <Button
-          label="Guardar"
+          label="Guardar datos"
           :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="dispararActualizar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
 
+
+
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { mostrarConfirmacion, mostrarAlertaConfirmar, mostrarExito } from '@/utils/SweetAlertService'
+import { 
+  mostrarConfirmacion, 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
+import BaseInput from '../base/BaseInput.vue'
+import BaseInputPercent from '../base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible:   { type: Boolean, default: false },
@@ -112,6 +146,11 @@ watch(
     }
   }
 )
+
+const resetForm = () => {
+  errorNombre.value = ''
+  errorGanancia.value = ''
+}
 
 const validarNombre = () => {
   const valor = form.nombre
@@ -166,55 +205,70 @@ const dispararActualizar = async () => {
   if (!confirmacion.isConfirmed) return
 
   guardando.value = true
-  
+  mostrarCargando('Guardando cambios...', 'Actualizando información de la categoría')
+
   const payload = {
     nombre: form.nombre.trim(),
     porcentaje_ganancia_minimo: form.porcentaje_ganancia_minimo !== null ? form.porcentaje_ganancia_minimo : 15.00
   }
 
-  const resultado = await store.actualizarCategoria(form.id, payload)
-  guardando.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.actualizarCategoria(form.id, payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  if (resultado.ok) {
-    localVisible.value = false
-    mostrarExito(
-      '¡Categoría actualizada!',
-      'La categoría fue actualizada exitosamente.'
-    )
-  } else if (resultado.status === 403) {
-    mostrarAlertaConfirmar({
-      tipo: 'ban',
-      icono: 'pi-bell',
-      titulo: 'Sin autorización',
-      mensajeHtml: 'No tiene permisos para editar este registro',
-      confirmButtonText : 'Entendido'
-    })
-  } else if (resultado.error) {
-    errorNombre.value = resultado.error
+    if (resultado.ok) {
+      localVisible.value = false
+      mostrarExito(
+        '¡Categoría actualizada!',
+        'La categoría fue actualizada exitosamente.'
+      )
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      errorNombre.value = resultado.error
+    } else {
+      mostrarError('Error', 'No se pudo actualizar la categoría.')
+    }
+  } catch (err) {
+    mostrarError('Error inesperado', 'Ocurrió un problema de conexión al guardar los datos.')
+  } finally {
+    guardando.value = false
   }
 }
 </script>
 
 <style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
+/* Limpieza del contenedor de contenido */
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
+/* Enfoques y bordes para componentes PrimeVue dentro del modal */
 .p-inputtext:enabled:focus,
-.p-inputnumber:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+.p-inputnumber-input:enabled:focus,
+.p-select:not(.p-disabled).p-focus,
+.p-password-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+/* Superposición de SweetAlert2 sobre modales */
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

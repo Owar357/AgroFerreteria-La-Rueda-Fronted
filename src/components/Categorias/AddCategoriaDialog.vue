@@ -3,70 +3,92 @@
     v-model:visible="localVisible"
     modal
     header="AGREGAR CATEGORÍA"
-    :style="{ width: '450px' }"
     :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-6 font-['Inter',sans-serif]">
-      
-      <!-- Nombre de Categoría -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          Nombre: <span class="text-red-500">*</span>
-        </label>
-        <InputText
-          v-model="nombreCategoria"
-          placeholder="Escriba el nombre..."
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errorNombre ? 'border-red-500 border' : 'border-[#d1d5db]',
-          ]"
-          @input="validarNombre"
-          @keyup.enter="dispararGuardar"
-        />
-        <small v-if="errorNombre" class="text-red-500 text-[12px]">{{ errorNombre }}</small>
-      </div>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model="nombreCategoria"
+        label="Nombre: *"
+        placeholder="Escriba el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararGuardar"
+      />
+      <BaseInputPercent
+        v-model="porcentajeGananciaMinimo"
+        label="% Ganancia Mínima Deseada:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararGuardar"
+      />
 
-      <!-- Porcentaje Ganancia Mínimo -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">
-          % Ganancia Mínima Deseada:
-        </label>
-        <InputNumber
-          v-model="porcentajeGananciaMinimo"
-          placeholder="Ej: 15.00"
-          suffix="%"
-          :min="0"
-          :max="100"
-          :minFractionDigits="1"
-          :maxFractionDigits="2"
-          :class="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 rounded-lg',
-            errorGanancia ? 'border-red-500 border' : 'border-[#d1d5db]',
-          ]"
-          @input="validarGanancia"
-          @keyup.enter="dispararGuardar"
-        />
-        <small class="text-[#6b7280] text-[14px]">Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicara a todos los productos
-          que pertenezcan a esta categoría
-        </small>
-        <small v-if="errorGanancia" class="text-red-500 text-[12px]">{{ errorGanancia }}</small>
-      </div>
-
-      <!-- Botones de Acción -->
-      <div class="flex justify-between gap-4 mt-2">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-4 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="guardando"
+          label="Guardar"
+          :loading="guardando"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
+          @click="dispararGuardar"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="localVisible = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model="nombreCategoria"
+        label="Nombre: *"
+        placeholder="Escriba el nombre..."
+        filter="alpha"
+        :error="errorNombre"
+        @input="validarNombre"
+        @keyup.enter="dispararGuardar"
+      />
+      <BaseInputPercent
+        v-model="porcentajeGananciaMinimo"
+        label="% Ganancia Mínima Deseada:"
+        placeholder="Ej: 15.00"
+        help="Si se deja vacío, se aplicará el 15.00% por defecto. Esta ganancia se aplicará a todos los productos que pertenezcan a esta categoría."
+        :error="errorGanancia"
+        @input="validarGanancia"
+        @keyup.enter="dispararGuardar"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
           @click="localVisible = false"
         />
         <Button
           label="Guardar"
           :loading="guardando"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-4 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
           @click="dispararGuardar"
         />
       </div>
@@ -77,11 +99,16 @@
 <script setup>
 import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { mostrarAccesoDenegado, mostrarError, mostrarExito } from '@/utils/SweetAlertService'
+import { 
+  mostrarAccesoDenegado, 
+  mostrarError, 
+  mostrarExito, 
+  mostrarCargando 
+} from '@/utils/SweetAlertService'
+import BaseInput from '../base/BaseInput.vue'
+import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -165,53 +192,73 @@ const dispararGuardar = async () => {
   errorNombre.value = ''
   errorGanancia.value = ''
   guardando.value = true
+  mostrarCargando('Creando categoría...', 'Registrando la nueva categoría en el catálogo')
 
   const payload = {
     nombre: nombreCategoria.value.trim(),
     porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : 15.00
   }
 
-  localVisible.value = false
+  try {
+    const [resultado] = await Promise.all([
+      store.crearCategoria(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  const resultado = await store.crearCategoria(payload)
-  guardando.value = false
-
-  if (resultado.ok) {
-    resetForm()
-    mostrarExito(
-      '¡Categoría creada!',
-      `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
-    )
-  } else if (resultado.status === 403) {
-    resetForm()
-    mostrarAccesoDenegado()
-  } else if (resultado.error) {
-    resetForm()
-    mostrarError('Error al guardar', resultado.error)
+    if (resultado.ok) {
+      localVisible.value = false
+      resetForm()
+      mostrarExito(
+        '¡Categoría creada!',
+        `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
+      )
+    } else if (resultado.status === 403) {
+      localVisible.value = false
+      resetForm()
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      const errorMsg = resultado.error.toLowerCase()
+      if (errorMsg.includes('nombre') || errorMsg.includes('existe')) {
+        errorNombre.value = resultado.error
+      } else {
+        mostrarError('Error al guardar', resultado.error)
+      }
+    } else {
+      mostrarError('Error al guardar', 'No se pudo crear la categoría.')
+    }
+  } catch (err) {
+    mostrarError('Error inesperado', 'Ocurrió un problema de red al guardar la categoría.')
+  } finally {
+    guardando.value = false
   }
 }
 </script>
 
 <style>
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
-.p-inputnumber:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+.p-inputnumber-input:enabled:focus {
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
+}
+
+
+.swal2-container {
+  z-index: 999999 !important;
 }
 </style>

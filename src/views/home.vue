@@ -31,7 +31,7 @@ import NavBar from '@/components/shared/navbar.vue'
 import SideBar from '@/components/home/SideBar.vue'
 import Footer from '@/components/shared/Footer.vue'
 
-const sidebarOpen = ref(true)
+const sidebarOpen = ref(window.innerWidth >= 768)
 const windowWidth = ref(window.innerWidth)
 
 const updateWidth = () => {

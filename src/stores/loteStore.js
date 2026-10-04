@@ -52,31 +52,14 @@ export const useLoteStore = defineStore('lote', () => {
   }
 
   const actualizarDescuento = async (loteId, porcentajeDescuento, presentacionId) => {
-    try {
-      const res = await updateDescuentoLote(loteId, porcentajeDescuento)
-      
-      Swal.fire({
-        icon: 'success',
-        title: 'Descuento actualizado',
-        text: res.data.message || 'El porcentaje de descuento ha sido actualizado correctamente.',
-        confirmButtonColor: '#2b5e3b',
-        timer: 2000,
-        showConfirmButton: false
-      })
-
-      await fetchLotesByPresentacion(presentacionId, currentPage.value, perPage.value)
-      return res.data
-    } catch (error) {
-      const mensaje = error.response?.data?.message || 'Error al actualizar el descuento del lote'
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al aplicar descuento',
-        text: mensaje,
-        confirmButtonColor: '#2b5e3b',
-      })
-      throw error
-    }
+  try {
+    const res = await updateDescuentoLote(loteId, porcentajeDescuento)
+    await fetchLotesByPresentacion(presentacionId, currentPage.value, perPage.value)
+    return res.data
+  } catch (error) {
+    throw error
   }
+}
 
   return {
     lotes,

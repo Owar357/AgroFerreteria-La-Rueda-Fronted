@@ -12,7 +12,7 @@
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
 
       <p class="text-[14px] text-[#6b7280]">
-        {{ descripcion }} <!--cambio-->
+        {{ descripcion }}
       </p>
 
       <!-- Email -->
@@ -54,7 +54,6 @@
         <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
       </div>
 
-      
       <div v-if="errorGeneral" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
         <small class="text-red-600 text-[13px] font-medium">{{ errorGeneral }}</small>
       </div>
@@ -66,7 +65,7 @@
           :disabled="cargando"
           @click="localVisible = false"
         />
-        
+
         <Button
           :label="labelBoton"
           icon="pi pi-unlock"
@@ -89,8 +88,8 @@ import Button    from 'primevue/button'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  labelBoton: {type: String, default: 'Abrir caja' },
-  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrado. '}
+  labelBoton: { type: String, default: 'Abrir caja' },
+  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrador.' }
 })
 
 const emit = defineEmits(['update:visible', 'credenciales-confirmadas'])
@@ -138,20 +137,20 @@ const handleConfirmar = () => {
   errorGeneral.value = ''
   if (!validar()) return
 
-  // Emitimos las credenciales al padre para que las use junto al monto
+
   emit('credenciales-confirmadas', {
     email:    form.email.trim(),
     password: form.password
   })
 }
 
-// El padre puede llamar este método para mostrar un error de credenciales
+
 const mostrarError = (mensaje) => {
   errorGeneral.value = mensaje
   cargando.value     = false
 }
 
-// El padre puede llamar este método para indicar que está cargando
+
 const setLoading = (val) => { cargando.value = val }
 
 defineExpose({ mostrarError, setLoading, resetForm })
@@ -173,4 +172,8 @@ defineExpose({ mostrarError, setLoading, resetForm })
   padding: 1.5rem !important;
 }
 .p-password-toggle-icon { color: #6b7280 !important; }
+
+.swal2-container {
+  z-index: 999999 !important;
+}
 </style>

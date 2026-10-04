@@ -1,99 +1,117 @@
 <template>
   <Dialog
-    v-model:visible="localVisible"
+    v-model:visible="visibleLocal"
     modal
     header="EDITAR USUARIO"
-    :style="{ width: '500px' }"
     :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
     class="custom-dialog"
-    :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
-    @hide="resetForm"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    @hide="reiniciarFormulario"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-      <!-- NOMBRE -->
-      <!-- Nombre -->
-<div class="flex flex-col gap-2">
-  <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre</label>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL (< 640px)                                   -->
+    <!-- ======================================================= -->
+    <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model.trim="form.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre del usuario"
+        filter="alpha"
+        maxlength="100"
+        autocomplete="name"
+        :error="errors.name"
+        @input="validarNombre"
+      />
 
-  <InputText
-    v-model.trim="form.name"
-    placeholder="Ingrese el nombre del usuario"
-    maxlength="100"
-    autocomplete="name"
-    @input="validarNombre"
-    :class="[
-      'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-      errors.name ? 'border-red-500 border' : 'border-[#d1d5db]',
-    ]"
-  />
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña nueva"
+        size="xl"
+        placeholder="********"
+        help="(Opcional — dejar vacío para no cambiar)"
+        :error="errors.password"
+        @input="validarContrasena"
+      />
 
-  <small v-if="errors.name" class="text-red-600 text-[12px] font-medium">
-    {{ errors.name }}
-  </small>
-</div>
+      <BasePassword
+        v-model="form.confirmPassword"
+        label="Confirmar contraseña"
+        placeholder="********"
+        :error="errors.confirmPassword"
+        @input="validarConfirmarContrasena"
+      />
 
-      <!-- Contraseña nueva -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Contraseña nueva</label>
-        <Password
-          v-model="form.password"
-          toggleMask
-          :feedback="false"
-          placeholder="********"
-          @input="validarPassword"
-          :inputProps="{ autocomplete: 'new-password' }"
-          class="w-full"
-          :inputClass="
-            [
-              'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-              errors.password ? 'border-red-500 border' : 'border-[#d1d5db]',
-            ].join(' ')
-          "
-        />
-        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
-          errors.password
-        }}</small>
-        <small class="text-[13px] text-[#6b7280]"
-          >(Opcional — dejar vacío para no cambiar la contraseña)</small
-        >
-      </div>
-
-      <!-- Confirmar contraseña -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[14px] font-medium text-[#1a2e1f]">Confirmar contraseña</label>
-        <Password
-          v-model="form.confirmPassword"
-          toggleMask
-          :feedback="false"
-          placeholder="********"
-          @input="validarConfirmPassword"
-          class="w-full"
-          :inputProps="{ autocomplete: 'new-password' }"
-          :inputClass="
-            [
-              'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-              errors.confirmPassword ? 'border-red-500 border' : 'border-[#d1d5db]',
-            ].join(' ')
-          "
-        />
-        <small v-if="errors.confirmPassword" class="text-red-600 text-[12px] font-medium">{{
-          errors.confirmPassword
-        }}</small>
-      </div>
-
-      <div class="flex justify-between mt-6 gap-6">
+      <!-- Botones Móvil -->
+      <div class="pt-3 flex flex-col gap-2 w-full">
         <Button
-          label="Cancelar"
-          class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-6 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
-          :disabled="loading"
-          @click="localVisible = false"
+          label="Guardar datos"
+          :loading="cargando"
+          :disabled="!tieneCambios"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full disabled:!opacity-50"
+          @click="procesarActualizacion"
+        />
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+          @click="visibleLocal = false"
+        />
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO (>= 640px)                             -->
+    <!-- ======================================================= -->
+    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+      <BaseInput
+        v-model.trim="form.name"
+        label="Nombre"
+        placeholder="Ingrese el nombre del usuario"
+        filter="alpha"
+        maxlength="100"
+        autocomplete="name"
+        :error="errors.name"
+        @input="validarNombre"
+      />
+
+      <BasePassword
+        v-model="form.password"
+        label="Contraseña nueva"
+        size="xl"
+        placeholder="********"
+        help="(Opcional — dejar vacío para no cambiar la contraseña)"
+        :error="errors.password"
+        @input="validarContrasena"
+      />
+
+      <BasePassword
+        v-model="form.confirmPassword"
+        label="Confirmar contraseña"
+        placeholder="********"
+        :error="errors.confirmPassword"
+        @input="validarConfirmarContrasena"
+      />
+
+      <!-- Botones Escritorio -->
+      <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+        <Button
+          label="Cerrar"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
+          @click="visibleLocal = false"
         />
         <Button
           label="Guardar datos"
-          :loading="loading"
+          :loading="cargando"
           :disabled="!tieneCambios"
-          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-5 py-4 rounded-lg border-none cursor-pointer shadow-lg transition-colors"
-          @click="handleUpdate"
+          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center disabled:!opacity-50"
+          @click="procesarActualizacion"
         />
       </div>
     </div>
@@ -103,11 +121,17 @@
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
 import Button from 'primevue/button'
-import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/usuarioStore'
+import BaseInput from '../base/BaseInput.vue'
+import BasePassword from '../base/BasePassword.vue'
+import { 
+  mostrarExito, 
+  mostrarError, 
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando
+} from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -117,8 +141,8 @@ const props = defineProps({
 const emit = defineEmits(['update:visible'])
 
 const store = useUserStore()
-const localVisible = ref(false)
-const loading = ref(false)
+const visibleLocal = ref(false)
+const cargando = ref(false)
 
 const form = reactive({
   name: '',
@@ -144,12 +168,11 @@ const cargarDatosUsuario = () => {
 
 watch(
   () => props.visible,
-  (visible) => {
-    localVisible.value = visible
+  (esVisible) => {
+    visibleLocal.value = esVisible
 
-    if (visible) {
+    if (esVisible) {
       cargarDatosUsuario()
-     
     }
   },
   { immediate: true },
@@ -158,19 +181,18 @@ watch(
 watch(
   () => props.user,
   () => {
-    if (localVisible.value) {
+    if (visibleLocal.value) {
       cargarDatosUsuario()
-       console.log('Usuario a editar:', props.user)
     }
   },
   { deep: true },
 )
 
-watch(localVisible, (visible) => {
-  emit('update:visible', visible)
+watch(visibleLocal, (esVisible) => {
+  emit('update:visible', esVisible)
 })
 
-const resetForm = () => {
+const reiniciarFormulario = () => {
   form.name = ''
   form.password = ''
   form.confirmPassword = ''
@@ -179,7 +201,7 @@ const resetForm = () => {
   errors.password = ''
   errors.confirmPassword = ''
 }
-//validaciones para el nombre
+
 const validarNombre = () => {
   const nombre = form.name.trim()
 
@@ -193,9 +215,8 @@ const validarNombre = () => {
     return false
   }
 
-  // Expresión regular: Solo letras (con tildes/ñ) y espacios
   const regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
-  
+
   if (!regexLetras.test(nombre)) {
     errors.name = 'El nombre no puede contener números ni caracteres especiales.'
     return false
@@ -205,30 +226,30 @@ const validarNombre = () => {
   return true
 }
 
-const validarPassword = () => {
-  const v = form.password
-  if (!v) {
+const validarContrasena = () => {
+  const clave = form.password
+  if (!clave) {
     errors.password = ''
     return true
   }
-  if (v.length < 8) {
+  if (clave.length < 8) {
     errors.password = 'Mínimo 8 caracteres.'
     return false
   }
-  if (/\s/.test(v)) {
+  if (/\s/.test(clave)) {
     errors.password = 'No puede contener espacios.'
     return false
   }
-  if (!/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v)) {
+  if (!/[A-Z]/.test(clave) || !/[a-z]/.test(clave) || !/[0-9]/.test(clave) || !/[^A-Za-z0-9]/.test(clave)) {
     errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
     return false
   }
   errors.password = ''
-  if (form.confirmPassword) validarConfirmPassword()
+  if (form.confirmPassword) validarConfirmarContrasena()
   return true
 }
 
-const validarConfirmPassword = () => {
+const validarConfirmarContrasena = () => {
   if (!form.confirmPassword && !form.password) {
     errors.confirmPassword = ''
     return true
@@ -241,75 +262,68 @@ const validarConfirmPassword = () => {
   return true
 }
 
-
 const tieneCambios = computed(() => {
   const nombreOriginal = props.user?.name ?? ''
-  
-  // Si cambió el nombre, o si escribió algo en el campo de contraseña
+
   const cambioNombre = form.name.trim() !== nombreOriginal.trim()
   const cambioPassword = form.password.length > 0
 
   return cambioNombre || cambioPassword
 })
 
-// Guardamos
-const handleUpdate = async () => {
-
-  //  NUEVA VALIDACIÓN: Si no se modificó nada, frena y avisa
+const procesarActualizacion = async () => {
   if (!tieneCambios.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Sin cambios',
-      text: 'No se editó ningún campo.',
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Entendido'
+    mostrarAlertaConfirmar({
+      tipo: 'advertencia',
+      titulo: 'Sin cambios',
+      mensajeHtml: 'No se editó ningún campo.'
     })
     return
   }
-  const nombreOk = validarNombre()
-  const passwordOk = validarPassword()
-  const confirmOk = validarConfirmPassword()
+  const nombreValido = validarNombre()
+  const contrasenaValida = validarContrasena()
+  const confirmacionValida = validarConfirmarContrasena()
 
   if (form.password && !form.confirmPassword) {
     errors.confirmPassword = 'Debes confirmar la contraseña.'
     return
   }
 
-  if (!nombreOk || !passwordOk || !confirmOk) return
+  if (!nombreValido || !contrasenaValida || !confirmacionValida) return
 
-  loading.value = true
+  cargando.value = true
+  mostrarCargando('Guardando cambios...', 'Actualizando información del usuario')
 
-  const payload = {
+  const cargaUtil = {
     name: form.name.trim(),
     rol: props.user?.roles?.[0]?.name || '',
   }
 
   if (form.password) {
-    payload.password = form.password
-    payload.password_confirmation = form.confirmPassword
+    cargaUtil.password = form.password
+    cargaUtil.password_confirmation = form.confirmPassword
   }
 
-  const resultado = await store.updateUser(props.user?.id, payload)
+  try {
+    const [resultado] = await Promise.all([
+      store.updateUser(props.user?.id, cargaUtil),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
 
-  loading.value = false
-
-  if (resultado.ok) {
-    localVisible.value = false
-
-    await Swal.fire({
-      icon: 'success',
-      title: '¡Datos actualizados!',
-      text: 'Los datos del usuario fueron actualizados exitosamente.',
-      confirmButtonColor: '#2b5e3b',
-      confirmButtonText: 'Aceptar',
-    })
-  } else if (resultado.error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error al actualizar',
-      text: resultado.error,
-      confirmButtonColor: '#2b5e3b',
-    })
+    if (resultado.ok) {
+      visibleLocal.value = false
+      await mostrarExito('¡Datos actualizados!', 'Los datos del usuario fueron actualizados exitosamente.')
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else if (resultado.error) {
+      mostrarError('Error al actualizar', resultado.error)
+    } else {
+      mostrarError('Error inesperado', 'No se pudieron guardar los cambios.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'Ocurrió un problema de red al procesar la actualización.')
+  } finally {
+    cargando.value = false
   }
 }
 </script>
@@ -320,24 +334,24 @@ const handleUpdate = async () => {
 }
 
 .custom-dialog .p-dialog-header {
-  background-color: #1e3a2f !important;
+  background-color: #1a3323 !important;
   color: #ffffff !important;
-  border-bottom: 1px solid #e2e8dd;
+  border-bottom: 1px solid #2b5e3b !important;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.1rem 1.5rem !important;
 }
 
 .custom-dialog .p-dialog-content {
   background-color: #ffffff !important;
-  padding: 1.5rem !important;
+  padding: 0 !important;
 }
 
 .p-inputtext:enabled:focus,
 .p-password-input:enabled:focus {
-  box-shadow: 0 0 0 2px rgba(43, 94, 59, 0.2) !important;
+  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
 

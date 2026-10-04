@@ -24,12 +24,13 @@ export const getDetallesVenta = (id) => {
   return api.get(`/ventas/${id}`)
 }
 
- 
+// PENDIENTE: la anulación de ventas se implementará después de cerrar el módulo de caja.
 export const anularVenta = (id) => {
   return api.patch(`/ventas/${id}/anular`)
 }
 
-// Si en algún momento necesitas consumir el ticket vía Axios
+// El ticket exige token (auth:api), por eso NO se puede abrir con window.open(url):
+// se pide por axios como blob y se abre desde un object URL.
 export const imprimirTicketPDF = (ventaId) => {
-  return api.get(`/reportes/ticket/${ventaId}`)
+  return api.get(`/reportes/ticket/${ventaId}`, { responseType: 'blob' })
 }

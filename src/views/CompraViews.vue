@@ -24,6 +24,7 @@
     <DetalleCompraDialogo
       v-model:visible="mostrarDetalleDialog"
       :compra="selectedCompra"
+      @compra-actualizada="onCompraActualizada"
     />
   </div>
 </template>
@@ -97,6 +98,16 @@ const verDetalleCompra = async (compraRow) => {
     console.error('Error al cargar detalle de compra:', error)
   }
 }
+
+const onCompraActualizada = async () => {
+  // Refrescar la tabla
+  await cargarCompras(paginacion.value.currentPage)
+  // Refrescar el detalle abierto
+  if (selectedCompra.value) {
+    await verDetalleCompra(selectedCompra.value)
+  }
+}
+
 // Funcion para el boton a amular la compra// kathi
 const anularCompra = async (compraId) => {
   try {

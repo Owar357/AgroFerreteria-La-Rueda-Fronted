@@ -2,7 +2,7 @@
   <div>
     <UserTable
       @open-add="showAddModal = true"
-      @open-edit="prepareEdit"
+      @open-edit="prepararEdicion"
     />
 
     <AddUserDialog
@@ -32,8 +32,8 @@ const userToEdit    = ref(null)
 
 onMounted(() => store.fetchUsers())
 
-const prepareEdit = (user) => {
-  userToEdit.value  = { ...user }
+const prepararEdicion = (user) => {
+  userToEdit.value   = { ...user }
   showEditModal.value = true
 }
 </script>
