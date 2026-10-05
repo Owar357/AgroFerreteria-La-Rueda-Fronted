@@ -248,12 +248,13 @@
 
               </div>
 
-              <!-- Botones Móvil -->
+              <!-- Botones Móvil Outlined -->
               <div class="mt-3 flex justify-end">
                 <Button
                   icon="pi pi-eye"
                   label="Ver Detalle"
-                  class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer shadow-2xs w-full justify-center"
+                  outlined
+                  class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer shadow-2xs w-full justify-center"
                   @click="$emit('ver-detalle', slotProps.data)"
                 />
               </div>
@@ -347,7 +348,7 @@
             </template>
           </Column>
 
-          <!-- Acciones -->
+          <!-- Acciones Outlined -->
           <Column header="Acción" class="w-[6rem] shrink-0 text-center">
             <template #body="slotProps">
               <div class="flex items-center justify-center">
@@ -358,7 +359,8 @@
                 <template v-else>
                   <Button
                     icon="pi pi-eye"
-                    class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm cursor-pointer"
+                    outlined
+                    class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] w-8 h-8 rounded-full p-0 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
                     v-tooltip.top="'Ver detalle'"
                     @click="$emit('ver-detalle', slotProps.data)"
                   />
@@ -468,6 +470,7 @@ const formatearMoneda = (valor) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 </script>
+
 <style>
 .p-datatable-custom .p-datatable-thead > tr > th {
   background-color: #fbfdf9 !important;
