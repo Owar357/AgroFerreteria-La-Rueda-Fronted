@@ -28,14 +28,24 @@ api.interceptors.request.use(
   },
 )
 
-// aqio se Capturan de forma global sesiones que expriran
+// Interceptor de respuesta (ÚNICO): captura sesiones expiradas o tokens inválidos.
+// No actúa sobre la petición de login, para que las credenciales incorrectas
+// lleguen al catch y se muestre la alerta en lugar de recargar la página.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem(USER_KEY)
-      localStorage.removeItem(ROLE_KEY)
+    const status = error.response?.status
+    const mensaje = (error.response?.data?.message || '').toLowerCase()
+    const esPeticionLogin = error.config?.url?.includes('/auth/login')
+
+    const esTokenInvalido =
+      status === 401 ||
+      mensaje.includes('token expirado') ||
+      mensaje.includes('token inválido') ||
+      mensaje.includes('no autenticado')
+
+    if (esTokenInvalido && !esPeticionLogin) {
+      clearSession()
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login'
       }
@@ -129,25 +139,5 @@ const authService = {
     return getHomeRouteByRole(this.getUserRole())
   },
 }
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error.response?.status
-    const mensaje = (error.response?.data?.message || '').toLowerCase()
-    const esTokenInvalido =
-      status === 401 ||
-      mensaje.includes('token expirado') ||
-      mensaje.includes('token inválido') ||
-      mensaje.includes('no autenticado')
-
-    if (esTokenInvalido) {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem(USER_KEY)
-      localStorage.removeItem(ROLE_KEY)
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  },
-)
 
 export default authService
