@@ -1,43 +1,44 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
-      <!-- ======================================================= -->
-      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
-      <!-- ======================================================= -->
-      <div class="block lg:hidden mb-4">
-        <div class="flex items-center gap-3">
-          <div
-            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
-            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-              Historial de Clientes
-            </h1>
-            <p class="text-xs text-gray-500 mt-0.5 m-0">
-              Directorio general y registro de compras
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-      <!-- ======================================================= -->
-      <div class="hidden lg:flex items-center gap-3 mb-6">
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden mb-4">
+      <div class="flex items-center gap-3">
         <div
-          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
             Historial de Clientes
           </h1>
-          <p class="text-sm text-gray-500 mt-0.5 m-0">
-            Directorio general de clientes y registro de compras
+          <p class="text-xs text-gray-500 mt-0.5 m-0">
+            Directorio general y registro de compras
           </p>
         </div>
       </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:flex items-center gap-3 mb-6">
+      <div
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+          Historial de Clientes
+        </h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">
+          Directorio general de clientes y registro de compras
+        </p>
+      </div>
+    </div>
+
     <!-- TARJETA CONTENEDORA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
 
@@ -48,15 +49,14 @@
         <div class="flex flex-col gap-3">
 
           <IconField class="w-full relative flex items-center h-[2.5rem]">
-            <InputIcon class="pi pi-search text-gray-400   pointer-events-none z-10" />
+            <InputIcon class="pi pi-search text-gray-400 pointer-events-none z-10" />
             <InputText
               v-model="filters['global'].value"
               placeholder="Buscar por nombre o N° documento..."
-              class="w-full !h-[2.5rem] !bg-white !border-gray-300 text-[#1a2e1f] text-[20%] rounded-xl !pl-9 focus:!border-[#2b5e3b] box-border"
+              class="w-full !h-[2.5rem] !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl !pl-9 focus:!border-[#2b5e3b] box-border"
             />
           </IconField>
 
-          <!-- Tipo Persona Móvil igualado a 40px -->
           <Select
             v-model="filters['tipo_persona'].value"
             :options="tipoPersonaOpciones"
@@ -182,19 +182,21 @@
 
               </div>
 
-              <!-- Botones Móvil -->
+              <!-- Botones Móvil Outlined -->
               <div class="mt-3 flex gap-2 justify-end items-center">
                 <Button
                   icon="pi pi-eye"
                   label="Ver Detalles"
-                  class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
+                  outlined
+                  class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
                   @click="$emit('view-detail', slotProps.data)"
                 />
 
                 <Button
                   icon="pi pi-history"
                   label="Historial"
-                  class="!bg-[#a17923] hover:!bg-[#8c671e] !text-white !border-none rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
+                  outlined
+                  class="!border-[#a17923] !text-[#a17923] hover:!bg-[#fefce8] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
                   @click="$emit('view-history', slotProps.data)"
                 />
               </div>
@@ -258,7 +260,7 @@
             </template>
           </Column>
 
-          <!-- Acciones -->
+          <!-- Acciones Outlined -->
           <Column header="Acciones" class="w-[8rem] shrink-0 text-center">
             <template #body="slotProps">
               <div class="flex items-center gap-2 justify-center">
@@ -270,13 +272,15 @@
                 <template v-else>
                   <Button
                     icon="pi pi-eye"
-                    class="!bg-[#2b5e3b] hover:!bg-[#1f482d] border-none text-white w-8 h-8 rounded-full p-0 transition-colors shadow-sm cursor-pointer"
+                    outlined
+                    class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] w-8 h-8 rounded-full p-0 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
                     v-tooltip.top="'Ver detalles'"
                     @click="$emit('view-detail', slotProps.data)"
                   />
                   <Button
                     icon="pi pi-history"
-                    class="!bg-[#a17923] hover:!bg-[#8c671e] text-white border-none w-8 h-8 rounded-full p-0 transition-colors shadow-sm cursor-pointer"
+                    outlined
+                    class="!border-[#a17923] !text-[#a17923] hover:!bg-[#fefce8] w-8 h-8 rounded-full p-0 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
                     v-tooltip.top="'Ver historial de compras'"
                     @click="$emit('view-history', slotProps.data)"
                   />
