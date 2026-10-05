@@ -48,17 +48,21 @@
     >
       <!-- COLUMNA IZQUIERDA -->
       <div class="flex flex-col overflow-hidden" style="padding: 20px">
+        
+        <!-- CABECERA ACTUALIZADA (CON ICONO VERDE Y DISEÑO NUEVO) -->
         <div
           class="flex items-center justify-between mb-4 pb-4"
           style="border-bottom: 1px solid #e2e8dd"
         >
           <div class="flex items-center gap-3">
-            <i class="pi pi-shopping-cart" style="color: #e0b354; font-size: 20px"></i>
+            <div class="!w-10 !h-10 rounded-xl bg-[#2b5e3b] text-white flex items-center justify-center shadow-md shrink-0">
+              <i class="pi pi-shopping-cart text-lg"></i>
+            </div>
             <div>
-              <span style="font-size: 18px; font-weight: 600; color: #1a2e1f; display: block"
+              <span style="font-size: 18px; font-weight: 700; color: #1a2e1f; display: block; line-height: 1.2;"
                 >Punto de Venta</span
               >
-              <span style="font-size: 12px; color: #6b7280">{{ fechaActual }}</span>
+              <span style="font-size: 12px; color: #6d8f60">{{ fechaActual }}</span>
             </div>
           </div>
           <div class="flex items-center gap-2">

@@ -1,98 +1,267 @@
 <template>
   <Dialog
-    :visible="visible"
-    @update:visible="$emit('update:visible', $event)"
+    v-model:visible="visibleModel"
     modal
-    :header="'Detalle de Factura — ' + (compra?.factura || '')"
-    :style="{ width: '620px' }"
-    :pt="{
-      root: { style: 'border-radius: 12px; overflow: hidden;' },
-      header: { style: 'background:#1e3a2f; color:white; font-family:Poppins,sans-serif;' },
-      closeButton: { style: 'color:white;' }
-    }"
+    header="DETALLE DE FACTURA"
+    :draggable="false"
+    :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 48rem)' }"
+    class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
   >
-    <div class="p-4">
+    <template v-if="compra">
+      <!-- ======================================================= -->
+      <!-- VISTA MÓVIL (< 640px)                                   -->
+      <!-- ======================================================= -->
+      <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif] max-h-[85vh] overflow-y-auto">
+        
+        <!-- Subcabecera con Nº Factura -->
+        <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
+          <span class="text-xs font-bold uppercase text-[#2b5e3b]">N° Factura</span>
+          <span class="text-xs font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-2.5 py-1 rounded-md border border-[#dce4d7]">
+            {{ compra.factura || '—' }}
+          </span>
+        </div>
 
-      <!-- Tabla -->
-      <DataTable
-        :value="productos"
-        class="p-datatable-custom text-[13px]"
-        responsiveLayout="scroll"
-      >
-        <template #empty>
-          <div class="text-center py-6 text-[#6b7280] text-[13px]">
-            No hay productos registrados.
+        <!-- Tabla Desplegable / Con Scroll Móvil -->
+        <div class="space-y-2">
+          <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center gap-3.5">
+            <i class="pi pi-box text-[#2b5e3b]" /> Productos Registrados
+          </p>
+
+          <div class="rounded-xl border border-[#e2e8dd] overflow-hidden bg-white shadow-2xs">
+            <DataTable
+              v-model:expandedRows="expandedRows"
+              :value="productos"
+              :loading="cargando"
+              dataKey="nombre"
+              scrollable
+              scrollHeight="220px"
+              class="p-datatable-custom text-xs w-full"
+            >
+              <template #empty>
+                <div class="text-center py-6 text-gray-400 text-xs">
+                  No hay productos registrados en esta factura.
+                </div>
+              </template>
+
+              <!-- Columna Expansible -->
+              <Column expander style="width: 2.2rem" />
+
+              <Column header="Producto">
+                <template #body="{ data }">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-[#1a2e1f] capitalize">
+                      {{ data.nombre }}
+                    </span>
+                    <span class="text-[10px] text-gray-500">
+                      Cant: {{ data.cantidad }}
+                    </span>
+                  </div>
+                </template>
+              </Column>
+
+              <Column header="Subtotal" class="text-right">
+                <template #body="{ data }">
+                  <span class="font-bold text-[#1a2e1f] font-mono">
+                    ${{ formatCurrency(data.cantidad * data.precio) }}
+                  </span>
+                </template>
+              </Column>
+
+              <!-- Desplegable Móvil -->
+              <template #expansion="{ data }">
+                <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+                  <div class="bg-white p-3 rounded-lg border border-[#e2e8dd] space-y-2">
+                    <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                      <span class="text-gray-500 font-medium">Cantidad:</span>
+                      <span class="font-mono font-bold text-[#1a2e1f]">{{ data.cantidad }}</span>
+                    </div>
+                    <div class="flex justify-between pb-1.5 border-b border-gray-100">
+                      <span class="text-gray-500 font-medium">Precio Unitario:</span>
+                      <span class="font-mono">${{ formatCurrency(data.precio) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-500 font-medium">Subtotal Línea:</span>
+                      <span class="font-mono font-bold text-[#2b5e3b]">
+                        ${{ formatCurrency(data.cantidad * data.precio) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </DataTable>
           </div>
-        </template>
+        </div>
 
-        <Column field="nombre" header="Producto">
-          <template #body="{ data }">
-            <span class="font-medium text-[#1a2e1f]">{{ data.nombre }}</span>
-          </template>
-        </Column>
-
-        <Column field="cantidad" header="Cantidad" class="w-[90px]">
-          <template #body="{ data }">
-            <span class="text-[#4b5563]">{{ data.cantidad }}</span>
-          </template>
-        </Column>
-
-        <Column field="precio" header="Precio Unit." class="w-[110px]">
-          <template #body="{ data }">
-            <span class="text-[#4b5563]">${{ data.precio.toFixed(2) }}</span>
-          </template>
-        </Column>
-
-        <Column header="Subtotal" class="w-[110px]">
-          <template #body="{ data }">
-            <span class="font-semibold text-[#2b5e3b]">
-              ${{ (data.cantidad * data.precio).toFixed(2) }}
-            </span>
-          </template>
-        </Column>
-      </DataTable>
-
-      <!-- Resumen -->
-      <div class="mt-5 flex justify-end">
-        <div class="flex flex-col gap-2 min-w-[200px]">
-
-          <div class="flex justify-between text-[13px] text-[#4b5563]">
-            <span>Grabado</span>
-            <span>$0.00</span>
+        <!-- Resumen Financiero Móvil -->
+        <div class="bg-[#fbfdf9] rounded-xl border border-[#e2e8dd] p-3.5 space-y-2 text-xs">
+          <div class="flex justify-between items-center text-gray-600">
+            <span>Gravado:</span>
+            <span class="font-mono">$0.00</span>
           </div>
-
-          <div class="flex justify-between text-[13px] text-[#4b5563]">
-            <span>Exento</span>
-            <span>$0.00</span>
+          <div class="flex justify-between items-center text-gray-600">
+            <span>Exento:</span>
+            <span class="font-mono">$0.00</span>
           </div>
-
-          <div class="flex justify-between text-[13px] text-[#4b5563]">
-            <span>IVA (13%)</span>
-            <span>$0.00</span>
+          <div class="flex justify-between items-center text-gray-600 pb-2 border-b border-[#e2e8dd]">
+            <span>IVA (13%):</span>
+            <span class="font-mono">$0.00</span>
           </div>
-
-          <div class="border-t border-[#e2e8dd] my-1" />
-
-          <div class="flex justify-between items-center">
-            <span class="text-[15px] font-bold text-[#1a2e1f]" style="font-family:'Poppins',sans-serif;">
-              Total
-            </span>
-            <span class="text-[20px] font-bold text-[#1e3a2f]" style="font-family:'Poppins',sans-serif;">
-              ${{ compra?.total?.toFixed(2) || '0.00' }}
-            </span>
+          <div class="flex justify-between items-center pt-1">
+            <span class="font-bold text-[#1e3a2f] uppercase">Total Factura:</span>
+            <span class="text-lg font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra?.total) }}</span>
           </div>
+        </div>
 
+        <!-- Botón Cierre Móvil -->
+        <div class="pt-2 flex flex-col gap-2 w-full">
+          <Button
+            label="Cerrar factura"
+            icon="pi pi-times"
+            severity="secondary"
+            outlined
+            class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
+            @click="visibleModel = false"
+          />
         </div>
       </div>
 
-    </div>
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO (>= 640px)                             -->
+      <!-- ======================================================= -->
+      <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+        
+        <!-- Subcabecera Nº Factura -->
+        <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-receipt text-[#2b5e3b] text-base" />
+            <span class="text-xs font-bold uppercase tracking-wider text-[#2b5e3b]">Factura N°</span>
+          </div>
+          <span class="text-sm font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-3 py-1 rounded-lg border border-[#dce4d7]">
+            {{ compra.factura || '—' }}
+          </span>
+        </div>
+
+        <!-- Tabla Completa con Scrollable (Escritorio) -->
+        <div class="space-y-2">
+          <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center pb-3 gap-1.5">
+            <i class="pi pi-box text-[#2b5e3b]" /> Productos Registrados
+          </p>
+
+          <div class="rounded-2xl border border-[#e2e8dd] overflow-hidden bg-white shadow-2xs">
+            <DataTable
+              v-model:expandedRows="expandedRows"
+              :value="productos"
+              :loading="cargando"
+              dataKey="nombre"
+              scrollable
+              scrollHeight="280px"
+              responsiveLayout="scroll"
+              class="p-datatable-custom text-xs w-full"
+            >
+              <template #empty>
+                <div class="text-center py-8 text-gray-400 text-sm">
+                  No hay productos registrados en esta factura.
+                </div>
+              </template>
+
+              <!-- Columna Expansible -->
+              <Column expander style="width: 2.5rem" />
+
+              <Column header="Producto" class="font-semibold text-[#1a2e1f]">
+                <template #body="{ data }">
+                  <span class="font-bold text-[#1a2e1f] capitalize">
+                    {{ data.nombre }}
+                  </span>
+                </template>
+              </Column>
+
+              <Column header="Cantidad" class="text-center">
+                <template #body="{ data }">
+                  <span class="font-mono font-semibold text-gray-700">{{ data.cantidad }}</span>
+                </template>
+              </Column>
+
+              <Column header="Precio Unit." class="text-right">
+                <template #body="{ data }">
+                  <span class="font-mono">${{ formatCurrency(data.precio) }}</span>
+                </template>
+              </Column>
+
+              <Column header="Subtotal" class="text-right">
+                <template #body="{ data }">
+                  <span class="font-bold text-[#1a2e1f] font-mono">
+                    ${{ formatCurrency(data.cantidad * data.precio) }}
+                  </span>
+                </template>
+              </Column>
+
+              <!-- Desplegable con Detalle Secundario -->
+              <template #expansion="{ data }">
+                <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
+                  <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] grid grid-cols-3 gap-4">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Cantidad Comprada</span>
+                      <span class="font-mono text-gray-700">{{ data.cantidad }}</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Precio Unitario</span>
+                      <span class="font-mono text-gray-700">${{ formatCurrency(data.precio) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Subtotal de Línea</span>
+                      <span class="font-mono font-bold text-[#2b5e3b]">
+                        ${{ formatCurrency(data.cantidad * data.precio) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </DataTable>
+          </div>
+        </div>
+
+        <!-- Resumen y Cierre Escritorio -->
+        <div class="flex justify-between items-end mt-1 pt-4 border-t border-[#e2e8dd] w-full">
+          <!-- Desglose de Totales -->
+          <div class="flex flex-col gap-1.5 min-w-[220px] text-xs bg-[#fbfdf9] p-3 rounded-xl border border-[#e2e8dd]">
+            <div class="flex justify-between text-gray-600">
+              <span>Gravado:</span>
+              <span class="font-mono">$0.00</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+              <span>Exento:</span>
+              <span class="font-mono">$0.00</span>
+            </div>
+            <div class="flex justify-between text-gray-600 pb-1.5 border-b border-[#e2e8dd]">
+              <span>IVA (13%):</span>
+              <span class="font-mono">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center pt-0.5">
+              <span class="font-bold text-[#1e3a2f]">TOTAL:</span>
+              <span class="text-xl font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra?.total) }}</span>
+            </div>
+          </div>
+
+          <Button
+            label="Cerrar factura"
+            icon="pi pi-times"
+            severity="secondary"
+            outlined
+            class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[30%] flex justify-center items-center"
+            @click="visibleModel = false"
+          />
+        </div>
+      </div>
+    </template>
   </Dialog>
 </template>
-
 
 <script setup>
 import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { getDetallesVenta } from '@/services/ventaService'
@@ -106,10 +275,20 @@ const props = defineProps({
   compra: Object
 })
 
-defineEmits(['update:visible'])
+const emit = defineEmits(['update:visible'])
+
+const visibleModel = ref(props.visible)
+watch(() => props.visible, (val) => { visibleModel.value = val })
+watch(visibleModel, (val) => { emit('update:visible', val) })
 
 const productos = ref([])
 const cargando = ref(false)
+const expandedRows = ref({})
+
+const formatCurrency = (v) => {
+  const num = parseFloat(v)
+  return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
 
 watch(() => props.visible, async (val) => {
   if (val && props.compra?.id) {
@@ -138,22 +317,37 @@ watch(() => props.visible, async (val) => {
 </script>
 
 <style>
+/* Encabezado sin 'X' y paleta AgroFerretería */
+.custom-dialog .p-dialog-header {
+  background-color: #1a3323 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #2b5e3b !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1.1rem 1.5rem !important;
+}
+
+/* Limpieza del contenedor de contenido */
+.custom-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  padding: 0 !important;
+}
+
+/* Estilos de la DataTable personalizada para detalles */
 .p-datatable-custom .p-datatable-thead > tr > th {
-  background-color: #f4f7f2 !important;
-  color: #1e3a2f !important;
-  border-bottom: 2px solid #c8d8c0 !important;
-  font-size: 12px;
-  font-weight: 600;
+  background-color: #fcfdfe !important;
+  border-bottom: 1px solid #e2e8dd !important;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem !important;
 }
-.p-datatable-custom .p-datatable-tbody > tr {
-  background-color: #ffffff !important;
-  color: #1a2e1f !important;
-  border-bottom: 1px solid #e2e8dd !important;
-}
-.p-datatable-custom .p-datatable-tbody > tr:hover {
-  background-color: #f4f7f2 !important;
+
+.p-datatable-custom .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid #f1f5f0 !important;
 }
 </style>
