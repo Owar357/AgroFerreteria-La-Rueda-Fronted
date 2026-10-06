@@ -25,6 +25,15 @@
             <span>Fabricante: <strong class="text-gray-800 capitalize">{{ producto.fabricante }}</strong></span>
           </div>
         </div>
+
+        <!-- STOCK TOTAL (solo granel: el stock es compartido entre presentaciones) -->
+        <div
+          v-if="esGranel"
+          class="bg-[#2b5e3b]/10 text-[#2b5e3b] rounded-xl px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap"
+        >
+          Stock total:
+          <strong class="font-bold capitalize">{{ formatStock(stockBase) }} {{ unidadBaseProducto }}</strong>
+        </div>
       </div>
     </div>
 
@@ -102,10 +111,11 @@
                         </div>
                         <div>
                           <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                            Stock
+                            {{ esGranel ? 'Disponible' : 'Stock' }}
                           </span>
                           <span class="text-xs font-bold text-gray-800 block">
-                            {{ data.stock }}
+                            {{ formatStock(stockDisponible(data)) }}
+                            <span v-if="esGranel" class="font-normal text-gray-400 capitalize">{{ data.nombre }}</span>
                           </span>
                         </div>
                       </div>
@@ -169,8 +179,12 @@
                   <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
                 </Column>
 
-                <Column field="stock" header="Stock" class="text-sm text-gray-700 min-w-[5rem]">
-                  <template #body="{ data }"> {{ data.stock }} </template>
+                <!-- GRANEL: "Disponible" calculado por presentación | UNIDAD FIJA: "Stock" propio -->
+                <Column :header="esGranel ? 'Disponible' : 'Stock'" class="text-sm text-gray-700 min-w-[5rem]">
+                  <template #body="{ data }">
+                    {{ formatStock(stockDisponible(data)) }}
+                    <span v-if="esGranel" class="text-xs text-gray-400 capitalize">{{ data.nombre }}</span>
+                  </template>
                 </Column>
 
                 <Column field="estado" header="Estado" class="text-sm min-w-[6rem]">
@@ -279,6 +293,7 @@ const producto = ref({
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
+  tipo_producto: props.producto.tipo_producto || null,
   unidad_medida_id: props.producto.unidad_medida_id || props.producto.unidad_medida?.id || null,
   unidad_medida: props.producto.unidad_medida || null,
 })
@@ -308,6 +323,26 @@ const unidadBaseProducto = computed(() => {
   return '—'
 })
 
+
+const esGranel = computed(() => producto.value.tipo_producto === 'GRANEL')
+
+// En granel el stock total vive en la presentación base (unidad base)
+const stockBase = computed(() => {
+  const base = presentaciones.value.find((p) => p.es_base) ?? presentaciones.value[0]
+  return base?.stock ?? 0
+})
+
+
+const stockDisponible = (pres) => {
+  if (!esGranel.value) return pres.stock
+  if (!pres.factor_conversion) return 0
+  const disponible = stockBase.value / pres.factor_conversion
+  return pres.es_base ? disponible : Math.floor(disponible)
+}
+
+
+const formatStock = (value) => Number(Number(value ?? 0).toFixed(2))
+
 onMounted(async () => {
   await cargarPresentaciones()
 })
@@ -324,7 +359,7 @@ const cargarPresentaciones = async () => {
       unidadMedida: p.unidad_medida,
       factor_conversion: Number(p.factor_conversion) || 0,
       precio: parseFloat(p.precio_venta ?? 0),
-      stock: (p.stock !== null && p.stock !== undefined) ? Number(p.stock) : 0,
+      stock: Number(p.stock_actual ?? 0),
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
       es_base: p.es_base ?? false,
     }))
