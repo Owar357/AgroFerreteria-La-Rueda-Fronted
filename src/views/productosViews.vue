@@ -39,6 +39,8 @@
           v-else-if="vistaActual === 'lotes'"
           :presentacionId="presentacionSeleccionada?.id"
           :nombrePresentacion="presentacionSeleccionada?.nombre"
+          :esGranel="presentacionSeleccionada?.esGranel"
+          :nombreBase="presentacionSeleccionada?.nombreBase"
           @volver="cerrarLotes"
         />
       </div>
