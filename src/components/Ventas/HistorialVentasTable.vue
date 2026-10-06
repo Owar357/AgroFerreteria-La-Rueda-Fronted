@@ -53,9 +53,11 @@
             <InputText
               v-model="busqueda"
               placeholder="Buscar factura, vendedor..."
+              maxlength="100"
               class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl h-10 focus:!border-[#2b5e3b]"
             />
           </IconField>
+          <small v-if="busqueda.length >= 100" class="text-red-600 text-xs">Has llegado al límite de caracteres permitidos.</small>
 
           <!-- Estado y Pago Móvil -->
           <div class="grid grid-cols-2 gap-2">
@@ -104,14 +106,18 @@
           <!-- FILA 1: Buscador, Estado y Tipo de Pago -->
           <div class="flex items-center gap-3 w-full">
             <!-- Buscador -->
-            <IconField class="w-[50%] shrink-0">
-              <InputIcon class="pi pi-search text-gray-400 text-sm" />
-              <InputText
-                v-model="busqueda"
-                placeholder="Buscar por nº de factura o nombre de vendedor..."
-                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 focus:!border-[#2b5e3b]"
-              />
-            </IconField>
+            <div class="w-[50%] shrink-0">
+              <IconField class="w-full">
+                <InputIcon class="pi pi-search text-gray-400 text-sm" />
+                <InputText
+                  v-model="busqueda"
+                  placeholder="Buscar por nº de factura o nombre de vendedor..."
+                  maxlength="100"
+                  class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 focus:!border-[#2b5e3b]"
+                />
+              </IconField>
+              <small v-if="busqueda.length >= 100" class="text-red-600 text-xs">Has llegado al límite de caracteres permitidos.</small>
+            </div>
 
             <!-- Estado -->
             <Select

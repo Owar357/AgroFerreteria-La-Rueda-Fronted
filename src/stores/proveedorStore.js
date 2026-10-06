@@ -5,6 +5,7 @@ import {
   createProveedor,
   updateProveedor,
   desactivarProveedor as desactivarProveedorService,
+  activarProveedor as activarProveedorService,
 } from '../services/proveedorService'
 
 export const useProveedorStore = defineStore('proveedor', () => {
@@ -95,6 +96,25 @@ export const useProveedorStore = defineStore('proveedor', () => {
     }
   }
 
+   const activarProveedor = async (id) => {
+    try {
+      const response = await activarProveedorService(id)
+
+      const index = proveedores.value.findIndex((p) => p.id === id)
+      if (index !== -1) proveedores.value[index].activo = true
+
+      return { ok: true, data: response?.data }
+    } catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
+      return {
+        ok: false,
+        status,
+        error: responseData?.message || 'Error al activar el proveedor.',
+      }
+    }
+  }
+
   return {
     proveedores,
     cargando,
@@ -105,5 +125,6 @@ export const useProveedorStore = defineStore('proveedor', () => {
     crearProveedor,
     actualizarProveedor,
     desactivarProveedor,
+    activarProveedor,
   }
 })
