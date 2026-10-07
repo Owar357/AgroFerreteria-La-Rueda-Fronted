@@ -98,7 +98,7 @@
         <div class="block md:hidden space-y-4">
           <BaseInput
             v-model="nombre"
-            label="Nombre del Producto *"
+            label="Nombre del Producto"
             placeholder="Ej: Fertilizante Triple 15"
             filter="alphanum"
             class="w-full"
@@ -107,7 +107,7 @@
 
           <BaseInput
             v-model="fabricante"
-            label="Fabricante *"
+            label="Fabricante o Marca"
             placeholder="Ej: Fertica, Bayer, etc."
             filter="alpha"
             class="w-full"
@@ -115,8 +115,8 @@
           />
 
           <div class="flex flex-col gap-1.5 w-full">
-            <label class="text-xs font-semibold text-gray-700">
-              Categoría <span class="text-red-500">*</span>
+            <label class="font-semibold text-gray-700">
+              Categoría
             </label>
             <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
               placeholder="Buscar categoría..." @complete="buscarCategorias" :pt="{
@@ -226,7 +226,7 @@
             <!-- Nombre del Producto -->
             <BaseInput size="responsive"
               v-model="nombre"
-              label="Nombre del Producto *"
+              label="Nombre del Producto"
               placeholder="Ej: Fertilizante Triple 15"
               filter="alphanum"
               class="col-span-1 md:col-span-2 w-[145%]"
@@ -236,7 +236,7 @@
             <!-- Fabricante -->
             <BaseInput size="responsive"
               v-model="fabricante"
-              label="Fabricante *"
+              label="Fabricante o Marca"
               placeholder="Ej: Fertica, Bayer, etc."
               filter="alpha"
               class="col-span-1 md:col-span-2 w-[45%]"
@@ -245,8 +245,8 @@
 
             <!-- Categoría -->
             <div class="flex flex-col gap-1.5 col-span-1 w-[45%]">
-              <label class="text-xs sm:text-sm font-semibold text-gray-700">
-                Categoría <span class="text-red-500">*</span>
+              <label class="font-semibold text-gray-700">
+                Categoría 
               </label>
               <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
                 placeholder="Buscar categoría..." @complete="buscarCategorias" :pt="{
@@ -1592,7 +1592,7 @@ async function guardarProducto() {
     hayErrores = true
   }
   if (!fabricante.value.trim()) {
-    errores.value.fabricante = 'El fabricante es obligatorio.'
+    errores.value.fabricante = 'El fabricante/marca es obligatorio.'
     hayErrores = true
   }
   if (!unidadMedidaId.value) {
