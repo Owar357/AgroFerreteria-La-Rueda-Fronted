@@ -252,7 +252,14 @@
                         pcInputText: {
                           root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 rounded-lg w-full' }
                         }
-                      }" />
+                      }" >
+                      <template #option="{ option }">
+                        <span class="text-sm">
+                          <span class="font-semibold text-[#1a2e1f]">{{ option.nombre }}</span>
+                          <span v-if="option.fabricante" class="text-gray-500"> - {{ option.fabricante }}</span>
+                        </span>
+                      </template>
+                    </AutoComplete>
                   </div>
 
                   <!-- Presentación -->
@@ -411,7 +418,14 @@
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre del producto</label>
                         <AutoComplete v-model="loteForm.producto" optionLabel="nombre" :suggestions="sugerenciasProductos"
                           @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
-                          placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid />
+                          placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid >
+                          <template #option="{ option }">
+                            <span class="text-sm">
+                              <span class="font-semibold text-[#1a2e1f]">{{ option.nombre }}</span>
+                              <span v-if="option.fabricante" class="text-gray-500"> - {{ option.fabricante }}</span>
+                            </span>
+                          </template>
+                        </AutoComplete>
                       </div>
                       <BaseSelect
                         v-model="loteForm.presentacionFacturada"
