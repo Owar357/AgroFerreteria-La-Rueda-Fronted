@@ -31,6 +31,7 @@
       :max="1000000"
       :max-fraction-digits="0"
       :use-grouping="true"
+      :disabled="esUnidadFija"
       />
 
       <BaseInputNumberMoney
@@ -79,6 +80,7 @@
         :max="1000000"
         :max-fraction-digits="0"
         :use-grouping="true"
+        :disabled="esUnidadFija"
       />
 
       <BaseInputNumberMoney
@@ -109,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Button from 'primevue/button'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseInputNumber from '@/components/base/BaseInputNumber.vue'
@@ -128,6 +130,7 @@ const props = defineProps({
   presentacion: { type: Object, default: null },
   unidadBase: { type: String, default: '' },
   unidadMedidaId: { type: [Number, String], default: null },
+  tipoProducto: { type: String, default: '' },
   productoId: { type: [Number, String], required: true }
 })
 
@@ -136,11 +139,27 @@ const emit = defineEmits(['update:visible', 'guardar'])
 const store = useproductoStore()
 const localVisible = ref(false)
 const guardando = ref(false)
-const form = ref({
+
+// UNIDAD FIJA: el factor de conversión siempre es 1 y no se puede cambiar.
+// GRANEL: el factor es libre.
+const esUnidadFija = computed(() => props.tipoProducto === 'UNIDAD FIJA')
+
+const formVacio = () => ({
   nombre: '',
-  factor_conversion: null,
+  factor_conversion: esUnidadFija.value ? 1 : null,
   precio: null,
 })
+
+const form = ref(formVacio())
+
+// Mantiene el factor en 1 aunque algo intente cambiarlo
+watch(
+  [esUnidadFija, () => form.value.factor_conversion],
+  ([fija, factor]) => {
+    if (fija && factor !== 1) form.value.factor_conversion = 1
+  },
+  { immediate: true },
+)
 
 watch(() => props.visible, (val) => { localVisible.value = val })
 watch(localVisible, (val) => { emit('update:visible', val) })
@@ -149,7 +168,7 @@ watch(() => props.presentacion, (val) => {
 }, { immediate: true })
 
 const resetForm = () => {
-  form.value = { nombre: '', factor_conversion: null, precio: null }
+  form.value = formVacio()
   guardando.value = false
 }
 
@@ -189,7 +208,7 @@ const guardar = async () => {
   const payload = {
     nombre: form.value.nombre,
     unidad_medida_id: Number(idUnidad),
-    factor_conversion: form.value.factor_conversion,
+    factor_conversion: esUnidadFija.value ? 1 : form.value.factor_conversion,
     precio_venta: form.value.precio,
     producto_id: props.productoId
   }

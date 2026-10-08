@@ -15,7 +15,8 @@
             <h1 class="text-xl sm:text-2xl font-bold text-[#1a2e1f] capitalize leading-tight m-0">
               {{ producto.nombre }}
             </h1>
-            <span class="bg-[#2b5e3b]/10 text-[#2b5e3b] text-xs font-bold px-2.5 py-1 rounded-md uppercase font-mono tracking-wider whitespace-nowrap">
+            <span
+              class="bg-[#2b5e3b]/10 text-[#2b5e3b] text-xs font-bold px-2.5 py-1 rounded-md uppercase font-mono tracking-wider whitespace-nowrap">
               {{ producto.codigo }}
             </span>
           </div>
@@ -25,6 +26,13 @@
             <span>Fabricante: <strong class="text-gray-800 capitalize">{{ producto.fabricante }}</strong></span>
           </div>
         </div>
+
+        <!-- STOCK TOTAL (solo granel: el stock es compartido entre presentaciones) -->
+        <div v-if="esGranel"
+          class="bg-[#2b5e3b]/10 text-[#2b5e3b] rounded-xl px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap">
+          Stock total:
+          <strong class="font-bold capitalize">{{ formatStock(stockBase) }} {{ unidadBaseProducto }}</strong>
+        </div>
       </div>
     </div>
 
@@ -33,10 +41,12 @@
       <Tabs value="0">
         <!-- TABS NAV INTEGRADO -->
         <TabList class="bg-[#fbfdf9] border-b border-[#e2e8dd] px-2 sm:px-4 pt-2">
-          <Tab value="0" class="!text-[#1a2e1f] font-semibold flex items-center gap-2 px-3 sm:px-4 py-3 cursor-pointer text-xs sm:text-sm">
+          <Tab value="0"
+            class="!text-[#1a2e1f] font-semibold flex items-center gap-2 px-3 sm:px-4 py-3 cursor-pointer text-xs sm:text-sm">
             <i class="pi pi-box text-[#e0b354]"></i> Presentaciones
           </Tab>
-          <Tab value="1" class="!text-[#1a2e1f] font-semibold flex items-center gap-2 px-3 sm:px-4 py-3 cursor-pointer text-xs sm:text-sm">
+          <Tab value="1"
+            class="!text-[#1a2e1f] font-semibold flex items-center gap-2 px-3 sm:px-4 py-3 cursor-pointer text-xs sm:text-sm">
             <i class="pi pi-history text-[#2b5e3b]"></i> Historial Kardex
           </Tab>
         </TabList>
@@ -60,12 +70,8 @@
             <!-- VISTA MÓVIL: Fila Desplegable (< 768px)                  -->
             <!-- ======================================================= -->
             <div class="block md:hidden w-full border border-[#e2e8dd] rounded-xl overflow-hidden shadow-xs">
-              <DataTable 
-                v-model:expandedRows="expandedRows" 
-                :value="presentaciones" 
-                dataKey="id" 
-                class="p-datatable-custom text-sm w-full"
-              >
+              <DataTable v-model:expandedRows="expandedRows" :value="presentaciones" dataKey="id"
+                class="p-datatable-custom text-sm w-full">
                 <template #empty>
                   <div class="text-center py-8 text-gray-400 text-sm">No hay presentaciones registradas</div>
                 </template>
@@ -89,23 +95,25 @@
                 <template #expansion="{ data }">
                   <div class="p-3.5 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
                     <div class="bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs space-y-3">
-                      
+
                       <!-- Fila 1: Equivalencia y Stock -->
                       <div class="grid grid-cols-2 gap-2">
                         <div>
                           <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
                             Equivalencia
                           </span>
-                          <span class="font-mono text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded inline-block">
+                          <span
+                            class="font-mono text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded inline-block">
                             {{ data.factor_conversion }} {{ data.unidadMedida?.nombre || '—' }}
                           </span>
                         </div>
                         <div>
                           <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                            Stock
+                            {{ esGranel ? 'Disponible' : 'Stock' }}
                           </span>
                           <span class="text-xs font-bold text-gray-800 block">
-                            {{ data.stock }}
+                            {{ formatStock(stockDisponible(data)) }}
+                            <span v-if="esGranel" class="font-normal text-gray-400 capitalize">{{ data.nombre }}</span>
                           </span>
                         </div>
                       </div>
@@ -115,7 +123,8 @@
                         <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
                           Estado
                         </span>
-                        <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded class="!text-[10px] !px-2.5" />
+                        <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded
+                          class="!text-[10px] !px-2.5" />
                       </div>
 
                     </div>
@@ -133,7 +142,7 @@
                       <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                         :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                           ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                          : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'" 
+                          : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
                         class="rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer shadow-xs flex justify-center items-center w-full"
                         @click="toggleEstadoPresentacion(data)" />
 
@@ -150,8 +159,10 @@
             <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 768px)  -->
             <!-- ======================================================= -->
             <div class="hidden md:block border border-[#e2e8dd] rounded-xl overflow-x-auto shadow-xs">
-              <DataTable :value="presentaciones" responsiveLayout="scroll" class="p-datatable-custom text-sm w-full min-w-[50rem]">
-                <Column field="nombre" header="Nombre" class="text-sm font-medium text-gray-800 capitalize min-w-[10rem]">
+              <DataTable :value="presentaciones" responsiveLayout="scroll"
+                class="p-datatable-custom text-sm w-full min-w-[50rem]">
+                <Column field="nombre" header="Nombre"
+                  class="text-sm font-medium text-gray-800 capitalize min-w-[10rem]">
                   <template #body="{ data }">
                     <span class="block leading-tight font-semibold text-[#1a2e1f]">{{ data.nombre }}</span>
                   </template>
@@ -159,7 +170,8 @@
 
                 <Column header="Equivalencia" class="text-sm text-gray-600 min-w-[9rem]">
                   <template #body="{ data }">
-                    <span class="font-mono text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded whitespace-nowrap">
+                    <span
+                      class="font-mono text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded whitespace-nowrap">
                       {{ data.factor_conversion }} {{ data.unidadMedida?.nombre || '—' }}
                     </span>
                   </template>
@@ -169,13 +181,18 @@
                   <template #body="{ data }"> ${{ formatNumber(data.precio) }} </template>
                 </Column>
 
-                <Column field="stock" header="Stock" class="text-sm text-gray-700 min-w-[5rem]">
-                  <template #body="{ data }"> {{ data.stock }} </template>
+                <!-- GRANEL: "Disponible" calculado por presentación | UNIDAD FIJA: "Stock" propio -->
+                <Column :header="esGranel ? 'Disponible' : 'Stock'" class="text-sm text-gray-700 min-w-[5rem]">
+                  <template #body="{ data }">
+                    {{ formatStock(stockDisponible(data)) }}
+                    <span v-if="esGranel" class="text-xs text-gray-400 capitalize">{{ data.nombre }}</span>
+                  </template>
                 </Column>
 
                 <Column field="estado" header="Estado" class="text-sm min-w-[6rem]">
                   <template #body="{ data }">
-                    <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded class="!text-xs !px-2.5 whitespace-nowrap" />
+                    <Tag :value="data.estado" :severity="data.estado === 'ACTIVO' ? 'success' : 'danger'" rounded
+                      class="!text-xs !px-2.5 whitespace-nowrap" />
                   </template>
                 </Column>
 
@@ -194,7 +211,7 @@
                       <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                         :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                           ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
-                          : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'" 
+                          : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
                         class="rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
                         v-tooltip.top="data.estado === 'ACTIVO' ? 'Desactivar presentación' : 'Activar presentación'"
                         @click="toggleEstadoPresentacion(data)" />
@@ -222,12 +239,13 @@
 
     <!-- DIÁLOGOS -->
     <AñadirPresentacionDialog 
-      v-model:visible="AgregarVisible" 
-      :unidadBase="unidadBaseProducto"
-      :unidadMedidaId="idUnidadBase"
-      :productoId="producto.id" 
-      @guardar="onGuardar" 
-    />
+  v-model:visible="AgregarVisible" 
+  :unidadBase="unidadBaseProducto"
+  :unidadMedidaId="idUnidadBase"
+  :productoId="producto.id" 
+  :tipoProducto="producto.tipo_producto"
+  @guardar="onGuardar" 
+/>
     <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
       :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
     <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
@@ -251,11 +269,11 @@ import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vu
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import KardexTable from '@/components/Productos/KardexTable.vue'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarConfirmacion, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarConfirmacion,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -279,6 +297,7 @@ const producto = ref({
   codigo: props.producto.codigo,
   categoria: props.producto.categoria?.nombre ?? props.producto.categoria ?? '—',
   fabricante: props.producto.fabricante,
+  tipo_producto: props.producto.tipo_producto || null,
   unidad_medida_id: props.producto.unidad_medida_id || props.producto.unidad_medida?.id || null,
   unidad_medida: props.producto.unidad_medida || null,
 })
@@ -308,6 +327,26 @@ const unidadBaseProducto = computed(() => {
   return '—'
 })
 
+
+const esGranel = computed(() => producto.value.tipo_producto === 'GRANEL')
+
+// En granel el stock total vive en la presentación base (unidad base)
+const stockBase = computed(() => {
+  const base = presentaciones.value.find((p) => p.es_base) ?? presentaciones.value[0]
+  return base?.stock ?? 0
+})
+
+
+const stockDisponible = (pres) => {
+  if (!esGranel.value) return pres.stock
+  if (!pres.factor_conversion) return 0
+  const disponible = stockBase.value / pres.factor_conversion
+  return pres.es_base ? disponible : Math.floor(disponible)
+}
+
+
+const formatStock = (value) => Number(Number(value ?? 0).toFixed(2))
+
 onMounted(async () => {
   await cargarPresentaciones()
 })
@@ -324,7 +363,7 @@ const cargarPresentaciones = async () => {
       unidadMedida: p.unidad_medida,
       factor_conversion: Number(p.factor_conversion) || 0,
       precio: parseFloat(p.precio_venta ?? 0),
-      stock: (p.stock !== null && p.stock !== undefined) ? Number(p.stock) : 0,
+      stock: Number(p.stock_actual ?? 0),
       estado: p.activo ? 'ACTIVO' : 'INACTIVO',
       es_base: p.es_base ?? false,
     }))
@@ -346,8 +385,8 @@ const toggleEstadoPresentacion = async (pres) => {
   const esActivo = pres.estado === 'ACTIVO'
   const resultado = await mostrarConfirmacion({
     titulo: esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?',
-    mensajeHtml: esActivo 
-      ? 'La presentación dejará de estar disponible para la venta.' 
+    mensajeHtml: esActivo
+      ? 'La presentación dejará de estar disponible para la venta.'
       : 'La presentación volverá a estar disponible para la venta.',
     icono: esActivo ? 'pi-ban' : 'pi-check-circle',
     bgIcono: esActivo ? '#fee2e2' : '#dff0e0',
@@ -359,7 +398,7 @@ const toggleEstadoPresentacion = async (pres) => {
   if (!resultado.isConfirmed) return
 
   mostrarCargando(
-    esActivo ? 'Desactivando presentación...' : 'Activando presentación...', 
+    esActivo ? 'Desactivando presentación...' : 'Activando presentación...',
     'Por favor espera un momento'
   )
 
@@ -389,14 +428,12 @@ const abrirEditar = (presentacion) => {
   editarVisible.value = true
 }
 
-const onGuardar = (nuevaPresentacion) => {
-  presentaciones.value.push(nuevaPresentacion)
+const onGuardar = async () => {
+  await cargarPresentaciones()
 }
-const onGuardarEdicion = (presentacionEditada) => {
-  const index = presentaciones.value.findIndex((p) => p.id === presentacionEditada.id)
-  if (index !== -1) {
-    presentaciones.value[index] = { ...presentacionEditada }
-  }
+
+const onGuardarEdicion = async () => {
+  await cargarPresentaciones()
 }
 
 const abrirCodigos = (presentacion) => {
@@ -405,7 +442,12 @@ const abrirCodigos = (presentacion) => {
 }
 
 const abrirLotes = (presentacion) => {
-  emit('open-lotes', presentacion)
+  const base = presentaciones.value.find((p) => p.es_base)
+  emit('open-lotes', {
+    ...presentacion,
+    esGranel: esGranel.value,
+    nombreBase: base?.nombre ?? presentacion.nombre,
+  })
 }
 </script>
 

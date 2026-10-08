@@ -47,7 +47,7 @@
             <div class="flex items-baseline gap-1">
               <span class="text-base sm:text-lg font-bold text-[#2b5e3b] font-mono">{{ formatNumber(loteStore.stockTotalActivo) }}</span>
               <span class="text-[11px] sm:text-xs font-semibold text-[#2b5e3b]/80 capitalize font-mono truncate">
-                {{ nombrePresentacion || 'Unidades' }}
+                {{ etiquetaStock || 'Unidades' }}
               </span>
             </div>
           </div>
@@ -102,7 +102,7 @@
           <Column header="Stock Actual" class="text-right">
             <template #body="{ data }">
               <span class="font-bold text-[#1a2e1f] font-mono text-xs block">{{ formatNumber(data.cantidad_actual) }}</span>
-              <span class="text-[10px] text-gray-500 font-mono block mt-0.5">
+              <span v-if="!esGranel" class="text-[10px] text-gray-500 font-mono block mt-0.5">
                 <strong class="text-gray-400 font-normal">P.Venta:</strong> ${{ formatNumber(data.precio_venta) }}
               </span>
             </template>
@@ -193,7 +193,7 @@
             </template>
           </Column>
 
-          <Column field="precio_venta" header="Precio Venta" class="text-sm text-right">
+          <Column v-if="!esGranel" field="precio_venta" header="Precio Venta" class="text-sm text-right">
             <template #body="{ data }">
               <span class="font-semibold text-gray-800 font-mono text-xs">${{ formatNumber(data.precio_venta) }}</span>
             </template>
@@ -321,7 +321,7 @@
     <AjusteLoteDialog 
       v-model="mostrarModalAjuste" 
       :lote="loteSeleccionado" 
-      :nombre-presentacion="nombrePresentacion"
+      :nombre-presentacion="etiquetaStock"
       :unidad-medida="unidadMedida || 'Unidad'" 
       @ajuste-realizado="refrescarTablaLotes" 
     />
@@ -329,7 +329,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -348,7 +348,14 @@ const props = defineProps({
   presentacionId: { type: [String, Number], required: true },
   nombrePresentacion: { type: String, default: '' },
   unidadMedida: { type: String, default: 'Unidad' },
+  esGranel: { type: Boolean, default: false },
+  nombreBase: { type: String, default: '' },
 })
+
+// En granel el stock está en la unidad base; en unidad fija, en la propia presentación
+const etiquetaStock = computed(() =>
+  props.esGranel && props.nombreBase ? props.nombreBase : props.nombrePresentacion,
+)
 
 const loteStore = useLoteStore()
 const emit = defineEmits(['volver'])

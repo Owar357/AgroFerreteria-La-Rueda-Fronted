@@ -48,7 +48,11 @@
           </template>
         </Column>
         <template #empty>
-          <div class="text-center py-6 text-gray-400 text-xs">
+          <div v-if="cargando" class="text-center py-6 text-gray-400 text-xs">
+            <i class="pi pi-spin pi-spinner text-xl mb-1 block"></i>
+            Cargando códigos...
+          </div>
+          <div v-else class="text-center py-6 text-gray-400 text-xs">
             <i class="pi pi-barcode text-xl mb-1 block"></i>
             No hay códigos registrados
           </div>
@@ -125,7 +129,11 @@
           </template>
         </Column>
         <template #empty>
-          <div class="text-center py-6 text-gray-400 text-sm">
+          <div v-if="cargando" class="text-center py-6 text-gray-400 text-sm">
+            <i class="pi pi-spin pi-spinner text-2xl mb-1 block"></i>
+            Cargando códigos...
+          </div>
+          <div v-else class="text-center py-6 text-gray-400 text-sm">
             <i class="pi pi-barcode text-2xl mb-1 block"></i>
             No hay códigos registrados
           </div>
@@ -199,11 +207,20 @@ const codigos = ref([])
 const cargando = ref(false)
 const guardando = ref(false)
 
+// Guarda la última presentación abierta para saber cuándo limpiar la lista
+let ultimaPresentacionId = null
+
 watch(
   () => props.visible,
   async (val) => {
     localVisible.value = val
     if (val && props.presentacion?.id) {
+      // Si es otra presentación, se limpia la lista para no mostrar códigos ajenos.
+      // Si es la misma, se mantienen los que ya había y se refrescan en segundo plano.
+      if (ultimaPresentacionId !== props.presentacion.id) {
+        codigos.value = []
+        ultimaPresentacionId = props.presentacion.id
+      }
       await cargarCodigos()
     }
   },

@@ -79,7 +79,8 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha inicio"
               showIcon
-              :pt="{ pcInputText: { root: { readonly: true } } }"
+              :minDate="fechaFin1"
+              :maxDate="fechaMaxima"
               class="!w-full"
               :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
             />
@@ -92,7 +93,8 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha fin"
               showIcon
-              :pt="{ pcInputText: { root: { readonly: true } } }"
+              :minDate="fechaInicio2 || fechaFin1"
+              :maxDate="fechaMaxima"
               class="!w-full"
               :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
             />
@@ -197,7 +199,8 @@
                   dateFormat="yy-mm-dd"
                   placeholder="Seleccione fecha"
                   showIcon
-                  :pt="{ pcInputText: { root: { readonly: true } } }"
+                  :minDate="fechaFin1"
+                  :maxDate="fechaMaxima"
                   class="!w-full"
                   :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
                 />
@@ -209,7 +212,8 @@
                   dateFormat="yy-mm-dd"
                   placeholder="Seleccione fecha"
                   showIcon
-                  :pt="{ pcInputText: { root: { readonly: true } } }"
+                  :minDate="fechaInicio2 || fechaFin1"
+                  :maxDate="fechaMaxima"
                   class="!w-full"
                   :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
                 />
@@ -261,6 +265,8 @@ const fechaFin1 = ref(null)
 const fechaInicio2 = ref(null)
 const fechaFin2 = ref(null)
 const generandoPDF = ref(false)
+const fechaMaxima = new Date()
+fechaMaxima.setHours(0, 0, 0, 0)
 
 const formatFechaParam = (date) => {
   if (!date) return null

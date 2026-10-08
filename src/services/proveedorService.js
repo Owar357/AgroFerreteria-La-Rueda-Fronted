@@ -7,6 +7,8 @@ export const updateProveedor = (id, data) => api.put(`/proveedores/${id}`, data)
 
 export const desactivarProveedor = (id) => api.patch(`/proveedores/${id}/desactivar`)
 
+export const activarProveedor = (id) => api.patch(`/proveedores/${id}/activar`)
+
 export const proveedores = () => api.get('/proveedor/proveedores')
 
 
