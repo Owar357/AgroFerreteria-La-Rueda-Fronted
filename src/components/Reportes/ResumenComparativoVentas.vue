@@ -1,11 +1,10 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
-    <!-- ======================================================= -->
+  <div
+  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+><!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -18,13 +17,13 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-chart-line text-[#2b5e3b] text-lg"></i>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Resumen Comparativo
-          </h1>
+        <div> 
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Resumen Comparativo</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Compara las ventas entre dos rangos de fecha
           </p>
@@ -41,7 +40,7 @@
         <!-- Rango 1 Móvil -->
         <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-3 space-y-3 w-full">
           <span class="text-xs font-bold text-[#1e3a2f] block">Rango 1</span>
-          
+
           <div class="flex flex-col gap-1 w-full">
             <label class="text-xs font-semibold text-gray-600">Fecha inicio</label>
             <DatePicker
@@ -49,6 +48,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha inicio"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
             />
@@ -61,6 +61,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha fin"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
             />
@@ -70,7 +71,7 @@
         <!-- Rango 2 Móvil -->
         <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-3 space-y-3 w-full">
           <span class="text-xs font-bold text-[#1e3a2f] block">Rango 2</span>
-          
+
           <div class="flex flex-col gap-1 w-full">
             <label class="text-xs font-semibold text-gray-600">Fecha inicio</label>
             <DatePicker
@@ -119,14 +120,12 @@
           />
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -144,7 +143,9 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Resumen Comparativo de Ventas</h1>
-          <p class="text-gray-500 text-sm mt-1 m-0">Compara las ventas entre dos rangos de fecha distintos.</p>
+          <p class="text-gray-500 text-sm mt-1 m-0">
+            Compara las ventas entre dos rangos de fecha distintos.
+          </p>
         </div>
       </div>
 
@@ -167,6 +168,7 @@
                   dateFormat="yy-mm-dd"
                   placeholder="Seleccione fecha"
                   showIcon
+                  :pt="{ pcInputText: { root: { readonly: true } } }"
                   class="!w-full"
                   :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
                 />
@@ -178,6 +180,7 @@
                   dateFormat="yy-mm-dd"
                   placeholder="Seleccione fecha"
                   showIcon
+                  :pt="{ pcInputText: { root: { readonly: true } } }"
                   class="!w-full"
                   :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
                 />
@@ -238,9 +241,7 @@
           />
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
@@ -249,12 +250,12 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteComparativoVentas } from '@/services/reporteService'
-import { 
-  mostrarExito, 
-  mostrarError, 
+import {
+  mostrarExito,
+  mostrarError,
   mostrarAccesoDenegado,
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
@@ -278,7 +279,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
-      mensajeHtml: 'Debes completar las fechas de <strong>Inicio</strong> y <strong>Fin</strong> de ambos rangos para realizar la comparación.'
+      mensajeHtml:
+        'Debes completar las fechas de <strong>Inicio</strong> y <strong>Fin</strong> de ambos rangos para realizar la comparación.',
     })
     return
   }
@@ -287,7 +289,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango 1 inválido',
-      mensajeHtml: 'La <strong>Fecha inicio</strong> del Rango 1 no puede ser posterior a su <strong>Fecha fin</strong>.'
+      mensajeHtml:
+        'La <strong>Fecha inicio</strong> del Rango 1 no puede ser posterior a su <strong>Fecha fin</strong>.',
     })
     return
   }
@@ -296,7 +299,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango 2 inválido',
-      mensajeHtml: 'La <strong>Fecha inicio</strong> del Rango 2 no puede ser posterior a su <strong>Fecha fin</strong>.'
+      mensajeHtml:
+        'La <strong>Fecha inicio</strong> del Rango 2 no puede ser posterior a su <strong>Fecha fin</strong>.',
     })
     return
   }
@@ -312,12 +316,12 @@ const generarPDF = async () => {
         fechaInicio2: formatFechaParam(fechaInicio2.value),
         fechaFin2: formatFechaParam(fechaFin2.value),
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     mostrarExito(
       '¡Reporte generado!',
-      'El resumen comparativo de ventas en formato PDF se ha descargado exitosamente.'
+      'El resumen comparativo de ventas en formato PDF se ha descargado exitosamente.',
     )
   } catch (error) {
     const status = error.response?.status

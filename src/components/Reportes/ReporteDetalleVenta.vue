@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
+  <div
+  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+>
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -18,13 +18,13 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-shopping-cart text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Reporte de Ventas
-          </h1>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Reporte de Ventas</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Filtra por rango de fecha y genera el reporte
           </p>
@@ -46,6 +46,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha desde"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -59,6 +60,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha hasta"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -83,14 +85,12 @@
           />
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -108,7 +108,9 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Reporte de Ventas</h1>
-          <p class="text-gray-500 text-sm mt-1 m-0">Seleccione un rango de fechas para exportar el informe detallado en formato PDF.</p>
+          <p class="text-gray-500 text-sm mt-1 m-0">
+            Seleccione un rango de fechas para exportar el informe detallado en formato PDF.
+          </p>
         </div>
       </div>
 
@@ -128,6 +130,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha desde"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -141,6 +144,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha hasta"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -166,9 +170,7 @@
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
@@ -177,11 +179,11 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteVentas } from '@/services/reporteService'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
@@ -201,7 +203,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
-      mensajeHtml: 'Debes seleccionar la <strong>Fecha desde</strong> y la <strong>Fecha hasta</strong> para generar el reporte.'
+      mensajeHtml:
+        'Debes seleccionar la <strong>Fecha desde</strong> y la <strong>Fecha hasta</strong> para generar el reporte.',
     })
     return
   }
@@ -210,7 +213,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango de fechas inválido',
-      mensajeHtml: 'La <strong>Fecha desde</strong> no puede ser posterior a la <strong>Fecha hasta</strong>.'
+      mensajeHtml:
+        'La <strong>Fecha desde</strong> no puede ser posterior a la <strong>Fecha hasta</strong>.',
     })
     return
   }
@@ -224,12 +228,12 @@ const generarPDF = async () => {
         fechaDesde: formatFechaParam(fechaDesde.value),
         fechaHasta: formatFechaParam(fechaHasta.value),
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     mostrarExito(
       '¡Reporte generado!',
-      'El reporte de ventas en formato PDF se ha descargado exitosamente.'
+      'El reporte de ventas en formato PDF se ha descargado exitosamente.',
     )
   } catch (error) {
     const msg = error.response?.data?.message || 'No se pudo generar ni descargar el archivo PDF.'

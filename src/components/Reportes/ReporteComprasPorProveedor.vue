@@ -1,11 +1,10 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
-    <!-- ======================================================= -->
+ <div
+  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+> <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -18,16 +17,14 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-truck text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Compras por Proveedor
-          </h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Filtra por fechas y genera el reporte
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Compras por Proveedor</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Filtra por fechas y genera el reporte</p>
         </div>
       </div>
 
@@ -46,6 +43,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha inicio"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -59,6 +57,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha fin"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -98,16 +97,25 @@
           <span class="text-xs font-bold text-gray-600 uppercase tracking-wider">
             Compras Registradas
           </span>
-          <span v-if="compras.length > 0" class="text-xs font-semibold text-[#2b5e3b] bg-[#eef7f0] px-2 py-0.5 rounded-full border border-[#c2e3c8]">
+          <span
+            v-if="compras.length > 0"
+            class="text-xs font-semibold text-[#2b5e3b] bg-[#eef7f0] px-2 py-0.5 rounded-full border border-[#c2e3c8]"
+          >
             {{ compras.length }} registros
           </span>
         </div>
 
-        <div v-if="compras.length === 0 && !cargando" class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs">
+        <div
+          v-if="compras.length === 0 && !cargando"
+          class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs"
+        >
           No hay compras en el rango seleccionado.
         </div>
 
-        <div v-if="cargando" class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs">
+        <div
+          v-if="cargando"
+          class="bg-white rounded-2xl border border-[#e2e8dd] p-6 text-center text-gray-500 text-xs"
+        >
           <i class="pi pi-spin pi-spinner text-lg mb-2 block"></i>
           Cargando compras...
         </div>
@@ -131,29 +139,33 @@
 
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <span class="text-gray-400 block text-[10px] uppercase font-semibold">N° Documento</span>
+              <span class="text-gray-400 block text-[10px] uppercase font-semibold"
+                >N° Documento</span
+              >
               <span class="font-medium text-[#1a2e1f]">{{ compra.numero_documento || '—' }}</span>
             </div>
             <div>
               <span class="text-gray-400 block text-[10px] uppercase font-semibold">Fecha</span>
-              <span class="font-medium text-[#1a2e1f]">{{ formatFecha(compra.fecha_emision) }}</span>
+              <span class="font-medium text-[#1a2e1f]">{{
+                formatFecha(compra.fecha_emision)
+              }}</span>
             </div>
           </div>
 
           <div class="pt-2 border-t border-[#f0f4ee] flex items-center justify-between">
             <span class="text-xs text-gray-500 font-medium">Monto Total</span>
-            <span class="text-sm font-bold text-[#2b5e3b]">{{ formatCurrency(compra.monto_total) }}</span>
+            <span class="text-sm font-bold text-[#2b5e3b]">{{
+              formatCurrency(compra.monto_total)
+            }}</span>
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -171,7 +183,9 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Reporte de Compras por Proveedor</h1>
-          <p class="text-gray-500 text-sm mt-1 m-0">Filtra por rango de fecha y genera el reporte PDF.</p>
+          <p class="text-gray-500 text-sm mt-1 m-0">
+            Filtra por rango de fecha y genera el reporte PDF.
+          </p>
         </div>
       </div>
 
@@ -191,6 +205,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -204,6 +219,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -279,14 +295,14 @@
           </Column>
           <Column field="monto_total" header="Monto" class="text-sm">
             <template #body="{ data }">
-              <span class="font-semibold text-[#1e3a2f]">{{ formatCurrency(data.monto_total) }}</span>
+              <span class="font-semibold text-[#1e3a2f]">{{
+                formatCurrency(data.monto_total)
+              }}</span>
             </template>
           </Column>
         </DataTable>
       </div>
-
     </div>
-
   </div>
 </template>
 
