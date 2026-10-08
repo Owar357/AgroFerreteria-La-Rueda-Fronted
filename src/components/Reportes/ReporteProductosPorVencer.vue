@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
+  <div
+  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+>
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -18,13 +18,13 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-exclamation-triangle text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Productos Por Vencer
-          </h1>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Productos Por Vencer</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Lotes activos próximos a vencer para mermas
           </p>
@@ -80,14 +80,12 @@
           * Si no especifica un valor, el sistema utiliza 30 días por defecto.
         </p>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -104,7 +102,9 @@
           <i class="pi pi-exclamation-triangle text-[24px] text-[#5F6B52]"></i>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Reporte de Productos Próximos a Vencer</h1>
+          <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">
+            Reporte de Productos Próximos a Vencer
+          </h1>
           <p class="text-gray-500 text-sm mt-1 m-0">
             Lotes activos próximos a vencer, para control de mermas.
           </p>
@@ -162,9 +162,7 @@
           * Si no especifica un valor, el backend usa 30 días por defecto.
         </p>
       </div>
-
     </div>
-
   </div>
 </template>
 
@@ -173,11 +171,11 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import { generarReporteProductosPorVencer } from '@/services/reporteService'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
@@ -194,12 +192,12 @@ const generarPDF = async () => {
       generarReporteProductosPorVencer({
         diasUmbral: diasUmbral.value,
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     mostrarExito(
       '¡Reporte generado!',
-      'El reporte de productos próximos a vencer en formato PDF se ha descargado exitosamente.'
+      'El reporte de productos próximos a vencer en formato PDF se ha descargado exitosamente.',
     )
   } catch (error) {
     const status = error.response?.status

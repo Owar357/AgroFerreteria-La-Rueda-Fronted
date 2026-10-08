@@ -19,6 +19,7 @@
         label="Nombre"
         placeholder="Nombre completo"
         filter="alpha"
+        maxlength="50"
         :error="errors.name"
         @input="validarCampo('name')"
       />
@@ -28,6 +29,7 @@
         label="Email"
         placeholder="correo@ejemplo.com"
         autocomplete="off"
+        maxlength="255"
         :error="errors.email"
         @input="validarCampo('email')"
       />
@@ -62,7 +64,7 @@
           icon="pi pi-times"
           severity="secondary"
           outlined
-          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl  !w-full font-semibold cursor-pointer"
+          class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
           @click="visibleLocal = false"
         />
       </div>
@@ -71,12 +73,15 @@
     <!-- ======================================================= -->
     <!-- CONTENIDO - VISTA ESCRITORIO (>= 640px)                -->
     <!-- ======================================================= -->
-    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+    <div
+      class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]"
+    >
       <BaseInput
         v-model="form.name"
         label="Nombre"
         placeholder="Nombre completo"
         filter="alpha"
+        maxlength="50"
         :error="errors.name"
         @input="validarCampo('name')"
       />
@@ -86,6 +91,7 @@
         label="Email"
         placeholder="correo@ejemplo.com"
         autocomplete="off"
+        maxlength="255"
         :error="errors.email"
         @input="validarCampo('email')"
       />
@@ -136,12 +142,12 @@ import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
 import BaseSelect from '../base/BaseSelect.vue'
-import { 
-  mostrarExito, 
-  mostrarError, 
+import {
+  mostrarExito,
+  mostrarError,
   mostrarAccesoDenegado,
   mostrarAlertaConfirmar,
-  mostrarCargando
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -186,11 +192,16 @@ const reiniciarFormulario = () => {
   Object.keys(errors).forEach((clave) => (errors[clave] = ''))
 }
 
+
+ 
+const regexEmail = /^[A-Za-z0-9]+([._-][A-Za-z0-9]+)*@[A-Za-z0-9]+(-[A-Za-z0-9]+)*(\.[A-Za-z]{2,3})?\.[A-Za-z]{2,}$/
+
 const validarCampo = (campo) => {
   if (campo === 'name') {
     const valor = form.name.trim()
     if (!valor) errors.name = 'El nombre es obligatorio.'
-    else if (valor.length > 70) errors.name = 'El nombre no debe exceder los 70 caracteres.'
+    else if (valor.length < 3) errors.name = 'El nombre debe tener al menos 3 caracteres.'
+    else if (valor.length > 50) errors.name = 'El nombre no debe exceder los 50 caracteres.'
     else if (!/^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(valor))
       errors.name = 'Solo se permiten letras (sin números ni caracteres especiales).'
     else errors.name = ''
@@ -199,8 +210,9 @@ const validarCampo = (campo) => {
   if (campo === 'email') {
     const valor = form.email.trim()
     if (!valor) errors.email = 'El correo electrónico es obligatorio.'
-    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor))
-      errors.email = 'Formato de correo inválido.'
+    else if (valor.length > 255) errors.email = 'El correo no puede superar los 255 caracteres.'
+    else if (!regexEmail.test(valor))
+      errors.email = 'Correo inválido. Solo se permiten letras, números y los símbolos . _ -'
     else errors.email = ''
   }
 
@@ -209,7 +221,12 @@ const validarCampo = (campo) => {
     if (!valor) errors.password = 'La contraseña es obligatoria.'
     else if (valor.length < 8) errors.password = 'Mínimo 8 caracteres.'
     else if (/\s/.test(valor)) errors.password = 'La contraseña no puede contener espacios.'
-    else if (!/[A-Z]/.test(valor) || !/[a-z]/.test(valor) || !/[0-9]/.test(valor) || !/[^A-Za-z0-9]/.test(valor))
+    else if (
+      !/[A-Z]/.test(valor) ||
+      !/[a-z]/.test(valor) ||
+      !/[0-9]/.test(valor) ||
+      !/[^A-Za-z0-9]/.test(valor)
+    )
       errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
     else errors.password = ''
   }
@@ -224,7 +241,7 @@ const guardarUsuario = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Formulario vacío',
-      mensajeHtml: 'Complete los campos requeridos antes de guardar.'
+      mensajeHtml: 'Complete los campos requeridos antes de guardar.',
     })
     return
   }
@@ -247,16 +264,27 @@ const guardarUsuario = async () => {
         password: form.password,
         role: form.role,
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (resultado.ok) {
       visibleLocal.value = false
-      mostrarExito('¡Usuario creado!', `El usuario "${resultado.user.name}" fue registrado exitosamente.`)
+      mostrarExito(
+        '¡Usuario creado!',
+        `El usuario "${resultado.user.name}" fue registrado exitosamente.`,
+      )
     } else if (resultado.status === 403) {
       mostrarAccesoDenegado()
+    } else if (resultado.status === 422 && resultado.errors) {
+      // Errores de Laravel, campo por campo
+      errors.name = resultado.errors.name?.[0] ?? ''
+      errors.email = resultado.errors.email?.[0] ?? ''
+      errors.password = resultado.errors.password?.[0] ?? ''
+      errors.role = resultado.errors.rol?.[0] ?? ''
+      // Reemplaza el modal de "Registrando usuario..." para que no quede abierto
+      mostrarError('Datos inválidos', 'Revisa los campos marcados en el formulario.')
     } else if (resultado.error) {
-      mostrarError('Error de validación', resultado.error)
+      mostrarError('Error', resultado.error)
     } else {
       mostrarError('Error', 'No se pudo crear el usuario.')
     }

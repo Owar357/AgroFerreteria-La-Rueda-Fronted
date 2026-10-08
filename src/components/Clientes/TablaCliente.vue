@@ -1,22 +1,18 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
     <!-- ======================================================= -->
     <div class="block lg:hidden mb-4">
       <div class="flex items-center gap-3">
         <div
-          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Historial de Clientes
-          </h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Directorio general y registro de compras
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Historial de Clientes</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Directorio general y registro de compras</p>
         </div>
       </div>
     </div>
@@ -26,7 +22,8 @@
     <!-- ======================================================= -->
     <div class="hidden lg:flex items-center gap-3 mb-6">
       <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
+      >
         <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
@@ -41,13 +38,11 @@
 
     <!-- TARJETA CONTENEDORA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
-
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL FILTROS (Solo Teléfono / Tablet)           -->
       <!-- ======================================================= -->
       <div class="block lg:hidden p-4 border-b border-[#e2e8dd] bg-[#fbfdf9] space-y-3">
         <div class="flex flex-col gap-3">
-
           <IconField class="w-full relative flex items-center h-[2.5rem]">
             <InputIcon class="pi pi-search text-gray-400 pointer-events-none z-10" />
             <InputText
@@ -60,6 +55,8 @@
           <Select
             v-model="filters['tipo_persona'].value"
             :options="tipoPersonaOpciones"
+            optionLabel="label"
+            optionValue="value"
             showClear
             placeholder="Todos los tipos de persona"
             class="w-full !h-[2.5rem] !bg-white !border-gray-300 text-xs rounded-xl flex items-center px-2"
@@ -86,6 +83,8 @@
           <Select
             v-model="filters['tipo_persona'].value"
             :options="tipoPersonaOpciones"
+            optionLabel="label"
+            optionValue="value"
             showClear
             placeholder="Todos los tipos de persona"
             class="w-[40%] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2 shrink-0"
@@ -127,9 +126,11 @@
               </div>
               <div v-else class="flex flex-col gap-0.5 items-start">
                 <span class="font-semibold text-xs text-[#1a2e1f] block truncate max-w-[170px]">
-                  {{ slotProps.data.nombre }}
+                  {{ slotProps.data.nombre || slotProps.data.razon_social }}
                 </span>
-                <span class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap">
+                <span
+                  class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap"
+                >
                   {{ slotProps.data.numero_documento }}
                 </span>
               </div>
@@ -145,7 +146,7 @@
               <Tag
                 v-else
                 :value="slotProps.data.tipo_persona"
-                :severity="slotProps.data.tipo_persona === 'Natural' ? 'info' : 'warn'"
+               :severity="slotProps.data.tipo_persona?.toUpperCase() === 'NATURAL' ? 'info' : 'warn'"
                 rounded
                 class="!text-[9px] !px-2 !py-0.5 whitespace-nowrap uppercase"
               />
@@ -156,17 +157,22 @@
           <template #expansion="slotProps">
             <div class="p-3 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
               <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2.5">
-                
                 <!-- Nombre -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
-                  <span class="text-[10px] font-bold uppercase text-[#6b7280]">Nombre Completo</span>
-                  <span class="text-xs text-[#334155] font-semibold">{{ slotProps.data.nombre }}</span>
+                  <span class="text-[10px] font-bold uppercase text-[#6b7280]"
+                    >Nombre Completo</span
+                  >
+                  <span class="text-xs text-[#334155] font-semibold">{{
+                    slotProps.data.nombre || slotProps.data.razon_social
+                  }}</span>
                 </div>
 
                 <!-- N° Documento -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">N° Documento</span>
-                  <span class="font-mono text-xs text-[#2b5e3b] font-bold">{{ slotProps.data.numero_documento }}</span>
+                  <span class="font-mono text-xs text-[#2b5e3b] font-bold">{{
+                    slotProps.data.numero_documento
+                  }}</span>
                 </div>
 
                 <!-- Tipo de Persona -->
@@ -174,12 +180,10 @@
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Tipo Persona</span>
                   <Tag
                     :value="slotProps.data.tipo_persona"
-                    :severity="slotProps.data.tipo_persona === 'Natural' ? 'info' : 'warn'"
-                    rounded
+                    :severity="slotProps.data.tipo_persona?.toUpperCase() === 'NATURAL' ? 'info' : 'warn'"
                     class="!text-[10px] !px-2.5 !py-0.5 uppercase"
                   />
                 </div>
-
               </div>
 
               <!-- Botones Móvil Outlined -->
@@ -200,7 +204,6 @@
                   @click="$emit('view-history', slotProps.data)"
                 />
               </div>
-
             </div>
           </template>
         </DataTable>
@@ -235,7 +238,7 @@
               <Tag
                 v-else
                 :value="slotProps.data.tipo_persona"
-                :severity="slotProps.data.tipo_persona === 'Natural' ? 'info' : 'warn'"
+               :severity="slotProps.data.tipo_persona?.toUpperCase() === 'NATURAL' ? 'info' : 'warn'"
                 rounded
                 class="!text-xs !px-2.5 whitespace-nowrap uppercase"
               />
@@ -246,7 +249,7 @@
           <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] min-w-[14rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="75%" height="1.2rem" />
-              <span v-else class="capitalize block">{{ slotProps.data.nombre }}</span>
+              <span v-else class="capitalize block">{{ slotProps.data.nombre || slotProps.data.razon_social }}</span>
             </template>
           </Column>
 
@@ -254,7 +257,10 @@
           <Column field="numero_documento" header="N° Documento" class="min-w-[11rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="6rem" height="1.2rem" />
-              <span v-else class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase">
+              <span
+                v-else
+                class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase"
+              >
                 {{ slotProps.data.numero_documento }}
               </span>
             </template>
@@ -290,7 +296,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 </template>
@@ -308,10 +313,7 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { useClienteStore } from '@/stores/clienteStore'
 import { storeToRefs } from 'pinia'
-import { 
-  mostrarError, 
-  mostrarAccesoDenegado 
-} from '@/utils/SweetAlertService'
+import { mostrarError, mostrarAccesoDenegado } from '@/utils/SweetAlertService'
 
 defineEmits(['view-detail', 'view-history'])
 
@@ -319,7 +321,10 @@ const store = useClienteStore()
 const { clientes, cargando, porPagina } = storeToRefs(store)
 
 const expandedRows = ref({})
-const tipoPersonaOpciones = ref(['Natural', 'Jurídica'])
+const tipoPersonaOpciones = ref([
+  { label: 'Natural', value: 'NATURAL'},
+  {label: 'Juridica', value: 'JURIDICA'},
+])
 
 const filters = ref({
   global: { value: null },
@@ -331,20 +336,21 @@ const clientesFiltrados = computed(() => {
 
   const textoBusqueda = filters.value.global.value?.toLowerCase().trim() || ''
   if (textoBusqueda) {
-    lista = lista.filter((c) =>
-      c.nombre?.toLowerCase().includes(textoBusqueda) ||
-      c.numero_documento?.toLowerCase().includes(textoBusqueda)
+    lista = lista.filter(
+      (c) =>
+        c.nombre?.toLowerCase().includes(textoBusqueda) ||
+        c.razon_social?.toLowerCase().includes(textoBusqueda) ||
+        c.numero_documento?.toLowerCase().includes(textoBusqueda),
     )
   }
 
   const tipoSeleccionado = filters.value.tipo_persona.value
   if (tipoSeleccionado) {
-    lista = lista.filter((c) => c.tipo_persona === tipoSeleccionado)
+    lista = lista.filter((c) => c.tipo_persona?.toUpperCase() === tipoSeleccionado)
   }
 
   return lista
 })
-
 onMounted(async () => {
   const resultado = await store.cargarClientes()
   if (resultado?.status === 403) {
