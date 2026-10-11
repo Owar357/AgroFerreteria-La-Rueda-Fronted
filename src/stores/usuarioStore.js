@@ -6,6 +6,7 @@ import {
   updateUsuario,
   desactivarUsuario as desactivarUsuarioService,
 } from '../services/usuarioService'
+import { reroute } from 'vue-router/dist/experimental/index.js'
 
 export const useUserStore = defineStore('userStore', () => {
   const users = ref([])
@@ -14,6 +15,22 @@ export const useUserStore = defineStore('userStore', () => {
   const currentPage = ref(1)
   const perPage = ref(5)
 
+  //devolvemos los erros
+  const formatearError = (error, mensajeDefault) => {
+    const status = error.response?.status
+    const data = error.response?.data
+
+    if (status === 422 && data?.errors) {
+      return {
+        ok: false,
+        status,
+        errors: data.errors,
+        error: Object.values(data.errors).flat()[0],
+      }
+    }
+
+    return { ok: false, status, error: data?.message || mensajeDefault }
+  }
   const fetchUsers = async (page = 1, rows = perPage.value) => {
     if (loading.value) return
 
@@ -55,21 +72,11 @@ export const useUserStore = defineStore('userStore', () => {
       await fetchUsers(1, perPage.value)
       return { ok: true, user: response.data.user }
     } catch (error) {
-      const status = error.response?.status
-      const responseData = error.response?.data
-
-      if (status === 422 && responseData?.errors) {
-        const mensajes = Object.values(responseData.errors).flat()
-        return { ok: false, status, error: mensajes[0] }
-      }
-      return {
-        ok: false,
-        status,
-        error: responseData?.message || 'Error en el servidor.',
-      }
+      return formatearError(error, 'Error en el servidor.')
     }
   }
 
+  
   const updateUser = async (id, payload) => {
     try {
       const response = await updateUsuario(id, payload)
@@ -77,20 +84,10 @@ export const useUserStore = defineStore('userStore', () => {
       if (index !== -1) users.value[index] = response.data.user
       return { ok: true, user: response.data.user }
     } catch (error) {
-      const status = error.response?.status
-      const responseData = error.response?.data
-
-      if (status === 422 && responseData?.errors) {
-        const mensajes = Object.values(responseData.errors).flat()
-        return { ok: false, status, error: mensajes[0] }
-      }
-      return {
-        ok: false,
-        status,
-        error: responseData?.message || 'Error en el servidor.',
-      }
+      return formatearError(error, 'Error en el servidor.')
     }
   }
+
 
   const desactivarUsuario = async (id) => {
     try {

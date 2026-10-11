@@ -1,19 +1,17 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
     <!-- ======================================================= -->
     <div class="block lg:hidden mb-4">
       <div class="flex items-center gap-3">
         <div
-          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-receipt text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Historial de Ventas
-          </h1>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Historial de Ventas</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Consulta de transacciones e historial general
           </p>
@@ -26,7 +24,8 @@
     <!-- ======================================================= -->
     <div class="hidden lg:flex items-center gap-3 mb-6">
       <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
+      >
         <i class="pi pi-receipt text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
@@ -41,7 +40,6 @@
 
     <!-- TARJETA CONTENEDORA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
-
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL FILTROS (Solo Teléfono / Tablet)           -->
       <!-- ======================================================= -->
@@ -49,7 +47,7 @@
         <div class="flex flex-col gap-3">
           <!-- Buscador Móvil -->
           <IconField class="grid grid-cols-2 gap-2">
-            <InputIcon class="pi pi-search text-gray-400 " />
+            <InputIcon class="pi pi-search text-gray-400" />
             <InputText
               v-model="busqueda"
               placeholder="Buscar factura, vendedor..."
@@ -78,20 +76,32 @@
             />
           </div>
 
-          <!-- Rango Fechas Móvil -->
-          <div class="flex flex-col gap-1 grid grid-cols-2 gap-2 pt-1 border-t border-[#e2e8dd]/60">
-            <span class="text-[11px] font-bold text-[#2b5e3b] uppercase tracking-wider block">
+          <!-- Fechas Móvil -->
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#e2e8dd]/60">
+            <span
+              class="col-span-2 text-[11px] font-bold text-[#2b5e3b] uppercase tracking-wider block"
+            >
               Filtrar por fecha:
             </span>
             <DatePicker
-              v-model="rangoDeFechas"
-              selectionMode="range"
-              placeholder="Seleccionar rango..."
+              v-model="fechaInicio"
+              :maxDate="fechaFin"
+              placeholder="Fecha inicio"
               dateFormat="dd/mm/yy"
               showIcon
-              showButtonBar
+              :pt="{ pcInputText: { root: { readonly: true } } }"
+             
               class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10"
-              @hide="alCerrarCalendario"
+            />
+            <DatePicker
+              v-model="fechaFin"
+              :minDate="fechaInicio"
+              placeholder="Fecha fin"
+              dateFormat="dd/mm/yy"
+              showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
+              
+              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10"
             />
           </div>
         </div>
@@ -102,7 +112,6 @@
       <!-- ======================================================= -->
       <div class="hidden lg:block p-5 border-b border-[#e2e8dd] bg-[#fbfdf9]">
         <div class="flex flex-col gap-3.5 w-full">
-          
           <!-- FILA 1: Buscador, Estado y Tipo de Pago -->
           <div class="flex items-center gap-3 w-full">
             <!-- Buscador -->
@@ -138,25 +147,36 @@
             />
           </div>
 
-          <!-- FILA 2: Rango de Fechas -->
+          <!-- FILA 2: Fecha inicio y Fecha fin -->
           <div class="flex items-center gap-3 pt-2 border-t border-[#e2e8dd]/60">
             <span class="text-xs font-bold text-[#2b5e3b] uppercase tracking-wider shrink-0">
               Filtrar por fecha:
             </span>
-            <div class="w-[30%] shrink-0">
+            <div class="w-[22%] shrink-0">
               <DatePicker
-                v-model="rangoDeFechas"
-                selectionMode="range"
-                placeholder="Seleccionar rango de fechas..."
+                v-model="fechaInicio"
+                :maxDate="fechaFin"
+                placeholder="Fecha inicio"
                 dateFormat="dd/mm/yy"
                 showIcon
-                showButtonBar
+                :pt="{ pcInputText: { root: { readonly: true } } }"
+               
                 class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
-                @hide="alCerrarCalendario"
+              />
+            </div>
+            <div class="w-[22%] shrink-0">
+              <DatePicker
+                v-model="fechaFin"
+                :minDate="fechaInicio"
+                placeholder="Fecha fin"
+                dateFormat="dd/mm/yy"
+                showIcon
+                :pt="{ pcInputText: { root: { readonly: true } } }"
+                
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
               />
             </div>
           </div>
-
         </div>
       </div>
 
@@ -195,7 +215,9 @@
                 <Skeleton width="40%" height="0.8rem" />
               </div>
               <div v-else class="flex flex-col gap-0.5 items-start">
-                <span class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap">
+                <span
+                  class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap"
+                >
                   {{ slotProps.data.numeroFactura }}
                 </span>
                 <span class="text-xs text-gray-600 truncate max-w-[150px] block">
@@ -230,11 +252,12 @@
           <template #expansion="slotProps">
             <div class="p-3 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
               <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2.5">
-                
                 <!-- Fecha -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Fecha Registro</span>
-                  <span class="font-mono text-xs text-[#334155] font-semibold">{{ slotProps.data.fecha }}</span>
+                  <span class="font-mono text-xs text-[#334155] font-semibold">{{
+                    slotProps.data.fecha
+                  }}</span>
                 </div>
 
                 <!-- Tipo de Pago -->
@@ -249,9 +272,10 @@
                 <!-- Vendedor -->
                 <div class="flex justify-between items-center">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Vendedor</span>
-                  <span class="text-xs text-[#334155] font-medium">{{ slotProps.data.vendidoPor }}</span>
+                  <span class="text-xs text-[#334155] font-medium">{{
+                    slotProps.data.vendidoPor
+                  }}</span>
                 </div>
-
               </div>
 
               <!-- Botones Móvil Outlined -->
@@ -264,7 +288,6 @@
                   @click="$emit('ver-detalle', slotProps.data)"
                 />
               </div>
-
             </div>
           </template>
         </DataTable>
@@ -291,12 +314,18 @@
           <template #empty>
             <div class="flex flex-col items-center justify-center py-12 text-gray-400">
               <i class="pi pi-inbox text-[48px] mb-3 text-gray-300" />
-              <span class="text-[15px] font-medium">No hay ventas registradas para estos filtros</span>
+              <span class="text-[15px] font-medium"
+                >No hay ventas registradas para estos filtros</span
+              >
             </div>
           </template>
 
           <!-- Vendido por -->
-          <Column field="vendidoPor" header="Vendido por" class="font-semibold text-[#1a2e1f] min-w-[12rem]">
+          <Column
+            field="vendidoPor"
+            header="Vendido por"
+            class="font-semibold text-[#1a2e1f] min-w-[12rem]"
+          >
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="65%" height="1.2rem" />
               <span v-else class="capitalize block">{{ slotProps.data.vendidoPor }}</span>
@@ -307,7 +336,10 @@
           <Column field="numeroFactura" header="N° Factura" class="min-w-[9.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="5rem" height="1.2rem" />
-              <span v-else class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase">
+              <span
+                v-else
+                class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase"
+              >
                 {{ slotProps.data.numeroFactura }}
               </span>
             </template>
@@ -327,7 +359,13 @@
           <!-- Estado -->
           <Column field="estado" header="Estado" class="text-center min-w-[8.5rem]">
             <template #body="slotProps">
-              <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="20px" class="mx-auto" />
+              <Skeleton
+                v-if="cargando"
+                width="5.5rem"
+                height="1.5rem"
+                borderRadius="20px"
+                class="mx-auto"
+              />
               <Tag
                 v-else
                 :value="slotProps.data.estado"
@@ -350,7 +388,9 @@
           <Column field="total" header="Total" class="text-right min-w-[8.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="4rem" height="1.2rem" class="ml-auto" />
-              <span v-else class="font-bold text-[#1a2e1f] font-mono">${{ formatearMoneda(slotProps.data.total) }}</span>
+              <span v-else class="font-bold text-[#1a2e1f] font-mono"
+                >${{ formatearMoneda(slotProps.data.total) }}</span
+              >
             </template>
           </Column>
 
@@ -376,7 +416,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 </template>
@@ -418,24 +457,26 @@ const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 const busqueda = ref('')
 const estadoSel = ref(null)
 const pagoSel = ref(null)
-const rangoDeFechas = ref(null)
+const fechaInicio = ref(null)
+const fechaFin = ref(null)
+
 
 const aISO = (fecha) =>
   `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
 
-const emitirFiltros = () => {
-  const [desde, hasta] = rangoDeFechas.value ?? []
 
+const emitirFiltros = () => {
   emit('cambiar-filtros', {
     search: busqueda.value.trim(),
     estado: estadoSel.value || '',
     tipo_pago: pagoSel.value || '',
-    fecha_desde: desde ? aISO(desde) : '',
-    fecha_hasta: desde ? aISO(hasta ?? desde) : '',
+    fecha_desde: fechaInicio.value ? aISO(fechaInicio.value) : '',
+    fecha_hasta: fechaFin.value ? aISO(fechaFin.value) : '',
   })
-}
 
-watch([estadoSel, pagoSel], emitirFiltros)
+
+watch([estadoSel, pagoSel, fechaInicio, fechaFin], emitirFiltros)
+
 
 let temporizador = null
 watch(busqueda, () => {
@@ -443,16 +484,7 @@ watch(busqueda, () => {
   temporizador = setTimeout(emitirFiltros, 400)
 })
 onBeforeUnmount(() => clearTimeout(temporizador))
-
-watch(rangoDeFechas, (rango) => {
-  if (!rango || (rango[0] && rango[1])) emitirFiltros()
-})
-
-const alCerrarCalendario = () => {
-  const rango = rangoDeFechas.value
-  if (rango?.[0] && !rango[1]) emitirFiltros()
 }
-
 // --- Helpers visuales ---
 const estiloPago = (tipo) => {
   if (tipo === 'EFECTIVO')

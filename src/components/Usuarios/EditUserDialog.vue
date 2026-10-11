@@ -24,6 +24,15 @@
         :error="errors.name"
         @input="validarNombre"
       />
+      <BaseInput
+        v-model.trim="form.email"
+        label="Email"
+        placeholder="correo@ejemplo.com"
+        autocomplete="off"
+        maxlength="50"
+        :error="errors.email"
+        @input="validarEmail"
+      />
 
       <BasePassword
         v-model="form.password"
@@ -66,7 +75,9 @@
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO (>= 640px)                             -->
     <!-- ======================================================= -->
-    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+    <div
+      class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]"
+    >
       <BaseInput
         v-model.trim="form.name"
         label="Nombre"
@@ -76,6 +87,16 @@
         autocomplete="name"
         :error="errors.name"
         @input="validarNombre"
+      />
+
+      <BaseInput
+        v-model.trim="form.email"
+        label="Email"
+        placeholder="correo@ejemplo.com"
+        autocomplete="off"
+        maxlength="50"
+        :error="errors.email"
+        @input="validarEmail"
       />
 
       <BasePassword
@@ -117,7 +138,6 @@
     </div>
   </Dialog>
 </template>
-
 <script setup>
 import { ref, reactive, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
@@ -125,12 +145,12 @@ import Button from 'primevue/button'
 import { useUserStore } from '@/stores/usuarioStore'
 import BaseInput from '../base/BaseInput.vue'
 import BasePassword from '../base/BasePassword.vue'
-import { 
-  mostrarExito, 
-  mostrarError, 
+import {
+  mostrarExito,
+  mostrarError,
   mostrarAccesoDenegado,
   mostrarAlertaConfirmar,
-  mostrarCargando
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -146,24 +166,28 @@ const cargando = ref(false)
 
 const form = reactive({
   name: '',
+  email: '',
   password: '',
   confirmPassword: '',
 })
 
 const errors = reactive({
   name: '',
+  email: '',
   password: '',
   confirmPassword: '',
 })
 
+const limpiarErrores = () => {
+  Object.keys(errors).forEach((clave) => (errors[clave] = ''))
+}
+
 const cargarDatosUsuario = () => {
   form.name = props.user?.name ?? ''
+  form.email = props.user?.email ?? ''
   form.password = ''
   form.confirmPassword = ''
-
-  errors.name = ''
-  errors.password = ''
-  errors.confirmPassword = ''
+  limpiarErrores()
 }
 
 watch(
@@ -194,13 +218,14 @@ watch(visibleLocal, (esVisible) => {
 
 const reiniciarFormulario = () => {
   form.name = ''
+  form.email = ''
   form.password = ''
   form.confirmPassword = ''
-
-  errors.name = ''
-  errors.password = ''
-  errors.confirmPassword = ''
+  limpiarErrores()
 }
+
+const regexEmail =
+  /^[A-Za-z0-9]+([._-][A-Za-z0-9]+)*@[A-Za-z0-9]+(-[A-Za-z0-9]+)*(\.[A-Za-z]{2,3})?\.[A-Za-z]{2,}$/
 
 const validarNombre = () => {
   const nombre = form.name.trim()
@@ -210,12 +235,17 @@ const validarNombre = () => {
     return false
   }
 
-  if (nombre.length < 10) {
-    errors.name = 'El nombre debe tener al menos 10 caracteres.'
+  if (nombre.length < 3) {
+    errors.name = 'El nombre debe tener al menos 3 caracteres.'
     return false
   }
 
-  const regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
+  if (nombre.length > 50) {
+    errors.name = 'El nombre no debe exceder los 50 caracteres.'
+    return false
+  }
+
+  const regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/
 
   if (!regexLetras.test(nombre)) {
     errors.name = 'El nombre no puede contener números ni caracteres especiales.'
@@ -223,6 +253,28 @@ const validarNombre = () => {
   }
 
   errors.name = ''
+  return true
+}
+
+const validarEmail = () => {
+  const email = form.email.trim()
+
+  if (!email) {
+    errors.email = 'El correo electrónico es obligatorio.'
+    return false
+  }
+
+  if (email.length > 255) {
+    errors.email = 'El correo no puede superar los 255 caracteres.'
+    return false
+  }
+
+  if (!regexEmail.test(email)) {
+    errors.email = 'Correo inválido. Solo se permiten letras, números y los símbolos . _ -'
+    return false
+  }
+
+  errors.email = ''
   return true
 }
 
@@ -240,7 +292,12 @@ const validarContrasena = () => {
     errors.password = 'No puede contener espacios.'
     return false
   }
-  if (!/[A-Z]/.test(clave) || !/[a-z]/.test(clave) || !/[0-9]/.test(clave) || !/[^A-Za-z0-9]/.test(clave)) {
+  if (
+    !/[A-Z]/.test(clave) ||
+    !/[a-z]/.test(clave) ||
+    !/[0-9]/.test(clave) ||
+    !/[^A-Za-z0-9]/.test(clave)
+  ) {
     errors.password = 'Debe incluir mayúscula, minúscula, número y símbolo.'
     return false
   }
@@ -262,25 +319,24 @@ const validarConfirmarContrasena = () => {
   return true
 }
 
-const tieneCambios = computed(() => {
-  const nombreOriginal = props.user?.name ?? ''
+const cambioNombre = computed(() => form.name.trim() !== (props.user?.name ?? '').trim())
+const cambioEmail = computed(() => form.email.trim() !== (props.user?.email ?? '').trim())
+const cambioPassword = computed(() => form.password.length > 0)
 
-  const cambioNombre = form.name.trim() !== nombreOriginal.trim()
-  const cambioPassword = form.password.length > 0
-
-  return cambioNombre || cambioPassword
-})
+const tieneCambios = computed(() => cambioNombre.value || cambioEmail.value || cambioPassword.value)
 
 const procesarActualizacion = async () => {
   if (!tieneCambios.value) {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Sin cambios',
-      mensajeHtml: 'No se editó ningún campo.'
+      mensajeHtml: 'No se editó ningún campo.',
     })
     return
   }
+
   const nombreValido = validarNombre()
+  const emailValido = validarEmail()
   const contrasenaValida = validarContrasena()
   const confirmacionValida = validarConfirmarContrasena()
 
@@ -289,7 +345,7 @@ const procesarActualizacion = async () => {
     return
   }
 
-  if (!nombreValido || !contrasenaValida || !confirmacionValida) return
+  if (!nombreValido || !emailValido || !contrasenaValida || !confirmacionValida) return
 
   cargando.value = true
   mostrarCargando('Guardando cambios...', 'Actualizando información del usuario')
@@ -297,6 +353,11 @@ const procesarActualizacion = async () => {
   const cargaUtil = {
     name: form.name.trim(),
     rol: props.user?.roles?.[0]?.name || '',
+  }
+
+  // El email solo se envía si cambió (evita validaciones innecesarias en el servidor)
+  if (cambioEmail.value) {
+    cargaUtil.email = form.email.trim()
   }
 
   if (form.password) {
@@ -307,14 +368,23 @@ const procesarActualizacion = async () => {
   try {
     const [resultado] = await Promise.all([
       store.updateUser(props.user?.id, cargaUtil),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (resultado.ok) {
       visibleLocal.value = false
-      await mostrarExito('¡Datos actualizados!', 'Los datos del usuario fueron actualizados exitosamente.')
+      await mostrarExito(
+        '¡Datos actualizados!',
+        'Los datos del usuario fueron actualizados exitosamente.',
+      )
     } else if (resultado.status === 403) {
       mostrarAccesoDenegado()
+    } else if (resultado.status === 422 && resultado.errors) {
+      errors.name = resultado.errors.name?.[0] ?? ''
+      errors.email = resultado.errors.email?.[0] ?? ''
+      errors.password = resultado.errors.password?.[0] ?? ''
+      // Reemplaza el modal de "Guardando cambios..." para que no quede abierto
+      mostrarError('Datos inválidos', 'Revisa los campos marcados en el formulario.')
     } else if (resultado.error) {
       mostrarError('Error al actualizar', resultado.error)
     } else {

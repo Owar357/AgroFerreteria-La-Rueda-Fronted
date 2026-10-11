@@ -1,35 +1,47 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-
+  <div class="bg-[#eef2e9] min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet)        -->
     <!-- ======================================================= -->
     <div class="block lg:hidden mb-4">
       <div class="flex flex-col gap-3">
-      
-       <!-- Encabezado Móvil -->
-      <div class="flex items-center gap-3 mb-4">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
-          <i class="pi pi-chart-line text-[#2b5e3b] text-lg"></i>
+        <!-- Encabezado Móvil -->
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+          >
+            <i class="pi pi-chart-line text-[#2b5e3b] text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Turno de Caja</h1>
+            <h2 class="text-xs font-semibold text-[#2b5e3b] mt-0.5 m-0 tracking-wide">
+              Control y gestión del turno actual
+            </h2>
+          </div>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Turno de Caja
-          </h1>
-          <h2 class="text-xs font-semibold text-[#2b5e3b] mt-0.5 m-0 tracking-wide">
-             Control y gestión del turno actual
-          </h2>
-        </div>
-      </div>
 
         <!-- Badges Estado y Fecha Móvil (Inline / Ancho Ajustado) -->
-        <div class="flex items-center gap-2">
-          <div class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <div
+            class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs"
+          >
             <i class="pi pi-calendar text-[#2b5e3b] text-xs"></i>
             <span class="text-xs font-medium text-[#1a2e1f]">{{ currentDate }}</span>
           </div>
 
-          <div class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs">
+          <!-- Hora de apertura del turno -->
+          <div
+            v-if="turnoAbierto && horaAperturaTurno"
+            class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs"
+          >
+            <i class="pi pi-clock text-[#2b5e3b] text-xs"></i>
+            <span class="text-xs font-medium text-[#1a2e1f]">{{ horaAperturaTurno }}</span>
+          </div>
+
+          <!-- Estado -->
+          <div
+            class="flex-1 flex items-center justify-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-[#e2e8dd] shadow-2xs"
+          >
             <span class="text-[11px] text-gray-500 font-medium">Estado:</span>
             <Tag
               :value="turnoAbierto ? 'ABIERTO' : 'CERRADO'"
@@ -48,13 +60,13 @@
     <div class="hidden lg:flex items-center justify-between gap-4 mb-6">
       <!-- Título con Icono PC -->
       <div class="flex items-center gap-3">
-        <div class="!w-11 !h-11 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <div
+          class="!w-11 !h-11 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-wallet text-[#2b5e3b] text-xl"></i>
         </div>
         <div>
-          <h1 class="text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-            Turno de Caja
-          </h1>
+          <h1 class="text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Turno de Caja</h1>
           <h2 class="text-sm font-semibold text-[#2b5e3b] mt-0.5 m-0 tracking-wide">
             Control y gestión del turno actual
           </h2>
@@ -63,12 +75,27 @@
 
       <!-- Badges Estado y Fecha PC -->
       <div class="flex items-center gap-2">
-        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs">
+        <div
+          class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs"
+        >
           <i class="pi pi-calendar text-[#2b5e3b] text-xs"></i>
           <span class="text-xs font-semibold text-[#1a2e1f]">{{ currentDate }}</span>
         </div>
 
-        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs">
+        <!-- Hora de apertura del turno -->
+        <div
+          v-if="turnoAbierto && horaAperturaTurno"
+          class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs"
+        >
+          <i class="pi pi-clock text-[#2b5e3b] text-xs"></i>
+          <span class="text-xs text-gray-500 font-semibold">Apertura:</span>
+          <span class="text-xs font-semibold text-[#1a2e1f]">{{ horaAperturaTurno }}</span>
+        </div>
+
+        <!-- Estado -->
+        <div
+          class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#e2e8dd] shadow-2xs"
+        >
           <span class="text-xs text-gray-500 font-semibold">Estado:</span>
           <Tag
             :value="turnoAbierto ? 'TURNO ABIERTO' : 'TURNO CERRADO'"
@@ -87,101 +114,150 @@
     <!-- VISTA MÓVIL / TABLET (< 1024px)                        -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4">
-      
       <!-- ADMINISTRADOR MÓVIL: Tarjetas de Monto en Pareja (2x2 Inline) -->
-      <div v-if="esAdministrador" class="grid grid-cols-2 gap-3 ">
-
+      <div v-if="esAdministrador" class="grid grid-cols-2 gap-3">
         <!-- Monto Inicial -->
-        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between">
+        <div
+          class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between"
+        >
           <div>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <p
+              class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+            >
               <i class="pi pi-wallet text-[#2b5e3b] text-xs"></i> Monto Inicial
             </p>
-            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">
+              ${{ formatNumber(cajaStore.montoInicial) }}
+            </p>
           </div>
           <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Efectivo al abrir</p>
         </div>
 
         <!-- Monto Esperado -->
-        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%]  shadow-2xs flex flex-col justify-between">
+        <div
+          class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between"
+        >
           <div>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <p
+              class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+            >
               <i class="pi pi-chart-line text-[#2b5e3b] text-xs"></i> Monto Esperado
             </p>
-            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(montoEsperado) }}</p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">
+              ${{ formatNumber(montoEsperado) }}
+            </p>
           </div>
           <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Estimado en caja</p>
         </div>
 
         <!-- Efectivo en Gaveta (Alineado con Fondo Fijo) -->
-        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between">
+        <div
+          class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between"
+        >
           <div>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <p
+              class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+            >
               <i class="pi pi-money-bill text-[#2b5e3b] text-xs"></i> Efectivo Gaveta
             </p>
-            <p class="text-xl font-bold text-[#2b5e3b] font-mono m-0">${{ formatNumber(montoEnCaja) }}</p>
+            <p class="text-xl font-bold text-[#2b5e3b] font-mono m-0">
+              ${{ formatNumber(montoEnCaja) }}
+            </p>
           </div>
-          <p class="text-[10px] text-[#2b5e3b] font-medium mt-2 m-0 leading-tight">Ventas + Ent. - Sal.</p>
+          <p class="text-[10px] text-[#2b5e3b] font-medium mt-2 m-0 leading-tight">
+            Ventas + Ent. - Sal.
+          </p>
         </div>
 
         <!-- Fondo Fijo (Alineado con Efectivo en Gaveta) -->
-        <div class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd]  w-[48%] shadow-2xs flex flex-col justify-between">
+        <div
+          class="bg-white rounded-2xl p-3.5 border border-[#e2e8dd] w-[48%] shadow-2xs flex flex-col justify-between"
+        >
           <div>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <p
+              class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+            >
               <i class="pi pi-lock text-[#2b5e3b] text-xs"></i> Fondo Fijo
             </p>
-            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.fondoFijo) }}</p>
+            <p class="text-xl font-bold text-[#1a2e1f] font-mono m-0">
+              ${{ formatNumber(cajaStore.fondoFijo) }}
+            </p>
           </div>
           <p class="text-[10px] text-gray-400 mt-2 m-0 leading-tight">Base obligatoria</p>
         </div>
       </div>
 
       <!-- ADMINISTRADOR MÓVIL: Resumen de Movimientos -->
-      <div v-if="esAdministrador" class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden">
+      <div
+        v-if="esAdministrador"
+        class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden"
+      >
         <div class="bg-[#fbfdf9] px-4 py-3 border-b border-[#e2e8dd]">
           <h2 class="font-bold text-[#1a2e1f] text-sm flex items-center gap-2 m-0">
             <i class="pi pi-chart-pie text-[#a17923]"></i> Resumen de Movimientos
           </h2>
         </div>
         <div class="p-3.5 space-y-2.5">
-          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+          >
             <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
               <i class="pi pi-dollar text-[#2b5e3b]"></i> Ventas contado:
             </span>
-            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasContado) }}</span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs"
+              >${{ formatNumber(ventasContado) }}</span
+            >
           </div>
 
-          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+          >
             <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
               <i class="pi pi-credit-card text-[#2b5e3b]"></i> Ventas tarjeta:
             </span>
-            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasTarjeta) }}</span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs"
+              >${{ formatNumber(ventasTarjeta) }}</span
+            >
           </div>
 
-          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+          >
             <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
               <i class="pi pi-mobile text-[#2b5e3b]"></i> Transferencia:
             </span>
-            <span class="font-bold text-[#1a2e1f] font-mono text-xs">${{ formatNumber(ventasTransferencia) }}</span>
+            <span class="font-bold text-[#1a2e1f] font-mono text-xs"
+              >${{ formatNumber(ventasTransferencia) }}</span
+            >
           </div>
 
-          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+          >
             <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
               <i class="pi pi-plus text-green-600"></i> Otras entradas:
             </span>
-            <span class="font-bold text-green-700 font-mono text-xs">+${{ formatNumber(entradas) }}</span>
+            <span class="font-bold text-green-700 font-mono text-xs"
+              >+${{ formatNumber(entradas) }}</span
+            >
           </div>
 
-          <div class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center p-2.5 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+          >
             <span class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
               <i class="pi pi-arrow-down text-red-600"></i> Retiros / Gastos:
             </span>
-            <span class="font-bold text-red-600 font-mono text-xs">-${{ formatNumber(retiros) }}</span>
+            <span class="font-bold text-red-600 font-mono text-xs"
+              >-${{ formatNumber(retiros) }}</span
+            >
           </div>
 
           <div class="pt-3 border-t border-[#e2e8dd] flex justify-between items-center">
             <span class="text-xs font-bold text-[#1a2e1f]">Total Vendido:</span>
-            <span class="text-xl font-bold text-[#2b5e3b] font-mono">${{ formatNumber(totalEnCaja) }}</span>
+            <span class="text-xl font-bold text-[#2b5e3b] font-mono"
+              >${{ formatNumber(totalEnCaja) }}</span
+            >
           </div>
         </div>
       </div>
@@ -190,10 +266,14 @@
       <div v-if="esCajero" class="space-y-3">
         <!-- Monto Inicial Cajero -->
         <div class="bg-white rounded-2xl p-4 border border-[#e2e8dd] shadow-2xs">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <p
+            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"
+          >
             <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
           </p>
-          <p class="text-2xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+          <p class="text-2xl font-bold text-[#1a2e1f] font-mono m-0">
+            ${{ formatNumber(cajaStore.montoInicial) }}
+          </p>
         </div>
 
         <!-- Botones de Acción -->
@@ -211,7 +291,10 @@
             class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2"
           >
             <i class="pi pi-user text-amber-600 mt-0.5"></i>
-            <span>Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong>.</span>
+            <span
+              >Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong
+              >.</span
+            >
           </div>
 
           <Button
@@ -256,19 +339,28 @@
                   rounded
                   class="!text-[9px] !px-2 !py-0.5"
                 />
-                <Tag v-if="mov.esAnulado" value="Anulado" severity="secondary" rounded class="!text-[9px] !px-2 !py-0.5" />
+                <Tag
+                  v-if="mov.esAnulado"
+                  value="Anulado"
+                  severity="secondary"
+                  rounded
+                  class="!text-[9px] !px-2 !py-0.5"
+                />
               </div>
             </div>
 
             <div class="flex justify-between items-center">
-              <span class="text-xs text-[#1a2e1f] font-medium truncate max-w-[180px]" :class="{ 'line-through': mov.esAnulado }">
+              <span
+                class="text-xs text-[#1a2e1f] font-medium truncate max-w-[180px]"
+                :class="{ 'line-through': mov.esAnulado }"
+              >
                 {{ mov.concepto }}
               </span>
               <span
                 class="font-mono text-xs font-bold"
                 :class="[
                   mov.tipo === 'Ingreso' ? 'text-[#2b5e3b]' : 'text-red-600',
-                  { 'line-through': mov.esAnulado }
+                  { 'line-through': mov.esAnulado },
                 ]"
               >
                 {{ mov.monto }}
@@ -284,51 +376,70 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO / PC (>= 1024px)                      -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6">
-      
       <!-- ADMINISTRADOR PC: 4 Tarjetas en 1 Fila -->
       <div v-if="esAdministrador" class="grid grid-cols-4 gap-4 w-full">
         <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <p
+            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
+          >
             <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
           </p>
-          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">
+            ${{ formatNumber(cajaStore.montoInicial) }}
+          </p>
           <p class="text-xs text-gray-400 mt-2 m-0">Efectivo al abrir el turno</p>
         </div>
 
         <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <p
+            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
+          >
             <i class="pi pi-chart-line text-[#2b5e3b]"></i> Monto Esperado
           </p>
-          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(montoEsperado) }}</p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">
+            ${{ formatNumber(montoEsperado) }}
+          </p>
           <p class="text-xs text-gray-400 mt-2 m-0">Estimado a haber en caja</p>
         </div>
 
         <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <p
+            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
+          >
             <i class="pi pi-money-bill text-[#2b5e3b]"></i> Efectivo en Gaveta
           </p>
-          <p class="text-3xl font-bold text-[#2b5e3b] font-mono m-0">${{ formatNumber(montoEnCaja) }}</p>
-          <p class="text-xs text-[#2b5e3b] font-medium mt-2 m-0">Fondo + ventas en efectivo + entradas - salidas</p>
+          <p class="text-3xl font-bold text-[#2b5e3b] font-mono m-0">
+            ${{ formatNumber(montoEnCaja) }}
+          </p>
+          <p class="text-xs text-[#2b5e3b] font-medium mt-2 m-0">
+            Fondo + ventas en efectivo + entradas - salidas
+          </p>
         </div>
 
         <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <p
+            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
+          >
             <i class="pi pi-lock text-[#2b5e3b]"></i> Fondo Fijo
           </p>
-          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.fondoFijo) }}</p>
+          <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">
+            ${{ formatNumber(cajaStore.fondoFijo) }}
+          </p>
           <p class="text-xs text-gray-400 mt-2 m-0">Base obligatoria para cada turno</p>
         </div>
       </div>
 
       <!-- ADMINISTRADOR PC: Resumen de Movimientos -->
-      <div v-if="esAdministrador" class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden">
+      <div
+        v-if="esAdministrador"
+        class="bg-white rounded-2xl border border-[#e2e8dd] shadow-2xs overflow-hidden"
+      >
         <div class="bg-[#fbfdf9] px-6 py-4 border-b border-[#e2e8dd]">
           <h2 class="font-bold text-[#1a2e1f] text-lg flex items-center gap-2 m-0">
             <i class="pi pi-chart-pie text-[#a17923]"></i> Resumen de Movimientos
@@ -337,39 +448,59 @@
 
         <div class="p-6 space-y-5">
           <div class="grid grid-cols-2 gap-4">
-            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <div
+              class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+            >
               <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
                 <i class="pi pi-dollar text-[#2b5e3b]"></i> Ventas al contado:
               </span>
-              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasContado) }}</span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg"
+                >${{ formatNumber(ventasContado) }}</span
+              >
             </div>
 
-            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <div
+              class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+            >
               <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
                 <i class="pi pi-credit-card text-[#2b5e3b]"></i> Ventas por tarjeta:
               </span>
-              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasTarjeta) }}</span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg"
+                >${{ formatNumber(ventasTarjeta) }}</span
+              >
             </div>
 
-            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <div
+              class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+            >
               <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
                 <i class="pi pi-mobile text-[#2b5e3b]"></i> Transferencia bancaria:
               </span>
-              <span class="font-bold text-[#1a2e1f] font-mono text-lg">${{ formatNumber(ventasTransferencia) }}</span>
+              <span class="font-bold text-[#1a2e1f] font-mono text-lg"
+                >${{ formatNumber(ventasTransferencia) }}</span
+              >
             </div>
 
-            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]">
+            <div
+              class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd]"
+            >
               <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
                 <i class="pi pi-plus text-green-600"></i> Otras entradas:
               </span>
-              <span class="font-bold text-green-700 font-mono text-lg">+${{ formatNumber(entradas) }}</span>
+              <span class="font-bold text-green-700 font-mono text-lg"
+                >+${{ formatNumber(entradas) }}</span
+              >
             </div>
 
-            <div class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd] col-span-2">
+            <div
+              class="flex justify-between items-center p-4 bg-[#f8faf6] rounded-xl border border-[#e2e8dd] col-span-2"
+            >
               <span class="text-sm font-semibold text-gray-600 flex items-center gap-2">
                 <i class="pi pi-arrow-down text-red-600"></i> Retiros / Gastos:
               </span>
-              <span class="font-bold text-red-600 font-mono text-lg">-${{ formatNumber(retiros) }}</span>
+              <span class="font-bold text-red-600 font-mono text-lg"
+                >-${{ formatNumber(retiros) }}</span
+              >
             </div>
           </div>
 
@@ -377,7 +508,9 @@
             <span class="text-base font-bold text-[#1a2e1f] flex items-center gap-2">
               <i class="pi pi-chart-line text-[#a17923]"></i> Total vendido y movimientos del turno
             </span>
-            <span class="text-3xl font-bold text-[#2b5e3b] font-mono">${{ formatNumber(totalEnCaja) }}</span>
+            <span class="text-3xl font-bold text-[#2b5e3b] font-mono"
+              >${{ formatNumber(totalEnCaja) }}</span
+            >
           </div>
         </div>
       </div>
@@ -387,10 +520,14 @@
         <!-- Columna Acciones Cajero -->
         <div v-if="esCajero" class="col-span-1 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <p
+              class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
+            >
               <i class="pi pi-wallet text-[#2b5e3b]"></i> Monto Inicial
             </p>
-            <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">${{ formatNumber(cajaStore.montoInicial) }}</p>
+            <p class="text-3xl font-bold text-[#1a2e1f] font-mono m-0">
+              ${{ formatNumber(cajaStore.montoInicial) }}
+            </p>
             <p class="text-xs text-gray-400 mt-2 m-0">Efectivo al abrir el turno</p>
           </div>
 
@@ -414,7 +551,10 @@
                 class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2"
               >
                 <i class="pi pi-user text-amber-600 mt-0.5"></i>
-                <span>Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong>.</span>
+                <span
+                  >Turno abierto por <strong>{{ cajaStore.turnoActivo.cajero_nombre }}</strong
+                  >.</span
+                >
               </div>
 
               <Button
@@ -454,20 +594,27 @@
                 <div class="flex flex-col items-center justify-center py-10 text-gray-400">
                   <i class="pi pi-inbox text-4xl mb-2 opacity-40" />
                   <span class="text-sm font-medium">
-                    {{ turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto' }}
+                    {{
+                      turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto'
+                    }}
                   </span>
                 </div>
               </template>
 
               <Column field="hora" header="Hora" class="min-w-[7rem]">
                 <template #body="slotProps">
-                  <span class="font-mono text-xs text-gray-600 font-semibold">{{ slotProps.data.hora }}</span>
+                  <span class="font-mono text-xs text-gray-600 font-semibold">{{
+                    slotProps.data.hora
+                  }}</span>
                 </template>
               </Column>
 
               <Column field="concepto" header="Concepto" class="min-w-[14rem]">
                 <template #body="slotProps">
-                  <span class="text-xs text-[#1a2e1f] font-medium" :class="{ 'line-through opacity-60': slotProps.data.esAnulado }">
+                  <span
+                    class="text-xs text-[#1a2e1f] font-medium"
+                    :class="{ 'line-through opacity-60': slotProps.data.esAnulado }"
+                  >
                     {{ slotProps.data.concepto }}
                   </span>
                 </template>
@@ -479,7 +626,7 @@
                     class="font-mono text-xs font-bold"
                     :class="[
                       slotProps.data.tipo === 'Ingreso' ? 'text-[#2b5e3b]' : 'text-red-600',
-                      { 'line-through opacity-60': slotProps.data.esAnulado }
+                      { 'line-through opacity-60': slotProps.data.esAnulado },
                     ]"
                   >
                     {{ slotProps.data.monto }}
@@ -496,16 +643,20 @@
                       rounded
                       class="!text-xs !px-2.5"
                     />
-                    <Tag v-if="slotProps.data.esAnulado" value="Anulado" severity="secondary" rounded class="!text-xs !px-2.5" />
+                    <Tag
+                      v-if="slotProps.data.esAnulado"
+                      value="Anulado"
+                      severity="secondary"
+                      rounded
+                      class="!text-xs !px-2.5"
+                    />
                   </div>
                 </template>
               </Column>
             </DataTable>
           </div>
         </div>
-
       </div>
-
     </div>
 
     <!-- DIÁLOGOS Y MODALES -->
@@ -544,7 +695,6 @@
       @cierre-exitoso="onCierreExitoso"
       @cancelar="onCancelarCierre"
     />
-
   </div>
 </template>
 
@@ -566,16 +716,15 @@ import OpenCashierDialog from '@/components/Caja/OpenCashierDialog.vue'
 import CloseCashierDialog from '@/components/Caja/CloseCashierDialog.vue'
 import CierreCajaDialog from '@/components/Caja/CierreCajaDialog.vue'
 
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAlertaConfirmar, 
-  mostrarAccesoDenegado 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAlertaConfirmar,
+  mostrarAccesoDenegado,
 } from '@/utils/SweetAlertService'
 
 const cajaStore = useCajaStore()
 const posStore = usePosStore()
-
 
 const rolUsuario = ref((authService.getUserRole() || '').replace(/[^a-zA-Z]/g, '').toLowerCase())
 
@@ -589,7 +738,17 @@ const turnoAbierto = computed(() => !!cajaStore.turnoActivo)
 const currentDate = ref(
   new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
 )
+// Hora en que se abrió el turno activo
+const horaAperturaTurno = computed(() => {
+  const fecha = cajaStore.turnoActivo?.fecha_hora_apertura
+  if (!fecha) return null
 
+  return new Date(fecha).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+)
 
 const adminAuthVisible = ref(false)
 const aperturaVentaVisible = ref(false)
@@ -621,7 +780,6 @@ const montoEnCaja = computed(() => montoEnCajaReal.value)
 const totalEnCaja = computed(() => totalEnCajaReal.value)
 
 const formatNumber = (value) => parseFloat(value || 0).toFixed(2)
-
 
 const movimientosRecientes = ref([])
 
@@ -670,7 +828,11 @@ const cargarResumenTurno = async () => {
 }
 
 const refrescarDatosTurno = async () => {
-  await Promise.all([cajaStore.cargarEstadoCaja(), cargarMovimientosRecientes(), cargarResumenTurno()])
+  await Promise.all([
+    cajaStore.cargarEstadoCaja(),
+    cargarMovimientosRecientes(),
+    cargarResumenTurno(),
+  ])
 }
 
 onMounted(refrescarDatosTurno)
@@ -716,7 +878,10 @@ const onAbrirVenta = async ({ total, denominaciones, justificacion }) => {
     aperturaVentaVisible.value = false
     openCashierRef.value?.reset()
     await refrescarDatosTurno()
-    mostrarExito('¡Venta aperturada!', `Se inició la venta con un monto base de $${formatNumber(total)}.`)
+    mostrarExito(
+      '¡Venta aperturada!',
+      `Se inició la venta con un monto base de $${formatNumber(total)}.`,
+    )
     return
   }
 
@@ -724,7 +889,7 @@ const onAbrirVenta = async ({ total, denominaciones, justificacion }) => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Justificación requerida',
-      mensajeHtml: resultado.error || 'El conteo ingresado difiere del fondo fijo estipulado.'
+      mensajeHtml: resultado.error || 'El conteo ingresado difiere del fondo fijo estipulado.',
     })
   } else {
     mostrarError('Error al aperturar venta', resultado.error || 'No se pudo iniciar la venta.')
@@ -803,7 +968,6 @@ const onCierreExitoso = async () => {
 .p-datatable-custom .p-datatable-tbody > tr:hover {
   background-color: #f4f8f3 !important;
 }
-
 
 .swal2-container {
   z-index: 999999 !important;

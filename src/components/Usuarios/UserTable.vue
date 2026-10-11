@@ -383,7 +383,15 @@ const confirmarDesactivar = async (usuario) => {
     ])
 
     if (resultado?.ok) {
+
       mostrarExito('¡Usuario desactivado!', `El usuario "${usuario.name}" fue desactivado correctamente.`)
+    } else if (resultado?.status === 409) {
+      // El usuario tiene una caja aperturada: no se puede desactivar hasta que la cierre
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'No se puede desactivar',
+        mensajeHtml: `El usuario <strong style="color:#1e3a2f;">${usuario.name}</strong> tiene una caja aperturada. Debe cerrar la caja por completo para poder desactivarlo.`,
+      })
     } else if (resultado?.status === 403) {
       mostrarAccesoDenegado()
     } else {

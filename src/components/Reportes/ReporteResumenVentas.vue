@@ -1,6 +1,7 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
+  <div
+  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+>
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -46,6 +47,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha inicio"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -59,6 +61,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha fin"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -128,6 +131,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -141,6 +145,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
