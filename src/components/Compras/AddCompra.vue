@@ -81,14 +81,15 @@
                       </span>
                       <BaseInput
                         v-model="documentoForm.numComprobante"
-                        :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
+                        :placeholder="prefijoComprobante ? '12345678-000000000000001' : 'Número de documento'"
+                        :maxlength="prefijoComprobante ? 25 : 31"
                         size="sm"
                         class="w-full"
                         :class="prefijoComprobante ? '[&_input]:!rounded-l-none' : ''"
                       />
                     </div>
                     <small v-if="prefijoComprobante" class="text-[11px] text-[#6b7280] font-normal">
-                      Aplica para comprobante físico
+                      Escribe los 23 dígitos; el guion se inserta automáticamente.
                     </small>
                   </div>
 
@@ -162,14 +163,15 @@
                           </span>
                           <BaseInput
                             v-model="documentoForm.numComprobante"
-                            :placeholder="prefijoComprobante ? '000123456' : 'Número de documento'"
+                            :placeholder="prefijoComprobante ? '12345678-000000000000001' : 'Número de documento'"
+                            :maxlength="prefijoComprobante ? 25 : 31"
                             size="md"
                             class="w-full"
                             :class="prefijoComprobante ? '[&_input]:!rounded-l-none' : ''"
                           />
                         </div>
                         <small v-if="prefijoComprobante" class="text-[13px] text-[#6b7280] font-normal">
-                          Aplica para comprobante físico
+                          Escribe los 23 dígitos; el guion se inserta automáticamente.
                         </small>
                       </div>
                     </div>
@@ -207,28 +209,27 @@
                   </div>
                 </div>
 
-               
-                  <!-- Footer Paso 1 -->
-                  <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
-                    <!-- Vista Móvil -->
-                    <div class="flex flex-col gap-3 block md:hidden">
-                      <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
-                        class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
-                        @click="activateCallback('2')" />
-                      <Button label="Regresar" icon="pi pi-arrow-left"
-                        class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
-                        @click="emit('close')" />
-                    </div>
-                    <!-- Vista Escritorio -->
-                    <div class="hidden md:flex justify-between items-center w-full">
-                      <Button label="Regresar" icon="pi pi-arrow-left"
-                        class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                        @click="emit('close')" />
-                      <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
-                        class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                        @click="activateCallback('2')" />
-                    </div>
+                <!-- Footer Paso 1 -->
+                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                  <!-- Vista Móvil -->
+                  <div class="flex flex-col gap-3 block md:hidden">
+                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-xs transition-all cursor-pointer w-full flex justify-center"
+                      @click="activateCallback('2')" />
+                    <Button label="Regresar" icon="pi pi-arrow-left"
+                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                      @click="emit('close')" />
                   </div>
+                  <!-- Vista Escritorio -->
+                  <div class="hidden md:flex justify-between items-center w-full">
+                    <Button label="Regresar" icon="pi pi-arrow-left"
+                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                      @click="emit('close')" />
+                    <Button label="Siguiente" icon="pi pi-arrow-right" iconPos="right"
+                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                      @click="activateCallback('2')" />
+                  </div>
+                </div>
               </div>
             </StepPanel>
 
@@ -252,7 +253,7 @@
                         pcInputText: {
                           root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 rounded-lg w-full' }
                         }
-                      }" >
+                      }">
                       <template #option="{ option }">
                         <span class="text-sm">
                           <span class="font-semibold text-[#1a2e1f]">{{ option.nombre }}</span>
@@ -284,7 +285,7 @@
                     <template #help>
                       <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
                         class="text-[11px] text-[#2b5e3b] font-medium">
-                        = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                        = {{ formatearNumero(unidadesFacturadas) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
                       </small>
                     </template>
                   </BaseInputNumber>
@@ -338,7 +339,7 @@
                       <template #help>
                         <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
                           class="text-[11px] text-[#2b5e3b] font-medium">
-                          = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                          = {{ formatearNumero(unidadesBonificadas) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
                         </small>
                       </template>
                     </BaseInputNumber>
@@ -381,19 +382,19 @@
                     class="bg-[#f4f7f2] border border-[#dce4d7] rounded-xl p-3.5 space-y-1.5 text-xs">
                     <div class="flex justify-between">
                       <span class="text-gray-600">Subtotal (facturado):</span>
-                      <span class="font-semibold text-[#1a2e1f] font-mono">${{ subTotal.toFixed(2) }}</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">{{ formatearMoneda(subTotal, 2) }}</span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-gray-600">Total a pagar:</span>
-                      <span class="font-semibold text-[#1a2e1f] font-mono">${{ totalPagado.toFixed(2) }}</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">{{ formatearMoneda(totalPagado, 2) }}</span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-gray-600">Unidades reales bodega:</span>
-                      <span class="font-semibold text-[#1a2e1f] font-mono">{{ cantidadInicialLote }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
+                      <span class="font-semibold text-[#1a2e1f] font-mono">{{ formatearNumero(cantidadInicialLote) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
                     </div>
                     <div class="flex justify-between border-t border-[#dce4d7] pt-1 mt-1">
                       <span class="text-[#2b5e3b] font-bold">Costo unitario real:</span>
-                      <span class="font-bold text-[#2b5e3b] font-mono">${{ costoUnitarioReal.toFixed(4) }}</span>
+                      <span class="font-bold text-[#2b5e3b] font-mono">{{ formatearMoneda(costoUnitarioReal, 4) }}</span>
                     </div>
                   </div>
 
@@ -418,7 +419,7 @@
                         <label class="text-[14px] font-medium text-[#1a2e1f]">Nombre del producto</label>
                         <AutoComplete v-model="loteForm.producto" optionLabel="nombre" :suggestions="sugerenciasProductos"
                           @complete="buscarProductoLote" @item-select="alSeleccionarProductoLote"
-                          placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid >
+                          placeholder="Escribe nombre, cód. interno o cód. de barra" class="w-full" fluid>
                           <template #option="{ option }">
                             <span class="text-sm">
                               <span class="font-semibold text-[#1a2e1f]">{{ option.nombre }}</span>
@@ -446,7 +447,7 @@
                         <template #help>
                           <small v-if="loteForm.presentacionFacturada && loteForm.cantidadFacturada"
                             class="text-[13px] text-[#2b5e3b] font-medium">
-                            = {{ unidadesFacturadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                            = {{ formatearNumero(unidadesFacturadas) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
                           </small>
                         </template>
                       </BaseInputNumber>
@@ -500,7 +501,7 @@
                         <template #help>
                           <small v-if="loteForm.presentacionBonificada && loteForm.cantidadBonificada"
                             class="text-[13px] text-[#2b5e3b] font-medium">
-                            = {{ unidadesBonificadas }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
+                            = {{ formatearNumero(unidadesBonificadas) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }} en total
                           </small>
                         </template>
                       </BaseInputNumber>
@@ -540,19 +541,19 @@
                       class="bg-[#eef2e9] border border-[#d1d5db] rounded-lg p-4 flex flex-col gap-1 text-[13px]">
                       <div class="flex justify-between">
                         <span class="text-[#4b5563]">Subtotal (facturado)</span>
-                        <span class="font-semibold text-[#1a2e1f]">${{ subTotal.toFixed(2) }}</span>
+                        <span class="font-semibold text-[#1a2e1f]">{{ formatearMoneda(subTotal, 2) }}</span>
                       </div>
                       <div class="flex justify-between">
                         <span class="text-[#4b5563]">Total a pagar (con descuento)</span>
-                        <span class="font-semibold text-[#1a2e1f]">${{ totalPagado.toFixed(2) }}</span>
+                        <span class="font-semibold text-[#1a2e1f]">{{ formatearMoneda(totalPagado, 2) }}</span>
                       </div>
                       <div class="flex justify-between">
                         <span class="text-[#4b5563]">Unidades reales que entran a bodega</span>
-                        <span class="font-semibold text-[#1a2e1f]">{{ cantidadInicialLote }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
+                        <span class="font-semibold text-[#1a2e1f]">{{ formatearNumero(cantidadInicialLote) }} {{ loteForm.producto?.unidad_base?.toLowerCase() }}</span>
                       </div>
                       <div class="flex justify-between border-t border-[#d1d5db] pt-1 mt-1">
                         <span class="text-[#2b5e3b] font-semibold">Costo unitario real (lote)</span>
-                        <span class="font-bold text-[#2b5e3b]">${{ costoUnitarioReal.toFixed(4) }}</span>
+                        <span class="font-bold text-[#2b5e3b]">{{ formatearMoneda(costoUnitarioReal, 4) }}</span>
                       </div>
                     </div>
 
@@ -638,30 +639,27 @@
                 </div>
 
                 <!-- Footer Paso 2 -->
-               
-                  <!-- Footer Paso 2 -->
-                    <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
-                      <!-- Vista Móvil -->
-                      <div class="flex flex-col-reverse gap-3 block md:hidden">
-                        <Button label="Atrás" icon="pi pi-arrow-left"
-                          class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
-                          @click="activateCallback('1')" />
-                        <Button label="Registrar compra" icon="pi pi-save"
-                          class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
-                          @click="registrarCompraFinal" />
-                      </div>
+                <div class="mt-6 pt-4 border-t border-[#e2e8dd]">
+                  <!-- Vista Móvil -->
+                  <div class="flex flex-col-reverse gap-3 block md:hidden">
+                    <Button label="Atrás" icon="pi pi-arrow-left"
+                      class="!text-sm !py-3 !px-6 !bg-[#eef2e9] !border-[#cbd5e1] !text-[#1a2e1f] rounded-xl hover:!bg-[#e2e8dd] cursor-pointer w-full flex justify-center"
+                      @click="activateCallback('1')" />
+                    <Button label="Registrar compra" icon="pi pi-save"
+                      class="!text-sm !py-3 !px-6 !bg-[#2b5e3b] hover:!bg-[#1f482d] !border-none !text-white rounded-xl shadow-md cursor-pointer w-full flex justify-center"
+                      @click="registrarCompraFinal" />
+                  </div>
 
-                      <!-- Vista Escritorio -->
-                      <div class="hidden md:flex justify-between items-center w-full">
-                        <Button label="Atrás" icon="pi pi-arrow-left"
-                          class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
-                          @click="activateCallback('1')" />
-                        <Button label="Registrar compra" icon="pi pi-save"
-                          class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
-                          @click="registrarCompraFinal" />
-                      </div>
-                    </div>
-                
+                  <!-- Vista Escritorio -->
+                  <div class="hidden md:flex justify-between items-center w-full">
+                    <Button label="Atrás" icon="pi pi-arrow-left"
+                      class="bg-[#eef2e9] hover:bg-[#e2e8dd] text-[#1a2e1f] border border-[#cbd5e1] px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-colors duration-200 cursor-pointer"
+                      @click="activateCallback('1')" />
+                    <Button label="Registrar compra" icon="pi pi-save"
+                      class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white border-none px-6 py-2.5 rounded-xl text-[14px] font-semibold cursor-pointer shadow-md transition-colors duration-200"
+                      @click="registrarCompraFinal" />
+                  </div>
+                </div>
 
               </div>  
             </StepPanel>
@@ -714,6 +712,9 @@ const proveedoresOptions = ref([])
 const proveedoresFiltrados = ref([])
 const incluyeBonificacion = ref(false)
 
+const STORAGE_KEY_DOC = 'compra_borrador_documento'
+const STORAGE_KEY_ITEMS = 'compra_borrador_items'
+
 const comprobantesOptions = ref([
   { label: 'Nota de Remisión', value: '04' },
   { label: 'Factura Consumidor Final (FCF)', value: '01' },
@@ -750,6 +751,94 @@ const loteForm = reactive({
   fechaVencimientoLote: null,
 })
 
+const formatearMoneda = (valor, decimales = 2) => {
+  if (valor === null || valor === undefined || isNaN(valor)) return '$0.00'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales
+  }).format(valor)
+}
+
+const formatearNumero = (valor) => {
+  if (valor === null || valor === undefined || isNaN(valor)) return '0'
+  return new Intl.NumberFormat('en-US').format(valor)
+}
+
+const prefijoComprobante = computed(() => {
+  if (documentoForm.tipoComprobante === '99') return null
+  return `DTE-${documentoForm.tipoComprobante}-`
+})
+
+const formatearNumComprobante = (valor) => {
+  if (!valor) return ''
+  
+  let limpio = valor.replace(/[^0-9-]/g, '')
+  
+  if (prefijoComprobante.value) {
+    const soloNumeros = limpio.replace(/-/g, '')
+    
+    if (soloNumeros.length > 8) {
+      limpio = `${soloNumeros.slice(0, 8)}-${soloNumeros.slice(8, 23)}`
+    } else {
+      limpio = soloNumeros
+    }
+  }
+  
+  return limpio
+}
+
+watch(
+  () => documentoForm.numComprobante,
+  (nuevoValor) => {
+    const formateado = formatearNumComprobante(nuevoValor)
+    if (nuevoValor !== formateado) {
+      documentoForm.numComprobante = formateado
+    }
+  }
+)
+
+const guardarBorradorLocal = () => {
+  const docData = { ...documentoForm }
+  if (docData.fechaEmision) docData.fechaEmision = docData.fechaEmision.toISOString()
+  if (docData.fechaVencimiento) docData.fechaVencimiento = docData.fechaVencimiento.toISOString()
+
+  localStorage.setItem(STORAGE_KEY_DOC, JSON.stringify(docData))
+  localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(itemsAgregados.value))
+}
+
+const cargarBorradorLocal = () => {
+  try {
+    const docGuardado = localStorage.getItem(STORAGE_KEY_DOC)
+    if (docGuardado) {
+      const parsedDoc = JSON.parse(docGuardado)
+      if (parsedDoc.fechaEmision) parsedDoc.fechaEmision = new Date(parsedDoc.fechaEmision)
+      if (parsedDoc.fechaVencimiento) parsedDoc.fechaVencimiento = new Date(parsedDoc.fechaVencimiento)
+      Object.assign(documentoForm, parsedDoc)
+    }
+
+    const itemsGuardados = localStorage.getItem(STORAGE_KEY_ITEMS)
+    if (itemsGuardados) {
+      const parsedItems = JSON.parse(itemsGuardados)
+      itemsAgregados.value = parsedItems.map((item) => ({
+        ...item,
+        fecha_vencimiento: item.fecha_vencimiento ? new Date(item.fecha_vencimiento) : null,
+      }))
+    }
+  } catch (error) {
+    
+  }
+}
+
+const limpiarBorradorLocal = () => {
+  localStorage.removeItem(STORAGE_KEY_DOC)
+  localStorage.removeItem(STORAGE_KEY_ITEMS)
+}
+
+watch(documentoForm, guardarBorradorLocal, { deep: true })
+watch(itemsAgregados, guardarBorradorLocal, { deep: true })
+
 const buscarProveedor = (event) => {
   const q = event.query.toLowerCase().trim()
   if (!q) {
@@ -761,16 +850,13 @@ const buscarProveedor = (event) => {
   }
 }
 
-const prefijoComprobante = computed(() => {
-  if (documentoForm.tipoComprobante === '99') return null
-  return `DTE-${documentoForm.tipoComprobante}-`
-})
-
 watch(
   () => documentoForm.tipoComprobante,
   (nuevo) => {
     if (nuevo === '99') {
       documentoForm.numComprobante = ''
+    } else {
+      documentoForm.numComprobante = formatearNumComprobante(documentoForm.numComprobante)
     }
   },
 )
@@ -881,11 +967,11 @@ const agregarItemsATabla = () => {
     producto_id: loteForm.producto.id,
     tipo_producto: loteForm.producto.tipo_producto,
     producto: loteForm.producto.nombre,
-    cantFact: `${loteForm.cantidadFacturada} ${loteForm.presentacionFacturada.nombre}`,
-    cantidad: cantidadInicialLote.value,
-    costoUnit: `$${costoUnitarioReal.value.toFixed(4)}`,
+    cantFact: `${formatearNumero(loteForm.cantidadFacturada)} ${loteForm.presentacionFacturada.nombre}`,
+    cantidad: formatearNumero(cantidadInicialLote.value),
+    costoUnit: formatearMoneda(costoUnitarioReal.value, 4),
     vencimiento: vencimientoTexto,
-    subtotal: `$${totalPagado.value.toFixed(2)}`,
+    subtotal: formatearMoneda(totalPagado.value, 2),
     presentacion_id: loteForm.presentacionFacturada.id,
     cantidad_facturada: Number(loteForm.cantidadFacturada),
     cantidad_bonificada: unidadesBonificadas.value,
@@ -965,18 +1051,8 @@ const registrarCompraFinal = async () => {
 
   mostrarCargando('Registrando compra...', 'Guardando documento y procesando entrada de lotes')
 
-  try {
-    const [res] = await Promise.all([
-      registrarCompra(payload),
-      new Promise((resolve) => setTimeout(resolve, 500))
-    ])
-
-    if (res.data?.status === 'warning' && res.data?.alertas) {
-      await manejarAlertaGananciaReducida(res.data.alertas)
-    } else {
-      await mostrarExito('¡Compra registrada!', 'La compra y sus lotes fueron guardados con éxito.')
-    }
-
+  // Limpia el formulario y cierra el modal (solo cuando la compra YA quedó guardada)
+  const finalizarCompra = () => {
     itemsAgregados.value = []
     Object.assign(documentoForm, {
       proveedor: null,
@@ -987,11 +1063,53 @@ const registrarCompraFinal = async () => {
       montoTotal: '',
       fechaVencimiento: null,
     })
+    limpiarBorradorLocal()
     emit('close')
+  }
 
+  // La compra AÚN no está guardada: el usuario decide en los modales.
+  // Al elegir "Actualizar precios" o "Mantener precios" se reenvía con confirmado: true.
+  // Si cancela, nos quedamos en el formulario con todo intacto para corregir.
+  const gestionarAlertasGanancia = async (alertas) => {
+    const compraGuardada = await manejarAlertaGananciaReducida(
+      alertas,
+      () => registrarCompra({ ...payload, confirmado: true }),
+    )
+    if (compraGuardada) finalizarCompra()
+  }
+
+  try {
+    const [res] = await Promise.all([
+      registrarCompra(payload),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    if (res.data?.status === 'warning' && Array.isArray(res.data?.alertas)) {
+      await gestionarAlertasGanancia(res.data.alertas)
+      return
+    }
+
+    await mostrarExito('¡Compra registrada!', 'La compra y sus lotes fueron guardados con éxito.')
+    finalizarCompra()
   } catch (error) {
+    console.error('Error al registrar la compra:', error)
+
     const status = error.response?.status
-    const data = error.response?.data
+    const data = error.response?.data ?? error.data
+
+  
+    if (data?.status === 'warning' && Array.isArray(data?.alertas)) {
+      try {
+        await gestionarAlertasGanancia(data.alertas)
+      } catch (errorGuardado) {
+        console.error('Error al confirmar la compra:', errorGuardado)
+        mostrarError(
+          'Error',
+          errorGuardado.response?.data?.message || errorGuardado.message || 'No se pudo registrar la compra.',
+        )
+      }
+      return
+    }
 
     if (status === 403) {
       mostrarAccesoDenegado()
@@ -999,7 +1117,8 @@ const registrarCompraFinal = async () => {
       const mensajes = Object.values(data.errors).flat()
       mostrarError('Error de validación', mensajes[0])
     } else {
-      mostrarError('Error', data?.message || 'No se pudo registrar la compra.')
+      // error.message muestra la causa real si fue un fallo de JavaScript y no del servidor
+      mostrarError('Error', data?.message || error.message || 'No se pudo registrar la compra.')
     }
   }
 }
@@ -1011,8 +1130,10 @@ onMounted(async () => {
   } catch {
     proveedoresOptions.value = []
   }
+  cargarBorradorLocal()
 })
 </script>
+
 <style>
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #ffffff !important;
