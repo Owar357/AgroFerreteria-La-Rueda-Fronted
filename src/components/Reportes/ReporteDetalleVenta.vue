@@ -1,7 +1,8 @@
 <template>
   <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
->
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -24,7 +25,7 @@
           <i class="pi pi-shopping-cart text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Reporte de Ventas</h1>
+          <h1 class="text-3xl font-bold text-[#1a2e1f] leading-tight m-0">Reporte de Ventas</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Filtra por rango de fecha y genera el reporte
           </p>
@@ -40,7 +41,7 @@
 
         <!-- Fecha Desde Móvil -->
         <div class="flex flex-col gap-1 w-full">
-          <label class="text-xs font-semibold text-gray-600">Fecha desde</label>
+          <label class="text-xs font-semibold text-gray-600">Fecha inicio</label>
           <DatePicker
             v-model="fechaDesde"
             dateFormat="yy-mm-dd"
@@ -54,7 +55,7 @@
 
         <!-- Fecha Hasta Móvil -->
         <div class="flex flex-col gap-1 w-full">
-          <label class="text-xs font-semibold text-gray-600">Fecha hasta</label>
+          <label class="text-xs font-semibold text-gray-600">Fecha fin</label>
           <DatePicker
             v-model="fechaHasta"
             dateFormat="yy-mm-dd"
@@ -72,7 +73,7 @@
             label="Generar PDF"
             icon="pi pi-file-pdf"
             :loading="generandoPDF"
-            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
+           class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
           <Button
@@ -124,7 +125,7 @@
         <div class="flex flex-wrap items-end gap-4">
           <!-- Fecha Desde PC -->
           <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
-            <label class="text-sm font-medium text-gray-600">Fecha desde</label>
+            <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
             <DatePicker
               v-model="fechaDesde"
               dateFormat="yy-mm-dd"
@@ -138,7 +139,7 @@
 
           <!-- Fecha Hasta PC -->
           <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
-            <label class="text-sm font-medium text-gray-600">Fecha hasta</label>
+            <label class="text-sm font-medium text-gray-600">Fecha fin</label>
             <DatePicker
               v-model="fechaHasta"
               dateFormat="yy-mm-dd"
@@ -153,19 +154,19 @@
           <!-- Botones PC -->
           <div class="flex gap-3">
             <Button
+              label="Generar Reporte PDF"
+              icon="pi pi-file-pdf"
+              :loading="generandoPDF"
+              class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
+              @click="generarPDF"
+            />
+            <Button
               label="Limpiar"
               icon="pi pi-times"
               severity="secondary"
               outlined
               class="!text-sm !px-5 !py-2 !border-gray-300 !text-gray-600 cursor-pointer"
               @click="limpiarFiltros"
-            />
-            <Button
-              label="Generar Reporte PDF"
-              icon="pi pi-file-pdf"
-              :loading="generandoPDF"
-              class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-sm !px-5 !py-2 cursor-pointer font-semibold shadow-2xs"
-              @click="generarPDF"
             />
           </div>
         </div>
@@ -179,6 +180,7 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteVentas } from '@/services/reporteService'
+import { fondoStyle } from '@/utils/fondoReportes'
 import {
   mostrarExito,
   mostrarError,
@@ -204,7 +206,7 @@ const generarPDF = async () => {
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
       mensajeHtml:
-        'Debes seleccionar la <strong>Fecha desde</strong> y la <strong>Fecha hasta</strong> para generar el reporte.',
+        'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.',
     })
     return
   }
@@ -214,7 +216,7 @@ const generarPDF = async () => {
       tipo: 'advertencia',
       titulo: 'Rango de fechas inválido',
       mensajeHtml:
-        'La <strong>Fecha desde</strong> no puede ser posterior a la <strong>Fecha hasta</strong>.',
+        'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.',
     })
     return
   }

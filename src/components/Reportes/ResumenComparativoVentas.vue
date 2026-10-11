@@ -1,7 +1,18 @@
 <template>
+  
   <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
-><!-- ======================================================= -->
+<div
+  class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat
+         h-dvh lg:h-full
+         p-3 sm:p-6 md:p-8
+         text-[#1a2e1f] font-['Inter',sans-serif]
+         w-full overflow-x-hidden
+         overflow-y-auto lg:overflow-y-hidden"
+  :style="fondoStyle"
+>    
+  
+
+    <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
@@ -22,7 +33,7 @@
         >
           <i class="pi pi-chart-line text-[#2b5e3b] text-lg"></i>
         </div>
-        <div> 
+        <div>
           <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Resumen Comparativo</h1>
           <p class="text-xs text-gray-500 mt-0.5 m-0">
             Compara las ventas entre dos rangos de fecha
@@ -160,7 +171,7 @@
           <!-- Rango 1 PC -->
           <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-4">
             <p class="text-sm font-semibold text-[#1e3a2f] mb-3 m-0">Rango 1</p>
-            <div class="flex flex-col gap-3">
+           <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
                 <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
                 <DatePicker
@@ -191,7 +202,7 @@
           <!-- Rango 2 PC -->
           <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-4">
             <p class="text-sm font-semibold text-[#1e3a2f] mb-3 m-0">Rango 2</p>
-            <div class="flex flex-col gap-3">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
                 <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
                 <DatePicker
@@ -223,7 +234,7 @@
         </div>
 
         <!-- Botones PC -->
-        <div class="flex gap-3 mt-6 pt-4 border-t border-[#e2e8dd]">
+      <div class="flex gap-3 mt-4">
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
@@ -250,6 +261,7 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteComparativoVentas } from '@/services/reporteService'
+import { fondoStyle } from '@/utils/fondoReportes'
 import {
   mostrarExito,
   mostrarError,

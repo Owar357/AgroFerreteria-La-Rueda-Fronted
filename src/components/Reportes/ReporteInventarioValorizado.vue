@@ -1,7 +1,8 @@
 <template>
- <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
->
+  <div
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -170,6 +171,7 @@ import Button from 'primevue/button'
 import Select from 'primevue/select'
 import { api } from '@/services/authService'
 import { generarReporteInventarioValorizado } from '@/services/reporteService'
+import { fondoStyle } from '@/utils/fondoReportes'
 import {
   mostrarExito,
   mostrarError,
