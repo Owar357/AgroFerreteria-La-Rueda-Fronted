@@ -1,7 +1,9 @@
 <template>
   <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
-> <!-- ======================================================= -->
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
+    <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
@@ -176,6 +178,7 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteMargenGanancia } from '@/services/reporteService'
+import { fondoStyle } from '@/utils/fondoReportes'
 import {
   mostrarExito,
   mostrarError,

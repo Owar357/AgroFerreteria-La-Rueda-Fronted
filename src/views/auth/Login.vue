@@ -1,10 +1,14 @@
 <template>
   <div
-    class="min-h-screen bg-[#839370] flex items-center justify-center p-4 sm:p-6 md:p-8 font-['Inter',sans-serif]"
+    class="relative min-h-screen bg-[#14291d] bg-cover bg-center bg-no-repeat flex items-center justify-center p-4 sm:p-6 md:p-8 font-['Inter',sans-serif]"
+    :style="{ backgroundImage: `url(${fondoLogin})` }"
   >
+    <!-- Capa verde oscura sobre la foto de fondo -->
+    <div class="absolute inset-0 bg-[#14291d]/65 backdrop-blur-[2px]"></div>
+
     <!-- Contenedor principal adaptativo -->
     <div
-      class="w-full max-w-[56.25rem] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[32.5rem] border border-[#e2e8dd]"
+      class="relative z-10 w-full max-w-[56.25rem] bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[32.5rem] border border-[#e2e8dd]"
     >
       <!-- Panel izquierdo -->
       <div
@@ -30,7 +34,7 @@
             class="bg-[#1e3a2f] p-2 rounded-2xl w-[9rem] h-[9rem] flex items-center justify-center shadow-md overflow-hidden border border-white/10"
           >
             <img
-              src="/src/assets/logo.png"
+              :src="logo"
               alt="Logo La Rueda"
               class="w-full h-full object-contain"
             />
@@ -142,6 +146,9 @@ import Password from 'primevue/password'
 import Button from 'primevue/button'
 import authService from '@/services/authService'
 import { mostrarExito, mostrarError } from '@/utils/SweetAlertService'
+import fondoLogin from '@/assets/AgroLogin.jpg'
+//import AgroLogin2 from '@/assets/AgroLogin2.jpg'
+import logo from '@/assets/logo.png'
 
 const router = useRouter()
 
@@ -162,6 +169,7 @@ function validate() {
     errorMessage.value = 'La contraseña es requerida.'
     return false
   }
+  errorMessage.value = ''
   return true
 }
 

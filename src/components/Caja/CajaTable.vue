@@ -747,8 +747,7 @@ const horaAperturaTurno = computed(() => {
     hour: '2-digit',
     minute: '2-digit',
   })
-}
-)
+})
 
 const adminAuthVisible = ref(false)
 const aperturaVentaVisible = ref(false)
