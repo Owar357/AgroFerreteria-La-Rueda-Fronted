@@ -58,9 +58,7 @@
             :options="estadosPago"
             placeholder="Filtrar por Estado..."
             class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2"
-            showClear
             @change="emitirFiltros"
-            @clear="emitirFiltros"
           />
 
           <!-- Filtro proveedor -->
@@ -98,7 +96,6 @@
                 placeholder="dd-mm-aaaa"
                 dateFormat="dd-mm-yy"
                 class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl h-10"
-                showClear
                 :pt="{ pcInputText: { root: { readonly: true } } }"
                 @update:modelValue="emitirFiltros"
               />
@@ -112,11 +109,19 @@
                 placeholder="dd-mm-aaaa"
                 dateFormat="dd-mm-yy"
                 class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl h-10"
-                showClear
                 :pt="{ pcInputText: { root: { readonly: true } } }"
                 @update:modelValue="emitirFiltros"
               />
             </div>
+
+            <!-- Limpiar filtros (solo aparece si hay algún filtro activo) -->
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="w-full !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-10 rounded-xl cursor-pointer shadow-2xs flex justify-center items-center gap-2"
+              @click="limpiarFiltros"
+            />
           </div>
         </div>
       </div>
@@ -135,9 +140,7 @@
                 :options="estadosPago"
                 placeholder="Estado..."
                 class="!bg-white !border-gray-300 text-[#1a2e1f] w-[30%] text-sm rounded-xl h-10 flex items-center px-2"
-                showClear
                 @change="emitirFiltros"
-                @clear="emitirFiltros"
               />
 
               <!-- Proveedor -->
@@ -188,7 +191,6 @@
                 placeholder="dd-mm-aaaa"
                 dateFormat="dd-mm-yy"
                 class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
-                showClear
                 :pt="{ pcInputText: { root: { readonly: true } } }"
                 @update:modelValue="emitirFiltros"
               />
@@ -202,14 +204,28 @@
                 placeholder="dd-mm-aaaa"
                 dateFormat="dd-mm-yy"
                 class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
-                showClear
                 :pt="{ pcInputText: { root: { readonly: true } } }"
                 @update:modelValue="emitirFiltros"
               />
             </div>
+
+            <!-- Limpiar filtros (solo aparece si hay algún filtro activo) -->
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="ml-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-10 px-4 rounded-xl cursor-pointer shadow-2xs flex items-center gap-2 whitespace-nowrap shrink-0"
+              @click="limpiarFiltros"
+            />
           </div>
         </div>
       </div>
+
+
+     <p v-if="rango.desde" class="text-xs text-gray-500 px-5 py-2">
+      Mostrando compras del <strong>{{ formatearRango(rango.desde) }}</strong> al <strong>{{ formatearRango(rango.hasta) }}</strong>
+    </p>
+
 
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL: Tabla con Desplegable (< 1024px)           -->
@@ -222,6 +238,7 @@
           class="p-datatable-custom text-sm w-full"
           :paginator="!loading"
           :rows="5"
+          :first="(paginacion.currentPage - 1) * paginacion.perPage"
           :totalRecords="paginacion.total"
           :lazy="true"
           @page="(e) => emit('cambiar-pagina', e.page + 1)"
@@ -247,8 +264,13 @@
               <div v-else class="flex flex-col gap-0.5 items-start">
                 <span
                   class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap"
+                  :title="slotProps.data.numDocumento"
                 >
-                  {{ slotProps.data.numDocumento }}
+                  <span class="text-[#2b5e3b]">{{
+                    nombreTipoDocumento(slotProps.data.tipoDocumento)
+                  }}</span>
+                  <span class="text-gray-400">·</span>
+                  {{ abreviarNumero(slotProps.data.numDocumento) }}
                 </span>
                 <span class="text-xs text-gray-600 truncate max-w-[150px] block">
                   {{ slotProps.data.proveedor }}
@@ -295,10 +317,21 @@
                     <span class="text-[10px] font-bold uppercase text-[#6b7280] block"
                       >Tipo Documento</span
                     >
-                    <span class="text-xs text-[#334155] font-semibold">{{
-                      slotProps.data.tipoDocumento
-                    }}</span>
+                    <span
+                      class="text-xs text-[#334155] font-semibold"
+                      :title="nombreLargoTipoDocumento(slotProps.data.tipoDocumento)"
+                      >{{ nombreTipoDocumento(slotProps.data.tipoDocumento) }}</span
+                    >
                   </div>
+                </div>
+
+                <div class="pb-2 border-b border-[#e2e8dd]/60">
+                  <span class="text-[10px] font-bold uppercase text-[#6b7280] block"
+                    >Nº Documento</span
+                  >
+                  <span class="font-mono text-xs text-[#334155] font-semibold break-all">{{
+                    slotProps.data.numDocumento
+                  }}</span>
                 </div>
 
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
@@ -356,6 +389,7 @@
           class="p-datatable-custom text-sm w-full min-w-[55rem]"
           :paginator="!loading"
           :rows="5"
+          :first="(paginacion.currentPage - 1) * paginacion.perPage"
           :totalRecords="paginacion.total"
           :lazy="true"
           @page="(e) => emit('cambiar-pagina', e.page + 1)"
@@ -390,7 +424,13 @@
           <Column field="tipoDocumento" header="Tipo Documento" class="min-w-[9.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="4.5rem" height="1.2rem" />
-              <span v-else>{{ slotProps.data.tipoDocumento }}</span>
+              <span
+                v-else
+                class="inline-flex items-center bg-[#e8f0e5] text-[#2b5e3b] font-bold text-xs px-2.5 py-0.5 rounded-full whitespace-nowrap"
+                :title="nombreLargoTipoDocumento(slotProps.data.tipoDocumento)"
+              >
+                {{ nombreTipoDocumento(slotProps.data.tipoDocumento) }}
+              </span>
             </template>
           </Column>
 
@@ -399,9 +439,10 @@
               <Skeleton v-if="loading" width="5rem" height="1.2rem" />
               <span
                 v-else
-                class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase"
+                class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap"
+                :title="slotProps.data.numDocumento"
               >
-                {{ slotProps.data.numDocumento }}
+                {{ abreviarNumero(slotProps.data.numDocumento) }}
               </span>
             </template>
           </Column>
@@ -488,7 +529,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -509,6 +550,7 @@ import {
 const props = defineProps({
   compras: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  rango: { type: Object, default: () => ({ desde: null, hasta: null }) },
   paginacion: {
     type: Object,
     default: () => ({ currentPage: 1, lastPage: 1, perPage: 5, total: 0 }),
@@ -519,11 +561,12 @@ const isContador = authService.getUserRole() === 'CONTADOR'
 const emit = defineEmits(['open-add', 'cambiar-pagina', 'filtrar', 'anular-compra', 'ver-detalle'])
 
 const expandedRows = ref({})
-const estadoSeleccionado = ref(null)
+const ESTADO_TODOS = 'TODOS'
+const estadoSeleccionado = ref(ESTADO_TODOS)
 const proveedorSeleccionado = ref(null)
 const fechaInicio = ref(null)
 const fechaFin = ref(null)
-const estadosPago = ref(['PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO', 'ANULADA'])
+const estadosPago = ref([ESTADO_TODOS, 'PAGADO', 'PENDIENTE', 'ABONADO', 'VENCIDO', 'ANULADA'])
 const proveedoresOptions = ref([])
 const proveedoresFiltrados = ref([])
 
@@ -542,6 +585,40 @@ const obtenerSeveridadPago = (estado) => {
     default:
       return 'contrast'
   }
+}
+
+
+
+// Tipos de documento (DTE) -> nombre corto y nombre completo
+const TIPOS_DOCUMENTO = {
+  '01': { corto: 'Factura', largo: 'Factura' },
+  '03': { corto: 'CCF', largo: 'Comprobante de Crédito Fiscal' },
+  '04': { corto: 'NR', largo: 'Nota de Remisión' },
+  '05': { corto: 'NC', largo: 'Nota de Crédito' },
+  '06': { corto: 'ND', largo: 'Nota de Débito' },
+  '11': { corto: 'FEX', largo: 'Factura de Exportación' },
+  '14': { corto: 'FSE', largo: 'Factura de Sujeto Excluido' },
+}
+
+const infoTipoDocumento = (codigo) => TIPOS_DOCUMENTO[String(codigo ?? '').padStart(2, '0')]
+
+// "03" -> "CCF" (si el código no está en el catálogo, se muestra tal cual)
+const nombreTipoDocumento = (codigo) => infoTipoDocumento(codigo)?.corto ?? codigo ?? '—'
+
+// "03" -> "Comprobante de Crédito Fiscal" (para el tooltip)
+const nombreLargoTipoDocumento = (codigo) => infoTipoDocumento(codigo)?.largo ?? ''
+
+// "DTE-03-12345678-000000000000000" -> "12345678…0000000"
+// Se quita el prefijo "DTE-03-" (el tipo ya se muestra aparte) y, si aún es largo,
+// se deja el inicio y el final con "…" en medio. El número completo va en el tooltip.
+const abreviarNumero = (numero, max = 16) => {
+  if (!numero) return '—'
+  const limpio = String(numero).replace(/^DTE-\d{2}-/i, '')
+  if (limpio.length <= max) return limpio
+  const resto = max - 1
+  const inicio = Math.ceil(resto / 2)
+  const fin = Math.floor(resto / 2)
+  return `${limpio.slice(0, inicio)}…${limpio.slice(-fin)}`
 }
 
 const buscarProveedor = (event) => {
@@ -566,11 +643,60 @@ const formatearFecha = (fecha) => {
 
 const emitirFiltros = () => {
   emit('filtrar', {
-    estado_pago: estadoSeleccionado.value ?? null,
+    // 'TODOS' no es un estado real: no se manda filtro al backend
+    estado_pago:
+      estadoSeleccionado.value && estadoSeleccionado.value !== ESTADO_TODOS
+        ? estadoSeleccionado.value
+        : null,
     proveedor: proveedorSeleccionado.value?.id ?? null,
     fecha_desde: formatearFecha(fechaInicio.value),
     fecha_hasta: formatearFecha(fechaFin.value),
   })
+}
+
+// ¿Hay algún filtro distinto del valor por defecto?
+const hayFiltros = computed(
+  () =>
+    estadoSeleccionado.value !== ESTADO_TODOS ||
+    Boolean(proveedorSeleccionado.value) ||
+    Boolean(fechaInicio.value) ||
+    Boolean(fechaFin.value),
+)
+
+// Evita que el watch del proveedor dispare una segunda petición al limpiar
+let limpiando = false
+
+// Si el usuario borra el texto del proveedor a mano, se quita el filtro
+watch(proveedorSeleccionado, (valor) => {
+  if (!valor && !limpiando) emitirFiltros()
+})
+
+const limpiarFiltros = () => {
+  limpiando = true
+  estadoSeleccionado.value = ESTADO_TODOS
+  proveedorSeleccionado.value = null
+  fechaInicio.value = null
+  fechaFin.value = null
+  emitirFiltros() // una sola petición, con todo en su valor por defecto
+  nextTick(() => {
+    limpiando = false
+  })
+}
+
+// "2026-10-01" -> "01 de octubre de 2026"
+const formatearRango = (f) => {
+  if (!f) return '';
+  
+  const [anio, mes, dia] = f.split('-');
+  
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
+  
+  return new Intl.DateTimeFormat('es-ES', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC'
+  }).format(fecha);
 }
 
 const verDetalles = (compra) => {
