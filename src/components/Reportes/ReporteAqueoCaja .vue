@@ -1,7 +1,8 @@
 <template>
   <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
->
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -46,7 +47,6 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha"
             showIcon
-            
             fluid
             class="!w-full"
             :pt="{
@@ -62,7 +62,6 @@
                 class: '!bg-white !border-[#cbd5e1] rounded-r-xl !py-2.5 border-l-0 text-gray-500',
               },
             }"
-            
           />
         </div>
 
@@ -216,6 +215,7 @@ import Select from 'primevue/select'
 import { DatePicker } from 'primevue'
 import { api } from '@/services/authService'
 import { generarReporteArqueoCaja } from '@/services/reporteService'
+import { fondoStyle } from '@/utils/fondoReportes'
 import {
   mostrarExito,
   mostrarError,

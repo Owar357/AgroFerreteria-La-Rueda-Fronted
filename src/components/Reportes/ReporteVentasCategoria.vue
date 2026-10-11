@@ -1,12 +1,12 @@
 <template>
   <div
-  class="bg-[#eef2e9] p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
->
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -19,16 +19,14 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-tags text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Ventas por Categoría
-          </h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Ventas agrupadas por categoría
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Ventas por Categoría</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Ventas agrupadas por categoría</p>
         </div>
       </div>
 
@@ -81,7 +79,11 @@
             filterPlaceholder="Buscar categoría..."
             scrollHeight="200px"
             class="!w-full"
-            :pt="{ input: { class: '!text-xs !py-2.5 !px-3 !border-[#cbd5e1] !bg-white !rounded-xl !w-full' } }"
+            :pt="{
+              input: {
+                class: '!text-xs !py-2.5 !px-3 !border-[#cbd5e1] !bg-white !rounded-xl !w-full',
+              },
+            }"
           />
         </div>
 
@@ -104,14 +106,12 @@
           />
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -207,9 +207,7 @@
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
@@ -220,12 +218,13 @@ import Select from 'primevue/select'
 import { DatePicker } from 'primevue'
 import { api } from '@/services/authService'
 import { generarReporteVentasPorCategoria } from '@/services/reporteService'
-import { 
-  mostrarExito, 
-  mostrarError, 
+import { fondoStyle } from '@/utils/fondoReportes'
+import {
+  mostrarExito,
+  mostrarError,
   mostrarAccesoDenegado,
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
@@ -261,7 +260,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
-      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.'
+      mensajeHtml:
+        'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.',
     })
     return
   }
@@ -270,7 +270,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango de fechas inválido',
-      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.'
+      mensajeHtml:
+        'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.',
     })
     return
   }
@@ -285,12 +286,12 @@ const generarPDF = async () => {
         fechaFin: formatFechaParam(fechaFin.value),
         categoriaId: categoriaId.value,
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     mostrarExito(
       '¡Reporte generado!',
-      'El reporte de ventas por categoría en formato PDF se ha descargado exitosamente.'
+      'El reporte de ventas por categoría en formato PDF se ha descargado exitosamente.',
     )
   } catch (error) {
     const status = error.response?.status
