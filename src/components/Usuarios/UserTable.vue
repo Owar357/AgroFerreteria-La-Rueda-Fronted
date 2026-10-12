@@ -5,17 +5,12 @@
       <!-- ======================================================= -->
       <div class="block lg:hidden mb-4">
         <div class="flex items-center gap-3">
-          <div
-            class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
             <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
           </div>
           <div>
-            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-              Registro de Usuarios
-            </h1>
-            <p class="text-xs text-gray-500 mt-0.5 m-0">
-              Gestión de cuentas, roles y permisos
-            </p>
+            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Registro de Usuarios</h1>
+            <p class="text-xs text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos</p>
           </div>
         </div>
       </div>
@@ -24,17 +19,12 @@
       <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
       <!-- ======================================================= -->
       <div class="hidden lg:flex items-center gap-3 mb-6">
-        <div
-          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
           <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
         </div>
         <div>
-          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-            Registro de Usuarios
-          </h1>
-          <p class="text-sm text-gray-500 mt-0.5 m-0">
-            Gestión de cuentas, roles y permisos del sistema
-          </p>
+          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Registro de Usuarios</h1>
+          <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos del sistema</p>
         </div>
       </div>
 
@@ -43,14 +33,16 @@
       <!-- Apartado de Filtros Estático Superior -->
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-white">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-          <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+          <!-- Grupo Izquierdo: Buscador, Filtro y Limpiar -->
+          <div class="flex flex-col md:flex-row items-center gap-3 w-full">
             <!-- Búsqueda -->
-            <IconField class="w-full sm:w-[20rem]">
+            <IconField class="w-full md:w-[22rem]">
               <InputIcon class="pi pi-search text-[#6b7280]" />
               <InputText
                 v-model="busqueda"
                 placeholder="Buscar usuario..."
-                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem]"
+                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11"
+                @input="emitirFiltros"
               />
             </IconField>
 
@@ -60,30 +52,40 @@
               :options="opcionesEstado"
               optionLabel="label"
               optionValue="value"
-              showClear
-              placeholder="Todos los estados"
-              class="w-full sm:w-[14rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem] flex items-center"
+              placeholder="Estado..."
+              class="w-full md:w-[15rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11 flex items-center"
+              @change="emitirFiltros"
+            />
+            
+            <!-- Limpiar Filtros -->
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="w-full md:w-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold px-7 h-11 rounded-lg cursor-pointer shadow-sm transition-all whitespace-nowrap shrink-0"
+              @click="limpiarFiltros"
             />
           </div>
 
-          <!-- Botón de Agregar -->
+          <!-- Botón de Agregar (Derecha) -->
           <Button
             label="+ Agregar"
-            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 py-3 rounded-lg border-none cursor-pointer shadow-md transition-all w-full md:w-auto whitespace-nowrap shrink-0"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 h-11 rounded-lg border-none cursor-pointer shadow-md transition-all w-full md:w-auto whitespace-nowrap shrink-0"
             @click="$emit('open-add')"
           />
         </div>
       </div>
 
       <!-- ======================================================= -->
-      <!-- VISTA MÓVIL: Fila Desplegable con Grid Ordenado (< 768px) -->
+      <!-- VISTA MÓVIL: Fila Desplegable (< 768px)                 -->
       <!-- ======================================================= -->
       <div class="block md:hidden w-full">
         <DataTable
           v-model:expandedRows="filasExpandidas"
-          :value="usuariosFiltrados"
+          :value="store.loading ? Array.from({ length: 5 }) : store.users"
           lazy
           :rows="store.perPage"
+          :first="(store.currentPage - 1) * store.perPage"
           paginator
           :totalRecords="store.totalRecords"
           dataKey="id"
@@ -96,10 +98,8 @@
             <div class="text-center py-6 text-[#6b7280] text-sm">No hay usuarios registrados.</div>
           </template>
 
-          <!-- Botón de Expansión (Flecha) -->
           <Column expander style="width: 3rem" />
 
-          <!-- Columna: Nombre -->
           <Column field="name" header="Nombre" class="font-semibold text-[#1a2e1f]">
             <template #body="slotProps">
               <Skeleton v-if="store.loading" width="80%" height="1.2rem" />
@@ -107,7 +107,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Estado -->
           <Column field="activo" header="Estado">
             <template #body="slotProps">
               <Skeleton v-if="store.loading" width="4rem" height="1.5rem" borderRadius="0.25rem" />
@@ -115,9 +114,7 @@
                 v-else
                 :class="[
                   'px-2 py-0.5 rounded text-[0.75rem] font-semibold uppercase tracking-wide inline-block',
-                  slotProps.data.activo
-                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
-                    : 'bg-[#fee2e2] text-[#b91c1c]',
+                  slotProps.data.activo ? 'bg-[#dff0e0] text-[#2b5e3b]' : 'bg-[#fee2e2] text-[#b91c1c]'
                 ]"
               >
                 {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
@@ -125,66 +122,26 @@
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión (Móvil) con Grid Ordenado -->
           <template #expansion="slotProps">
             <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div
-                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
-              >
-                <!-- Email (Ocupa las 2 columnas) -->
+              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
                 <div class="col-span-2">
-                  <span
-                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
-                  >
-                    Email
-                  </span>
-                  <span class="text-gray-800 font-medium break-all block">
-                    {{ slotProps.data.email }}
-                  </span>
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Email</span>
+                  <span class="text-gray-800 font-medium break-all block">{{ slotProps.data.email }}</span>
                 </div>
-
-                <!-- Rol -->
                 <div class="col-span-1">
-                  <span
-                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
-                  >
-                    Rol
-                  </span>
-                  <span class="text-gray-800 font-medium block">
-                    {{ slotProps.data.roles?.[0]?.name ?? '—' }}
-                  </span>
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Rol</span>
+                  <span class="text-gray-800 font-medium block">{{ slotProps.data.roles?.[0]?.name ?? '—' }}</span>
                 </div>
-
-                <!-- Fecha -->
                 <div class="col-span-1">
-                  <span
-                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
-                  >
-                    Fecha
-                  </span>
-                  <span class="text-gray-800 font-medium block">
-                    {{
-                      slotProps.data.created_at
-                        ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
-                        : '—'
-                    }}
-                  </span>
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Fecha</span>
+                  <span class="text-gray-800 font-medium block">{{ slotProps.data.created_at ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV') : '—' }}</span>
                 </div>
-
-                <!-- Creado por (Ocupa las 2 columnas) -->
                 <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span
-                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
-                  >
-                    Creado por
-                  </span>
-                  <span class="text-gray-800 font-medium block">
-                    {{ slotProps.data.registrado_por?.name ?? '—' }}
-                  </span>
+                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Creado por</span>
+                  <span class="text-gray-800 font-medium block">{{ slotProps.data.registrado_por?.name ?? '—' }}</span>
                 </div>
               </div>
-
-              <!-- Botones de Acción Móvil -->
               <div class="mt-3 pt-2 flex gap-2 justify-end items-center">
                 <template v-if="slotProps.data.activo">
                   <Button
@@ -208,11 +165,15 @@
         </DataTable>
       </div>
 
+      <!-- ======================================================= -->
+      <!-- VISTA ESCRITORIO: Tabla                                 -->
+      <!-- ======================================================= -->
       <div class="hidden md:block w-full overflow-x-auto">
         <DataTable
-          :value="usuariosFiltrados"
+          :value="store.loading ? Array.from({ length: 5 }) : store.users"
           lazy
           :rows="store.perPage"
+          :first="(store.currentPage - 1) * store.perPage"
           paginator
           :totalRecords="store.totalRecords"
           class="p-datatable-custom text-sm w-full"
@@ -245,9 +206,7 @@
                 v-else
                 :class="[
                   'px-3 py-1 rounded text-[0.8125rem] font-semibold uppercase tracking-wide',
-                  slotProps.data.activo
-                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
-                    : 'bg-[#fee2e2] text-[#b91c1c]',
+                  slotProps.data.activo ? 'bg-[#dff0e0] text-[#2b5e3b]' : 'bg-[#fee2e2] text-[#b91c1c]'
                 ]"
               >
                 {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
@@ -273,11 +232,7 @@
             <template #body="slotProps">
               <Skeleton v-if="store.loading" width="5rem" height="1.2rem" />
               <span v-else>
-                {{
-                  slotProps.data.created_at
-                    ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
-                    : '—'
-                }}
+                {{ slotProps.data.created_at ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV') : '—' }}
               </span>
             </template>
           </Column>
@@ -288,7 +243,6 @@
                 <Skeleton width="4rem" height="2rem" borderRadius="0.5rem" />
                 <Skeleton width="5rem" height="2rem" borderRadius="0.5rem" />
               </div>
-
               <div v-else class="flex gap-2 justify-center">
                 <template v-if="slotProps.data.activo">
                   <Button
@@ -298,7 +252,6 @@
                     v-tooltip.top="'Editar usuario'"
                     @click="$emit('open-edit', slotProps.data)"
                   />
-
                   <Button
                     v-if="usuarioActual?.id !== slotProps.data.id"
                     icon="pi pi-eye-slash"
@@ -319,7 +272,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
@@ -342,15 +295,47 @@ import {
 const usuarioActual = authService.getUser()
 const store = useUserStore()
 
+const ESTADO_TODOS = 'TODOS'
 const busqueda = ref('')
-const filtroEstado = ref(null)
-
+const filtroEstado = ref(ESTADO_TODOS)
 const filasExpandidas = ref({})
 
 const opcionesEstado = ref([
+  { label: 'Todos los estados', value: ESTADO_TODOS },
   { label: 'Activo', value: true },
   { label: 'Inactivo', value: false },
 ])
+
+const hayFiltros = computed(() => {
+  return busqueda.value.trim() !== '' || filtroEstado.value !== ESTADO_TODOS
+})
+
+let timeoutBusqueda = null
+const emitirFiltros = () => {
+  clearTimeout(timeoutBusqueda)
+  timeoutBusqueda = setTimeout(() => {
+    store.fetchUsers(1, store.perPage, busqueda.value, filtroEstado.value)
+  }, 300) // Pequeño delay para no saturar al escribir
+}
+
+const limpiarFiltros = () => {
+  busqueda.value = ''
+  filtroEstado.value = ESTADO_TODOS
+  emitirFiltros()
+}
+
+const alCambiarPagina = async (evento) => {
+  const pagina = evento.page + 1
+  const filas = evento.rows
+  
+  const resultado = await store.fetchUsers(pagina, filas, busqueda.value, filtroEstado.value)
+  
+  if (resultado?.status === 403) {
+    mostrarAccesoDenegado()
+  } else if (resultado?.error) {
+    mostrarError('Error de conexión', resultado.error)
+  }
+}
 
 const confirmarDesactivar = async (usuario) => {
   if (usuarioActual?.id === usuario.id) {
@@ -384,6 +369,12 @@ const confirmarDesactivar = async (usuario) => {
 
     if (resultado?.ok) {
       mostrarExito('¡Usuario desactivado!', `El usuario "${usuario.name}" fue desactivado correctamente.`)
+    } else if (resultado?.status === 409) {
+      mostrarAlertaConfirmar({
+        tipo: 'advertencia',
+        titulo: 'No se puede desactivar',
+        mensajeHtml: `El usuario <strong style="color:#1e3a2f;">${usuario.name}</strong> tiene una caja aperturada. Debe cerrar la caja por completo para poder desactivarlo.`,
+      })
     } else if (resultado?.status === 403) {
       mostrarAccesoDenegado()
     } else {
@@ -391,37 +382,6 @@ const confirmarDesactivar = async (usuario) => {
     }
   } catch (err) {
     mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
-  }
-}
-
-onMounted(async () => {})
-
-const usuariosFiltrados = computed(() => {
-  return (store.users ?? []).filter((u) => {
-    const coincideBusqueda =
-      !busqueda.value ||
-      u.name?.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-      u.email?.toLowerCase().includes(busqueda.value.toLowerCase())
-
-    const coincideEstado =
-      filtroEstado.value === null || filtroEstado.value === undefined
-        ? true
-        : u.activo === filtroEstado.value
-
-    return coincideBusqueda && coincideEstado
-  })
-})
-
-const alCambiarPagina = async (evento) => {
-  const pagina = evento.page + 1
-  const filas = evento.rows
-  
-  const resultado = await store.fetchUsers(pagina, filas)
-  
-  if (resultado?.status === 403) {
-    mostrarAccesoDenegado()
-  } else if (resultado?.error) {
-    mostrarError('Error de conexión', resultado.error)
   }
 }
 

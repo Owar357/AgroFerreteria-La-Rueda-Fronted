@@ -1,15 +1,7 @@
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="AGREGAR PROVEEDOR"
-    :draggable="false"
-    :closable="false"
-    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
-    class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
-    @hide="resetForm"
-  >
+  <Dialog v-model:visible="visible" modal header="AGREGAR PROVEEDOR" :draggable="false" :closable="false"
+    :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }" class="custom-dialog"
+    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }" @hide="resetForm">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL (< 640px)                                   -->
     <!-- ======================================================= -->
@@ -17,29 +9,21 @@
 
       <!-- Tipo de persona Móvil -->
       <div class="flex gap-2">
-        <button
-          type="button"
-          @click="tipoPersona = 'natural'"
-          :class="[
-            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-xs transition-all cursor-pointer font-semibold',
-            tipoPersona === 'natural'
-              ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
-          ]"
-        >
+        <button type="button" @click="tipoPersona = 'natural'" :class="[
+          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-xs transition-all cursor-pointer font-semibold',
+          tipoPersona === 'natural'
+            ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
+            : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
+        ]">
           <i class="pi pi-user text-sm" />
           Natural
         </button>
-        <button
-          type="button"
-          @click="tipoPersona = 'juridica'"
-          :class="[
-            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-xs transition-all cursor-pointer font-semibold',
-            tipoPersona === 'juridica'
-              ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
-          ]"
-        >
+        <button type="button" @click="tipoPersona = 'juridica'" :class="[
+          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-xs transition-all cursor-pointer font-semibold',
+          tipoPersona === 'juridica'
+            ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
+            : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
+        ]">
           <i class="pi pi-building text-sm" />
           Jurídica
         </button>
@@ -48,33 +32,20 @@
 
       <!-- Campos Móvil -->
       <div class="flex flex-col gap-3">
-        <BaseInput
-          v-model="form.nombre"
-          label="Nombre *"
-          placeholder="Nombre del proveedor"
-          :error="errores.nombre"
-          @input="validarCampo('nombre')"
-        />
+        <BaseInput v-model="form.nombre" label="Nombre *" placeholder="Nombre del proveedor" :error="errores.nombre"
+           @input="validarCampo('nombre')" />
 
-        <BaseInput
-          v-model="form.direccion"
-          placeholder="Calle, colonia, municipio..."
-        >
+        <BaseInput v-model="form.direccion" placeholder="Calle, colonia, municipio..." :error="errores.direccion"
+@input="validarCampo('direccion')">
           <template #label>
             <label class="text-xs font-semibold text-[#1a2e1f]">
-              Dirección
-              <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+              Dirección *
             </label>
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="form.correo"
-          type="email"
-          placeholder="correo@ejemplo.com"
-          :error="errores.correo"
-          @input="validarCampo('correo')"
-        >
+        <BaseInput v-model="form.correo" type="email" placeholder="correo@ejemplo.com" :error="errores.correo"
+          @input="validarCampo('correo') ">
           <template #label>
             <label class="text-xs font-semibold text-[#1a2e1f]">
               Correo electrónico
@@ -83,33 +54,18 @@
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="form.telefono"
-          label="Teléfono"
-          type="tel"
-          filter="int"
-          placeholder="22223333"
-          maxlength="8"
-        />
+        <BaseInput v-model="form.telefono" label="Teléfono" type="tel" filter="int" placeholder="22223333"
+          maxlength="8" />
       </div>
 
       <!-- Botones Móvil -->
       <div class="pt-3 flex flex-col gap-2 w-full">
-        <Button
-          label="Guardar proveedor"
-          :loading="cargando"
+        <Button label="Guardar proveedor" :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-xs font-bold py-3 rounded-xl border-none cursor-pointer shadow-md w-full"
-          @click="guardar"
-        />
-        <Button
-          label="Cerrar"
-          icon="pi pi-times"
-          severity="secondary"
-          outlined
-          :disabled="cargando"
+          @click="guardar" />
+        <Button label="Cerrar" icon="pi pi-times" severity="secondary" outlined :disabled="cargando"
           class="!text-xs !py-3 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
-          @click="visible = false"
-        />
+          @click="visible = false" />
       </div>
     </div>
 
@@ -120,29 +76,21 @@
 
       <!-- Tipo de persona Escritorio -->
       <div class="flex gap-3">
-        <button
-          type="button"
-          @click="tipoPersona = 'natural'"
-          :class="[
-            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-sm transition-all cursor-pointer font-semibold',
-            tipoPersona === 'natural'
-              ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
-          ]"
-        >
+        <button type="button" @click="tipoPersona = 'natural'" :class="[
+          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-sm transition-all cursor-pointer font-semibold',
+          tipoPersona === 'natural'
+            ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
+            : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
+        ]">
           <i class="pi pi-user text-base" />
           Natural
         </button>
-        <button
-          type="button"
-          @click="tipoPersona = 'juridica'"
-          :class="[
-            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-sm transition-all cursor-pointer font-semibold',
-            tipoPersona === 'juridica'
-              ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
-          ]"
-        >
+        <button type="button" @click="tipoPersona = 'juridica'" :class="[
+          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-[1.5px] text-sm transition-all cursor-pointer font-semibold',
+          tipoPersona === 'juridica'
+            ? 'border-[#2b5e3b] bg-[#eef2e9] text-[#1a2e1f] shadow-xs'
+            : 'border-gray-200 bg-white text-gray-500 hover:border-[#2b5e3b] hover:text-[#1a2e1f]',
+        ]">
           <i class="pi pi-building text-base" />
           Jurídica
         </button>
@@ -151,33 +99,20 @@
 
       <!-- Campos Escritorio -->
       <div class="flex flex-col gap-4">
-        <BaseInput
-          v-model="form.nombre"
-          label="Nombre *"
-          placeholder="Nombre del proveedor"
-          :error="errores.nombre"
-          @input="validarCampo('nombre')"
-        />
+        <BaseInput v-model="form.nombre" label="Nombre *" placeholder="Nombre del proveedor" :error="errores.nombre"
+           @input="validarCampo('nombre')" />
 
-        <BaseInput
-          v-model="form.direccion"
-          placeholder="Calle, colonia, municipio..."
-        >
+        <BaseInput v-model="form.direccion" placeholder="Calle, colonia, municipio..." :error="errores.direccion"
+@input="validarCampo('direccion')" >
           <template #label>
             <label class="text-sm font-medium text-[#1a2e1f]">
-              Dirección
-              <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+              Dirección *
             </label>
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="form.correo"
-          type="email"
-          placeholder="correo@ejemplo.com"
-          :error="errores.correo"
-          @input="validarCampo('correo')"
-        >
+        <BaseInput v-model="form.correo" type="email" placeholder="correo@ejemplo.com" :error="errores.correo"
+          @input="validarCampo('correo')">
           <template #label>
             <label class="text-sm font-medium text-[#1a2e1f]">
               Correo electrónico
@@ -186,33 +121,18 @@
           </template>
         </BaseInput>
 
-        <BaseInput
-          v-model="form.telefono"
-          label="Teléfono"
-          type="tel"
-          filter="int"
-          placeholder="22223333"
-          maxlength="8"
-        />
+        <BaseInput v-model="form.telefono" label="Teléfono" type="tel" filter="int" placeholder="22223333"
+          maxlength="8" />
       </div>
 
       <!-- Botones Escritorio -->
       <div class="flex justify-between items-center mt-1 pt-4 border-t border-[#e2e8dd] w-full">
-        <Button
-          label="Cerrar"
-          icon="pi pi-times"
-          severity="secondary"
-          outlined
-          :disabled="cargando"
+        <Button label="Cerrar" icon="pi pi-times" severity="secondary" outlined :disabled="cargando"
           class="!text-sm !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl font-semibold cursor-pointer w-[47%] flex justify-center items-center"
-          @click="visible = false"
-        />
-        <Button
-          label="Guardar proveedor"
-          :loading="cargando"
+          @click="visible = false" />
+        <Button label="Guardar proveedor" :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold !py-2.5 rounded-xl border-none cursor-pointer shadow-lg transition-colors w-[47%] flex justify-center items-center"
-          @click="guardar"
-        />
+          @click="guardar" />
       </div>
     </div>
   </Dialog>
@@ -259,18 +179,22 @@ function validarCampo(campo) {
   if (campo === 'correo') {
     const valor = form.correo.trim()
     if (!valor) {
-      errores.correo = '' 
+      errores.correo = ''
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
       errores.correo = 'Formato de correo electrónico inválido.'
     } else {
       errores.correo = ''
     }
   }
+  if (campo === 'direccion') {
+    errores.direccion = form.direccion.trim() ? '' : 'La dirección es obligatoria.'
+  }
 }
 
 function validarFormulario() {
   validarCampo('nombre')
   validarCampo('correo')
+  validarCampo('direccion')
   return !errores.nombre && !errores.correo
 }
 

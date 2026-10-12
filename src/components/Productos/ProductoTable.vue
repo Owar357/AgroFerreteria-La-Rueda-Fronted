@@ -6,17 +6,12 @@
     <!-- ======================================================= -->
     <div class="block lg:hidden mb-4">
       <div class="flex items-center gap-3">
-        <div
-          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
           <i class="pi pi-book text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Catálogo de Productos
-          </h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Gestión general del inventario
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Catálogo de Productos</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Gestión general del inventario</p>
         </div>
       </div>
     </div>
@@ -25,17 +20,12 @@
     <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
     <!-- ======================================================= -->
     <div class="hidden lg:flex items-center gap-3 mb-6">
-      <div
-        class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+      <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
         <i class="pi pi-book text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Catálogo de Productos
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">
-          Gestión general del inventario
-        </p>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Catálogo de Productos</h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión general del inventario</p>
       </div>
     </div>
 
@@ -46,29 +36,38 @@
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-[#fbfdf9]">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           <!-- Filtros (Izquierda) -->
-          <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+          <div class="flex flex-col md:flex-row items-center gap-3 w-full">
             <!-- Búsqueda -->
-            <IconField class="w-full lg:w-[30rem]">
+            <IconField class="w-full md:w-[22rem]">
               <InputIcon class="pi pi-search text-[#6b7280]" />
               <InputText 
                 v-model="searchQuery" 
                 @input="onSearchInput" 
                 placeholder="Buscar nombre, código..."
-                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-[2.625rem]" 
+                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11" 
               />
             </IconField>
 
-            <!-- Categorías con búsqueda integrada -->
+            <!-- Categorías -->
             <Select 
               v-model="filtroCategoria" 
-              :options="opcionesCategorias" 
+              :options="store.categorias" 
               optionLabel="nombre" 
               optionValue="nombre"
               filter 
               filterPlaceholder="Buscar..." 
               placeholder="Todas las categorías" 
               @change="onCategoriaChange"
-              class="w-full sm:w-[15rem] !border-[#cbd5e1] !bg-white  text-[#1a2e1f] text-sm rounded-lg h-[2.625rem] flex items-center px-3" 
+              class="w-full md:w-[15rem] !border-[#cbd5e1] !bg-white text-[#1a2e1f] text-sm rounded-lg h-11 flex items-center px-3" 
+            />
+
+            <!-- Limpiar Filtros -->
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="w-full md:w-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold px-7 h-11 rounded-lg cursor-pointer shadow-sm transition-all whitespace-nowrap shrink-0"
+              @click="limpiarFiltros"
             />
           </div>
 
@@ -76,7 +75,7 @@
           <Button 
             label="Nuevo Producto" 
             icon="pi pi-plus"
-            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-6 h-[2.625rem] rounded-lg border-none cursor-pointer transition-all shadow-sm w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 h-11 rounded-lg border-none cursor-pointer transition-all shadow-sm w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
             @click="$emit('open-add')" 
           />
         </div>
@@ -92,6 +91,7 @@
           lazy 
           :paginator="!store.cargando"
           :rows="store.perPage" 
+          :first="(store.currentPage - 1) * store.perPage"
           :totalRecords="store.totalRecords" 
           dataKey="id"
           class="p-datatable-custom text-sm w-full"
@@ -106,10 +106,8 @@
             </div>
           </template>
 
-          <!-- Botón de Expansión (Flecha) -->
           <Column expander style="width: 2.5rem" />
 
-          <!-- Columna 1: Nombre -->
           <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="75%" height="1.2rem" />
@@ -119,7 +117,6 @@
             </template>
           </Column>
 
-          <!-- Columna 2: Código -->
           <Column field="codigo" header="Código" class="text-[#6b7280]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="45%" height="1.2rem" />
@@ -129,17 +126,13 @@
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión (Móvil) Reorganizada -->
           <template #expansion="slotProps">
             <div class="p-3.5 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
               <div class="bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs space-y-3">
                 
-                <!-- Fila 1: Tipo y Fabricante en Flexbox equilibrado -->
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
-                      Tipo
-                    </span>
+                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">Tipo</span>
                     <span :class="[
                       'px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase inline-block whitespace-nowrap',
                       slotProps.data.tipo_producto === 'GRANEL'
@@ -151,30 +144,18 @@
                   </div>
 
                   <div class="text-right">
-                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                      Fabricante
-                    </span>
-                    <span class="text-gray-800 font-medium capitalize block">
-                      {{ slotProps.data.fabricante || '—' }}
-                    </span>
+                    <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Fabricante</span>
+                    <span class="text-gray-800 font-medium capitalize block">{{ slotProps.data.fabricante || '—' }}</span>
                   </div>
                 </div>
 
-                <!-- Fila 2: Categoría sola en su línea para dar espacio a nombres largos -->
                 <div class="pt-2 border-t border-gray-100">
-                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">
-                    Categoría
-                  </span>
-                  <span class="text-gray-800 font-medium block break-words">
-                    {{ slotProps.data.categoria?.nombre ?? '—' }}
-                  </span>
+                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Categoría</span>
+                  <span class="text-gray-800 font-medium block break-words">{{ slotProps.data.categoria?.nombre ?? '—' }}</span>
                 </div>
 
-                <!-- Fila 3: % Ganancia Mínimo -->
                 <div class="pt-2 border-t border-gray-100">
-                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">
-                    % Ganancia Mínimo
-                  </span>
+                  <span class="text-[0.6875rem] font-bold tracking-wider uppercase text-gray-500 block mb-1">% Ganancia Mínimo</span>
                   <div>
                     <span v-if="slotProps.data.porcentaje_ganancia_minimo !== null"
                       class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eef7f0] text-[#2b5e3b] border border-[#c2e3c8]">
@@ -190,7 +171,6 @@
 
               </div>
 
-              <!-- Botones de Acción Móvil -->
               <div class="mt-3 pt-1 flex gap-2 justify-end items-center">
                 <Button 
                   icon="pi pi-pencil" 
@@ -219,6 +199,7 @@
           lazy 
           :paginator="!store.cargando"
           :rows="store.perPage" 
+          :first="(store.currentPage - 1) * store.perPage"
           :totalRecords="store.totalRecords" 
           responsiveLayout="scroll"
           class="p-datatable-custom text-sm w-full min-w-[58rem]"
@@ -233,7 +214,6 @@
             </div>
           </template>
 
-          <!-- Columna: Nombre -->
           <Column field="nombre" header="Nombre" class="font-medium text-[#1a2e1f] min-w-[10rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="75%" height="1.2rem" />
@@ -241,7 +221,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Fabricante -->
           <Column field="fabricante" header="Fabricante" class="text-[#4b5563] min-w-[8rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="55%" height="1.2rem" />
@@ -249,7 +228,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Código -->
           <Column field="codigo" header="Código" class="text-[#6b7280] min-w-[7.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="45%" height="1.2rem" />
@@ -260,7 +238,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Categoría -->
           <Column header="Categoría" class="text-[#4b5563] min-w-[9rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="60%" height="1.2rem" />
@@ -268,7 +245,6 @@
             </template>
           </Column>
 
-          <!-- Columna: % Ganancia Mínimo -->
           <Column header="% Ganancia Mínimo" class="text-center min-w-[8.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="50%" height="1.2rem" class="mx-auto" />
@@ -288,7 +264,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Tipo -->
           <Column header="Tipo" class="text-[#4b5563] min-w-[7.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="store.cargando" width="4.5rem" height="1.5rem" borderRadius="20px" />
@@ -303,7 +278,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Acciones -->
           <Column header="Acciones" class="w-[12rem] shrink-0">
             <template #body="slotProps">
               <div class="flex gap-2 justify-end whitespace-nowrap">
@@ -363,27 +337,29 @@ onMounted(async () => {
   }
 })
 
-const opcionesCategorias = computed(() => [
-  { nombre: 'Todas las categorías', id: null },
-  ...store.categorias
-])
+const hayFiltros = computed(() => {
+  return searchQuery.value.trim() !== '' || filtroCategoria.value !== null
+})
 
 const onSearchInput = () => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    const cat = filtroCategoria.value === 'Todas las categorías' ? null : filtroCategoria.value
-    store.cargarProductos(1, store.perPage, searchQuery.value, cat)
+    store.cargarProductos(1, store.perPage, searchQuery.value, filtroCategoria.value)
   }, 350)
 }
 
-const onCategoriaChange = (e) => {
-  const cat = e.value === 'Todas las categorías' ? null : e.value
-  store.cargarProductos(1, store.perPage, searchQuery.value, cat)
+const onCategoriaChange = () => {
+  store.cargarProductos(1, store.perPage, searchQuery.value, filtroCategoria.value)
+}
+
+const limpiarFiltros = () => {
+  searchQuery.value = ''
+  filtroCategoria.value = null
+  store.cargarProductos(1, store.perPage, searchQuery.value, filtroCategoria.value)
 }
 
 const onPageChange = async (event) => {
-  const cat = filtroCategoria.value === 'Todas las categorías' ? null : filtroCategoria.value
-  const resultado = await store.cargarProductos(event.page + 1, event.rows, searchQuery.value, cat)
+  const resultado = await store.cargarProductos(event.page + 1, event.rows, searchQuery.value, filtroCategoria.value)
 
   if (resultado?.status === 403) {
     mostrarAccesoDenegado()
@@ -397,6 +373,7 @@ const handleDetail = (product) => emit('open-detail', product)
 </script>
 
 <style>
+/* Estilos omitidos para brevedad, mantenlos igual que en el original */
 .p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #fcfdfe !important;
   border-bottom: 1px solid #e2e8dd !important;

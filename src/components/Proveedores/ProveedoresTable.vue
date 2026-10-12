@@ -1,43 +1,33 @@
 <template>
   <div class="bg-[#eef2e9] min-h-screen p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
 
-      <!-- ======================================================= -->
-      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
-      <!-- ======================================================= -->
-      <div class="block lg:hidden mb-4">
-        <div class="flex items-center gap-3">
-          <div
-            class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
-            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-              Registro de Proveedores
-            </h1>
-            <p class="text-xs text-gray-500 mt-0.5 m-0">
-              Gestión de contactos y directorio comercial
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-      <!-- ======================================================= -->
-      <div class="hidden lg:flex items-center gap-3 mb-6">
-        <div
-          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden mb-4">
+      <div class="flex items-center gap-3">
+        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+          <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-            Registro de Proveedores
-          </h1>
-          <p class="text-sm text-gray-500 mt-0.5 m-0">
-            Gestión de contactos, directorio y comerciales
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Registro de Proveedores</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Gestión de contactos y directorio comercial</p>
         </div>
       </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:flex items-center gap-3 mb-6">
+      <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
+        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Registro de Proveedores</h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de contactos, directorio y comerciales</p>
+      </div>
+    </div>
 
     <!-- TARJETA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
@@ -45,15 +35,16 @@
       <!-- APARTADO DE FILTROS ESTÁTICO SUPERIOR -->
       <div class="p-4 sm:p-5 border-b border-[#e2e8dd] bg-[#fbfdf9]">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-          
-          <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
-            <!-- Búsqueda Responsiva -->
-            <IconField class="w-full sm:w-[20rem] lg:w-[30rem]">
-              <InputIcon class="pi pi-search text-gray-400 text-sm" />
+
+          <div class="flex flex-col md:flex-row items-center gap-3 w-full">
+            <!-- Búsqueda -->
+            <IconField class="w-full md:w-[22rem]">
+              <InputIcon class="pi pi-search text-[#6b7280]" />
               <InputText 
-                v-model="filters['global'].value" 
+                v-model="busqueda" 
                 placeholder="Buscar por nombre o correo..."
-                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-[2.625rem] focus:!border-[#2b5e3b]" 
+                class="w-full !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11"
+                @input="emitirFiltros" 
               />
             </IconField>
 
@@ -62,40 +53,44 @@
               v-model="filtroEstado" 
               :options="estadoOptions" 
               optionLabel="label" 
-              optionValue="value" 
-              showClear
+              optionValue="value"
               placeholder="Todos los estados"
-              class="w-full sm:w-[13.75rem] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-[2.625rem] flex items-center px-2 focus:!border-[#2b5e3b]" 
+              class="w-full md:w-[15rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11 flex items-center px-2"
+              @change="emitirFiltros" 
+            />
+
+            <!-- Limpiar Filtros -->
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="w-full md:w-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold px-7 h-11 rounded-lg cursor-pointer shadow-sm transition-all whitespace-nowrap shrink-0"
+              @click="limpiarFiltros"
             />
           </div>
 
           <!-- Botón Agregar Proveedor -->
-          <Button 
-            label="Agregar Proveedor" 
-            icon="pi pi-plus"
-            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-6 h-[2.625rem] rounded-xl border-none cursor-pointer shadow-sm transition-all w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
-            @click="$emit('open-add')" 
-          />
+          <Button label="Agregar Proveedor" icon="pi pi-plus"
+            class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 h-11 rounded-lg border-none cursor-pointer shadow-sm transition-all w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
+            @click="$emit('open-add')" />
         </div>
       </div>
 
       <!-- ======================================================= -->
-      <!-- VISTA MÓVIL: 2 Columnas + Desplegable (< 768px)          -->
+      <!-- VISTA MÓVIL: (< 768px)          -->
       <!-- ======================================================= -->
       <div class="block md:hidden w-full">
-        <DataTable 
-          v-model:expandedRows="expandedRows"
-          :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados" 
-          :lazy="false"
+        <DataTable v-model:expandedRows="expandedRows"
+          :value="loading ? Array.from({ length: store.perPage }) : proveedores" 
+          :lazy="true"
           :totalRecords="totalProveedores" 
-          v-model:filters="filters" 
-          :globalFilterFields="['nombre', 'correo']"
-          dataKey="id"
-          class="p-datatable-custom text-sm w-full" 
+          dataKey="id" class="p-datatable-custom text-sm w-full" 
           :paginator="!loading" 
-          :rows="7"
+          :rows="store.perPage"
+          :first="(store.currentPage - 1) * store.perPage"
           currentPageReportTemplate="{first}-{last} de {totalRecords}"
           paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+          @page="onPageChange"
         >
           <template #empty>
             <div class="flex flex-col items-center justify-center py-8 text-gray-400">
@@ -106,7 +101,6 @@
 
           <Column expander style="width: 2.5rem" />
 
-          <!-- Columna: Nombre -->
           <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="70%" height="1.2rem" />
@@ -114,84 +108,48 @@
             </template>
           </Column>
 
-          <!-- Columna: Estado -->
           <Column field="estado" header="Estado">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="4rem" height="1.4rem" borderRadius="20px" />
-              <Tag 
-                v-else 
-                :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
-                :severity="slotProps.data.activo ? 'success' : 'danger'" 
-                rounded 
-                class="!text-[10px] !px-2 py-0.5 whitespace-nowrap" 
-              />
+              <Tag v-else :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
+                :severity="slotProps.data.activo ? 'success' : 'danger'" rounded
+                class="!text-[10px] !px-2 py-0.5 whitespace-nowrap" />
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión (Móvil Ajustada) -->
           <template #expansion="slotProps">
             <div class="p-3 sm:p-4 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
-              
-              <!-- Contenedor blanco con alineación vertical limpia -->
               <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-3">
-                
-                <!-- Correo -->
                 <div>
-                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">
-                    Correo Electrónico
-                  </span>
-                  <span class="text-xs sm:text-sm text-[#334155] font-medium break-all block">
-                    {{ slotProps.data.correo || '—' }}
-                  </span>
+                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">Correo Electrónico</span>
+                  <span class="text-xs sm:text-sm text-[#334155] font-medium break-all block">{{ slotProps.data.correo || '—' }}</span>
                 </div>
-
-                <!-- Teléfono -->
                 <div class="pt-2 border-t border-[#e2e8dd]/60">
-                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">
-                    Teléfono / Contacto
-                  </span>
-                  <span class="text-xs sm:text-sm text-[#334155] font-mono font-medium block">
-                    {{ slotProps.data.telefono || '—' }}
-                  </span>
+                  <span class="text-[10px] font-bold tracking-wider uppercase text-[#6b7280] block mb-0.5">Teléfono / Contacto</span>
+                  <span class="text-xs sm:text-sm text-[#334155] font-mono font-medium block">{{ slotProps.data.telefono || '—' }}</span>
                 </div>
-
               </div>
-
-              <!-- Botones de Acción Móvil Distribuidos Uniformemente -->
               <div class="mt-3 flex gap-2 justify-end items-center">
                 <template v-if="slotProps.data.activo">
-                  <Button 
-                    icon="pi pi-pencil" 
-                    label="Editar"
+                  <Button icon="pi pi-pencil" label="Editar"
                     class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
-                    @click="handleEdit(slotProps.data)" 
-                  />
-
-                  <Button 
-                    icon="pi pi-eye" 
-                    label="Ver"
+                    @click="handleEdit(slotProps.data)" />
+                  <Button icon="pi pi-eye" label="Ver"
                     class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
-                    @click="handleDetail(slotProps.data)" 
-                  />
-
-                  <Button 
-                    icon="pi pi-ban" 
-                    label="Desactivar"
+                    @click="handleDetail(slotProps.data)" />
+                  <Button icon="pi pi-ban" label="Desactivar"
                     class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 sm:flex-none justify-center"
-                    @click="confirmarDesactivar(slotProps.data)" 
-                  />
+                    @click="confirmarDesactivar(slotProps.data)" />
                 </template>
-
                 <template v-else>
-                  <Button 
-                    icon="pi pi-eye" 
-                    label="Ver"
-                    class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs w-full justify-center"
-                    @click="handleDetail(slotProps.data)" 
-                  />
+                  <Button icon="pi pi-eye" label="Ver"
+                    class="!bg-white hover:!bg-[#f4f7f2] !text-[#2b5e3b] !border !border-[#2b5e3b] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
+                    @click="handleDetail(slotProps.data)" />
+                  <Button icon="pi pi-check" label="Activar"
+                    class="!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2] rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer shadow-2xs flex-1 justify-center"
+                    @click="confirmarActivar(slotProps.data)" />
                 </template>
               </div>
-
             </div>
           </template>
         </DataTable>
@@ -201,18 +159,15 @@
       <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 768px)  -->
       <!-- ======================================================= -->
       <div class="hidden md:block w-full overflow-x-auto">
-        <DataTable 
-          :value="loading ? Array.from({ length: 5 }) : proveedoresFiltrados" 
-          :lazy="false"
+        <DataTable :value="loading ? Array.from({ length: store.perPage }) : proveedores" :lazy="true"
           :totalRecords="totalProveedores" 
-          v-model:filters="filters" 
-          :globalFilterFields="['nombre', 'correo']"
-          responsiveLayout="scroll" 
-          class="p-datatable-custom text-sm w-full min-w-[50rem]" 
-          :paginator="!loading" 
-          :rows="7"
+          responsiveLayout="scroll" class="p-datatable-custom text-sm w-full min-w-[50rem]" 
+          :paginator="!loading"
+          :rows="store.perPage" 
+          :first="(store.currentPage - 1) * store.perPage"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proveedores"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+          @page="onPageChange"
         >
           <template #empty>
             <div class="flex flex-col items-center justify-center py-12 text-gray-400">
@@ -221,7 +176,6 @@
             </div>
           </template>
 
-          <!-- Columna: Nombre -->
           <Column field="nombre" header="Nombre" class="font-semibold text-[#1a2e1f] min-w-[12rem]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="70%" height="1.2rem" />
@@ -229,7 +183,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Correo -->
           <Column field="correo" header="Correo" class="text-gray-600 min-w-[12rem]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="80%" height="1.2rem" />
@@ -237,7 +190,6 @@
             </template>
           </Column>
 
-          <!-- Columna: Teléfono -->
           <Column field="telefono" header="Teléfono" class="text-gray-600 font-mono min-w-[8.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="50%" height="1.2rem" />
@@ -245,21 +197,15 @@
             </template>
           </Column>
 
-          <!-- Columna: Estado -->
           <Column field="estado" header="Estado" class="min-w-[7rem]">
             <template #body="slotProps">
               <Skeleton v-if="loading" width="5rem" height="1.4rem" borderRadius="20px" />
-              <Tag 
-                v-else 
-                :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
-                :severity="slotProps.data.activo ? 'success' : 'danger'" 
-                rounded 
-                class="!text-xs !px-2.5 whitespace-nowrap" 
-              />
+              <Tag v-else :value="slotProps.data.activo ? 'ACTIVO' : 'INACTIVO'"
+                :severity="slotProps.data.activo ? 'success' : 'danger'" rounded
+                class="!text-xs !px-2.5 whitespace-nowrap" />
             </template>
           </Column>
 
-          <!-- Columna: Acciones -->
           <Column header="Acciones" class="w-[14rem] shrink-0">
             <template #body="slotProps">
               <div class="flex items-center gap-1.5 justify-end whitespace-nowrap">
@@ -270,39 +216,27 @@
 
                 <template v-else>
                   <template v-if="slotProps.data.activo">
-                    <Button 
-                      icon="pi pi-pencil" 
-                      label="Editar"
+                    <Button icon="pi pi-pencil" label="Editar"
                       class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
-                      v-tooltip.top="'Editar proveedor'" 
-                      @click="handleEdit(slotProps.data)" 
-                    />
+                      v-tooltip.top="'Editar proveedor'" @click="handleEdit(slotProps.data)" />
 
-                    <Button 
-                      icon="pi pi-eye" 
-                      label="Ver"
+                    <Button icon="pi pi-eye" label="Ver"
                       class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
-                      v-tooltip.top="'Ver detalles'" 
-                      @click="handleDetail(slotProps.data)" 
-                    />
+                      v-tooltip.top="'Ver detalles'" @click="handleDetail(slotProps.data)" />
 
-                    <Button 
-                      icon="pi pi-ban" 
-                      label="Desactivar"
+                    <Button icon="pi pi-ban" label="Desactivar"
                       class="!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
-                      v-tooltip.top="'Desactivar proveedor'" 
-                      @click="confirmarDesactivar(slotProps.data)" 
-                    />
+                      v-tooltip.top="'Desactivar proveedor'" @click="confirmarDesactivar(slotProps.data)" />
                   </template>
 
                   <template v-else>
-                    <Button 
-                      icon="pi pi-eye" 
-                      label="Ver"
+                    <Button icon="pi pi-eye" label="Ver"
                       class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
-                      v-tooltip.top="'Ver detalles'" 
-                      @click="handleDetail(slotProps.data)" 
-                    />
+                      v-tooltip.top="'Ver detalles'" @click="handleDetail(slotProps.data)" />
+
+                    <Button icon="pi pi-check" label="Activar"
+                      class="!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
+                      v-tooltip.top="'Activar proveedor'" @click="confirmarActivar(slotProps.data)" />
                   </template>
                 </template>
               </div>
@@ -328,12 +262,12 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { useProveedorStore } from '@/stores/proveedorStore'
 import { storeToRefs } from 'pinia'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado, 
-  mostrarConfirmacion, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarConfirmacion,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
@@ -342,36 +276,46 @@ const store = useProveedorStore()
 const { proveedores, cargando: loading, totalRecords: totalProveedores } = storeToRefs(store)
 
 const expandedRows = ref({})
+const ESTADO_TODOS = 'TODOS'
+const busqueda = ref('')
+const filtroEstado = ref(ESTADO_TODOS)
+let timeoutBusqueda = null
 
 const estadoOptions = ref([
+  { label: 'Todos los estados', value: ESTADO_TODOS },
   { label: 'Activo', value: true },
   { label: 'Inactivo', value: false },
 ])
 
-const filtroEstado = ref(null)
-
-const filters = ref({
-  global: { value: null, matchMode: 'contains' },
+const hayFiltros = computed(() => {
+  return busqueda.value.trim() !== '' || filtroEstado.value !== ESTADO_TODOS
 })
 
-const proveedoresFiltrados = computed(() => {
-  const lista = proveedores.value ?? []
+const emitirFiltros = () => {
+  clearTimeout(timeoutBusqueda)
+  timeoutBusqueda = setTimeout(() => {
+    store.cargarProveedores(1, store.perPage, busqueda.value, filtroEstado.value)
+  }, 300)
+}
 
-  return lista.filter((p) => {
-    const textoBusqueda = filters.value.global.value?.toLowerCase() || ''
-    const coincideBusqueda =
-      !textoBusqueda ||
-      p.nombre?.toLowerCase().includes(textoBusqueda) ||
-      p.correo?.toLowerCase().includes(textoBusqueda)
+const limpiarFiltros = () => {
+  busqueda.value = ''
+  filtroEstado.value = ESTADO_TODOS
+  emitirFiltros()
+}
 
-    const coincideEstado =
-      filtroEstado.value === null || filtroEstado.value === undefined
-        ? true
-        : p.activo === filtroEstado.value
-
-    return coincideBusqueda && coincideEstado
-  })
-})
+const onPageChange = async (event) => {
+  const pagina = event.page + 1
+  const filas = event.rows
+  
+  const resultado = await store.cargarProveedores(pagina, filas, busqueda.value, filtroEstado.value)
+  
+  if (resultado?.status === 403) {
+    mostrarAccesoDenegado()
+  } else if (resultado?.error) {
+    mostrarError('Error de conexión', resultado.error)
+  }
+}
 
 onMounted(async () => {
   const resultado = await store.cargarProveedores()
@@ -385,10 +329,42 @@ onMounted(async () => {
 const handleEdit = (proveedor) => emit('open-edit', proveedor)
 const handleDetail = (proveedor) => emit('open-detail', proveedor)
 
+const confirmarActivar = async (proveedor) => {
+  const confirmacion = await mostrarConfirmacion({
+    titulo: '¿Activar proveedor?',
+    mensajeHtml: `¿Deseas activar nuevamente a <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>?`,
+    icono: 'pi-check',
+    bgIcono: '#dcfce7',
+    colorIcono: '#2b5e3b',
+    confirmButtonText: 'Sí, activar',
+    confirmButtonColor: '#2b5e3b',
+  })
+
+  if (!confirmacion.isConfirmed) return
+  mostrarCargando('Activando proveedor...', 'Por favor espera un momento')
+
+  try {
+    const [resultado] = await Promise.all([
+      store.activarProveedor(proveedor.id),
+      new Promise((resolve) => setTimeout(resolve, 500))
+    ])
+
+    if (resultado.ok) {
+      mostrarExito('¡Proveedor activado!', `El proveedor "${proveedor.nombre}" fue activado correctamente.`)
+    } else if (resultado.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error al activar', resultado.error || 'No se pudo activar al proveedor.')
+    }
+  } catch (err) {
+    mostrarError('Error de conexión', 'No se pudo comunicar con el servidor.')
+  }
+}
+
 const confirmarDesactivar = async (proveedor) => {
   const confirmacion = await mostrarConfirmacion({
     titulo: '¿Desactivar proveedor?',
-    mensajeHtml: `¿Estás seguro de que deseas desactivar a <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>? Esta acción no se puede revertir.`,
+    mensajeHtml: `¿Estás seguro de que deseas desactivar a <strong style="color:#1e3a2f;">${proveedor.nombre}</strong>?`,
     icono: 'pi-ban',
     bgIcono: '#fee2e2',
     colorIcono: '#b91c1c',
@@ -397,7 +373,6 @@ const confirmarDesactivar = async (proveedor) => {
   })
 
   if (!confirmacion.isConfirmed) return
-
   mostrarCargando('Desactivando proveedor...', 'Por favor espera un momento')
 
   try {
@@ -419,8 +394,9 @@ const confirmarDesactivar = async (proveedor) => {
 }
 </script>
 
+
 <style>
-.p-datatable-custom .p-datatable-thead > tr > th {
+.p-datatable-custom .p-datatable-thead>tr>th {
   background-color: #fbfdf9 !important;
   color: #2b5e3b !important;
   font-weight: 600 !important;
@@ -430,13 +406,13 @@ const confirmarDesactivar = async (proveedor) => {
   white-space: nowrap !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr > td {
+.p-datatable-custom .p-datatable-tbody>tr>td {
   padding: 0.75rem 1rem !important;
   font-size: 0.85rem !important;
   border-bottom: 1px solid #f1f5f0 !important;
 }
 
-.p-datatable-custom .p-datatable-tbody > tr:hover {
+.p-datatable-custom .p-datatable-tbody>tr:hover {
   background-color: #f4f8f3 !important;
 }
 

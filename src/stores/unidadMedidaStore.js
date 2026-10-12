@@ -11,11 +11,14 @@ export const useUnidadMedidaStore = defineStore('unidadMedida', () => {
     try {
       const response = await getUnidades(params)
       unidades.value = response.data.data || []
-      return { ok: true }
+      return { ok: true, data: unidades.value }
     } catch (error) {
+      const status = error.response?.status
+      const msg = error.response?.data?.message || 'Error al cargar unidades de medida.'
       return {
         ok: false,
-        error: error.response?.data?.message || 'Error al cargar unidades'
+        status,
+        error: msg
       }
     } finally {
       cargando.value = false
@@ -23,7 +26,7 @@ export const useUnidadMedidaStore = defineStore('unidadMedida', () => {
   }
 
   const getUnidadesByMagnitud = (magnitud) => {
-    return unidades.value.filter(u => u.magnitud === magnitud)
+    return unidades.value.filter((u) => u.magnitud === magnitud)
   }
 
   return {

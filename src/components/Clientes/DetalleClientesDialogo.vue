@@ -22,7 +22,7 @@
             class="!w-10 !h-10 rounded-full flex items-center justify-center bg-[#1a3323] border border-[#e0b354] shadow-xs shrink-0"
           >
             <i
-              :class="client.personType === 'Natural' ? 'pi pi-user' : 'pi pi-building'"
+              :class="client.tipo_persona === 'Natural' ? 'pi pi-user' : 'pi pi-building'"
               class="text-base text-[#e0b354]"
             />
           </div>
@@ -32,7 +32,7 @@
               {{ client.name }}
             </h2>
             <span class="self-start px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-[#e0b354] text-[#1a3323]">
-              {{ client.personType }}
+              {{ client.tipo_persona }}
             </span>
           </div>
         </div>
@@ -46,7 +46,7 @@
           <div class="grid grid-cols-2 gap-3 bg-[#fbfdf9] p-3 rounded-xl border border-[#e2e8dd]">
             <div>
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">N° Documento</label>
-              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ client.documentNumber || '—' }}</p>
+              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ numero_documento || '—' }}</p>
             </div>
             <div>
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">NRC</label>
@@ -130,7 +130,7 @@
             <div class="grid grid-cols-2 gap-4 bg-[#fbfdf9] p-3.5 rounded-xl border border-[#e2e8dd]">
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">N° Documento</label>
-                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ client.documentNumber || '—' }}</p>
+                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ client.numero_documento || '—' }}</p>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">NRC</label>
@@ -150,14 +150,14 @@
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Teléfono</label>
                 <p class="flex items-center gap-1.5 text-sm text-[#1a2e1f] m-0 font-medium">
                   <i class="pi pi-phone text-xs text-gray-500 shrink-0" />
-                  {{ client.phone || '—' }}
+                  {{ client.telefono || '—' }}
                 </p>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Correo electrónico</label>
                 <p class="flex items-center gap-1.5 text-sm text-gray-700 m-0 font-medium">
                   <i class="pi pi-envelope text-xs text-gray-500 shrink-0" />
-                  <span class="break-all">{{ client.email || '—' }}</span>
+                  <span class="break-all">{{ client.correo || '—' }}</span>
                 </p>
               </div>
             </div>
@@ -182,15 +182,30 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 
-defineProps({
+const props = defineProps({
   visible: { type: Boolean, required: true },
   client: { type: Object, default: null }
 })
 
 defineEmits(['update:visible'])
+
+const c = computed(() => {
+  const x = props.client ?? {}
+  const tipo = x.tipo_persona ?? x.personType ?? ''
+  return {
+    nombre: x.nombre ?? x.razon_social ?? x.name ?? '',
+    tipo,
+    esNatural: tipo.toUpperCase() === 'NATURAL',
+    numero_documento: x.numero_documento ?? '',
+    nrc: x.nrc ?? '',
+    telefono: x.telefono ?? x.phone ?? '',
+    correo: x.correo ?? x.email ?? '',
+  }
+})
 </script>
 
 <style>

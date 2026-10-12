@@ -26,13 +26,19 @@
 
       <BaseInput
         v-model="form.correo"
-        label="Correo electrónico"
         type="email"
         placeholder="correo@ejemplo.com"
         :error="errores.correo"
         @input="validarCampo('correo')"
         @keyup.enter="guardar"
-      />
+      >
+        <template #label>
+          <label class="text-xs font-semibold text-[#1a2e1f]">
+            Correo electrónico
+            <span class="text-[10px] font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+          </label>
+        </template>
+      </BaseInput>
 
       <BaseInput
         v-model="form.telefono"
@@ -80,13 +86,19 @@
 
       <BaseInput
         v-model="form.correo"
-        label="Correo electrónico"
         type="email"
         placeholder="correo@ejemplo.com"
         :error="errores.correo"
         @input="validarCampo('correo')"
         @keyup.enter="guardar"
-      />
+      >
+        <template #label>
+          <label class="text-sm font-medium text-[#1a2e1f]">
+            Correo electrónico
+            <span class="text-xs font-normal text-gray-400 normal-case ml-1">(opcional)</span>
+          </label>
+        </template>
+      </BaseInput>
 
       <BaseInput
         v-model="form.telefono"
@@ -125,11 +137,11 @@ import { reactive, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import BaseInput from '@/components/base/BaseInput.vue'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAlertaConfirmar,
+  mostrarCargando
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -171,7 +183,7 @@ function validarCampo(campo) {
   if (campo === 'correo') {
     const valor = form.correo.trim()
     if (!valor) {
-      errores.correo = '' // el correo es opcional: vacío es válido
+      errores.correo = ''
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(valor)) {
       errores.correo = 'Formato de correo electrónico inválido.'
     } else {
@@ -191,7 +203,7 @@ watch(() => props.modelValue, (isOpen) => {
     const p = props.proveedor
     form.id           = p.id           ?? null
     form.nombre       = p.nombre       ?? ''
-    form.correo       = p.correo       ?? ''
+    form.correo       = p.correo && p.correo !== '—' ? p.correo : ''
     form.telefono     = p.telefono     ?? ''
     form.direccion    = p.direccion    ?? ''
     form.tipo_persona = p.tipo_persona ?? ''
@@ -234,7 +246,7 @@ function guardar() {
   const payload = { id: form.id }
 
   if (form.nombre?.trim())   payload.nombre   = form.nombre.trim()
-  if (form.correo?.trim())   payload.correo   = form.correo.trim()
+  payload.correo = form.correo.trim() || null
   if (form.telefono?.trim()) payload.telefono = form.telefono.trim()
 
   emit('actualizar', payload)

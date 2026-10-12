@@ -98,7 +98,7 @@
         <div class="block md:hidden space-y-4">
           <BaseInput
             v-model="nombre"
-            label="Nombre del Producto *"
+            label="Nombre del Producto"
             placeholder="Ej: Fertilizante Triple 15"
             filter="alphanum"
             class="w-full"
@@ -107,7 +107,7 @@
 
           <BaseInput
             v-model="fabricante"
-            label="Fabricante *"
+            label="Fabricante o Marca"
             placeholder="Ej: Fertica, Bayer, etc."
             filter="alpha"
             class="w-full"
@@ -115,8 +115,8 @@
           />
 
           <div class="flex flex-col gap-1.5 w-full">
-            <label class="text-xs font-semibold text-gray-700">
-              Categoría <span class="text-red-500">*</span>
+            <label class="font-semibold text-gray-700">
+              Categoría
             </label>
             <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
               placeholder="Buscar categoría..." @complete="buscarCategorias" :pt="{
@@ -226,7 +226,7 @@
             <!-- Nombre del Producto -->
             <BaseInput size="responsive"
               v-model="nombre"
-              label="Nombre del Producto *"
+              label="Nombre del Producto"
               placeholder="Ej: Fertilizante Triple 15"
               filter="alphanum"
               class="col-span-1 md:col-span-2 w-[145%]"
@@ -236,7 +236,7 @@
             <!-- Fabricante -->
             <BaseInput size="responsive"
               v-model="fabricante"
-              label="Fabricante *"
+              label="Fabricante o Marca"
               placeholder="Ej: Fertica, Bayer, etc."
               filter="alpha"
               class="col-span-1 md:col-span-2 w-[45%]"
@@ -245,8 +245,8 @@
 
             <!-- Categoría -->
             <div class="flex flex-col gap-1.5 col-span-1 w-[45%]">
-              <label class="text-xs sm:text-sm font-semibold text-gray-700">
-                Categoría <span class="text-red-500">*</span>
+              <label class="font-semibold text-gray-700">
+                Categoría 
               </label>
               <AutoComplete v-model="categoria" :suggestions="categoriasFiltradas" optionLabel="nombre" dropdown fluid
                 placeholder="Buscar categoría..." @complete="buscarCategorias" :pt="{
@@ -689,7 +689,7 @@
           <div class="mt-5">
             <!-- Vista Móvil (Apilados full width) -->
             <div class="flex flex-col-reverse gap-3 block md:hidden">
-              <Button label="Cancelar" icon="pi pi-times"
+              <Button label="Limpiar Campos" icon="pi pi-eraser "
                 class="!text-sm !py-3 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer w-full flex justify-center"
                 @click="limpiarFormularioDerivada" />
               <Button label="Agregar" icon="pi pi-plus"
@@ -699,7 +699,7 @@
 
             <!-- Vista Escritorio (Medidas controladas en la misma fila) -->
             <div class="hidden md:flex md:justify-end md:gap-4">
-              <Button label="Cancelar" icon="pi pi-times"
+              <Button label="Limpiar Campos" icon="pi pi-eraser"
                 style="min-width: 10.5rem; height: 3.25rem;"
                 class="!text-base !py-2.5 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer flex justify-center items-center"
                 @click="limpiarFormularioDerivada" />
@@ -865,7 +865,7 @@
           <div class="mt-5">
             <!-- Vista Móvil -->
             <div class="flex flex-col-reverse gap-3 block md:hidden">
-              <Button label="Cancelar" icon="pi pi-times"
+              <Button label="Limpiar Campos" icon="pi pi-eraser"
                 class="!text-sm !py-3 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer w-full flex justify-center"
                 @click="limpiarFormularioUnidadFija" />
               <Button label="Agregar" icon="pi pi-plus"
@@ -875,7 +875,7 @@
 
             <!-- Vista Escritorio -->
             <div class="hidden md:flex md:justify-end md:gap-4">
-              <Button label="Cancelar" icon="pi pi-times"
+              <Button label="Limpiar Campos" icon="pi pi-eraser"
                 style="min-width: 10.5rem; height: 3.25rem;"
                 class="!text-base !py-2.5 !px-6 !bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-[#1a2e1f] rounded-xl cursor-pointer flex justify-center items-center"
                 @click="limpiarFormularioUnidadFija" />
@@ -1016,7 +1016,6 @@
               <Column header="Acciones" class="!text-sm">
                 <template #body="{ index }">
                   <div class="flex gap-2">
-                    <Button icon="pi pi-pencil" severity="secondary" text rounded size="small" @click="editarPresentacion(index)" />
                     <Button icon="pi pi-trash" severity="danger" text rounded @click="eliminarPresentacion(index)" />
                   </div>
                 </template>
@@ -1396,10 +1395,12 @@ function irAPaso2() {
 
 function limpiarFormularioDerivada() {
   formDerivada.value = { nombre: '', factorConversion: null, precioVenta: null }
+  formBase.value.precioVenta = null
 }
 
 function limpiarFormularioUnidadFija() {
   formUnidadFija.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
+  formBase.value = { nombre: '', stockMinimo: null, precioVenta: null, codigoBarra: '' }
 }
 
 function onSelectDerivada(event) {
@@ -1487,12 +1488,13 @@ function agregarDerivada() {
     return
   }
 
-  if (!formDerivada.value.precioVenta || formDerivada.value.precioVenta <= 0) {
+  const precio = formDerivada.value.precioVenta || formBase.value.precioVenta
+  if (!precio || precio <= 0) {
     mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
-  const sinIva = Number(formDerivada.value.precioVenta)
+  const sinIva = Number(precio)
   const iva = aplicaIva.value ? Number((sinIva * 0.13).toFixed(2)) : 0
   const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
 
@@ -1524,23 +1526,23 @@ function agregarUnidadFija() {
     return
   }
 
-  if (!formUnidadFija.value.stockMinimo || formUnidadFija.value.stockMinimo <= 0) {
+  if (!formBase.value.stockMinimo || formBase.value.stockMinimo <= 0) {
     mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Stock mínimo requerido', mensajeHtml: 'Define un stock mínimo mayor a 0.' })
     return
   }
 
-  if (!formUnidadFija.value.precioVenta || formUnidadFija.value.precioVenta <= 0) {
+  if (!formBase.value.precioVenta || formBase.value.precioVenta <= 0) {
     mostrarAlertaConfirmar({ tipo: 'advertencia', titulo: 'Precio requerido', mensajeHtml: 'Define un precio de venta válido.' })
     return
   }
 
-  const sinIva = Number(formUnidadFija.value.precioVenta)
+  const sinIva = Number(formBase.value.precioVenta)
   const iva = aplicaIva.value ? Number((sinIva * 0.13).toFixed(2)) : 0
   const conIva = aplicaIva.value ? Number((sinIva + iva).toFixed(2)) : sinIva
 
   presentaciones.value.push({
     nombre: nombreFija,
-    codigoBarra: formUnidadFija.value.codigoBarra || '',
+    codigoBarra: formBase.value.codigoBarra || '',
     equivalencia: 1,
     unidadBase: nombreUnidadBase.value,
     aplicaIva: aplicaIva.value,
@@ -1548,16 +1550,14 @@ function agregarUnidadFija() {
     ivaAplicado: iva,
     precioConIva: conIva,
     es_base: false,
-    stock_minimo: Number(formUnidadFija.value.stockMinimo),
+    stock_minimo: Number(formBase.value.stockMinimo),
   })
 
   limpiarFormularioUnidadFija()
   mostrarExito(`¡Presentación "${nombreFija}" agregada!`)
 }
 
-function editarPresentacion(index) {
-  mostrarAlertaConfirmar({ tipo: 'informacion', titulo: 'Editar presentación', mensajeHtml: 'Opción en mantenimiento.' })
-}
+
 
 async function eliminarPresentacion(index) {
   const resultado = await mostrarConfirmacion({
@@ -1592,7 +1592,7 @@ async function guardarProducto() {
     hayErrores = true
   }
   if (!fabricante.value.trim()) {
-    errores.value.fabricante = 'El fabricante es obligatorio.'
+    errores.value.fabricante = 'El fabricante/marca es obligatorio.'
     hayErrores = true
   }
   if (!unidadMedidaId.value) {

@@ -1,10 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getLotesByPresentacion, updateDescuentoLote } from '@/services/productoService'
-import Swal from 'sweetalert2'
 
 export const useLoteStore = defineStore('lote', () => {
-
   const lotes = ref([])
   const cargando = ref(false)
   const totalRecords = ref(0)
@@ -18,48 +16,52 @@ export const useLoteStore = defineStore('lote', () => {
       const res = await getLotesByPresentacion(presentacionId, page, rows)
       lotes.value = res.data.data
       totalRecords.value = res.data.total
-      stockTotalActivo.value = res.data.stock_total_activo ?? 0 
+      stockTotalActivo.value = res.data.stock_total_activo ?? 0
       currentPage.value = res.data.current_page
       perPage.value = res.data.per_page
+
+      return { ok: true, data: res.data.data }
     } catch (error) {
       const status = error.response?.status
+      const msg = error.response?.data?.message || 'No se pudieron cargar los lotes.'
+
       if (status === 404) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Presentación no encontrada',
-          text: 'Esta presentación ya no existe.',
-          confirmButtonColor: '#2b5e3b',
-        })
-      } else if (status === 403) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Sin autorización',
-          text: 'No tiene permisos para ver los lotes.',
-          confirmButtonColor: '#2b5e3b',
-        })
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los lotes.',
-          confirmButtonColor: '#2b5e3b',
-        })
+        lotes.value = []
+        totalRecords.value = 0
+        stockTotalActivo.value = 0
       }
-      throw error
+
+      return {
+        ok: false,
+        status,
+        error: msg
+      }
     } finally {
       cargando.value = false
     }
   }
 
   const actualizarDescuento = async (loteId, porcentajeDescuento, presentacionId) => {
-  try {
-    const res = await updateDescuentoLote(loteId, porcentajeDescuento)
-    await fetchLotesByPresentacion(presentacionId, currentPage.value, perPage.value)
-    return res.data
-  } catch (error) {
-    throw error
+    try {
+      const res = await updateDescuentoLote(loteId, porcentajeDescuento)
+      await fetchLotesByPresentacion(presentacionId, currentPage.value, perPage.value)
+      return { ok: true, data: res.data }
+    } catch (error) {
+      const status = error.response?.status
+      const responseData = error.response?.data
+
+      if (status === 422 && responseData?.errors) {
+        const mensajes = Object.values(responseData.errors).flat()
+        return { ok: false, status, error: mensajes[0] }
+      }
+
+      return {
+        ok: false,
+        status,
+        error: responseData?.message || 'Error al actualizar el descuento del lote.'
+      }
+    }
   }
-}
 
   return {
     lotes,

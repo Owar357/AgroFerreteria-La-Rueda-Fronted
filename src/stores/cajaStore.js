@@ -5,7 +5,6 @@ import { abrirCaja, abrirVenta, cuadrarVenta, cerrarVentaCaja, getEstadoCaja } f
 // Solo se usa hasta que llega el valor real desde el backend (/caja/estado)
 const FONDO_FIJO_DEFECTO = '75.00'
 
-
 const mensajeDeError = (error, porDefecto) => {
   if (!error.response) return 'No se pudo conectar con el servidor.'
   const data = error.response.data
@@ -13,7 +12,7 @@ const mensajeDeError = (error, porDefecto) => {
   return primerError || data?.message || porDefecto
 }
 
-// Forma única de error para todas las acciones: { ok:false, status, error, data }
+// Forma única de error para todas las acciones: { ok: false, status, error, data }
 const resultadoError = (error, porDefecto = 'Error interno del servidor.') => ({
   ok: false,
   status: error.response?.status,
@@ -29,7 +28,7 @@ export const useCajaStore = defineStore('caja', () => {
   const turnoActivo = ref(null) // { id, cajero_id, cajero_nombre, es_mio, fecha_hora_apertura } | null
   const cargando = ref(false)
   const estadoCargado = ref(false)
-  const errorEstado = ref(false) // true si la última consulta de estado falló (red, servidor)
+  const errorEstado = ref(false)
   const necesitaActualizarResumen = ref(false)
 
   // Hay un turno abierto, pero es de otro cajero
@@ -51,9 +50,10 @@ export const useCajaStore = defineStore('caja', () => {
       fondoFijo.value = data.fondo_fijo ?? FONDO_FIJO_DEFECTO
       turnoActivo.value = data.turno_activo ?? null
       errorEstado.value = false
-    } catch {
-      // No se borra el estado previo: un fallo de red no significa que la caja se haya cerrado
+      return { ok: true, data }
+    } catch (error) {
       errorEstado.value = true
+      return resultadoError(error, 'No se pudo obtener el estado de la caja.')
     } finally {
       estadoCargado.value = true
     }
@@ -67,7 +67,7 @@ export const useCajaStore = defineStore('caja', () => {
       if (data.status === 'ok') {
         cajaAbierta.value = true
         await cargarEstadoCaja()
-        return { ok: true }
+        return { ok: true, data }
       }
       return { ok: false, error: data.message }
     } catch (error) {
@@ -77,14 +77,6 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  /**
-   * Apertura de venta.
-   * - Nuevo:  abrirTurnoVenta({ denominaciones, justificacion })
-   * - TRANSICIÓN (se elimina en la fase 6): abrirTurnoVenta(monto) con un número.
-   *
-   * Si el conteo es distinto del fondo fijo y falta la justificación, el resultado trae
-   * requiereJustificacion: true junto con fondoFijo, montoContado y tipo ('MENOR' | 'MAYOR').
-   */
   const abrirTurnoVenta = async (conteo) => {
     cargando.value = true
 
@@ -102,7 +94,7 @@ export const useCajaStore = defineStore('caja', () => {
         ventaAbierta.value = true
         montoInicial.value = data.monto_inicial ?? montoInicial.value
         await cargarEstadoCaja()
-        return { ok: true }
+        return { ok: true, data }
       }
       return { ok: false, error: data.message }
     } catch (error) {
@@ -124,7 +116,7 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // payload: { email, password, denominaciones } (o monto_contado en la transición)
+  // payload: { email, password, denominaciones }
   const cuadrarTurnoVenta = async (payload) => {
     cargando.value = true
     try {
@@ -141,7 +133,6 @@ export const useCajaStore = defineStore('caja', () => {
   }
 
   // payload: { token_autorizacion, justificacion? }
-  // status 409 = hubo ventas/movimientos después del cuadre: hay que repetir el cuadre.
   const cerrarTurnoVentaCaja = async (payload) => {
     cargando.value = true
     try {

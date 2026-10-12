@@ -1,11 +1,12 @@
 <template>
-  <div class="bg-[#eef2e9] min-h-screen p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden">
-
+  <div
+    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
     <div class="block lg:hidden space-y-4 w-full max-w-full">
-
       <!-- Botón Volver Móvil -->
       <Button
         icon="pi pi-arrow-left"
@@ -18,16 +19,14 @@
 
       <!-- Encabezado Móvil -->
       <div class="flex items-center gap-3">
-        <div class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
+        <div
+          class="!w-10 !h-10 rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
           <i class="pi pi-chart-pie text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">
-            Resumen de Ventas
-          </h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Resumen general y tendencias por período
-          </p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Resumen de Ventas</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Resumen general y tendencias por período</p>
         </div>
       </div>
 
@@ -46,6 +45,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha inicio"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -59,6 +59,7 @@
             dateFormat="yy-mm-dd"
             placeholder="Seleccione fecha fin"
             showIcon
+            :pt="{ pcInputText: { root: { readonly: true } } }"
             class="!w-full"
             :inputClass="'!border-[#cbd5e1] !text-[#1a2e1f] !text-xs !py-2.5 !px-3 !bg-white !rounded-xl !w-full'"
           />
@@ -83,14 +84,12 @@
           />
         </div>
       </div>
-
     </div>
 
     <!-- ======================================================= -->
     <!-- VISTA ESCRITORIO                                       -->
     <!-- ======================================================= -->
     <div class="hidden lg:block space-y-6 w-full">
-
       <!-- Botón Volver PC -->
       <Button
         icon="pi pi-arrow-left"
@@ -108,7 +107,9 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-[#1e3a2f] m-0">Reporte de Resumen de Ventas</h1>
-          <p class="text-gray-500 text-sm mt-1 m-0">Resumen general y tendencias de ventas por período.</p>
+          <p class="text-gray-500 text-sm mt-1 m-0">
+            Resumen general y tendencias de ventas por período.
+          </p>
         </div>
       </div>
 
@@ -128,6 +129,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -141,6 +143,7 @@
               dateFormat="yy-mm-dd"
               placeholder="Seleccione fecha"
               showIcon
+              :pt="{ pcInputText: { root: { readonly: true } } }"
               class="!w-full"
               :inputClass="'!border-gray-300 !text-[#1a2e1f] !text-sm !py-2 !px-3 !bg-white !w-full'"
             />
@@ -166,9 +169,7 @@
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
@@ -177,12 +178,13 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 import { DatePicker } from 'primevue'
 import { generarReporteResumenVentas } from '@/services/reporteService'
-import { 
-  mostrarExito, 
-  mostrarError, 
+import { fondoStyle } from '@/utils/fondoReportes'
+import {
+  mostrarExito,
+  mostrarError,
   mostrarAccesoDenegado,
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['volver'])
@@ -202,7 +204,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
-      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.'
+      mensajeHtml:
+        'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.',
     })
     return
   }
@@ -211,13 +214,17 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango de fechas inválido',
-      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.'
+      mensajeHtml:
+        'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.',
     })
     return
   }
 
   generandoPDF.value = true
-  mostrarCargando('Generando reporte PDF...', 'Procesando el resumen general de ventas para descargar')
+  mostrarCargando(
+    'Generando reporte PDF...',
+    'Procesando el resumen general de ventas para descargar',
+  )
 
   try {
     const [resultado] = await Promise.all([
@@ -225,12 +232,12 @@ const generarPDF = async () => {
         fechaInicio: formatFechaParam(fechaInicio.value),
         fechaFin: formatFechaParam(fechaFin.value),
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     mostrarExito(
       '¡Reporte generado!',
-      'El reporte de resumen de ventas en formato PDF se ha descargado exitosamente.'
+      'El reporte de resumen de ventas en formato PDF se ha descargado exitosamente.',
     )
   } catch (error) {
     const status = error.response?.status

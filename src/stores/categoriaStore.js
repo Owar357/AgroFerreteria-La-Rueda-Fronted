@@ -13,7 +13,6 @@ export const useCategoriaStore = defineStore('categoria', () => {
   let debounceTimeout = null
 
   const cargarCategorias = async (page = 1, rows = porPagina.value) => {
-
     if (cargando.value) return
     cargando.value = true
     try {
@@ -22,13 +21,18 @@ export const useCategoriaStore = defineStore('categoria', () => {
       totalRegistros.value = response.data.total
       paginaActual.value = response.data.current_page
       porPagina.value = response.data.per_page
+      return { ok: true, data: response.data.data }
     } catch (error) {
       if (error.response?.status === 404) {
         categorias.value = []
         totalRegistros.value = 0
-        return
+        return { ok: true, data: [] }
       }
-      return { ok: false, status: error.response?.status, error: error.response?.data?.message }
+      return { 
+        ok: false, 
+        status: error.response?.status, 
+        error: error.response?.data?.message || 'Error al cargar las categorías.' 
+      }
     } finally {
       cargando.value = false
     }
@@ -53,9 +57,9 @@ export const useCategoriaStore = defineStore('categoria', () => {
       const status = error.response?.status
       const responseData = error.response?.data
 
-      if (status === 422) {
+      if (status === 422 && responseData?.errors) {
         const mensajes = Object.values(responseData.errors).flat()
-        return { ok: false, error: mensajes[0] }
+        return { ok: false, status, error: mensajes[0] }
       }
       return { ok: false, status, error: responseData?.message || 'Error en el servidor.' }
     }
@@ -66,14 +70,14 @@ export const useCategoriaStore = defineStore('categoria', () => {
       const response = await updateCategoria(id, data)
       const index = categorias.value.findIndex((c) => c.id === id)
       if (index !== -1) categorias.value[index] = response.data.categoria
-      return { ok: true }
+      return { ok: true, categoria: response.data.categoria }
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
 
-      if (status === 422) {
+      if (status === 422 && responseData?.errors) {
         const mensajes = Object.values(responseData.errors).flat()
-        return { ok: false, error: mensajes[0] }
+        return { ok: false, status, error: mensajes[0] }
       }
       return { ok: false, status, error: responseData?.message || 'Error en el servidor.' }
     }
