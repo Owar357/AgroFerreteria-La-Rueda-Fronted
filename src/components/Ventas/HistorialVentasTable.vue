@@ -169,7 +169,7 @@
         <span class="text-sm font-medium text-[#4b5563]">
           {{ textoRangoFechas }}
         </span>
-      </div>
+      </div>  
 
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL: Tabla con Desplegable (< 1024px)           -->
