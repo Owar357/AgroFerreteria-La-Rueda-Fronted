@@ -43,21 +43,6 @@ const filtros = ref({ search: '', estado: '', tipo_pago: '', fecha_desde: '', fe
 
 let peticionActual = 0
 
-const mapearVenta = (v) => ({
-  id: v.id,
-  vendidoPor: v.vendido_por?.name ?? '-',
-  numeroFactura: v.numero_factura,
-  tipoPago: v.tipo_pago,
-  estado: v.estado,
-  fecha: new Date(v.created_at).toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }),
-  total: v.total,
-  aperturaVentaId: v.apertura_venta_id,
-})
-
 const cargarVentas = async () => {
   const numeroPeticion = ++peticionActual
   cargando.value = true
@@ -78,7 +63,8 @@ const cargarVentas = async () => {
 
     if (numeroPeticion !== peticionActual) return
 
-    ventas.value = (response.data.data ?? []).map(mapearVenta)
+    // Pasamos los datos crudos, la tabla se encarga de mostrar lo necesario
+    ventas.value = response.data.data ?? []
     totalRegistros.value = response.data.total ?? 0
   } catch (error) {
     if (numeroPeticion !== peticionActual) return
@@ -116,10 +102,14 @@ const abrirDetalle = async (venta) => {
     const detalles = response.data.data || response.data
 
     ventaSeleccionada.value = {
-      vendidoPor: venta.vendidoPor,
-      numeroFactura: venta.numeroFactura,
-      fechaEmision: venta.fecha,
-      tipoPago: venta.tipoPago,
+      vendidoPor: venta.vendido_por?.name ?? '—',
+      numeroFactura: venta.numero_factura,
+      fechaEmision: new Date(venta.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }),
+      tipoPago: venta.tipo_pago,
       estado: venta.estado,
       total: venta.total,
 

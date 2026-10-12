@@ -5,16 +5,12 @@
     <!-- ======================================================= -->
     <div class="block lg:hidden mb-4">
       <div class="flex items-center gap-3">
-        <div
-          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
-        >
+        <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
           <i class="pi pi-receipt text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
           <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Historial de Ventas</h1>
-          <p class="text-xs text-gray-500 mt-0.5 m-0">
-            Consulta de transacciones e historial general
-          </p>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Consulta de transacciones e historial general</p>
         </div>
       </div>
     </div>
@@ -23,87 +19,77 @@
     <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
     <!-- ======================================================= -->
     <div class="hidden lg:flex items-center gap-3 mb-6">
-      <div
-        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
-      >
+      <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
         <i class="pi pi-receipt text-[#2b5e3b] text-xl"></i>
       </div>
       <div>
-        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
-          Historial de Ventas
-        </h1>
-        <p class="text-sm text-gray-500 mt-0.5 m-0">
-          Consulta de transacciones del día e historial general
-        </p>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Historial de Ventas</h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">Consulta de transacciones del día e historial general</p>
       </div>
     </div>
 
     <!-- TARJETA CONTENEDORA PRINCIPAL -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
+      
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL FILTROS (Solo Teléfono / Tablet)           -->
       <!-- ======================================================= -->
       <div class="block lg:hidden p-4 border-b border-[#e2e8dd] bg-[#fbfdf9] space-y-3">
         <div class="flex flex-col gap-3">
-          <!-- Buscador Móvil -->
-          <IconField class="grid grid-cols-2 gap-2">
+          <IconField class="w-full">
             <InputIcon class="pi pi-search text-gray-400" />
             <InputText
               v-model="busqueda"
               placeholder="Buscar factura, vendedor..."
               maxlength="100"
-              class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-xs rounded-xl h-10 focus:!border-[#2b5e3b]"
+              class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11 focus:!border-[#2b5e3b]"
             />
           </IconField>
-          <small v-if="busqueda.length >= 100" class="text-red-600 text-xs">Has llegado al límite de caracteres permitidos.</small>
-
-          <!-- Estado y Pago Móvil -->
+          
           <div class="grid grid-cols-2 gap-2">
             <Select
               v-model="estadoSel"
               :options="opcionesEstado"
-              showClear
               placeholder="Estado..."
-              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10 flex items-center px-2"
+              class="w-full !bg-white !border-gray-300 text-sm rounded-xl h-11 flex items-center px-2"
             />
-
             <Select
               v-model="pagoSel"
               :options="opcionesPago"
-              showClear
               placeholder="Tipo pago..."
-              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10 flex items-center px-2"
+              class="w-full !bg-white !border-gray-300 text-sm rounded-xl h-11 flex items-center px-2"
             />
           </div>
 
-          <!-- Fechas Móvil -->
           <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#e2e8dd]/60">
-            <span
-              class="col-span-2 text-[11px] font-bold text-[#2b5e3b] uppercase tracking-wider block"
-            >
+            <span class="col-span-2 text-xs font-bold text-[#2b5e3b] uppercase tracking-wider block">
               Filtrar por fecha:
             </span>
             <DatePicker
               v-model="fechaInicio"
               :maxDate="fechaFin"
-              placeholder="Fecha inicio"
+              placeholder="Desde"
               dateFormat="dd/mm/yy"
-              showIcon
               :pt="{ pcInputText: { root: { readonly: true } } }"
-             
-              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10"
+              class="w-full !bg-white !border-gray-300 text-sm rounded-xl h-11"
             />
             <DatePicker
               v-model="fechaFin"
               :minDate="fechaInicio"
-              placeholder="Fecha fin"
+              placeholder="Hasta"
               dateFormat="dd/mm/yy"
-              showIcon
               :pt="{ pcInputText: { root: { readonly: true } } }"
-              
-              class="w-full !bg-white !border-gray-300 text-xs rounded-xl h-10"
+              class="w-full !bg-white !border-gray-300 text-sm rounded-xl h-11"
             />
           </div>
+          
+          <Button
+            v-if="hayFiltros"
+            label="Limpiar filtros"
+            icon="pi pi-filter-slash"
+            class="w-full !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-11 rounded-xl cursor-pointer shadow-2xs"
+            @click="limpiarFiltros"
+          />
         </div>
       </div>
 
@@ -114,70 +100,75 @@
         <div class="flex flex-col gap-3.5 w-full">
           <!-- FILA 1: Buscador, Estado y Tipo de Pago -->
           <div class="flex items-center gap-3 w-full">
-            <!-- Buscador -->
-            <div class="w-[50%] shrink-0">
-              <IconField class="w-full">
-                <InputIcon class="pi pi-search text-gray-400 text-sm" />
-                <InputText
-                  v-model="busqueda"
-                  placeholder="Buscar por nº de factura o nombre de vendedor..."
-                  maxlength="100"
-                  class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 focus:!border-[#2b5e3b]"
-                />
-              </IconField>
-              <small v-if="busqueda.length >= 100" class="text-red-600 text-xs">Has llegado al límite de caracteres permitidos.</small>
-            </div>
+            <IconField class="w-full md:w-[22rem]">
+              <InputIcon class="pi pi-search text-[#6b7280] text-sm" />
+              <InputText
+                v-model="busqueda"
+                placeholder="Nº factura o vendedor..."
+                maxlength="100"
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11 focus:!border-[#2b5e3b]"
+              />
+            </IconField>
 
-            <!-- Estado -->
             <Select
               v-model="estadoSel"
               :options="opcionesEstado"
-              showClear
               placeholder="Todos los estados"
-              class="w-[25%] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2 shrink-0"
+              class="w-full md:w-[12rem] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11 flex items-center px-2"
             />
 
-            <!-- Tipo de Pago -->
             <Select
               v-model="pagoSel"
               :options="opcionesPago"
-              showClear
-              placeholder="Tipo de pago"
-              class="w-[20%] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10 flex items-center px-2 shrink-0"
+              placeholder="Tipos de pago"
+              class="w-full md:w-[12rem] !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11 flex items-center px-2"
             />
           </div>
 
-          <!-- FILA 2: Fecha inicio y Fecha fin -->
+          <!-- FILA 2: Fechas y Limpiar -->
           <div class="flex items-center gap-3 pt-2 border-t border-[#e2e8dd]/60">
             <span class="text-xs font-bold text-[#2b5e3b] uppercase tracking-wider shrink-0">
               Filtrar por fecha:
             </span>
-            <div class="w-[22%] shrink-0">
+            <div class="w-[12rem] shrink-0">
               <DatePicker
                 v-model="fechaInicio"
                 :maxDate="fechaFin"
-                placeholder="Fecha inicio"
+                placeholder="Desde"
                 dateFormat="dd/mm/yy"
-                showIcon
                 :pt="{ pcInputText: { root: { readonly: true } } }"
-               
-                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11"
               />
             </div>
-            <div class="w-[22%] shrink-0">
+            <div class="w-[12rem] shrink-0">
               <DatePicker
                 v-model="fechaFin"
                 :minDate="fechaInicio"
-                placeholder="Fecha fin"
+                placeholder="Hasta"
                 dateFormat="dd/mm/yy"
-                showIcon
                 :pt="{ pcInputText: { root: { readonly: true } } }"
-                
-                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-10"
+                class="w-full !bg-white !border-gray-300 text-[#1a2e1f] text-sm rounded-xl h-11"
               />
             </div>
+            
+            <Button
+              v-if="hayFiltros"
+              label="Limpiar filtros"
+              icon="pi pi-filter-slash"
+              class="ml-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-11 px-6 rounded-xl cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
+              @click="limpiarFiltros"
+            />
           </div>
         </div>
+      </div>
+
+      <!-- ======================================================= -->
+      <!-- BANNER DE FECHAS DINÁMICO                               -->
+      <!-- ======================================================= -->
+      <div class="px-4 py-3 sm:px-5 bg-white border-b border-[#e2e8dd] flex items-center gap-2.5">
+        <span class="text-sm font-medium text-[#4b5563]">
+          {{ textoRangoFechas }}
+        </span>
       </div>
 
       <!-- ======================================================= -->
@@ -192,7 +183,7 @@
           :rows="filas"
           :first="primero"
           :totalRecords="totalRegistros"
-          dataKey="numeroFactura"
+          dataKey="numero_factura"
           class="p-datatable-custom text-sm w-full"
           currentPageReportTemplate="{first}-{last} de {totalRecords}"
           paginatorTemplate="PrevPageLink PageLinks NextPageLink"
@@ -207,7 +198,6 @@
 
           <Column expander style="width: 2.2rem" />
 
-          <!-- Factura y Vendedor -->
           <Column header="Factura / Vendedor">
             <template #body="slotProps">
               <div v-if="cargando" class="space-y-1">
@@ -215,19 +205,16 @@
                 <Skeleton width="40%" height="0.8rem" />
               </div>
               <div v-else class="flex flex-col gap-0.5 items-start">
-                <span
-                  class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap"
-                >
-                  {{ slotProps.data.numeroFactura }}
+                <span class="font-mono text-[11px] bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase whitespace-nowrap">
+                  {{ slotProps.data.numero_factura }}
                 </span>
                 <span class="text-xs text-gray-600 truncate max-w-[150px] block">
-                  {{ slotProps.data.vendidoPor }}
+                  {{ slotProps.data.vendido_por?.name || '—' }}
                 </span>
               </div>
             </template>
           </Column>
 
-          <!-- Total y Estado -->
           <Column header="Total / Estado" class="text-right">
             <template #body="slotProps">
               <div v-if="cargando" class="flex flex-col items-end gap-1">
@@ -248,37 +235,25 @@
             </template>
           </Column>
 
-          <!-- Plantilla de Expansión Móvil -->
           <template #expansion="slotProps">
             <div class="p-3 bg-[#f1f5f0] border-y border-[#e2e8dd] text-sm">
               <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] shadow-2xs space-y-2.5">
-                <!-- Fecha -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Fecha Registro</span>
-                  <span class="font-mono text-xs text-[#334155] font-semibold">{{
-                    slotProps.data.fecha
-                  }}</span>
+                  <span class="font-mono text-xs text-[#334155] font-semibold">{{ formatearFechaVisual(slotProps.data.created_at) }}</span>
                 </div>
-
-                <!-- Tipo de Pago -->
                 <div class="flex justify-between items-center pb-2 border-b border-[#e2e8dd]/60">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Tipo de Pago</span>
-                  <span :class="estiloPago(slotProps.data.tipoPago)">
-                    <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
-                    {{ slotProps.data.tipoPago }}
+                  <span :class="estiloPago(slotProps.data.tipo_pago)">
+                    <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipo_pago)" />
+                    {{ slotProps.data.tipo_pago }}
                   </span>
                 </div>
-
-                <!-- Vendedor -->
                 <div class="flex justify-between items-center">
                   <span class="text-[10px] font-bold uppercase text-[#6b7280]">Vendedor</span>
-                  <span class="text-xs text-[#334155] font-medium">{{
-                    slotProps.data.vendidoPor
-                  }}</span>
+                  <span class="text-xs text-[#334155] font-medium">{{ slotProps.data.vendido_por?.name || '—' }}</span>
                 </div>
               </div>
-
-              <!-- Botones Móvil Outlined -->
               <div class="mt-3 flex justify-end">
                 <Button
                   icon="pi pi-eye"
@@ -304,68 +279,48 @@
           :rows="filas"
           :first="primero"
           :totalRecords="totalRegistros"
-          :rowsPerPageOptions="[8, 15, 30]"
           responsiveLayout="scroll"
           class="p-datatable-custom text-sm w-full min-w-[55rem]"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ventas"
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
           @page="onPage"
         >
           <template #empty>
             <div class="flex flex-col items-center justify-center py-12 text-gray-400">
               <i class="pi pi-inbox text-[48px] mb-3 text-gray-300" />
-              <span class="text-[15px] font-medium"
-                >No hay ventas registradas para estos filtros</span
-              >
+              <span class="text-[15px] font-medium">No hay ventas registradas para estos filtros</span>
             </div>
           </template>
 
-          <!-- Vendido por -->
-          <Column
-            field="vendidoPor"
-            header="Vendido por"
-            class="font-semibold text-[#1a2e1f] min-w-[12rem]"
-          >
+          <Column field="vendido_por" header="Vendido por" class="font-semibold text-[#1a2e1f] min-w-[12rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="65%" height="1.2rem" />
-              <span v-else class="capitalize block">{{ slotProps.data.vendidoPor }}</span>
+              <span v-else class="capitalize block">{{ slotProps.data.vendido_por?.name || '—' }}</span>
             </template>
           </Column>
 
-          <!-- N° Factura -->
-          <Column field="numeroFactura" header="N° Factura" class="min-w-[9.5rem]">
+          <Column field="numero_factura" header="N° Factura" class="min-w-[9.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="5rem" height="1.2rem" />
-              <span
-                v-else
-                class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase"
-              >
-                {{ slotProps.data.numeroFactura }}
+              <span v-else class="font-mono text-xs bg-[#f1f5f0] text-[#334155] px-2 py-0.5 rounded border border-[#e2e8dd] font-bold uppercase">
+                {{ slotProps.data.numero_factura }}
               </span>
             </template>
           </Column>
 
-          <!-- Tipo de pago -->
-          <Column field="tipoPago" header="Tipo de pago" class="min-w-[10rem]">
+          <Column field="tipo_pago" header="Tipo de pago" class="min-w-[10rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="6.5rem" height="1.5rem" borderRadius="20px" />
-              <span v-else :class="estiloPago(slotProps.data.tipoPago)">
-                <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipoPago)" />
-                {{ slotProps.data.tipoPago }}
+              <span v-else :class="estiloPago(slotProps.data.tipo_pago)">
+                <i class="pi text-[11px]" :class="iconoPago(slotProps.data.tipo_pago)" />
+                {{ slotProps.data.tipo_pago }}
               </span>
             </template>
           </Column>
 
-          <!-- Estado -->
           <Column field="estado" header="Estado" class="text-center min-w-[8.5rem]">
             <template #body="slotProps">
-              <Skeleton
-                v-if="cargando"
-                width="5.5rem"
-                height="1.5rem"
-                borderRadius="20px"
-                class="mx-auto"
-              />
+              <Skeleton v-if="cargando" width="5.5rem" height="1.5rem" borderRadius="20px" class="mx-auto" />
               <Tag
                 v-else
                 :value="slotProps.data.estado"
@@ -376,41 +331,32 @@
             </template>
           </Column>
 
-          <!-- Fecha -->
-          <Column field="fecha" header="Fecha" class="text-gray-600 min-w-[9rem]">
+          <Column field="created_at" header="Fecha" class="text-gray-600 min-w-[9rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="5.5rem" height="1.2rem" />
-              <span v-else class="font-mono text-xs">{{ slotProps.data.fecha }}</span>
+              <span v-else class="font-mono text-xs">{{ formatearFechaVisual(slotProps.data.created_at) }}</span>
             </template>
           </Column>
 
-          <!-- Total -->
           <Column field="total" header="Total" class="text-right min-w-[8.5rem]">
             <template #body="slotProps">
               <Skeleton v-if="cargando" width="4rem" height="1.2rem" class="ml-auto" />
-              <span v-else class="font-bold text-[#1a2e1f] font-mono"
-                >${{ formatearMoneda(slotProps.data.total) }}</span
-              >
+              <span v-else class="font-bold text-[#1a2e1f] font-mono">${{ formatearMoneda(slotProps.data.total) }}</span>
             </template>
           </Column>
 
-          <!-- Acciones Outlined -->
           <Column header="Acción" class="w-[6rem] shrink-0 text-center">
             <template #body="slotProps">
               <div class="flex items-center justify-center">
-                <template v-if="cargando">
-                  <Skeleton shape="circle" size="2rem" />
-                </template>
-
-                <template v-else>
-                  <Button
-                    icon="pi pi-eye"
-                    outlined
-                    class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] w-8 h-8 rounded-full p-0 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
-                    v-tooltip.top="'Ver detalle'"
-                    @click="$emit('ver-detalle', slotProps.data)"
-                  />
-                </template>
+                <Skeleton v-if="cargando" shape="circle" size="2rem" />
+                <Button
+                  v-else
+                  icon="pi pi-eye"
+                  outlined
+                  class="!border-[#2b5e3b] !text-[#2b5e3b] hover:!bg-[#f4f7f2] w-8 h-8 rounded-full p-0 transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
+                  v-tooltip.top="'Ver detalle'"
+                  @click="$emit('ver-detalle', slotProps.data)"
+                />
               </div>
             </template>
           </Column>
@@ -421,7 +367,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onBeforeUnmount } from 'vue'
+import { ref, watch, onBeforeUnmount, computed, nextTick } from 'vue'
 import Skeleton from 'primevue/skeleton'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
@@ -444,55 +390,105 @@ defineProps({
 const emit = defineEmits(['ver-detalle', 'cambiar-pagina', 'cambiar-filtros'])
 
 const expandedRows = ref({})
+const ESTADO_TODOS = 'TODAS'
 
-// --- Paginación ---
-const onPage = (event) => {
-  emit('cambiar-pagina', { page: event.page + 1, per_page: event.rows })
-}
-
-// --- Filtros ---
-const opcionesEstado = ref(['PROCESADA', 'ANULADA'])
-const opcionesPago = ref(['EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
+const opcionesEstado = ref([ESTADO_TODOS, 'PROCESADA', 'ANULADA'])
+const opcionesPago = ref([ESTADO_TODOS, 'EFECTIVO', 'TRANSFERENCIA', 'TARJETA'])
 
 const busqueda = ref('')
-const estadoSel = ref(null)
-const pagoSel = ref(null)
-const fechaInicio = ref(null)
-const fechaFin = ref(null)
+const estadoSel = ref(ESTADO_TODOS)
+const pagoSel = ref(ESTADO_TODOS)
+
+const fechaActual = new Date()
+const fechaHaceUnMes = new Date()
+fechaHaceUnMes.setMonth(fechaActual.getMonth() - 1)
+const fechaInicio = ref(fechaHaceUnMes)
+const fechaFin = ref(fechaActual)
+
+
 
 
 const aISO = (fecha) =>
   `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
 
+const formatearFechaVisual = (fechaISO) => {
+  if (!fechaISO) return '—'
+  const date = new Date(fechaISO)
+  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`
+}
+
+const textoRangoFechas = computed(() => {
+  if (!fechaInicio.value && !fechaFin.value) return 'Mostrando todo el historial de ventas'
+
+  const opciones = { day: '2-digit', month: 'long', year: 'numeric' }
+
+  if (fechaInicio.value && fechaFin.value) {
+    const inicio = fechaInicio.value.toLocaleDateString('es-ES', opciones)
+    const fin = fechaFin.value.toLocaleDateString('es-ES', opciones)
+    return `Mostrando ventas del ${inicio} al ${fin}`
+  } else if (fechaInicio.value) {
+    return `Mostrando ventas desde el ${fechaInicio.value.toLocaleDateString('es-ES', opciones)}`
+  } else if (fechaFin.value) {
+    return `Mostrando ventas hasta el ${fechaFin.value.toLocaleDateString('es-ES', opciones)}`
+  }
+})
 
 const emitirFiltros = () => {
   emit('cambiar-filtros', {
     search: busqueda.value.trim(),
-    estado: estadoSel.value || '',
-    tipo_pago: pagoSel.value || '',
+    estado: estadoSel.value === ESTADO_TODOS ? '' : estadoSel.value,
+    tipo_pago: pagoSel.value === ESTADO_TODOS ? '' : pagoSel.value,
     fecha_desde: fechaInicio.value ? aISO(fechaInicio.value) : '',
     fecha_hasta: fechaFin.value ? aISO(fechaFin.value) : '',
   })
+}
 
+const hayFiltros = computed(() => {
+  return busqueda.value.trim() !== '' || 
+         estadoSel.value !== ESTADO_TODOS || 
+         pagoSel.value !== ESTADO_TODOS || 
+         fechaInicio.value !== null || 
+         fechaFin.value !== null
+})
 
-watch([estadoSel, pagoSel, fechaInicio, fechaFin], emitirFiltros)
+let limpiando = false
+const limpiarFiltros = () => {
+  limpiando = true
+  busqueda.value = ''
+  estadoSel.value = ESTADO_TODOS
+  pagoSel.value = ESTADO_TODOS
+  fechaInicio.value = null
+  fechaFin.value = null
+  
+  emitirFiltros()
+  
+  nextTick(() => {
+    limpiando = false
+  })
+}
 
+watch([estadoSel, pagoSel, fechaInicio, fechaFin], () => {
+  if (!limpiando) emitirFiltros()
+})
 
 let temporizador = null
 watch(busqueda, () => {
   clearTimeout(temporizador)
-  temporizador = setTimeout(emitirFiltros, 400)
+  if (!limpiando) {
+    temporizador = setTimeout(emitirFiltros, 400)
+  }
 })
+
 onBeforeUnmount(() => clearTimeout(temporizador))
+
+const onPage = (event) => {
+  emit('cambiar-pagina', { page: event.page + 1, per_page: event.rows })
 }
-// --- Helpers visuales ---
+
 const estiloPago = (tipo) => {
-  if (tipo === 'EFECTIVO')
-    return 'inline-flex items-center gap-1.5 bg-[#fef9c3] text-[#854d0e] px-2.5 py-1 rounded-full text-xs font-semibold'
-  if (tipo === 'TRANSFERENCIA')
-    return 'inline-flex items-center gap-1.5 bg-[#dbeafe] text-[#1d4ed8] px-2.5 py-1 rounded-full text-xs font-semibold'
-  if (tipo === 'TARJETA')
-    return 'inline-flex items-center gap-1.5 bg-[#f3e8ff] text-[#6b21a8] px-2.5 py-1 rounded-full text-xs font-semibold'
+  if (tipo === 'EFECTIVO') return 'inline-flex items-center gap-1.5 bg-[#fef9c3] text-[#854d0e] px-2.5 py-1 rounded-full text-xs font-semibold'
+  if (tipo === 'TRANSFERENCIA') return 'inline-flex items-center gap-1.5 bg-[#dbeafe] text-[#1d4ed8] px-2.5 py-1 rounded-full text-xs font-semibold'
+  if (tipo === 'TARJETA') return 'inline-flex items-center gap-1.5 bg-[#f3e8ff] text-[#6b21a8] px-2.5 py-1 rounded-full text-xs font-semibold'
   return ''
 }
 
