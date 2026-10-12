@@ -6,7 +6,6 @@ import {
   updateUsuario,
   desactivarUsuario as desactivarUsuarioService,
 } from '../services/usuarioService'
-import { reroute } from 'vue-router/dist/experimental/index.js'
 
 export const useUserStore = defineStore('userStore', () => {
   const users = ref([])
@@ -15,7 +14,6 @@ export const useUserStore = defineStore('userStore', () => {
   const currentPage = ref(1)
   const perPage = ref(5)
 
-  //devolvemos los erros
   const formatearError = (error, mensajeDefault) => {
     const status = error.response?.status
     const data = error.response?.data
@@ -31,12 +29,15 @@ export const useUserStore = defineStore('userStore', () => {
 
     return { ok: false, status, error: data?.message || mensajeDefault }
   }
-  const fetchUsers = async (page = 1, rows = perPage.value) => {
+
+  // Agregamos search y estado a la petición
+  const fetchUsers = async (page = 1, rows = perPage.value, search = '', estado = 'TODOS') => {
     if (loading.value) return
 
     loading.value = true
     try {
-      const response = await getUsuarios(page, rows)
+      // Importante: asegúrate de enviar los filtros en tu usuarioService.js
+      const response = await getUsuarios(page, rows, { search, estado })
       users.value = response.data.data
       totalRecords.value = response.data.total
       currentPage.value = response.data.current_page
@@ -76,7 +77,6 @@ export const useUserStore = defineStore('userStore', () => {
     }
   }
 
-  
   const updateUser = async (id, payload) => {
     try {
       const response = await updateUsuario(id, payload)
@@ -87,7 +87,6 @@ export const useUserStore = defineStore('userStore', () => {
       return formatearError(error, 'Error en el servidor.')
     }
   }
-
 
   const desactivarUsuario = async (id) => {
     try {
@@ -120,4 +119,4 @@ export const useUserStore = defineStore('userStore', () => {
     updateUser,
     desactivarUsuario,
   }
-})
+})  

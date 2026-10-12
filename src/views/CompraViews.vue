@@ -1,10 +1,11 @@
 <template>
   <div>
     <ComprasTable
-      v-if="!showForm"
+      v-show="!showForm"
       :compras="compras"
       :loading="loading"
       :paginacion="paginacion"
+      :rango="rangoAplicado"
       @open-add="showForm = true"
       @cambiar-pagina="cargarCompras"
       @filtrar="aplicarFiltros"
@@ -44,6 +45,7 @@ const loading = ref(false)
 const compras = ref([])
 const mostrarDetalleDialog = ref(false)
 const selectedCompra = ref(null)
+const rangoAplicado = ref({ desde: null, hasta: null })
 
 const paginacion = ref({
   currentPage: 1,
@@ -59,37 +61,34 @@ const filtrosActivos = ref({
   fecha_hasta: null,
 })
 
+
+let ultimaPeticion = 0 
+
 const cargarCompras = async (pagina = 1) => {
-  loading.value = true
-  try {
-    const { data } = await comprasService({
-      page: pagina,
-      ...filtrosActivos.value,
-    })
-    compras.value = await Promise.all(data.compras.map(async (compra) => {
-      try {
-        const respuestaDetalle = await VerDetallesCompra(compra.id)
-        const compraCompleta = respuestaDetalle.data.data
-        return { ...compra, esAnulado: Boolean(compraCompleta.es_anulado) }
-      } catch {
-        return { ...compra, esAnulado: false }
+    const idPeticion = ++ultimaPeticion
+    loading.value = true
+    try {
+        const { data } = await comprasService({ page: pagina, ...filtrosActivos.value })
+        if (idPeticion !== ultimaPeticion) return  
+
+        compras.value = data.compras
+        paginacion.value = {
+          currentPage: data.current_page,
+          lastPage: data.last_page,
+          perPage: data.per_page,
+          total: data.total,
       }
-    }))
-    paginacion.value = {
-      currentPage: data.current_page,
-      lastPage: data.last_page,
-      perPage: data.per_page,
-      total: data.total,
+      rangoAplicado.value = { desde: data.fecha_desde, hasta: data.fecha_hasta }
+    } catch (error) {
+        if (idPeticion !== ultimaPeticion) return
+        if (error.response?.status === 403) {
+          mostrarAccesoDenegado()
+        } else {
+          mostrarError('Error de carga', 'No se pudieron obtener las compras.')
+        }
+    } finally {
+      if (idPeticion === ultimaPeticion) loading.value = false
     }
-  } catch (error) {
-    if (error.response?.status === 403) {
-      mostrarAccesoDenegado()
-    } else {
-      mostrarError('Error de carga', 'No se pudieron obtener las compras.')
-    }
-  } finally {
-    loading.value = false
-  }
 }
 
 const aplicarFiltros = (filtros) => {
