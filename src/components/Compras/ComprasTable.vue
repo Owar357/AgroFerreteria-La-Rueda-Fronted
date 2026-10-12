@@ -61,14 +61,13 @@
             @change="emitirFiltros"
           />
 
-          <!-- Filtro proveedor -->
+          <!-- Filtro proveedor (Corregido: se quitó @clear) -->
           <AutoComplete
             v-model="proveedorSeleccionado"
             optionLabel="nombre"
             :suggestions="proveedoresFiltrados"
             @complete="buscarProveedor"
             @item-select="emitirFiltros"
-            @clear="emitirFiltros"
             placeholder="Buscar proveedor..."
             class="w-full"
             fluid
@@ -143,7 +142,7 @@
                 @change="emitirFiltros"
               />
 
-              <!-- Proveedor -->
+              <!-- Proveedor (Corregido: se quitó @clear) -->
               <div class="w-[70%]">
                 <AutoComplete
                   v-model="proveedorSeleccionado"
@@ -151,7 +150,6 @@
                   :suggestions="proveedoresFiltrados"
                   @complete="buscarProveedor"
                   @item-select="emitirFiltros"
-                  @clear="emitirFiltros"
                   placeholder="Buscar proveedor..."
                   fluid
                   :pt="{
@@ -214,18 +212,16 @@
               v-if="hayFiltros"
               label="Limpiar filtros"
               icon="pi pi-filter-slash"
-              class="ml-auto !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-10 px-4 rounded-xl cursor-pointer shadow-2xs flex items-center gap-2 whitespace-nowrap shrink-0"
+              class="ml-auto !w-[12.5rem] !bg-white hover:!bg-[#f4f8f3] !text-[#2b5e3b] !border !border-[#2b5e3b]/40 text-sm font-semibold h-10 px-4 rounded-xl cursor-pointer shadow-2xs flex items-center gap-2 whitespace-nowrap shrink-0"
               @click="limpiarFiltros"
             />
           </div>
         </div>
       </div>
 
-
      <p v-if="rango.desde" class="text-xs text-gray-500 px-5 py-2">
       Mostrando compras del <strong>{{ formatearRango(rango.desde) }}</strong> al <strong>{{ formatearRango(rango.hasta) }}</strong>
     </p>
-
 
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL: Tabla con Desplegable (< 1024px)           -->
