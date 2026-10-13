@@ -6,8 +6,12 @@
     :draggable="false"
     :closable="false"
     :style="{ width: 'min(calc(100vw - 2rem), 34rem)' }"
-    class="custom-dialog"
-    :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
+    :pt="{ 
+      root: { class: '!rounded-2xl overflow-hidden shadow-2xl' },
+      header: { class: '!bg-[#1a3323] !text-white !border-b !border-[#2b5e3b] !px-6 !py-4.5' },
+      title: { class: 'font-[\'Inter\',sans-serif] !text-base !font-bold tracking-wider !text-white' },
+      content: { class: '!bg-white !p-0' }
+    }"
     @update:visible="$emit('update:visible', $event)"
   >
     <template v-if="client">
@@ -22,17 +26,17 @@
             class="!w-10 !h-10 rounded-full flex items-center justify-center bg-[#1a3323] border border-[#e0b354] shadow-xs shrink-0"
           >
             <i
-              :class="client.tipo_persona === 'Natural' ? 'pi pi-user' : 'pi pi-building'"
+              :class="c.esNatural ? 'pi pi-user' : 'pi pi-building'"
               class="text-base text-[#e0b354]"
             />
           </div>
 
           <div class="flex flex-col gap-0.5 overflow-hidden">
             <h2 class="text-base font-bold text-[#1a2e1f] m-0 leading-snug truncate">
-              {{ client.name }}
+              {{ c.nombre }}
             </h2>
             <span class="self-start px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-[#e0b354] text-[#1a3323]">
-              {{ client.tipo_persona }}
+              {{ c.tipo }}
             </span>
           </div>
         </div>
@@ -46,11 +50,11 @@
           <div class="grid grid-cols-2 gap-3 bg-[#fbfdf9] p-3 rounded-xl border border-[#e2e8dd]">
             <div>
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">N° Documento</label>
-              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ numero_documento || '—' }}</p>
+              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ c.numero_documento || '—' }}</p>
             </div>
             <div>
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">NRC</label>
-              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ client.nrc || '—' }}</p>
+              <p class="font-mono text-xs text-[#1a2e1f] font-bold m-0">{{ c.nrc || '—' }}</p>
             </div>
           </div>
         </div>
@@ -66,14 +70,14 @@
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">Teléfono</label>
               <p class="flex items-center gap-1.5 text-xs text-[#1a2e1f] m-0 font-medium">
                 <i class="pi pi-phone text-[11px] text-gray-500 shrink-0" />
-                {{ client.phone || '—' }}
+                {{ c.telefono || '—' }}
               </p>
             </div>
             <div>
               <label class="block text-[10px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-0.5">Correo electrónico</label>
               <p class="flex items-center gap-1.5 text-xs text-gray-700 m-0 font-medium">
                 <i class="pi pi-envelope text-[11px] text-gray-500 shrink-0" />
-                <span class="break-all">{{ client.email || '—' }}</span>
+                <span class="break-all">{{ c.correo || '—' }}</span>
               </p>
             </div>
           </div>
@@ -103,17 +107,17 @@
             class="!w-12 !h-12 rounded-full flex items-center justify-center bg-[#1a3323] border border-[#e0b354] shadow-sm shrink-0"
           >
             <i
-              :class="client.personType === 'Natural' ? 'pi pi-user' : 'pi pi-building'"
+              :class="c.esNatural ? 'pi pi-user' : 'pi pi-building'"
               class="text-xl text-[#e0b354]"
             />
           </div>
 
           <div class="flex flex-col gap-1 overflow-hidden">
             <h2 class="text-lg font-bold text-[#1a2e1f] m-0 leading-snug truncate">
-              {{ client.name }}
+              {{ c.nombre }}
             </h2>
             <span class="self-start px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-[#e0b354] text-[#1a3323]">
-              {{ client.personType }}
+              {{ c.tipo }}
             </span>
           </div>
         </div>
@@ -130,11 +134,11 @@
             <div class="grid grid-cols-2 gap-4 bg-[#fbfdf9] p-3.5 rounded-xl border border-[#e2e8dd]">
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">N° Documento</label>
-                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ client.numero_documento || '—' }}</p>
+                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ c.numero_documento || '—' }}</p>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">NRC</label>
-                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ client.nrc || '—' }}</p>
+                <p class="font-mono text-sm text-[#1a2e1f] font-bold m-0">{{ c.nrc || '—' }}</p>
               </div>
             </div>
           </div>
@@ -150,14 +154,14 @@
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Teléfono</label>
                 <p class="flex items-center gap-1.5 text-sm text-[#1a2e1f] m-0 font-medium">
                   <i class="pi pi-phone text-xs text-gray-500 shrink-0" />
-                  {{ client.telefono || '—' }}
+                  {{ c.telefono || '—' }}
                 </p>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#2b5e3b] mb-1">Correo electrónico</label>
                 <p class="flex items-center gap-1.5 text-sm text-gray-700 m-0 font-medium">
                   <i class="pi pi-envelope text-xs text-gray-500 shrink-0" />
-                  <span class="break-all">{{ client.correo || '—' }}</span>
+                  <span class="break-all">{{ c.correo || '—' }}</span>
                 </p>
               </div>
             </div>
@@ -193,6 +197,7 @@ const props = defineProps({
 
 defineEmits(['update:visible'])
 
+// Estandarizamos los datos que vienen de la API para que ambas vistas lean lo mismo
 const c = computed(() => {
   const x = props.client ?? {}
   const tipo = x.tipo_persona ?? x.personType ?? ''
@@ -207,32 +212,3 @@ const c = computed(() => {
   }
 })
 </script>
-
-<style>
-/* Encabezado sin 'X' y paleta AgroFerretería */
-.custom-dialog .p-dialog-header {
-  background-color: #1a3323 !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid #2b5e3b !important;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 1.1rem 1.5rem !important;
-}
-
-/* Limpieza del contenedor de contenido */
-.custom-dialog .p-dialog-content {
-  background-color: #ffffff !important;
-  padding: 0 !important;
-}
-
-/* Enfoques y bordes para componentes PrimeVue dentro del modal */
-.p-inputtext:enabled:focus,
-.p-inputnumber-input:enabled:focus,
-.p-select:not(.p-disabled).p-focus,
-.p-password-input:enabled:focus {
-  box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
-  border-color: #2b5e3b !important;
-}
-</style>
