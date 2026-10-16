@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const getCategorias   = (page = 1, perPage = 5, search = '') =>
   api.get('/categorias', { params: { page, per_page: perPage, search: search || undefined } })

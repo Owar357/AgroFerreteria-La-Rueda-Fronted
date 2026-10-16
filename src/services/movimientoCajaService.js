@@ -1,4 +1,4 @@
-import { api } from './authService'
+import api  from './axios'
 
 export const getMovimientos = (params) => api.get('/caja/movimientoExterno', { params })
 

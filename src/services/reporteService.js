@@ -1,4 +1,4 @@
-import { api } from '@/services/authService'
+import  api  from './axios'
 
 function construirUrlReporte(path, params = {}) {
   const query = new URLSearchParams(
