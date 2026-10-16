@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const abrirCaja = (data) => api.post('/caja/apertura', data)
 

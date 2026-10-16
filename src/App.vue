@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 
 <template>
   <!-- Este div asegura que el contenido ocupe toda la pantalla -->
-  <div class="min-h-screen bg-slate-50">
+ <div class="h-dvh max-h-screen overflow-hidden bg-slate-50">
     <RouterView />
   </div>
 </template>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
-    :style="fondoStyle"
-  >
+<div class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto" :style="fondoStyle">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -216,7 +213,7 @@ import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import { DatePicker } from 'primevue'
-import { api } from '@/services/authService'
+import api from '@/services/axios'
 import { generarReporteVentasPorCategoria } from '@/services/reporteService'
 import { fondoStyle } from '@/utils/fondoReportes'
 import {

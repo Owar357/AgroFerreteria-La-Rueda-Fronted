@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const buscarProductos = (q) => {
   return api.get('/productos/buscar-venta', { params: { q } })

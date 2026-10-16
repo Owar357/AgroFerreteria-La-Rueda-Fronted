@@ -1,9 +1,10 @@
 <template>
+
   <div
-    class="relative min-h-screen bg-[#14291d] bg-cover bg-center bg-no-repeat flex items-center justify-center p-4 sm:p-6 md:p-8 font-['Inter',sans-serif]"
+    class="relative h-dvh overflow-hidden bg-[#14291d] bg-cover bg-center bg-no-repeat flex items-center justify-center p-4 sm:p-6 md:p-8 font-['Inter',sans-serif]"
     :style="{ backgroundImage: `url(${fondoLogin})` }"
   >
-    <!-- Capa verde oscura sobre la foto de fondo -->
+<!-- Capa verde oscura sobre la foto de fondo -->
     <div class="absolute inset-0 bg-[#14291d]/65 backdrop-blur-[2px]"></div>
 
     <!-- Contenedor principal adaptativo -->
@@ -33,14 +34,12 @@
           <div
             class="bg-[#1e3a2f] p-2 rounded-2xl w-[9rem] h-[9rem] flex items-center justify-center shadow-md overflow-hidden border border-white/10"
           >
-            <img
-              :src="logo"
-              alt="Logo La Rueda"
-              class="w-full h-full object-contain"
-            />
+            <img :src="logo" alt="Logo La Rueda" class="w-full h-full object-contain" />
           </div>
 
-          <h2 class="text-white text-[1.625rem] md:text-[1.875rem] font-bold leading-tight tracking-wide drop-shadow-sm">
+          <h2
+            class="text-white text-[1.625rem] md:text-[1.875rem] font-bold leading-tight tracking-wide drop-shadow-sm"
+          >
             AgroFerretería<br />La Rueda
           </h2>
 
@@ -66,7 +65,9 @@
 
         <div class="w-full max-w-[23.75rem] flex flex-col gap-5 my-auto">
           <div class="text-center md:text-left">
-            <h1 class="text-[#1a2e1f] text-[1.875rem] font-bold tracking-tight">Inicio de sesión</h1>
+            <h1 class="text-[#1a2e1f] text-[1.875rem] font-bold tracking-tight">
+              Inicio de sesión
+            </h1>
             <p class="text-[#6b7280] text-sm mt-1 leading-relaxed">
               Ingresá tu correo y contraseña para continuar.
             </p>
@@ -186,7 +187,7 @@ async function handleLogin() {
         customClass: {
           container: '!z-[9999]',
           popup: '!rounded-2xl',
-        }
+        },
       })
       return
     }
@@ -196,10 +197,10 @@ async function handleLogin() {
     setTimeout(() => {
       router.push(response.route)
     }, 1200)
-
   } catch (error) {
     console.error('Error en login:', error)
-    const msg = error.response?.data?.message || 'Hubo un inconveniente al conectar con el servidor.'
+    const msg =
+      error.response?.data?.message || 'Hubo un inconveniente al conectar con el servidor.'
     mostrarError('Acceso denegado', msg)
   } finally {
     loading.value = false

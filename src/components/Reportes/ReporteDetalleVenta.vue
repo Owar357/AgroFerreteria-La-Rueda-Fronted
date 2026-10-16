@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
-    :style="fondoStyle"
-  >
+  <div class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto" :style="fondoStyle">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -73,7 +70,7 @@
             label="Generar PDF"
             icon="pi pi-file-pdf"
             :loading="generandoPDF"
-           class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
+            class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
           />
           <Button

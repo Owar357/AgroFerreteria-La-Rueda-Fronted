@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const getClientes   = (page = 1, porPagina = 10) =>
   api.get('/clientes', { params: { page, per_page: porPagina } })
