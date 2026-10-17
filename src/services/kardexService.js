@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const getKardexByProducto = (productoId, page = 1, perPage = 10, filtros = {}) => {
   const params = {

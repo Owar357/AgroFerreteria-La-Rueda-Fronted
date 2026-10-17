@@ -1,4 +1,4 @@
-import { api } from './authService'
+import  api  from './axios'
 
 export const getClientes = (page = 1, porPagina = 10, search = '', tipo_persona = 'TODOS') => {
   return api.get('/clientes', {

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="bg-[#eef2e9] bg-cover bg-center bg-fixed bg-no-repeat min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] w-full overflow-x-hidden"
-    :style="fondoStyle"
-  >
+ <div class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto" :style="fondoStyle">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -199,7 +196,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Fechas requeridas',
-      mensajeHtml: 'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.',
+      mensajeHtml:
+        'Debes seleccionar la <strong>Fecha inicio</strong> y la <strong>Fecha fin</strong> para generar el reporte.',
     })
     return
   }
@@ -208,7 +206,8 @@ const generarPDF = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Rango de fechas inválido',
-      mensajeHtml: 'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.',
+      mensajeHtml:
+        'La <strong>Fecha inicio</strong> no puede ser posterior a la <strong>Fecha fin</strong>.',
     })
     return
   }

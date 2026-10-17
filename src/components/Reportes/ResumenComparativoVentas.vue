@@ -1,17 +1,5 @@
 <template>
-  
-  <div
-<div
-  class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat
-         h-dvh lg:h-full
-         p-3 sm:p-6 md:p-8
-         text-[#1a2e1f] font-['Inter',sans-serif]
-         w-full overflow-x-hidden
-         overflow-y-auto lg:overflow-y-hidden"
-  :style="fondoStyle"
->    
-  
-
+<div class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto" :style="fondoStyle">
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -171,7 +159,7 @@
           <!-- Rango 1 PC -->
           <div class="bg-[#fafdf7] border border-[#e2e8dd] rounded-xl p-4">
             <p class="text-sm font-semibold text-[#1e3a2f] mb-3 m-0">Rango 1</p>
-           <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
                 <label class="text-sm font-medium text-gray-600">Fecha inicio</label>
                 <DatePicker
@@ -234,7 +222,7 @@
         </div>
 
         <!-- Botones PC -->
-      <div class="flex gap-3 mt-4">
+        <div class="flex gap-3 mt-4">
           <Button
             label="Generar PDF"
             icon="pi pi-file-pdf"
