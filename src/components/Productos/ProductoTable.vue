@@ -73,6 +73,7 @@
 
           <!-- Botón Acción Principal (Derecha) -->
           <Button 
+            v-if="esAdmin"
             label="Nuevo Producto" 
             icon="pi pi-plus"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-sm font-semibold px-7 h-11 rounded-lg border-none cursor-pointer transition-all shadow-sm w-full md:w-auto whitespace-nowrap flex justify-center items-center gap-2 shrink-0"
@@ -173,6 +174,7 @@
 
               <div class="mt-3 pt-1 flex gap-2 justify-end items-center">
                 <Button 
+                  v-if="esAdmin" 
                   icon="pi pi-pencil" 
                   label="Editar"
                   class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer shadow-xs"
@@ -287,7 +289,7 @@
                 </template>
 
                 <template v-else>
-                  <Button icon="pi pi-pencil" label="Editar"
+                  <Button v-if="esAdmin" icon="pi pi-pencil" label="Editar"
                     class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
                     @click="handleEdit(slotProps.data)" v-tooltip.top="'Editar producto'" />
 
@@ -316,10 +318,14 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { useproductoStore } from '@/stores/productoStore'
+import authService from '@/services/authService'
 import { mostrarAccesoDenegado, mostrarError } from '@/utils/SweetAlertService'
 
 const emit = defineEmits(['open-add', 'open-edit', 'open-detail'])
 const store = useproductoStore()
+
+// Solo ADMIN puede crear / editar. CAJERO: solo consulta y búsqueda.
+const esAdmin = computed(() => authService.getUserRole() === 'ADMIN')
 
 const searchQuery = ref('')
 const filtroCategoria = ref(null)
@@ -368,7 +374,7 @@ const onPageChange = async (event) => {
   }
 }
 
-const handleEdit = (product) => emit('open-edit', product)
+const handleEdit = (product) => { if (esAdmin.value) emit('open-edit', product) }
 const handleDetail = (product) => emit('open-detail', product)
 </script>
 

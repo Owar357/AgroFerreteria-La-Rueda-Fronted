@@ -101,6 +101,7 @@
             label="Nombre del Producto"
             placeholder="Ej: Fertilizante Triple 15"
             filter="alphanum"
+            maxlength="100"
             class="w-full"
             :error="errores.nombre"
           />
@@ -110,6 +111,7 @@
             label="Fabricante o Marca"
             placeholder="Ej: Fertica, Bayer, etc."
             filter="alpha"
+            maxlength="100"
             class="w-full"
             :error="errores.fabricante"
           />
@@ -123,6 +125,7 @@
                 root: { class: 'w-full' },
                 pcInputText: {
                   root: {
+                    maxlength: 100,
                     class: [
                       '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-2 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full',
                       { '!border-red-500': errores.categoria }
@@ -159,6 +162,7 @@
             v-model="codigoGenerado"
             label="Código del Producto"
             readonly
+            maxlength="24"
             class="w-full font-mono font-semibold [&_input]:!bg-gray-300"
             help="Autogenerado."
           />
@@ -229,6 +233,7 @@
               label="Nombre del Producto"
               placeholder="Ej: Fertilizante Triple 15"
               filter="alphanum"
+              maxlength="100"
               class="col-span-1 md:col-span-2 w-[145%]"
               :error="errores.nombre"
             />
@@ -239,6 +244,7 @@
               label="Fabricante o Marca"
               placeholder="Ej: Fertica, Bayer, etc."
               filter="alpha"
+              maxlength="100"
               class="col-span-1 md:col-span-2 w-[45%]"
               :error="errores.fabricante"
             />
@@ -253,6 +259,7 @@
                   root: { class: 'w-full' },
                   pcInputText: {
                     root: {
+                      maxlength: 100,
                       class: [
                         '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-2 !px-4 md:!px-5 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full',
                         { '!border-red-500': errores.categoria }
@@ -291,6 +298,7 @@
               v-model="codigoGenerado"
               label="Código del Producto"
               readonly
+              maxlength="24"
               class="w-[50%] font-semibold col-span-1 md:col-span-2 [&_input]:!bg-gray-300"
               help="Código autogenerado."
             />
@@ -411,7 +419,7 @@
           <!-- VISTA MÓVIL GRANEL BASE (Solo Teléfono: block md:hidden) -->
           <!-- ======================================================= -->
           <div class="block md:hidden space-y-4">
-            <BaseInput :model-value="nombreUnidadBase" label="Nombre de la presentación base *" disabled class="w-full">
+            <BaseInput :model-value="nombreUnidadBase" label="Nombre de la presentación base *" maxlength="150" disabled class="w-full">
               <template #help>
                 <small class="text-xs text-gray-500 flex items-center gap-1.5">
                   <i class="pi pi-lock text-[11px]"></i> Fijo
@@ -472,7 +480,7 @@
           <!-- ======================================================= -->
           <div class="hidden md:block">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <BaseInput size="responsive" :model-value="nombreUnidadBase" label="Nombre de la presentación base *" disabled>
+              <BaseInput size="responsive" :model-value="nombreUnidadBase" label="Nombre de la presentación base *" maxlength="150" disabled>
                 <template #help>
                   <small class="text-xs text-gray-500 flex items-center gap-1.5">
                     <i class="pi pi-lock text-[11px]"></i> Fijo
@@ -567,7 +575,10 @@
                 @complete="buscarUnidades" @item-select="onSelectDerivada" :pt="{
                   root: { class: 'w-full' },
                   pcInputText: {
-                    root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' }
+                    root: { 
+                      maxlength: 150, 
+                      class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' 
+                    }
                   },
                   dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-10 !w-10' }
                 }" />
@@ -632,7 +643,10 @@
                   @complete="buscarUnidades" @item-select="onSelectDerivada" :pt="{
                     root: { class: 'w-full' },
                     pcInputText: {
-                      root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5 rounded-lg shadow-2xs focus:!border-[#2b5e3b]' }
+                      root: { 
+                        maxlength: 150,
+                        class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5 rounded-lg shadow-2xs focus:!border-[#2b5e3b]' 
+                      }
                     },
                     dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-11 md:!h-14' }
                   }" />
@@ -733,7 +747,10 @@
                 @complete="buscarUnidades" @item-select="onSelectUnidadFija" :pt="{
                   root: { class: 'w-full' },
                   pcInputText: {
-                    root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' }
+                    root: { 
+                      maxlength: 150,
+                      class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-xs !h-10 !py-1 !px-3 rounded-lg shadow-2xs focus:!border-[#2b5e3b] w-full' 
+                    }
                   },
                   dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-10 !w-10' }
                 }" />
@@ -802,7 +819,10 @@
                   @complete="buscarUnidades" @item-select="onSelectUnidadFija" :pt="{
                     root: { class: 'w-full' },
                     pcInputText: {
-                      root: { class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5  rounded-lg shadow-2xs focus:!border-[#2b5e3b]' }
+                      root: { 
+                        maxlength: 150,
+                        class: '!bg-white !border-gray-300 !text-[#1a2e1f] !text-sm md:!text-lg !h-11 md:!h-14 !py-1 !px-4 md:!px-5  rounded-lg shadow-2xs focus:!border-[#2b5e3b]' 
+                      }
                     },
                     dropdown: { class: '!bg-white !border-gray-300 rounded-r-lg !h-11 md:!h-14' }
                   }" />
