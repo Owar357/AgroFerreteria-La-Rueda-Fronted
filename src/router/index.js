@@ -66,7 +66,7 @@ const routes = [
         path: 'inventario/productos',
         name: 'productos',
         component: () => import('@/views/productosViews.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'inventario/proveedores',

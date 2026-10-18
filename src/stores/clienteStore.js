@@ -9,10 +9,10 @@ export const useClienteStore = defineStore('cliente', () => {
   const paginaActual = ref(1)
   const porPagina = ref(10)
 
-  const cargarClientes = async (page = 1, rows = porPagina.value) => {
+  const cargarClientes = async (page = 1, rows = porPagina.value, search = '', tipo_persona = 'TODOS') => {
     cargando.value = true
     try {
-      const response = await getClientes(page, rows)
+      const response = await getClientes(page, rows, search, tipo_persona)
       const paginacion = response.data.data
 
       clientes.value = paginacion.data

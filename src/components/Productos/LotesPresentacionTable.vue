@@ -139,7 +139,7 @@
                   </div>
                 </div>
 
-                <div class="pt-1 flex justify-end gap-2">
+                <div v-if="esAdmin" class="pt-1 flex justify-end gap-2">
                   <Button icon="pi pi-tag" label="Descuento" severity="secondary" outlined size="small"
                     class="!py-1.5 !px-3 !text-xs !text-[#2b5e3b] !border-[#2b5e3b] hover:!bg-[#f4f7f2] rounded-lg cursor-pointer font-medium"
                     :disabled="data.estado !== 'ACTIVO' || Number(data.cantidad_actual) <= 0"
@@ -224,7 +224,7 @@
           </Column>
 
           <!-- ACCIONES PC -->
-          <Column header="Acciones" class="text-sm text-center" style="width: 130px">
+          <Column v-if="esAdmin" header="Acciones" class="text-sm text-center" style="width: 130px">
             <template #body="{ data }">
               <div class="flex justify-center gap-1.5">
                 <Button icon="pi pi-tag" v-tooltip.top="'Gestionar Descuento'"
@@ -251,6 +251,7 @@
     <!-- DIÁLOGO ESTANDARIZADO: GESTIONAR DESCUENTO              -->
     <!-- ======================================================= -->
     <Dialog 
+      v-if="esAdmin" 
       v-model:visible="modalVisible" 
       header="GESTIONAR DESCUENTO" 
       modal 
@@ -319,6 +320,7 @@
 
     <!-- MODAL AUXILIAR DE AJUSTE DE LOTE -->
     <AjusteLoteDialog 
+      v-if="esAdmin"
       v-model="mostrarModalAjuste" 
       :lote="loteSeleccionado" 
       :nombre-presentacion="etiquetaStock"
@@ -338,6 +340,7 @@ import Dialog from 'primevue/dialog'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
 import { useLoteStore } from '@/stores/loteStore'
 import AjusteLoteDialog from '@/components/Inventario/AjusteLoteDialog.vue'
+import authService from '@/services/authService'
 import { 
   mostrarExito, 
   mostrarError, 
@@ -358,6 +361,9 @@ const etiquetaStock = computed(() =>
 )
 
 const loteStore = useLoteStore()
+
+// Solo ADMIN puede aplicar descuentos o ajustar inventario. CAJERO: solo consulta.
+const esAdmin = computed(() => authService.getUserRole() === 'ADMIN')
 const emit = defineEmits(['volver'])
 
 const expandedRows = ref({})
@@ -384,18 +390,20 @@ const onPageChange = (event) => {
 }
 
 const abrirModalAjuste = (lote) => {
+  if (!esAdmin.value) return
   loteSeleccionado.value = lote
   mostrarModalAjuste.value = true
 }
 
 const abrirModalDescuento = (lote) => {
+  if (!esAdmin.value) return
   loteSeleccionado.value = lote
   porcentajeInput.value = Number(lote.porcentaje_descuento ?? 0)
   modalVisible.value = true
 }
 
 const guardarDescuento = async () => {
-  if (!loteSeleccionado.value) return
+  if (!esAdmin.value || !loteSeleccionado.value) return
   
   guardando.value = true
   mostrarCargando('Guardando descuento...', 'Actualizando el precio del lote')

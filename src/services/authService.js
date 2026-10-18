@@ -70,6 +70,29 @@ const authService = {
     }
   },
 
+  // Pide un token nuevo antes de que venza el actual
+  async refresh() {
+    try {
+      const { data } = await api.post('/auth/refresh')
+      localStorage.setItem(TOKEN_KEY, data.access_token)
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user))
+      return { success: true, token: data.access_token }
+    } catch (error) {
+      const status = error.response?.status
+      const message = error.response?.data?.message || 'No se pudo renovar la sesión.'
+      return { success: false, status, message }
+    }
+  },
+
+  getToken() {
+    return localStorage.getItem(TOKEN_KEY)
+  },
+
+  // Limpia la sesión sin llamar al backend (se usa cuando el token ya venció)
+  cerrarSesionLocal() {
+    clearSession()
+  },
+
   isAuthenticated() {
     return !!localStorage.getItem(TOKEN_KEY)
   },

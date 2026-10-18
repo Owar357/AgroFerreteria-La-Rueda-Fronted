@@ -45,8 +45,8 @@
           <hr class="border-none border-t my-3" style="border-color: #162e1e" />
         </template>
 
-        <!-- LOGÍSTICA — solo ADMIN -->
-        <template v-if="isAdmin">
+        <!-- LOGÍSTICA — ADMIN (completo) y CAJERO (solo Productos) -->
+        <template v-if="isAdmin || isCajero">
           <p
             style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
             class="mb-1.5 mx-1"
@@ -61,6 +61,7 @@
             @toggle="toggleInventario"
           >
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-th-large"
               label="Categorías"
               :active="activeItem === 'categorias'"
@@ -75,6 +76,7 @@
               sub
             />
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-truck"
               label="Proveedores"
               :active="activeItem === 'proveedores'"
@@ -238,8 +240,8 @@
           <hr class="border-none border-t my-3" style="border-color: #162e1e" />
         </template>
 
-        <!-- LOGÍSTICA — solo ADMIN -->
-        <template v-if="isAdmin">
+        <!-- LOGÍSTICA — ADMIN (completo) y CAJERO (solo Productos) -->
+        <template v-if="isAdmin || isCajero">
           <p
             style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
             class="mb-1.5 mx-1"
@@ -254,6 +256,7 @@
             @toggle="toggleInventario"
           >
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-th-large"
               label="Categorías"
               :active="activeItem === 'categorias'"
@@ -268,6 +271,7 @@
               sub
             />
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-truck"
               label="Proveedores"
               :active="activeItem === 'proveedores'"

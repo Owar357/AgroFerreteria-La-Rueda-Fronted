@@ -62,6 +62,7 @@
                 <p class="text-xs text-gray-500 m-0 mt-0.5">Gestión de unidades de venta y empaques</p>
               </div>
               <Button
+                v-if="esAdmin"
                 class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !text-white text-xs sm:text-sm font-semibold !px-4 !py-2.5 !rounded-xl !border-none shadow-sm transition-all duration-200 cursor-pointer w-full sm:w-auto"
                 label="Agregar presentación" icon="pi pi-plus" @click="abrirAñadir()" />
             </div>
@@ -131,15 +132,15 @@
 
                     <!-- Botones de Acción Móvil Adaptados (Grid 2x2) -->
                     <div class="mt-3 pt-1 grid grid-cols-2 gap-2">
-                      <Button icon="pi pi-pencil" label="Editar"
+                      <Button v-if="esAdmin" icon="pi pi-pencil" label="Editar"
                         class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer shadow-xs flex justify-center items-center w-full"
                         v-tooltip.top="'Editar presentación'" @click="abrirEditar(data)" />
 
-                      <Button icon="pi pi-barcode" label="Código"
+                      <Button v-if="esAdmin" icon="pi pi-barcode" label="Código"
                         class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer shadow-xs flex justify-center items-center w-full"
                         v-tooltip.top="'Ver códigos de barra'" @click="abrirCodigos(data)" />
 
-                      <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                      <Button v-if="esAdmin" :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                         :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                           ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
                           : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
@@ -147,6 +148,7 @@
                         @click="toggleEstadoPresentacion(data)" />
 
                       <Button icon="pi pi-box" label="Lotes"
+                        :class="{ 'col-span-2': !esAdmin }"
                         class="!bg-white hover:!bg-[#eef2e9] !text-[#3c674b] !border !border-[#cfe0d2] rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer shadow-xs flex justify-center items-center w-full"
                         v-tooltip.top="'Ver lotes'" @click="abrirLotes(data)" />
                     </div>
@@ -200,15 +202,15 @@
                 <Column header="Acciones" :exportable="false" class="text-sm w-[18rem] shrink-0">
                   <template #body="{ data }">
                     <div class="flex items-center gap-1.5 justify-end whitespace-nowrap">
-                      <Button icon="pi pi-pencil" label="Editar"
+                      <Button v-if="esAdmin" icon="pi pi-pencil" label="Editar"
                         class="!bg-white hover:!bg-[#fdf6e8] !text-[#b8860b] !border !border-[#e8d9b5] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
                         v-tooltip.top="'Editar presentación'" @click="abrirEditar(data)" />
 
-                      <Button icon="pi pi-barcode" label="Código"
+                      <Button v-if="esAdmin" icon="pi pi-barcode" label="Código"
                         class="!bg-white hover:!bg-[#eef2e9] !text-[#1e3a2f] !border !border-[#cfe0d2] rounded-lg !px-2.5 !py-1.5 text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
                         v-tooltip.top="'Ver códigos de barra'" @click="abrirCodigos(data)" />
 
-                      <Button :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                      <Button v-if="esAdmin" :icon="data.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
                         :label="data.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" :class="data.estado === 'ACTIVO'
                           ? '!bg-white hover:!bg-[#fde8e8] !text-[#9c2a2a] !border !border-[#f0c9c9]'
                           : '!bg-white hover:!bg-[#eef2e9] !text-[#2b5e3b] !border !border-[#cfe0d2]'"
@@ -237,7 +239,8 @@
       </Tabs>
     </div>
 
-    <!-- DIÁLOGOS -->
+    <!-- DIÁLOGOS (solo ADMIN) -->
+    <template v-if="esAdmin">
     <AñadirPresentacionDialog 
   v-model:visible="AgregarVisible" 
   :unidadBase="unidadBaseProducto"
@@ -249,6 +252,7 @@
     <EditarPresentacionDialog v-model:visible="editarVisible" :presentacion="presentacionSeleccionada"
       :presentacionesExistentes="presentaciones" @guardar="onGuardarEdicion" />
     <CodigosBarraDialog v-model:visible="codigosVisible" :presentacion="presentacionCodigos" />
+    </template>
   </div>
 </template>
 
@@ -268,6 +272,7 @@ import AñadirPresentacionDialog from '@/components/Productos/AddPresentacion.vu
 import EditarPresentacionDialog from '@/components/Productos/EditPresentacion.vue'
 import CodigosBarraDialog from '@/components/Productos/AddBarCode.vue'
 import KardexTable from '@/components/Productos/KardexTable.vue'
+import authService from '@/services/authService'
 import { getPresentacionesByProducto, togglePresentacion } from '@/services/productoService'
 import {
   mostrarExito,
@@ -281,6 +286,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['volver', 'open-lotes'])
+
+// Solo ADMIN puede agregar / editar / activar presentaciones y gestionar códigos.
+const esAdmin = computed(() => authService.getUserRole() === 'ADMIN')
 
 const editarVisible = ref(false)
 const presentacionSeleccionada = ref(null)
@@ -382,6 +390,7 @@ const formatNumber = (value) => value?.toFixed(2) ?? '0.00'
 const volver = () => emit('volver')
 
 const toggleEstadoPresentacion = async (pres) => {
+  if (!esAdmin.value) return
   const esActivo = pres.estado === 'ACTIVO'
   const resultado = await mostrarConfirmacion({
     titulo: esActivo ? '¿Desactivar presentación?' : '¿Activar presentación?',
@@ -422,8 +431,9 @@ const toggleEstadoPresentacion = async (pres) => {
   }
 }
 
-const abrirAñadir = () => { AgregarVisible.value = true }
+const abrirAñadir = () => { if (esAdmin.value) AgregarVisible.value = true }
 const abrirEditar = (presentacion) => {
+  if (!esAdmin.value) return
   presentacionSeleccionada.value = { ...presentacion }
   editarVisible.value = true
 }
@@ -437,6 +447,7 @@ const onGuardarEdicion = async () => {
 }
 
 const abrirCodigos = (presentacion) => {
+  if (!esAdmin.value) return
   presentacionCodigos.value = { ...presentacion }
   codigosVisible.value = true
 }
