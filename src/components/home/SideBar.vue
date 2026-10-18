@@ -10,6 +10,16 @@
       <div
         class="flex-1 overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
+        <!-- DASHBOARD — solo ADMIN -->
+        <template v-if="isAdmin">
+          <SidebarItem
+            icon="pi pi-chart-line"
+            label="Dashboard"
+            :active="activeItem === 'dashboard'"
+            @click="navigate('/admin/dashboard')"
+          />
+          <hr class="border-none border-t my-3" style="border-color: #162e1e" />
+        </template>
         <!-- ADMINISTRACIÓN — solo ADMIN -->
         <template v-if="isAdmin">
           <p
@@ -35,8 +45,8 @@
           <hr class="border-none border-t my-3" style="border-color: #162e1e" />
         </template>
 
-        <!-- LOGÍSTICA — solo ADMIN -->
-        <template v-if="isAdmin">
+        <!-- LOGÍSTICA — ADMIN (completo) y CAJERO (solo Productos) -->
+        <template v-if="isAdmin || isCajero">
           <p
             style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
             class="mb-1.5 mx-1"
@@ -51,6 +61,7 @@
             @toggle="toggleInventario"
           >
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-th-large"
               label="Categorías"
               :active="activeItem === 'categorias'"
@@ -65,6 +76,7 @@
               sub
             />
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-truck"
               label="Proveedores"
               :active="activeItem === 'proveedores'"
@@ -97,7 +109,7 @@
               @click="navigate('/admin/venta/compra')"
               sub
             />
-          
+
             <SidebarItem
               v-if="isAdmin || isCajero"
               icon="pi pi-history"
@@ -186,9 +198,6 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- VERSIÓN ESCRITORIO (>= 768px)                 -->
-    <!-- ============================================ -->
     <div
       class="hidden md:flex w-64 h-screen flex-col p-6 flex-shrink-0 border-r border-[#162e1e]"
       style="background-color: #1e3a2f; font-family: 'Inter', sans-serif"
@@ -202,6 +211,16 @@
             style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
             class="mb-1.5 mx-1"
           >
+            <!-- DASHBOARD — solo ADMIN -->
+            <template v-if="isAdmin">
+              <SidebarItem
+                icon="pi pi-chart-line"
+                label="Dashboard"
+                :active="activeItem === 'dashboard'"
+                @click="navigate('/admin/dashboard')"
+              />
+              <hr class="border-none border-t my-3" style="border-color: #162e1e" />
+            </template>
             ADMINISTRACIÓN
           </p>
           <SidebarItem
@@ -221,8 +240,8 @@
           <hr class="border-none border-t my-3" style="border-color: #162e1e" />
         </template>
 
-        <!-- LOGÍSTICA — solo ADMIN -->
-        <template v-if="isAdmin">
+        <!-- LOGÍSTICA — ADMIN (completo) y CAJERO (solo Productos) -->
+        <template v-if="isAdmin || isCajero">
           <p
             style="color: #b8cfaa; font-size: 11px; font-weight: 600; letter-spacing: 0.1em"
             class="mb-1.5 mx-1"
@@ -237,6 +256,7 @@
             @toggle="toggleInventario"
           >
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-th-large"
               label="Categorías"
               :active="activeItem === 'categorias'"
@@ -251,6 +271,7 @@
               sub
             />
             <SidebarItem
+              v-if="isAdmin"
               icon="pi pi-truck"
               label="Proveedores"
               :active="activeItem === 'proveedores'"
@@ -283,7 +304,7 @@
               @click="navigate('/admin/venta/compra')"
               sub
             />
-          
+
             <SidebarItem
               v-if="isAdmin || isCajero"
               icon="pi pi-history"
@@ -414,6 +435,7 @@ const isCajero = userRole === 'CAJERO'
 const isContador = userRole === 'CONTADOR'
 
 const activeItem = computed(() => {
+  if (route.path.includes('dashboard')) return 'dashboard'
   if (route.path.includes('usuarios')) return 'usuarios'
   if (route.path.includes('alertas')) return 'alertas'
   if (route.path.includes('productos')) return 'productos'
@@ -426,7 +448,7 @@ const activeItem = computed(() => {
   if (route.path.includes('caja')) return 'caja'
   if (route.path.includes('pos')) return 'pos'
   if (route.path.includes('reportes')) return 'reportes'
-  return 'dashboard'
+  return ''
 })
 
 const inventarioActive = computed(() =>

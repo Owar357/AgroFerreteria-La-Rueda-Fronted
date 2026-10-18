@@ -1,58 +1,8 @@
-import axios from 'axios'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
-// Claves locales
+import api from '../services/axios' 
+// Claves locales (se mantienen intactas para preservar tu localStorage)
 const TOKEN_KEY = 'auth_token'
 const USER_KEY = 'auth_user'
 const ROLE_KEY = 'auth_role'
-
-export const api = axios.create({
-  baseURL: API_URL,
-  headers: { 'Content-Type': 'application/json' },
-})
-
-// Interceptor de petición: Adjunta el token en tiempo real en cada solicitud
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    } else {
-      delete config.headers.Authorization
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  },
-)
-
-// Interceptor de respuesta (ÚNICO): captura sesiones expiradas o tokens inválidos.
-// No actúa sobre la petición de login, para que las credenciales incorrectas
-// lleguen al catch y se muestre la alerta en lugar de recargar la página.
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error.response?.status
-    const mensaje = (error.response?.data?.message || '').toLowerCase()
-    const esPeticionLogin = error.config?.url?.includes('/auth/login')
-
-    const esTokenInvalido =
-      status === 401 ||
-      mensaje.includes('token expirado') ||
-      mensaje.includes('token inválido') ||
-      mensaje.includes('no autenticado')
-
-    if (esTokenInvalido && !esPeticionLogin) {
-      clearSession()
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login'
-      }
-    }
-    return Promise.reject(error)
-  },
-)
 
 function normalizeRole(roles) {
   if (!roles || roles.length === 0) return null
@@ -74,17 +24,18 @@ function clearSession() {
 function getHomeRouteByRole(role) {
   switch (role) {
     case 'ADMIN':
-      return '/admin/usuarios'
+      return '/admin/dashboard'
     case 'CONTADOR':
       return '/admin/reportes'
     case 'CAJERO':
-      return 'admin/venta/venta'
+      return '/admin/venta/venta'
     default:
       return '/login'
   }
 }
 
-//  API pública
+// El objeto authService y sus métodos (login, logout, isAuthenticated, etc.) 
+// permanecen exactamente igual, consumiendo el objeto "api" importado.
 const authService = {
   async login(identity, password) {
     try {
@@ -117,6 +68,29 @@ const authService = {
     } finally {
       clearSession()
     }
+  },
+
+  // Pide un token nuevo antes de que venza el actual
+  async refresh() {
+    try {
+      const { data } = await api.post('/auth/refresh')
+      localStorage.setItem(TOKEN_KEY, data.access_token)
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user))
+      return { success: true, token: data.access_token }
+    } catch (error) {
+      const status = error.response?.status
+      const message = error.response?.data?.message || 'No se pudo renovar la sesión.'
+      return { success: false, status, message }
+    }
+  },
+
+  getToken() {
+    return localStorage.getItem(TOKEN_KEY)
+  },
+
+  // Limpia la sesión sin llamar al backend (se usa cuando el token ya venció)
+  cerrarSesionLocal() {
+    clearSession()
   },
 
   isAuthenticated() {

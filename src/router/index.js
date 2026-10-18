@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import authService from '@/services/authService.js'
 
-
 import Login from '@/views/auth/Login.vue'
 import HomeLayout from '@/views/home.vue'
 
@@ -9,24 +8,23 @@ const routes = [
   // Redirección inicial
   {
     path: '/',
-    redirect: '/login',
+    redirect: () => authService.getHomeRoute(),
   },
-  
+
   // Login
   {
     path: '/login',
     name: 'login',
     component: Login,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
 
   {
-  path: '/acceso-denegado',
-  name: 'unauthorized',
-  component: () => import('../views/auth/AccesoDenegado.vue'),
-  meta: { requiresAuth: true }
-},
-
+    path: '/acceso-denegado',
+    name: 'unauthorized',
+    component: () => import('../views/auth/AccesoDenegado.vue'),
+    meta: { requiresAuth: true },
+  },
 
   {
     path: '/admin',
@@ -38,8 +36,14 @@ const routes = [
         path: '',
         redirect: { name: 'usuarios' },
       },
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/DashboardViews.vue'),
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN']} ,
+      },
 
-      //  EXCLUSIVOS ADMIN 
+      //  EXCLUSIVOS ADMIN
       {
         path: 'usuarios',
         name: 'usuarios',
@@ -62,7 +66,7 @@ const routes = [
         path: 'inventario/productos',
         name: 'productos',
         component: () => import('@/views/productosViews.vue'),
-        meta: { requiresAuth: true, allowedRoles: ['ADMIN'] },
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
       {
         path: 'inventario/proveedores',
@@ -73,10 +77,9 @@ const routes = [
       {
         path: 'procesos/historial-ventas',
         name: 'HistorialVenta',
-       component: () => import('@/views/HistorialVentaViews.vue'), 
+        component: () => import('@/views/HistorialVentaViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO'] },
       },
-
 
       {
         path: 'gestion/pos',
@@ -84,8 +87,7 @@ const routes = [
         component: () => import('@/components/Ventas/POS.vue'),
         meta: { requiresAuth: true, allowedRoles: ['CAJERO'] },
       },
-      
- 
+
       {
         path: 'venta/venta',
         name: 'venta',
@@ -93,7 +95,6 @@ const routes = [
         meta: { requiresAuth: true, allowedRoles: ['CAJERO'] },
       },
 
-      
       {
         path: 'caja',
         name: 'caja',
@@ -128,36 +129,37 @@ const routes = [
       {
         path: 'reportes',
         name: 'reportes',
-        component: () => import('@/views/Reportes/ReportesViews.vue'), 
+        component: () => import('@/views/Reportes/ReportesViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CONTADOR'] },
       },
 
-      
       {
         path: 'procesos/clientes',
         name: 'Clientes',
         component: () => import('@/views/ClientesViews.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
       },
-      
-       {
-       path: 'procesos/clientes/:id/historial',  
-        name: 'ClienteHistorial',               
+
+      {
+        path: 'procesos/clientes/:id/historial',
+        name: 'ClienteHistorial',
         component: () => import('@/components/Clientes/HistorialClienteDialogo.vue'),
         meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
-       },
-       //agrege esto para cargar la pagina aparatee de lotes 
-       {
-          path: 'inventario/presentaciones/:id/lotes',
-             name: 'lotes-presentacion',
-            component: () => import('@/components/Productos/LotesPresentacionTable.vue'),
-           props: (route) => ({ presentacionId: route.params.id, nombrePresentacion: route.query.nombre }),
-             meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
-           }
-    ]
+      },
+      //agrege esto para cargar la pagina aparatee de lotes
+      {
+        path: 'inventario/presentaciones/:id/lotes',
+        name: 'lotes-presentacion',
+        component: () => import('@/components/Productos/LotesPresentacionTable.vue'),
+        props: (route) => ({
+          presentacionId: route.params.id,
+          nombrePresentacion: route.query.nombre,
+        }),
+        meta: { requiresAuth: true, allowedRoles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
+      },
+    ],
   },
 
- 
   {
     path: '/:pathMatch(.*)*',
     redirect: '/login',
@@ -166,31 +168,28 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes 
+  routes,
 })
-
 
 router.beforeEach((to) => {
   const isLoggedIn = authService.isAuthenticated()
   const userRole = authService.getUserRole()
 
-  
   if (to.matched.some((r) => r.meta.requiresAuth) && !isLoggedIn) {
-    return ({ name: 'login' })
+    return { name: 'login' }
   }
-  
+
   if (to.name === 'login' && isLoggedIn) {
     const homeRoute = authService.getHomeRoute()
-    return  (homeRoute)
+    return homeRoute
   }
 
   //  Control de Roles (Si la ruta tiene roles asignados y el usuario no lo incluye)
   if (isLoggedIn && to.meta.allowedRoles && !to.meta.allowedRoles.includes(userRole)) {
     return {
       name: 'unauthorized',
-      query : {intento:  to.name}
+      query: { intento: to.name },
     }
-
   }
 
   return true

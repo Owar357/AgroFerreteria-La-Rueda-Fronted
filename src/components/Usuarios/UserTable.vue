@@ -1,32 +1,40 @@
 <template>
   <div class="bg-[#eef2e9] min-h-full p-4 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-      <!-- ======================================================= -->
-      <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
-      <!-- ======================================================= -->
-      <div class="block lg:hidden mb-4">
-        <div class="flex items-center gap-3">
-          <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0">
-            <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Registro de Usuarios</h1>
-            <p class="text-xs text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-      <!-- ======================================================= -->
-      <div class="hidden lg:flex items-center gap-3 mb-6">
-        <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
-          <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+    <!-- ======================================================= -->
+    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet < 1024px)-->
+    <!-- ======================================================= -->
+    <div class="block lg:hidden mb-4">
+      <div class="flex items-center gap-3">
+        <div
+          class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-2xs flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-users text-[#2b5e3b] text-lg"></i>
         </div>
         <div>
-          <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">Registro de Usuarios</h1>
-          <p class="text-sm text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos del sistema</p>
+          <h1 class="text-xl font-bold text-[#1a2e1f] leading-tight m-0">Registro de Usuarios</h1>
+          <p class="text-xs text-gray-500 mt-0.5 m-0">Gestión de cuentas, roles y permisos</p>
         </div>
       </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
+    <!-- ======================================================= -->
+    <div class="hidden lg:flex items-center gap-3 mb-6">
+      <div
+        class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
+      >
+        <i class="pi pi-users text-[#2b5e3b] text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-[1.75rem] md:text-[2rem] font-bold text-[#1a2e1f] leading-tight m-0">
+          Registro de Usuarios
+        </h1>
+        <p class="text-sm text-gray-500 mt-0.5 m-0">
+          Gestión de cuentas, roles y permisos del sistema
+        </p>
+      </div>
+    </div>
 
     <!-- Contenedor Principal -->
     <div class="bg-[#ffffff] rounded-xl overflow-hidden shadow-lg w-full">
@@ -56,7 +64,7 @@
               class="w-full md:w-[15rem] !bg-white !border-[#cbd5e1] text-[#1a2e1f] text-sm rounded-lg h-11 flex items-center"
               @change="emitirFiltros"
             />
-            
+
             <!-- Limpiar Filtros -->
             <Button
               v-if="hayFiltros"
@@ -114,7 +122,9 @@
                 v-else
                 :class="[
                   'px-2 py-0.5 rounded text-[0.75rem] font-semibold uppercase tracking-wide inline-block',
-                  slotProps.data.activo ? 'bg-[#dff0e0] text-[#2b5e3b]' : 'bg-[#fee2e2] text-[#b91c1c]'
+                  slotProps.data.activo
+                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
+                    : 'bg-[#fee2e2] text-[#b91c1c]',
                 ]"
               >
                 {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
@@ -124,22 +134,46 @@
 
           <template #expansion="slotProps">
             <div class="p-4 bg-[#f8faf7] border-y border-[#e2e8dd] text-sm">
-              <div class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs">
+              <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-white p-3.5 rounded-lg border border-[#e2e8dd] shadow-xs"
+              >
                 <div class="col-span-2">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Email</span>
-                  <span class="text-gray-800 font-medium break-all block">{{ slotProps.data.email }}</span>
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                    >Email</span
+                  >
+                  <span class="text-gray-800 font-medium break-all block">{{
+                    slotProps.data.email
+                  }}</span>
                 </div>
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Rol</span>
-                  <span class="text-gray-800 font-medium block">{{ slotProps.data.roles?.[0]?.name ?? '—' }}</span>
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                    >Rol</span
+                  >
+                  <span class="text-gray-800 font-medium block">{{
+                    slotProps.data.roles?.[0]?.name ?? '—'
+                  }}</span>
                 </div>
                 <div class="col-span-1">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Fecha</span>
-                  <span class="text-gray-800 font-medium block">{{ slotProps.data.created_at ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV') : '—' }}</span>
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                    >Fecha</span
+                  >
+                  <span class="text-gray-800 font-medium block">{{
+                    slotProps.data.created_at
+                      ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                      : '—'
+                  }}</span>
                 </div>
                 <div class="col-span-2 pt-1 border-t border-gray-100">
-                  <span class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5">Creado por</span>
-                  <span class="text-gray-800 font-medium block">{{ slotProps.data.registrado_por?.name ?? '—' }}</span>
+                  <span
+                    class="text-[0.7rem] font-bold tracking-wider uppercase text-gray-500 block mb-0.5"
+                    >Creado por</span
+                  >
+                  <span class="text-gray-800 font-medium block">{{
+                    slotProps.data.registrado_por?.name ?? '—'
+                  }}</span>
                 </div>
               </div>
               <div class="mt-3 pt-2 flex gap-2 justify-end items-center">
@@ -206,7 +240,9 @@
                 v-else
                 :class="[
                   'px-3 py-1 rounded text-[0.8125rem] font-semibold uppercase tracking-wide',
-                  slotProps.data.activo ? 'bg-[#dff0e0] text-[#2b5e3b]' : 'bg-[#fee2e2] text-[#b91c1c]'
+                  slotProps.data.activo
+                    ? 'bg-[#dff0e0] text-[#2b5e3b]'
+                    : 'bg-[#fee2e2] text-[#b91c1c]',
                 ]"
               >
                 {{ slotProps.data.activo ? 'Activo' : 'Inactivo' }}
@@ -232,7 +268,11 @@
             <template #body="slotProps">
               <Skeleton v-if="store.loading" width="5rem" height="1.2rem" />
               <span v-else>
-                {{ slotProps.data.created_at ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV') : '—' }}
+                {{
+                  slotProps.data.created_at
+                    ? new Date(slotProps.data.created_at).toLocaleDateString('es-SV')
+                    : '—'
+                }}
               </span>
             </template>
           </Column>
@@ -283,13 +323,13 @@ import Skeleton from 'primevue/skeleton'
 import Column from 'primevue/column'
 import authService from '@/services/authService'
 import { useUserStore } from '@/stores/usuarioStore'
-import { 
+import {
   mostrarExito,
-  mostrarError, 
+  mostrarError,
   mostrarAccesoDenegado,
-  mostrarAlertaConfirmar, 
+  mostrarAlertaConfirmar,
   mostrarConfirmacion,
-  mostrarCargando 
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const usuarioActual = authService.getUser()
@@ -327,9 +367,9 @@ const limpiarFiltros = () => {
 const alCambiarPagina = async (evento) => {
   const pagina = evento.page + 1
   const filas = evento.rows
-  
+
   const resultado = await store.fetchUsers(pagina, filas, busqueda.value, filtroEstado.value)
-  
+
   if (resultado?.status === 403) {
     mostrarAccesoDenegado()
   } else if (resultado?.error) {
@@ -342,7 +382,7 @@ const confirmarDesactivar = async (usuario) => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Acción no permitida',
-      mensajeHtml: 'No puedes desactivar tu propio usuario.'
+      mensajeHtml: 'No puedes desactivar tu propio usuario.',
     })
     return
   }
@@ -364,11 +404,14 @@ const confirmarDesactivar = async (usuario) => {
   try {
     const [resultado] = await Promise.all([
       store.desactivarUsuario(usuario.id),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (resultado?.ok) {
-      mostrarExito('¡Usuario desactivado!', `El usuario "${usuario.name}" fue desactivado correctamente.`)
+      mostrarExito(
+        '¡Usuario desactivado!',
+        `El usuario "${usuario.name}" fue desactivado correctamente.`,
+      )
     } else if (resultado?.status === 409) {
       mostrarAlertaConfirmar({
         tipo: 'advertencia',

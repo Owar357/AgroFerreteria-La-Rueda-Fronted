@@ -74,13 +74,15 @@
       </div>
 
       <!-- Motivo -->
-       <BaseSelect
-        v-model="form.motivo"
-        label="Motivo del Ajuste"
-        :options="motivosDisponibles"
-        placeholder="Seleccione motivo"
-      />
-      
+      <div class="flex flex-col gap-1.5 w-full">
+        <BaseSelect
+          v-model="form.motivo"
+          label="Motivo del Ajuste"
+          :options="motivosDisponibles"
+          placeholder="Seleccione motivo"
+          maxlength="100"
+        />
+      </div>
       
       <!-- Observaciones -->
       <div class="flex flex-col gap-1.5 w-full">
@@ -88,6 +90,7 @@
         <Textarea
           v-model="form.observaciones"
           rows="2"
+          maxlength="500"
           class="w-full text-xs p-2.5 border border-gray-300 rounded-xl"
           placeholder="Detalles adicionales del ajuste..."
         />
@@ -132,15 +135,15 @@
         </div>
       </div>
 
-      
+      <div class="flex flex-col gap-1.5 w-full">
         <BaseSelect
         v-model="form.tipo_ajuste"
         label="Tipo de Ajuste"
         :options="tiposAjuste"
         option-label="label"
         option-value="value"
-      />
-      
+        />
+      </div>
 
       <!-- Campo Dinámico según Tipo de Ajuste -->
       <div v-if="form.tipo_ajuste === 'REEVALUACION'">
@@ -175,14 +178,15 @@
         </small>
       </div>
 
-      
+      <div class="flex flex-col gap-1.5 w-full">
         <BaseSelect
           v-model="form.motivo"
           label="Motivo del Ajuste"
           :options="motivosDisponibles"
           placeholder="Seleccione motivo"
+          maxlength="100"
         />
-      
+      </div>
 
       <!-- Observaciones -->
       <div class="flex flex-col gap-1.5 w-full">
@@ -190,6 +194,7 @@
         <Textarea
           v-model="form.observaciones"
           rows="2"
+          maxlength="500"
           class="w-full text-sm p-3 border border-gray-300 rounded-xl"
           placeholder="Detalles adicionales del ajuste..."
         />
@@ -471,7 +476,7 @@ const guardarAjuste = async () => {
     const mensaje = error.response?.data?.message || 'No se pudo registrar el ajuste de inventario.'
     mostrarError('Error al ajustar', mensaje)
   } finally {
-    guardando.value = false
+    cargando.value = false
   }
 }
 </script>

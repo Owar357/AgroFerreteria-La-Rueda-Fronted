@@ -24,7 +24,7 @@ const EstilosBase = {
   },
 }
 
-const clasesPopupResponsivo = {
+export const clasesPopupResponsivo = {
   popup: "!rounded-2xl !p-4 sm:!p-6 !max-w-[90vw] sm:!max-w-[32rem] !font-['Inter',sans-serif]",
   confirmButton:
     '!rounded-xl !font-semibold !text-xs sm:!text-sm !py-2.5 sm:!py-3 !px-5 sm:!px-6 !w-full sm:!w-auto cursor-pointer shadow-sm',

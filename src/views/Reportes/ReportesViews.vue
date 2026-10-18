@@ -1,7 +1,7 @@
 <template>
-  <div class="overflow-hidden relative">
+  <div class="relative h-full flex flex-col overflow-x-hidden overflow-y-auto">
     <transition :name="transitionName" mode="out-in">
-      <div :key="vistaActual" class="w-full">
+      <div :key="vistaActual" class="w-full flex-1 flex flex-col">
 
         <ReportesCentro
           v-if="vistaActual === 'centro'"
@@ -97,8 +97,7 @@ import ReporteMargenGanancia from '@/components/Reportes/ReporteMargenGanancia.v
 import ReporteComprasVentas from '@/components/Reportes/ReporteComprasVentas.vue'
 import ReporteInventarioValorizado from '@/components/Reportes/ReporteInventarioValorizado.vue'
 import ReporteProductosPorVencer from '@/components/Reportes/ReporteProductosPorVencer.vue'
-import ReporteAqueoCaja from '@/components/Reportes/ReporteAqueoCaja .vue'
-import { TreeSelect } from 'primevue'
+import ReporteAqueoCaja from '@/components/Reportes/ReporteAqueoCaja.vue'
 
 const vistaActual   = ref('centro')
 const transitionName = ref('slide-forward')
@@ -205,8 +204,5 @@ const abriraqueocaja = () => {
 .slide-backward-leave-to {
   transform: translateX(100%);
   opacity: 0;
-}
-.overflow-hidden {
-  overflow-x: hidden;
 }
 </style>
