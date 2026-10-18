@@ -8,9 +8,9 @@
     @keydown.enter="clickable && emit('click')"
   >
     <div class="flex items-center justify-between gap-3">
-      <span class="text-sm font-medium text-[#6b7280]">{{ title }}</span>
+      <span class="text-sm font-medium text-[#6b7280] leading-tight min-w-0">{{ title }}</span>
       <span
-        class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+        class="w-[2.5rem] h-[2.5rem] min-w-[2.5rem] rounded-xl flex items-center justify-center shrink-0"
         :class="tonos[tone].icono"
       >
         <i :class="icon" class="text-lg"></i>
@@ -46,7 +46,6 @@ const props = defineProps({
   value: { type: [String, Number], required: true },
   icon: { type: String, required: true },
   tone: { type: String, default: 'green' },
-  // undefined: no muestra comparación | null: sin base de comparación | número: % de variación
   variacion: { type: Number, default: undefined },
   comparacion: { type: String, default: '' },
   hint: { type: String, default: '' },

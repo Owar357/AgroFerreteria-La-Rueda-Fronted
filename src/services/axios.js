@@ -32,6 +32,8 @@ api.interceptors.response.use(
     const status = error.response?.status
     const mensaje = (error.response?.data?.message || '').toLowerCase()
     const esPeticionLogin = error.config?.url?.includes('/auth/login')
+    // El fallo de /auth/refresh lo maneja useSessionTimeout (muestra el mensaje antes de ir al login)
+    const esPeticionRefresh = error.config?.url?.includes('/auth/refresh')
 
     const esTokenInvalido =
       status === 401 ||
@@ -39,8 +41,8 @@ api.interceptors.response.use(
       mensaje.includes('token inválido') ||
       mensaje.includes('no autenticado')
 
-    // Si el token falló y no estamos intentando loguearnos, limpiamos y redirigimos
-    if (esTokenInvalido && !esPeticionLogin) {
+    // Si el token falló y no estamos intentando loguearnos ni renovar, limpiamos y redirigimos
+    if (esTokenInvalido && !esPeticionLogin && !esPeticionRefresh) {
       localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_user')
       localStorage.removeItem('auth_role')
