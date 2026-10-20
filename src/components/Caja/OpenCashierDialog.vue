@@ -187,7 +187,9 @@ const focusNextInput = (currentIndex) => {
   if (nextComponent) {
     nextComponent.$el.querySelector('input')?.focus()
   } else {
+    // Último campo ($100): Enter confirma y aperta la venta
     document.activeElement?.blur()
+    handleOpenCash()
   }
 }
 

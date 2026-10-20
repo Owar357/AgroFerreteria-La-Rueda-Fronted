@@ -236,6 +236,7 @@
           @click="onCancelar"
         />
         <Button
+          autofocus
           label="Confirmar y Cerrar Caja"
           icon="pi pi-check-circle"
           :loading="cargando"
