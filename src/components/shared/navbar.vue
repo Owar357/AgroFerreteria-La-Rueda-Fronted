@@ -1,9 +1,7 @@
 <template>
   <header class="flex-shrink-0 w-full font-['Inter',sans-serif]">
 
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL (< 640px)                                   -->
-    <!-- ======================================================= -->
+  
     <div class="block sm:hidden bg-[#1C3A1A] border-b border-[#2a4a28] px-3 py-2.5">
       <div class="flex items-center justify-between">
         
@@ -32,7 +30,7 @@
           </div>
         </div>
 
-        <!-- Derecha: Avatar + Nombre/Rol Compacto -->
+    
         <div class="flex items-center gap-2">
           <div class="flex flex-col justify-center text-right leading-tight max-w-[100px]">
             <span class="text-[#EAEAEA] text-[11px] font-semibold truncate">

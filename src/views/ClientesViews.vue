@@ -1,15 +1,8 @@
 <template>
   <div>
-    <TablaCliente
-      @view-detail="onViewDetail"
-      @view-history="onViewHistory"
-    />
+    <TablaCliente @view-detail="onViewDetail" @view-history="onViewHistory" />
 
-    <DetalleClientesDialogo
-      v-model:visible="detailVisible"
-      :client="selectedClient"
-    />
-    
+    <DetalleClientesDialogo v-model:visible="detailVisible" :client="selectedClient" />
   </div>
 </template>
 
@@ -20,10 +13,9 @@ import { useRouter } from 'vue-router'
 import TablaCliente from '@/components/Clientes/TablaCliente.vue'
 import DetalleClientesDialogo from '@/components/Clientes/DetalleClientesDialogo.vue'
 
-
 const router = useRouter()
 
-const detailVisible  = ref(false)
+const detailVisible = ref(false)
 const selectedClient = ref(null)
 
 const onViewDetail = (cliente) => {
@@ -31,19 +23,15 @@ const onViewDetail = (cliente) => {
   detailVisible.value = true
 }
 
-
-
 const onViewHistory = (cliente) => {
   router.push({
-    name:   'ClienteHistorial',
+    name: 'ClienteHistorial',
     params: { id: cliente.id },
-    query:  {
+    query: {
       clienteId: cliente.id,
       nombre: cliente.nombre || cliente.razon_social,
-      doc: cliente.numero_documento
-    }
+      doc: cliente.numero_documento,
+    },
   })
 }
-
-
 </script>

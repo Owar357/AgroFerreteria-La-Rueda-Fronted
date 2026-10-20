@@ -1,13 +1,13 @@
-import  api  from './axios'
+import api from './axios'
 
 export const getProveedores = (page = 1, perPage = 7, search = '', estado = 'TODOS') => {
-  return api.get('/proveedores', { 
-    params: { 
-      page, 
+  return api.get('/proveedores', {
+    params: {
+      page,
       per_page: perPage,
       search: search || undefined,
-      estado: estado !== 'TODOS' ? estado : undefined
-    } 
+      estado: estado !== 'TODOS' ? estado : undefined,
+    },
   })
 }
 

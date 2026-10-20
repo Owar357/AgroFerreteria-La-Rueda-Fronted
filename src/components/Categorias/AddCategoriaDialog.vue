@@ -10,9 +10,7 @@
     :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="resetForm"
   >
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL (< 640px)                                   -->
-    <!-- ======================================================= -->
+    <!--VISTA DE MOVIL-->
     <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
       <BaseInput
         v-model="nombreCategoria"
@@ -52,10 +50,10 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO (>= 640px)                             -->
-    <!-- ======================================================= -->
-    <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
+    <!--VISTA DE PC-->
+    <div
+      class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]"
+    >
       <BaseInput
         v-model="nombreCategoria"
         label="Nombre: *"
@@ -101,11 +99,11 @@ import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { useCategoriaStore } from '../../stores/categoriaStore'
-import { 
-  mostrarAccesoDenegado, 
-  mostrarError, 
-  mostrarExito, 
-  mostrarCargando 
+import {
+  mostrarAccesoDenegado,
+  mostrarError,
+  mostrarExito,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 import BaseInput from '../base/BaseInput.vue'
 import BaseInputPercent from '@/components/base/BaseInputPercent.vue'
@@ -196,13 +194,14 @@ const dispararGuardar = async () => {
 
   const payload = {
     nombre: nombreCategoria.value.trim(),
-    porcentaje_ganancia_minimo: porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : 15.00
+    porcentaje_ganancia_minimo:
+      porcentajeGananciaMinimo.value !== null ? porcentajeGananciaMinimo.value : 15.0,
   }
 
   try {
     const [resultado] = await Promise.all([
       store.crearCategoria(payload),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (resultado.ok) {
@@ -210,7 +209,7 @@ const dispararGuardar = async () => {
       resetForm()
       mostrarExito(
         '¡Categoría creada!',
-        `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`
+        `La categoría "<strong>${resultado.categoria.nombre}</strong>" fue registrada exitosamente.`,
       )
     } else if (resultado.status === 403) {
       localVisible.value = false
@@ -256,7 +255,6 @@ const dispararGuardar = async () => {
   box-shadow: 0 0 0 0.125rem rgba(43, 94, 59, 0.2) !important;
   border-color: #2b5e3b !important;
 }
-
 
 .swal2-container {
   z-index: 999999 !important;

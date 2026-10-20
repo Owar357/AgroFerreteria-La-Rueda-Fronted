@@ -17,9 +17,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-    <!-- ======================================================= -->
+   
     <div class="hidden lg:flex items-center gap-3 mb-6">
       <div
         class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0"
@@ -38,9 +36,7 @@
 
     <!-- COTENEDOR -->
     <div class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm overflow-hidden w-full">
-      <!-- ======================================================= -->
-      <!-- VISTA MÓVIL FILTROS (Solo Teléfono / Tablet)           -->
-      <!-- ======================================================= -->
+    
       <div class="block lg:hidden p-4 border-b border-[#e2e8dd] bg-[#fbfdf9] space-y-3">
         <div class="flex flex-col gap-3">
           <!-- Botón Agregar Compra Móvil -->
@@ -219,13 +215,12 @@
         </div>
       </div>
 
-     <p v-if="rango.desde" class="text-xs text-gray-500 px-5 py-2">
-      Mostrando compras del <strong>{{ formatearRango(rango.desde) }}</strong> al <strong>{{ formatearRango(rango.hasta) }}</strong>
-    </p>
+      <p v-if="rango.desde" class="text-xs text-gray-500 px-5 py-2">
+        Mostrando compras del <strong>{{ formatearRango(rango.desde) }}</strong> al
+        <strong>{{ formatearRango(rango.hasta) }}</strong>
+      </p>
 
-      <!-- ======================================================= -->
-      <!-- VISTA MÓVIL: Tabla con Desplegable (< 1024px)           -->
-      <!-- ======================================================= -->
+  
       <div class="block lg:hidden w-full">
         <DataTable
           v-model:expandedRows="expandedRows"
@@ -375,9 +370,7 @@
         </DataTable>
       </div>
 
-      <!-- ======================================================= -->
-      <!-- VISTA ESCRITORIO: Tabla Completa Tradicional (>= 1024px)-->
-      <!-- ======================================================= -->
+     
       <div class="hidden lg:block w-full overflow-x-auto">
         <DataTable
           :value="loading ? Array.from({ length: 5 }) : compras"
@@ -583,8 +576,6 @@ const obtenerSeveridadPago = (estado) => {
   }
 }
 
-
-
 // Tipos de documento (DTE) -> nombre corto y nombre completo
 const TIPOS_DOCUMENTO = {
   '01': { corto: 'Factura', largo: 'Factura' },
@@ -592,8 +583,8 @@ const TIPOS_DOCUMENTO = {
   '04': { corto: 'NR', largo: 'Nota de Remisión' },
   '05': { corto: 'NC', largo: 'Nota de Crédito' },
   '06': { corto: 'ND', largo: 'Nota de Débito' },
-  '11': { corto: 'FEX', largo: 'Factura de Exportación' },
-  '14': { corto: 'FSE', largo: 'Factura de Sujeto Excluido' },
+  11: { corto: 'FEX', largo: 'Factura de Exportación' },
+  14: { corto: 'FSE', largo: 'Factura de Sujeto Excluido' },
 }
 
 const infoTipoDocumento = (codigo) => TIPOS_DOCUMENTO[String(codigo ?? '').padStart(2, '0')]
@@ -681,18 +672,18 @@ const limpiarFiltros = () => {
 
 // "2026-10-01" -> "01 de octubre de 2026"
 const formatearRango = (f) => {
-  if (!f) return '';
-  
-  const [anio, mes, dia] = f.split('-');
-  
-  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
-  
+  if (!f) return ''
+
+  const [anio, mes, dia] = f.split('-')
+
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia))
+
   return new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-    timeZone: 'UTC'
-  }).format(fecha);
+    timeZone: 'UTC',
+  }).format(fecha)
 }
 
 const verDetalles = (compra) => {

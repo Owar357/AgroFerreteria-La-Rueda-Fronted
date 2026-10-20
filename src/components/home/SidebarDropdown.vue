@@ -4,9 +4,9 @@
       @click="$emit('toggle')"
       :class="[
         'flex items-center justify-between p-3 rounded-lg cursor-pointer mb-1 transition-colors duration-150 text-[14px] font-medium',
-        parentActive 
-          ? 'bg-transparent text-[#e0b354] font-semibold' 
-          : 'bg-transparent text-[#b8cfaa] hover:bg-[#b8cfaa]/10'
+        parentActive
+          ? 'bg-transparent text-[#e0b354] font-semibold'
+          : 'bg-transparent text-[#b8cfaa] hover:bg-[#b8cfaa]/10',
       ]"
     >
       <div class="flex items-center">
@@ -15,7 +15,7 @@
       </div>
       <i :class="open ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="text-[11px]"></i>
     </div>
-    
+
     <transition name="slide">
       <div v-if="open" class="mb-1">
         <slot />

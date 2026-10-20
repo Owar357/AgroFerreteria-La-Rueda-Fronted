@@ -1,6 +1,8 @@
 <template>
   <div class="min-h-screen bg-[#839370] flex items-center justify-center p-4">
-    <div class="w-full max-w-[480px] bg-white rounded-3xl shadow-2xl p-10 text-center flex flex-col items-center gap-5 border border-[#e2e8dd]">
+    <div
+      class="w-full max-w-[480px] bg-white rounded-3xl shadow-2xl p-10 text-center flex flex-col items-center gap-5 border border-[#e2e8dd]"
+    >
       <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
         <i class="pi pi-lock text-red-500 text-[34px]"></i>
       </div>
@@ -10,8 +12,8 @@
       <p class="text-[#6b7280] text-[14px] leading-relaxed">
         No tenés permisos para acceder a
         <strong v-if="modulo">{{ modulo }}</strong>
-        <span v-else>esta funcionalidad</span>.
-        Si creés que esto es un error, contactá al administrador.
+        <span v-else>esta funcionalidad</span>. Si creés que esto es un error, contactá al
+        administrador.
       </p>
 
       <Button

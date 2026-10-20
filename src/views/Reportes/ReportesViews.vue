@@ -2,7 +2,6 @@
   <div class="relative h-full flex flex-col overflow-x-hidden overflow-y-auto">
     <transition :name="transitionName" mode="out-in">
       <div :key="vistaActual" class="w-full flex-1 flex flex-col">
-
         <ReportesCentro
           v-if="vistaActual === 'centro'"
           @ver-ventas="abrirReporteVentas"
@@ -10,7 +9,7 @@
           @ver-resumen-ventas="abrirReporteResumenVentas"
           @ver-productos-mas-vendidos="abrirProductosmasvendidos"
           @ver-ventas-cajero="abrirVentasCajero"
-          @ver-ventas-categoria="abrirventascategoria" 
+          @ver-ventas-categoria="abrirventascategoria"
           @ver-resumen-comparativo="abrirresumencomparativo"
           @ver-margen-ganancia="abrimargenganancia"
           @ver-flujo-compras-ventas="abrircompraventa"
@@ -19,65 +18,40 @@
           @ver-arqueo-caja="abriraqueocaja"
         />
 
-        <ReporteDetalleVenta
-          v-else-if="vistaActual === 'ventas'"
+        <ReporteDetalleVenta v-else-if="vistaActual === 'ventas'" @volver="volver" />
+        <ReporteComprasPorProveedor v-else-if="vistaActual === 'proveedor'" @volver="volver" />
+
+        <ReporteResumenVentas v-else-if="vistaActual === 'resumen-ventas'" @volver="volver" />
+
+        <ProductosMasVendidos
+          v-else-if="vistaActual === 'productos-mas-vendidos'"
           @volver="volver"
         />
-        <ReporteComprasPorProveedor 
-          v-else-if="vistaActual === 'proveedor'"
+
+        <ReporteVentasCajero v-else-if="vistaActual === 'ventas-cajero'" @volver="volver" />
+
+        <ReporteVentasCategoria v-else-if="vistaActual === 'ventas-categoria'" @volver="volver" />
+
+        <ResumenComparativoVentas
+          v-else-if="vistaActual === 'resumen-comparativo'"
           @volver="volver"
         />
-        
-        <ReporteResumenVentas 
-        v-else-if="vistaActual === 'resumen-ventas'"
-        @volver="volver"
+
+        <ReporteMargenGanancia v-else-if="vistaActual === 'margen-ganancia'" @volver="volver" />
+
+        <ReporteComprasVentas v-else-if="vistaActual === 'compra-venta'" @volver="volver" />
+
+        <ReporteInventarioValorizado
+          v-else-if="vistaActual === 'inventario-valorizado'"
+          @volver="volver"
         />
 
-        <ProductosMasVendidos 
-        v-else-if="vistaActual ==='productos-mas-vendidos'"
-        @volver="volver"
+        <ReporteProductosPorVencer
+          v-else-if="vistaActual === 'productos-por-vencer'"
+          @volver="volver"
         />
 
-        <ReporteVentasCajero 
-        v-else-if="vistaActual === 'ventas-cajero'"
-        @volver="volver"
-        />
-
-        <ReporteVentasCategoria 
-        v-else-if="vistaActual === 'ventas-categoria'"
-        @volver="volver"
-        />
-
-        <ResumenComparativoVentas 
-        v-else-if="vistaActual === 'resumen-comparativo'"
-        @volver="volver"
-        />
-
-        <ReporteMargenGanancia 
-        v-else-if="vistaActual === 'margen-ganancia'"
-        @volver="volver"
-        />
-
-        <ReporteComprasVentas 
-        v-else-if="vistaActual === 'compra-venta'"
-        @volver="volver"
-        />
-
-        <ReporteInventarioValorizado 
-        v-else-if="vistaActual === 'inventario-valorizado'"
-        @volver="volver"
-        />
-
-        <ReporteProductosPorVencer 
-        v-else-if="vistaActual === 'productos-por-vencer'"
-        @volver="volver"
-        />
-
-        <ReporteAqueoCaja 
-        v-else-if="vistaActual == 'arqueo-caja'"
-        @volver="volver"
-        />
-
+        <ReporteAqueoCaja v-else-if="vistaActual == 'arqueo-caja'" @volver="volver" />
       </div>
     </transition>
   </div>
@@ -99,7 +73,7 @@ import ReporteInventarioValorizado from '@/components/Reportes/ReporteInventario
 import ReporteProductosPorVencer from '@/components/Reportes/ReporteProductosPorVencer.vue'
 import ReporteAqueoCaja from '@/components/Reportes/ReporteAqueoCaja.vue'
 
-const vistaActual   = ref('centro')
+const vistaActual = ref('centro')
 const transitionName = ref('slide-forward')
 
 const abrirReporteVentas = () => {
@@ -112,7 +86,6 @@ const abrirReporteProveedor = () => {
   transitionName.value = 'slide-forward'
   vistaActual.value = 'proveedor'
 }
-
 
 const volver = () => {
   transitionName.value = 'slide-backward'
@@ -127,8 +100,8 @@ const abrirReporteResumenVentas = () => {
 
 //funcion para abriri la card de poductos mas vendidos
 const abrirProductosmasvendidos = () => {
-transitionName.value = 'slide-forward'
-vistaActual.value = 'productos-mas-vendidos'
+  transitionName.value = 'slide-forward'
+  vistaActual.value = 'productos-mas-vendidos'
 }
 
 //Funcion para ver las ver la vista de ventas por cajeri

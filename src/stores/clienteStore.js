@@ -9,7 +9,12 @@ export const useClienteStore = defineStore('cliente', () => {
   const paginaActual = ref(1)
   const porPagina = ref(10)
 
-  const cargarClientes = async (page = 1, rows = porPagina.value, search = '', tipo_persona = 'TODOS') => {
+  const cargarClientes = async (
+    page = 1,
+    rows = porPagina.value,
+    search = '',
+    tipo_persona = 'TODOS',
+  ) => {
     cargando.value = true
     try {
       const response = await getClientes(page, rows, search, tipo_persona)
@@ -30,7 +35,7 @@ export const useClienteStore = defineStore('cliente', () => {
       return {
         ok: false,
         status: error.response?.status,
-        error: error.response?.data?.message || 'Error de conexión'
+        error: error.response?.data?.message || 'Error de conexión',
       }
     } finally {
       cargando.value = false
@@ -53,7 +58,7 @@ export const useClienteStore = defineStore('cliente', () => {
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error en el servidor.'
+        error: responseData?.message || 'Error en el servidor.',
       }
     }
   }

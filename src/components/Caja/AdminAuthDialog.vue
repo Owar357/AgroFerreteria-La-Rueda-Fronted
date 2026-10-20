@@ -10,7 +10,6 @@
     @hide="resetForm"
   >
     <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
-
       <p class="text-[14px] text-[#6b7280]">
         {{ descripcion }}
       </p>
@@ -27,10 +26,12 @@
           @input="errors.email = ''"
           :class="[
             'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errors.email ? 'border-red-500 border' : 'border-[#d1d5db]'
+            errors.email ? 'border-red-500 border' : 'border-[#d1d5db]',
           ]"
         />
-        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{ errors.email }}</small>
+        <small v-if="errors.email" class="text-red-600 text-[12px] font-medium">{{
+          errors.email
+        }}</small>
       </div>
 
       <!-- Contraseña -->
@@ -46,12 +47,16 @@
           :inputProps="{ autocomplete: 'current-password' }"
           @input="errors.password = ''"
           class="w-full"
-          :inputClass="[
-            'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
-            errors.password ? 'border-red-500 border' : 'border-[#d1d5db]'
-          ].join(' ')"
+          :inputClass="
+            [
+              'w-full bg-[#f9fafb] text-[#1a2e1f] text-[14px] h-11 px-4 rounded-lg',
+              errors.password ? 'border-red-500 border' : 'border-[#d1d5db]',
+            ].join(' ')
+          "
         />
-        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{ errors.password }}</small>
+        <small v-if="errors.password" class="text-red-600 text-[12px] font-medium">{{
+          errors.password
+        }}</small>
       </div>
 
       <div v-if="errorGeneral" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
@@ -74,47 +79,52 @@
           @click="handleConfirmar"
         />
       </div>
-
     </div>
   </Dialog>
 </template>
 
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import Dialog    from 'primevue/dialog'
+import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import Password  from 'primevue/password'
-import Button    from 'primevue/button'
+import Password from 'primevue/password'
+import Button from 'primevue/button'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   labelBoton: { type: String, default: 'Abrir caja' },
-  descripcion: { type: String, default: 'Para aperturar la caja ingrese las credenciales del Administrador.' }
+  descripcion: {
+    type: String,
+    default: 'Para aperturar la caja ingrese las credenciales del Administrador.',
+  },
 })
 
 const emit = defineEmits(['update:visible', 'credenciales-confirmadas'])
 
 const localVisible = ref(false)
-const cargando     = ref(false)
+const cargando = ref(false)
 const errorGeneral = ref('')
 
 const form = reactive({ email: '', password: '' })
 const errors = reactive({ email: '', password: '' })
 
-watch(() => props.visible, (val) => (localVisible.value = val))
-watch(localVisible,        (val) => emit('update:visible', val))
+watch(
+  () => props.visible,
+  (val) => (localVisible.value = val),
+)
+watch(localVisible, (val) => emit('update:visible', val))
 
 const resetForm = () => {
-  form.email    = ''
+  form.email = ''
   form.password = ''
-  errors.email  = ''
+  errors.email = ''
   errors.password = ''
   errorGeneral.value = ''
 }
 
 const validar = () => {
   let ok = true
-  errors.email    = ''
+  errors.email = ''
   errors.password = ''
 
   if (!form.email.trim()) {
@@ -137,21 +147,20 @@ const handleConfirmar = () => {
   errorGeneral.value = ''
   if (!validar()) return
 
-
   emit('credenciales-confirmadas', {
-    email:    form.email.trim(),
-    password: form.password
+    email: form.email.trim(),
+    password: form.password,
   })
 }
 
-
 const mostrarError = (mensaje) => {
   errorGeneral.value = mensaje
-  cargando.value     = false
+  cargando.value = false
 }
 
-
-const setLoading = (val) => { cargando.value = val }
+const setLoading = (val) => {
+  cargando.value = val
+}
 
 defineExpose({ mostrarError, setLoading, resetForm })
 </script>
@@ -171,7 +180,9 @@ defineExpose({ mostrarError, setLoading, resetForm })
   background-color: #ffffff !important;
   padding: 1.5rem !important;
 }
-.p-password-toggle-icon { color: #6b7280 !important; }
+.p-password-toggle-icon {
+  color: #6b7280 !important;
+}
 
 .swal2-container {
   z-index: 999999 !important;
