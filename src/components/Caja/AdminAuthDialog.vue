@@ -9,7 +9,10 @@
     :pt="{ root: { class: 'rounded-2xl overflow-hidden' } }"
     @hide="resetForm"
   >
-    <div class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]">
+    <form
+      class="bg-[#ffffff] p-2 text-[#1a2e1f] flex flex-col gap-5 font-['Inter',sans-serif]"
+      @submit.prevent="handleConfirmar"
+    >
       <p class="text-[14px] text-[#6b7280]">
         {{ descripcion }}
       </p>
@@ -65,6 +68,7 @@
 
       <div class="flex justify-between gap-4 mt-2">
         <Button
+          type="button"
           label="Cancelar"
           class="!bg-white hover:!bg-[#e2e8dd] !text-[#1a2e1f] text-[14px] font-semibold px-6 py-4 rounded-lg !border !border-[#cbd5e1] cursor-pointer transition-colors"
           :disabled="cargando"
@@ -72,14 +76,14 @@
         />
 
         <Button
+          type="submit"
           :label="labelBoton"
           icon="pi pi-unlock"
           :loading="cargando"
           class="!bg-[#2b5e3b] hover:!bg-[#1f482d] text-white text-[14px] font-semibold px-6 py-4 rounded-lg border-none cursor-pointer shadow-md transition-colors"
-          @click="handleConfirmar"
         />
       </div>
-    </div>
+    </form>
   </Dialog>
 </template>
 
@@ -144,6 +148,7 @@ const validar = () => {
 }
 
 const handleConfirmar = () => {
+  if (cargando.value) return
   errorGeneral.value = ''
   if (!validar()) return
 

@@ -138,7 +138,11 @@ const fmt = (val) =>
 const focusNextInput = (currentIndex) => {
   const next = inputRefs.value[currentIndex + 1]
   if (next) next.$el.querySelector('input')?.focus()
-  else document.activeElement?.blur()
+  else {
+    // Último campo ($100): Enter confirma y abre el cuadre
+    document.activeElement?.blur()
+    onCuadrar()
+  }
 }
 
 // Restaura un conteo guardado (al volver desde el resumen del cierre)
