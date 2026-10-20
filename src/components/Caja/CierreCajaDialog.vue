@@ -18,29 +18,38 @@
     </template>
 
     <div class="flex flex-col gap-5 font-['Inter',sans-serif]">
-
       <!-- Datos del turno -->
       <div class="border border-[#e2e8dd] rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <i class="pi pi-info-circle text-[#2b5e3b] text-[15px]"></i>
-          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider">Datos del Turno</span>
+          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider"
+            >Datos del Turno</span
+          >
         </div>
         <div class="grid grid-cols-4 gap-4">
           <div class="flex flex-col gap-1">
             <span class="text-[12px] text-[#6b7280]">Cajero</span>
-            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{ datos.nombre_cajero ?? '—' }}</span>
+            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{
+              datos.nombre_cajero ?? '—'
+            }}</span>
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-[12px] text-[#6b7280]">Número de Caja</span>
-            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{ datos.numero_caja ?? '—' }}</span>
+            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{
+              datos.numero_caja ?? '—'
+            }}</span>
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-[12px] text-[#6b7280]">Fecha/Hora</span>
-            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{ datos.fecha_hora ?? '—' }}</span>
+            <span class="text-[14px] font-semibold text-[#1a2e1f]">{{
+              datos.fecha_hora ?? '—'
+            }}</span>
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-[12px] text-[#6b7280]">Fondo Inicial (Base)</span>
-            <span class="text-[14px] font-semibold text-[#2b5e3b]">{{ fmt(datos.monto_inicial) }}</span>
+            <span class="text-[14px] font-semibold text-[#2b5e3b]">{{
+              fmt(datos.monto_inicial)
+            }}</span>
             <span class="text-[11px] text-[#6b7280]">No editable - Valor del sistema</span>
           </div>
         </div>
@@ -50,7 +59,9 @@
       <div class="border border-[#e2e8dd] rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <i class="pi pi-arrows-h text-[#2b5e3b] text-[15px]"></i>
-          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider">Resumen de Movimientos</span>
+          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider"
+            >Resumen de Movimientos</span
+          >
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-[#f0faf0] border border-[#c3e6c3] rounded-xl p-4">
@@ -58,7 +69,9 @@
               <i class="pi pi-arrow-up text-green-600 text-[12px]"></i>
               <span class="text-[12px] text-green-700 font-medium">Entradas Manuales</span>
             </div>
-            <span class="text-[22px] font-bold text-green-700">{{ fmt(datos.total_entradas) }}</span>
+            <span class="text-[22px] font-bold text-green-700">{{
+              fmt(datos.total_entradas)
+            }}</span>
             <p class="text-[11px] text-green-600 mt-1">Total acumulado de entradas de efectivo</p>
           </div>
           <div class="bg-[#fff5f5] border border-[#fecaca] rounded-xl p-4">
@@ -76,23 +89,33 @@
       <div class="border border-[#e2e8dd] rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <i class="pi pi-barcode text-[#2b5e3b] text-[15px]"></i>
-          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider">Registro de Ventas del Sistema</span>
+          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider"
+            >Registro de Ventas del Sistema</span
+          >
         </div>
         <div class="grid grid-cols-3 gap-4">
           <div class="border border-[#e2e8dd] rounded-xl p-3">
             <span class="text-[12px] text-[#6b7280]">Ventas en Efectivo</span>
-            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">{{ fmt(datos.total_ventas_efectivo) }}</p>
-            <span class="text-[11px] text-[#6b7280]">Valor neto de las ventas cobradas en efectivo</span>
+            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">
+              {{ fmt(datos.total_ventas_efectivo) }}
+            </p>
+            <span class="text-[11px] text-[#6b7280]"
+              >Valor neto de las ventas cobradas en efectivo</span
+            >
           </div>
           <div class="border border-[#e2e8dd] rounded-xl p-3">
             <span class="text-[12px] text-[#6b7280]">Ventas por Tarjeta/Digital</span>
             <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">{{ fmt(ventasDigitales) }}</p>
-            <span class="text-[11px] text-[#6b7280]">Tarjeta + transferencias (no entran a la gaveta)</span>
+            <span class="text-[11px] text-[#6b7280]"
+              >Tarjeta + transferencias (no entran a la gaveta)</span
+            >
           </div>
           <div class="bg-[#eef2e9] border border-[#c8d8c0] rounded-xl p-3">
             <span class="text-[12px] text-[#4b5563]">Total Esperado en Caja</span>
             <p class="text-[18px] font-bold text-[#2b5e3b] mt-1">{{ fmt(datos.monto_esperado) }}</p>
-            <span class="text-[11px] text-[#6b7280]">Fondo inicial + Ventas EF + Entradas - Salidas</span>
+            <span class="text-[11px] text-[#6b7280]"
+              >Fondo inicial + Ventas EF + Entradas - Salidas</span
+            >
           </div>
         </div>
       </div>
@@ -101,17 +124,26 @@
       <div class="border border-[#e2e8dd] rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <i class="pi pi-balance-scale text-[#2b5e3b] text-[15px]"></i>
-          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider">Validación y Diferencias</span>
+          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider"
+            >Validación y Diferencias</span
+          >
         </div>
         <div class="border border-[#e2e8dd] rounded-xl p-4 mb-4">
           <span class="text-[13px] text-[#6b7280]">Diferencia de Efectivo</span>
           <div class="flex items-center gap-3 mt-1">
-            <span class="text-[22px] font-bold" :class="diferenciaColor">{{ fmt(datos.diferencia) }}</span>
-            <span class="text-[12px] px-2 py-0.5 rounded-full font-semibold" :class="diferenciaTagClass">
+            <span class="text-[22px] font-bold" :class="diferenciaColor">{{
+              fmt(datos.diferencia)
+            }}</span>
+            <span
+              class="text-[12px] px-2 py-0.5 rounded-full font-semibold"
+              :class="diferenciaTagClass"
+            >
               {{ datos.tipo_diferencia }}
             </span>
           </div>
-          <span class="text-[12px] text-[#6b7280]">Efectivo Contado ({{ fmt(datos.monto_contado) }}) - Total Esperado</span>
+          <span class="text-[12px] text-[#6b7280]"
+            >Efectivo Contado ({{ fmt(datos.monto_contado) }}) - Total Esperado</span
+          >
         </div>
 
         <div v-if="hayDiferencia" class="flex flex-col gap-2">
@@ -126,8 +158,14 @@
             class="w-full !text-[13px] !border-[#d1d5db] !rounded-lg resize-none"
             :class="{ '!border-red-500': errorJustificacion }"
           />
-          <small v-if="errorJustificacion" class="text-red-500 text-[12px]">{{ errorJustificacion }}</small>
-          <small class="text-[12px] text-[#6b7280]">La justificación es obligatoria cuando hay diferencias ({{ justificacion.length }}/255)</small>
+          <small v-if="errorJustificacion" class="text-red-500 text-[12px]">{{
+            errorJustificacion
+          }}</small>
+          <small class="text-[12px] text-[#6b7280]"
+            >La justificación es obligatoria cuando hay diferencias ({{
+              justificacion.length
+            }}/255)</small
+          >
         </div>
       </div>
 
@@ -138,11 +176,13 @@
       >
         <i class="pi pi-exclamation-triangle text-red-600 text-[20px] mt-0.5"></i>
         <div class="flex flex-col gap-1">
-          <span class="text-[14px] font-semibold text-red-700">Día incompleto: no se puede retirar efectivo</span>
+          <span class="text-[14px] font-semibold text-red-700"
+            >Día incompleto: no se puede retirar efectivo</span
+          >
           <span class="text-[13px] text-red-700">
             El efectivo contado ({{ fmt(datos.monto_contado) }}) es menor al fondo fijo de
-            {{ fmt(datos.fondo_fijo) }}. El retiro queda bloqueado en $0.00 y todo el dinero
-            se queda en la gaveta como fondo del siguiente turno.
+            {{ fmt(datos.fondo_fijo) }}. El retiro queda bloqueado en $0.00 y todo el dinero se
+            queda en la gaveta como fondo del siguiente turno.
           </span>
         </div>
       </div>
@@ -151,26 +191,39 @@
       <div class="border border-[#e2e8dd] rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <i class="pi pi-wallet text-[#2b5e3b] text-[15px]"></i>
-          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider">Destino del Dinero</span>
+          <span class="text-[12px] font-semibold text-[#2b5e3b] uppercase tracking-wider"
+            >Destino del Dinero</span
+          >
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <div class="border border-[#e2e8dd] rounded-xl p-3" :class="{ 'bg-red-50 border-red-200': esEscenarioB }">
+          <div
+            class="border border-[#e2e8dd] rounded-xl p-3"
+            :class="{ 'bg-red-50 border-red-200': esEscenarioB }"
+          >
             <span class="text-[12px] text-[#6b7280]">Efectivo a Retirar</span>
-            <p class="text-[18px] font-bold mt-1" :class="esEscenarioB ? 'text-red-600' : 'text-[#1a2e1f]'">
+            <p
+              class="text-[18px] font-bold mt-1"
+              :class="esEscenarioB ? 'text-red-600' : 'text-[#1a2e1f]'"
+            >
               {{ fmt(datos.retiro_efectivo) }}
             </p>
             <span class="text-[11px] text-[#6b7280]">
-              {{ esEscenarioB ? 'Bloqueado: el fondo no alcanza la base' : 'Monto a depositar o guardar en caja fuerte' }}
+              {{
+                esEscenarioB
+                  ? 'Bloqueado: el fondo no alcanza la base'
+                  : 'Monto a depositar o guardar en caja fuerte'
+              }}
             </span>
           </div>
           <div class="border border-[#e2e8dd] rounded-xl p-3">
             <span class="text-[12px] text-[#6b7280]">Fondo para el Siguiente Turno</span>
-            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">{{ fmt(datos.fondo_siguiente_turno) }}</p>
+            <p class="text-[18px] font-bold text-[#1a2e1f] mt-1">
+              {{ fmt(datos.fondo_siguiente_turno) }}
+            </p>
             <span class="text-[11px] text-[#6b7280]">Monto que queda en la gaveta como base</span>
           </div>
         </div>
       </div>
-
     </div>
 
     <template #footer>
@@ -200,11 +253,11 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import { useCajaStore } from '@/stores/cajaStore'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -220,9 +273,11 @@ const justificacion = ref('')
 const errorJustificacion = ref('')
 const cargando = ref(false)
 
-watch(() => props.visible, (val) => (localVisible.value = val))
+watch(
+  () => props.visible,
+  (val) => (localVisible.value = val),
+)
 watch(localVisible, (val) => emit('update:visible', val))
-
 
 watch(
   () => props.visible,
@@ -240,7 +295,6 @@ const fmt = (val) =>
     currency: 'USD',
     minimumFractionDigits: 2,
   }).format(parseFloat(val) || 0)
-
 
 const ventasDigitales = computed(() => {
   const tarjeta = Math.round((parseFloat(props.datos.total_ventas_tarjeta) || 0) * 100)
@@ -284,7 +338,7 @@ const onConfirmar = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Justificación requerida',
-      mensajeHtml: 'Existe un descuadre en caja. Ingresa una justificación para continuar.'
+      mensajeHtml: 'Existe un descuadre en caja. Ingresa una justificación para continuar.',
     })
     return
   }
@@ -298,7 +352,7 @@ const onConfirmar = async () => {
         token_autorizacion: props.datos.token_autorizacion,
         justificacion: justificacion.value.trim() || null,
       }),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (resultado.ok) {
@@ -314,13 +368,13 @@ const onConfirmar = async () => {
           <p style="margin:6px 0;"><strong>Queda en la gaveta (siguiente turno):</strong> ${fondo}</p>
         </div>`,
         {
-          timer: undefined,          
-          showConfirmButton: true,   
+          timer: undefined,
+          showConfirmButton: true,
           confirmButtonText: 'Entendido, finalizar turno',
           confirmButtonColor: '#2b5e3b',
-          allowOutsideClick: false,  
-          allowEscapeKey: false      
-        }
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        },
       )
 
       emit('cierre-exitoso')
@@ -330,7 +384,9 @@ const onConfirmar = async () => {
       await mostrarAlertaConfirmar({
         tipo: 'advertencia',
         titulo: 'Repite el cuadre',
-        mensajeHtml: resultado.error || 'Se detectaron movimientos nuevos en el turno. Es necesario reajustar el conteo.'
+        mensajeHtml:
+          resultado.error ||
+          'Se detectaron movimientos nuevos en el turno. Es necesario reajustar el conteo.',
       })
       localVisible.value = false
       emit('cancelar')
@@ -338,7 +394,6 @@ const onConfirmar = async () => {
     }
 
     mostrarError('Error al cerrar caja', resultado.error || 'No se pudo cerrar la caja.')
-
   } catch (err) {
     mostrarError('Error de conexión', 'Ocurrió un fallo en la red al procesar el cierre.')
   }

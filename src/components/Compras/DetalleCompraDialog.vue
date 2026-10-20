@@ -9,9 +9,7 @@
     class="custom-dialog"
     :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
   >
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL (< 640px)                                   -->
-    <!-- ======================================================= -->
+    <!--vista movil-->
     <div v-if="compra" class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
 
       <!-- Subcabecera con Nº Documento -->
@@ -196,9 +194,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO (>= 640px)                             -->
-    <!-- ======================================================= -->
+    <!--vista de escritorio-->
     <div v-if="compra" class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
 
       <!-- Subcabecera Nº Documento -->

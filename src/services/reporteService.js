@@ -1,22 +1,15 @@
-import  api  from './axios'
+import api from './axios'
 
 function construirUrlReporte(path, params = {}) {
   const query = new URLSearchParams(
     Object.entries(params).filter(
-      ([, value]) => value !== null && value !== undefined && value !== ''
-    )
+      ([, value]) => value !== null && value !== undefined && value !== '',
+    ),
   ).toString()
 
   return `${path}${query ? `?${query}` : ''}`
 }
 
-/**
- * Pide el PDF al backend usando axios (así sí viaja el header Authorization),
- * lo recibe como blob binario y lo abre en una pestaña nueva mediante un
- * Object URL. window.open(url) directo NO sirve para endpoints protegidos
- * por JWT porque una navegación de navegador no puede llevar headers
- * personalizados.
- */
 async function abrirReporte(path, params = {}) {
   const url = construirUrlReporte(path, params)
 
@@ -31,9 +24,6 @@ async function abrirReporte(path, params = {}) {
 
     setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60_000)
   } catch (error) {
-    // Si el backend devuelve un error (401, 404, 500...), con responseType
-    // 'blob' axios también entrega ese error como Blob. Lo convertimos a
-    // texto/JSON para poder mostrar el mensaje real en vez de un blob roto.
     if (error.response?.data instanceof Blob) {
       const texto = await error.response.data.text()
       let mensaje = texto
@@ -93,7 +83,12 @@ export function generarReporteVentasPorCategoria({ fechaInicio, fechaFin, catego
 }
 
 //funcion para obtener las ventas comparativas
-export function generarReporteComparativoVentas({ fechaInicio1, fechaFin1, fechaInicio2, fechaFin2 }) {
+export function generarReporteComparativoVentas({
+  fechaInicio1,
+  fechaFin1,
+  fechaInicio2,
+  fechaFin2,
+}) {
   return abrirReporte('/reportes/ventas/resumen/comparativa', {
     fecha_inicio_1: fechaInicio1,
     fecha_fin_1: fechaFin1,

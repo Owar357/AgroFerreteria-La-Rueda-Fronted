@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('auth', {
     user: null,
   }),
 
-
   persist: true,
 
   getters: {
@@ -33,7 +32,6 @@ export const useAuthStore = defineStore('auth', {
         this.token = data.access_token
         this.user = data.user
 
-    
         if (this.isAdmin || this.isContador || this.isCajero) {
           router.push('/admin/dashboard')
         } else {

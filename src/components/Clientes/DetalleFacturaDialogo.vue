@@ -13,19 +13,24 @@
       <!-- ======================================================= -->
       <!-- VISTA MÓVIL (< 640px)                                   -->
       <!-- ======================================================= -->
-      <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif] max-h-[85vh] overflow-y-auto">
-        
+      <div
+        class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif] max-h-[85vh] overflow-y-auto"
+      >
         <!-- Subcabecera con Nº Factura -->
         <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
           <span class="text-xs font-bold uppercase text-[#2b5e3b]">N° Factura</span>
-          <span class="text-xs font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-2.5 py-1 rounded-md border border-[#dce4d7]">
+          <span
+            class="text-xs font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-2.5 py-1 rounded-md border border-[#dce4d7]"
+          >
             {{ compra.factura || '—' }}
           </span>
         </div>
 
         <!-- Tabla Desplegable / Con Scroll Móvil -->
         <div class="space-y-2">
-          <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center gap-3.5">
+          <p
+            class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center gap-3.5"
+          >
             <i class="pi pi-box text-[#2b5e3b]" /> Productos Registrados
           </p>
 
@@ -54,9 +59,7 @@
                     <span class="font-bold text-[#1a2e1f] capitalize">
                       {{ data.nombre }}
                     </span>
-                    <span class="text-[10px] text-gray-500">
-                      Cant: {{ data.cantidad }}
-                    </span>
+                    <span class="text-[10px] text-gray-500"> Cant: {{ data.cantidad }} </span>
                   </div>
                 </template>
               </Column>
@@ -104,13 +107,17 @@
             <span>Exento:</span>
             <span class="font-mono">$0.00</span>
           </div>
-          <div class="flex justify-between items-center text-gray-600 pb-2 border-b border-[#e2e8dd]">
+          <div
+            class="flex justify-between items-center text-gray-600 pb-2 border-b border-[#e2e8dd]"
+          >
             <span>IVA (13%):</span>
             <span class="font-mono">$0.00</span>
           </div>
           <div class="flex justify-between items-center pt-1">
             <span class="font-bold text-[#1e3a2f] uppercase">Total Factura:</span>
-            <span class="text-lg font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra?.total) }}</span>
+            <span class="text-lg font-black text-[#2b5e3b] font-mono"
+              >${{ formatCurrency(compra?.total) }}</span
+            >
           </div>
         </div>
 
@@ -130,22 +137,29 @@
       <!-- ======================================================= -->
       <!-- VISTA ESCRITORIO (>= 640px)                             -->
       <!-- ======================================================= -->
-      <div class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]">
-        
+      <div
+        class="hidden sm:flex bg-white p-6 text-[#1a2e1f] flex-col gap-5 font-['Inter',sans-serif]"
+      >
         <!-- Subcabecera Nº Factura -->
         <div class="flex items-center justify-between pb-2 border-b border-[#e2e8dd]">
           <div class="flex items-center gap-2">
             <i class="pi pi-receipt text-[#2b5e3b] text-base" />
-            <span class="text-xs font-bold uppercase tracking-wider text-[#2b5e3b]">Factura N°</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#2b5e3b]"
+              >Factura N°</span
+            >
           </div>
-          <span class="text-sm font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-3 py-1 rounded-lg border border-[#dce4d7]">
+          <span
+            class="text-sm font-mono font-bold text-[#1a2e1f] bg-[#f4f7f2] px-3 py-1 rounded-lg border border-[#dce4d7]"
+          >
             {{ compra.factura || '—' }}
           </span>
         </div>
 
         <!-- Tabla Completa con Scrollable (Escritorio) -->
         <div class="space-y-2">
-          <p class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center pb-3 gap-1.5">
+          <p
+            class="text-xs uppercase tracking-wider text-[#1a2e1f] font-bold m-0 flex items-center pb-3 gap-1.5"
+          >
             <i class="pi pi-box text-[#2b5e3b]" /> Productos Registrados
           </p>
 
@@ -200,17 +214,27 @@
               <!-- Desplegable con Detalle Secundario -->
               <template #expansion="{ data }">
                 <div class="p-3 bg-[#f8faf7] border-y border-[#e2e8dd] text-xs">
-                  <div class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] grid grid-cols-3 gap-4">
+                  <div
+                    class="bg-white p-3.5 rounded-xl border border-[#e2e8dd] grid grid-cols-3 gap-4"
+                  >
                     <div>
-                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Cantidad Comprada</span>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5"
+                        >Cantidad Comprada</span
+                      >
                       <span class="font-mono text-gray-700">{{ data.cantidad }}</span>
                     </div>
                     <div>
-                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Precio Unitario</span>
-                      <span class="font-mono text-gray-700">${{ formatCurrency(data.precio) }}</span>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5"
+                        >Precio Unitario</span
+                      >
+                      <span class="font-mono text-gray-700"
+                        >${{ formatCurrency(data.precio) }}</span
+                      >
                     </div>
                     <div>
-                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5">Subtotal de Línea</span>
+                      <span class="text-[10px] font-bold uppercase text-[#2b5e3b] block mb-0.5"
+                        >Subtotal de Línea</span
+                      >
                       <span class="font-mono font-bold text-[#2b5e3b]">
                         ${{ formatCurrency(data.cantidad * data.precio) }}
                       </span>
@@ -225,7 +249,9 @@
         <!-- Resumen y Cierre Escritorio -->
         <div class="flex justify-between items-end mt-1 pt-4 border-t border-[#e2e8dd] w-full">
           <!-- Desglose de Totales -->
-          <div class="flex flex-col gap-1.5 min-w-[220px] text-xs bg-[#fbfdf9] p-3 rounded-xl border border-[#e2e8dd]">
+          <div
+            class="flex flex-col gap-1.5 min-w-[220px] text-xs bg-[#fbfdf9] p-3 rounded-xl border border-[#e2e8dd]"
+          >
             <div class="flex justify-between text-gray-600">
               <span>Gravado:</span>
               <span class="font-mono">$0.00</span>
@@ -240,7 +266,9 @@
             </div>
             <div class="flex justify-between items-center pt-0.5">
               <span class="font-bold text-[#1e3a2f]">TOTAL:</span>
-              <span class="text-xl font-black text-[#2b5e3b] font-mono">${{ formatCurrency(compra?.total) }}</span>
+              <span class="text-xl font-black text-[#2b5e3b] font-mono"
+                >${{ formatCurrency(compra?.total) }}</span
+              >
             </div>
           </div>
 
@@ -265,21 +293,25 @@ import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { getDetallesVenta } from '@/services/ventaService'
-import { 
-  mostrarError, 
-  mostrarAccesoDenegado 
-} from '@/utils/SweetAlertService'
+import { mostrarError, mostrarAccesoDenegado } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: Boolean,
-  compra: Object
+  compra: Object,
 })
 
 const emit = defineEmits(['update:visible'])
 
 const visibleModel = ref(props.visible)
-watch(() => props.visible, (val) => { visibleModel.value = val })
-watch(visibleModel, (val) => { emit('update:visible', val) })
+watch(
+  () => props.visible,
+  (val) => {
+    visibleModel.value = val
+  },
+)
+watch(visibleModel, (val) => {
+  emit('update:visible', val)
+})
 
 const productos = ref([])
 const cargando = ref(false)
@@ -290,30 +322,33 @@ const formatCurrency = (v) => {
   return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-watch(() => props.visible, async (val) => {
-  if (val && props.compra?.id) {
-    cargando.value = true
-    try {
-      const { data } = await getDetallesVenta(props.compra.id)
-      const lista = data.data || data
-      productos.value = lista.map(d => ({
-        nombre: d.nombre_producto,
-        cantidad: parseFloat(d.cantidad),
-        precio: parseFloat(d.precio_unitario)
-      }))
-    } catch (error) {
-      const status = error.response?.status
-      productos.value = []
-      if (status === 403) {
-        mostrarAccesoDenegado()
-      } else {
-        mostrarError('Error de carga', 'No se pudieron consultar los productos de la factura.')
+watch(
+  () => props.visible,
+  async (val) => {
+    if (val && props.compra?.id) {
+      cargando.value = true
+      try {
+        const { data } = await getDetallesVenta(props.compra.id)
+        const lista = data.data || data
+        productos.value = lista.map((d) => ({
+          nombre: d.nombre_producto,
+          cantidad: parseFloat(d.cantidad),
+          precio: parseFloat(d.precio_unitario),
+        }))
+      } catch (error) {
+        const status = error.response?.status
+        productos.value = []
+        if (status === 403) {
+          mostrarAccesoDenegado()
+        } else {
+          mostrarError('Error de carga', 'No se pudieron consultar los productos de la factura.')
+        }
+      } finally {
+        cargando.value = false
       }
-    } finally {
-      cargando.value = false
     }
-  }
-})
+  },
+)
 </script>
 
 <style>

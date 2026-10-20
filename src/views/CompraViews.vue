@@ -13,10 +13,7 @@
       @anular-compra="anularCompra"
     />
 
-    <AddCompra
-      v-if="showForm"
-      @close="cerrarFormulario"
-    />
+    <AddCompra v-if="showForm" @close="cerrarFormulario" />
 
     <!-- Diálogo de detalle de compra -->
     <DetalleCompraDialogo
@@ -32,12 +29,16 @@ import { ref, onMounted } from 'vue'
 import ComprasTable from '../components/Compras/ComprasTable.vue'
 import AddCompra from '../components/Compras/AddCompra.vue'
 import DetalleCompraDialogo from '../components/Compras/DetalleCompraDialog.vue'
-import { compras as comprasService, VerDetallesCompra, anularCompra as anularCompraService } from '@/services/compraService.js'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado, 
-  mostrarCargando 
+import {
+  compras as comprasService,
+  VerDetallesCompra,
+  anularCompra as anularCompraService,
+} from '@/services/compraService.js'
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const showForm = ref(false)
@@ -61,34 +62,33 @@ const filtrosActivos = ref({
   fecha_hasta: null,
 })
 
-
-let ultimaPeticion = 0 
+let ultimaPeticion = 0
 
 const cargarCompras = async (pagina = 1) => {
-    const idPeticion = ++ultimaPeticion
-    loading.value = true
-    try {
-        const { data } = await comprasService({ page: pagina, ...filtrosActivos.value })
-        if (idPeticion !== ultimaPeticion) return  
+  const idPeticion = ++ultimaPeticion
+  loading.value = true
+  try {
+    const { data } = await comprasService({ page: pagina, ...filtrosActivos.value })
+    if (idPeticion !== ultimaPeticion) return
 
-        compras.value = data.compras
-        paginacion.value = {
-          currentPage: data.current_page,
-          lastPage: data.last_page,
-          perPage: data.per_page,
-          total: data.total,
-      }
-      rangoAplicado.value = { desde: data.fecha_desde, hasta: data.fecha_hasta }
-    } catch (error) {
-        if (idPeticion !== ultimaPeticion) return
-        if (error.response?.status === 403) {
-          mostrarAccesoDenegado()
-        } else {
-          mostrarError('Error de carga', 'No se pudieron obtener las compras.')
-        }
-    } finally {
-      if (idPeticion === ultimaPeticion) loading.value = false
+    compras.value = data.compras
+    paginacion.value = {
+      currentPage: data.current_page,
+      lastPage: data.last_page,
+      perPage: data.per_page,
+      total: data.total,
     }
+    rangoAplicado.value = { desde: data.fecha_desde, hasta: data.fecha_hasta }
+  } catch (error) {
+    if (idPeticion !== ultimaPeticion) return
+    if (error.response?.status === 403) {
+      mostrarAccesoDenegado()
+    } else {
+      mostrarError('Error de carga', 'No se pudieron obtener las compras.')
+    }
+  } finally {
+    if (idPeticion === ultimaPeticion) loading.value = false
+  }
 }
 
 const aplicarFiltros = (filtros) => {
@@ -104,7 +104,7 @@ const cerrarFormulario = () => {
 const verDetalleCompra = async (compraRow) => {
   try {
     const response = await VerDetallesCompra(compraRow.id)
-    selectedCompra.value = response.data.data 
+    selectedCompra.value = response.data.data
     mostrarDetalleDialog.value = true
   } catch (error) {
     if (error.response?.status === 403) {
@@ -124,13 +124,13 @@ const onCompraActualizada = async () => {
 
 const anularCompra = async (compraId) => {
   const compra = compras.value.find((c) => c.id === compraId)
-  
+
   mostrarCargando('Anulando compra...', 'Procesando la anulación del documento')
 
   try {
     const [resultado] = await Promise.all([
       anularCompraService(compraId),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
     if (compra) {
@@ -139,9 +139,9 @@ const anularCompra = async (compraId) => {
 
     mostrarExito(
       'Anulación exitosa',
-      `La compra con número de documento <strong>${compra?.numDocumento ?? ''}</strong> fue anulada.`
+      `La compra con número de documento <strong>${compra?.numDocumento ?? ''}</strong> fue anulada.`,
     )
-    
+
     await cargarCompras(paginacion.value.currentPage)
   } catch (error) {
     if (error.response?.status === 403) {

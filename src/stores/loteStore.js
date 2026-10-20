@@ -34,7 +34,7 @@ export const useLoteStore = defineStore('lote', () => {
       return {
         ok: false,
         status,
-        error: msg
+        error: msg,
       }
     } finally {
       cargando.value = false
@@ -58,7 +58,7 @@ export const useLoteStore = defineStore('lote', () => {
       return {
         ok: false,
         status,
-        error: responseData?.message || 'Error al actualizar el descuento del lote.'
+        error: responseData?.message || 'Error al actualizar el descuento del lote.',
       }
     }
   }
@@ -71,6 +71,6 @@ export const useLoteStore = defineStore('lote', () => {
     currentPage,
     perPage,
     fetchLotesByPresentacion,
-    actualizarDescuento
+    actualizarDescuento,
   }
 })

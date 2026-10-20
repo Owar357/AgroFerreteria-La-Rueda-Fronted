@@ -1,8 +1,6 @@
-import  api  from './axios'
+import api from './axios'
 
-// ==========================================
-// PRODUCTOS
-// ==========================================
+
 
 // Mandamos a traer los productos con paginación
 export const getProductos = (page = 1, perPage = 8, q = '', categoria = '') => {
@@ -23,9 +21,6 @@ export const updateProducto = (id, data) => api.put(`/productos/${id}`, data)
 // Traer presentaciones e información detallada de un producto
 export const getPresentacionesByProducto = (id) => api.get(`/productos/${id}`)
 
-// ==========================================
-// PRESENTACIONES
-// ==========================================
 
 // Añadir una nueva presentación
 export const añadirPresentacion = (data) => api.post('/presentaciones', data)
@@ -36,9 +31,7 @@ export const updatePresentacion = (id, data) => api.put(`/presentaciones/${id}`,
 // Activar / Desactivar presentación
 export const togglePresentacion = (id) => api.delete(`/presentaciones/${id}`)
 
-// ==========================================
-// CÓDIGOS DE BARRA
-// ==========================================
+
 
 // Obtener códigos de barra por presentación
 export const getCodigosByPresentacion = (presentacionId) =>
@@ -50,9 +43,6 @@ export const createCodigoBarra = (data) => api.post('/codigosBarra', data)
 // Eliminar código de barra
 export const deleteCodigoBarra = (id) => api.delete(`/codigosBarra/${id}`)
 
-// ==========================================
-// LOTES
-// ==========================================
 
 // Traer lotes de una presentación (paginado)
 export const getLotesByPresentacion = (presentacionId, page = 1, perPage = 5) =>
@@ -63,9 +53,6 @@ export const updateDescuentoLote = (loteId, porcentajeDescuento) =>
   api.patch(`/lotes/${loteId}/descuento`, { porcentaje_descuento: porcentajeDescuento })
 
 
-// ==========================================
-// TABLAS DE APOYO / SELECTS
-// ==========================================
 
 // Para la obtención de la información de categorías
 export const getAllCategorias = () => api.get('/categorias', { params: { per_page: 999 } })

@@ -92,7 +92,7 @@ const cerrarFormulario = () => {
   transitionName.value = 'slide-backward'
   vistaActual.value = 'lista'
   productoSeleccionado.value = null
-  store.cargarProductos(1, store.perPage) 
+  store.cargarProductos(1, store.perPage)
 }
 
 const cerrarDetalle = () => {

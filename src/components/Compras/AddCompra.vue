@@ -36,9 +36,7 @@
           </StepList>
 
           <StepPanels>
-            <!-- ======================================================= -->
-            <!-- PASO 1: DOCUMENTO                                       -->
-            <!-- ======================================================= -->
+            
             <StepPanel value="1" v-slot="{ activateCallback }">
               <div class="flex flex-col gap-4 pt-4 sm:pt-6">
 

@@ -119,4 +119,4 @@ export const useUserStore = defineStore('userStore', () => {
     updateUser,
     desactivarUsuario,
   }
-})  
+})

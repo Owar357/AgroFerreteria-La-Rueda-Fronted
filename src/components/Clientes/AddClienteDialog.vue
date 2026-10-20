@@ -777,7 +777,6 @@ const validarTodo = () => {
   return camposActivos.value.every((campo) => !errors[campo])
 }
 
-
 // Nombres de campo del backend -> nombres de campo de este formulario
 const mapaErroresBackend = {
   complemento: 'direccion_complemento',

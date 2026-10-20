@@ -10,14 +10,12 @@
       root: { class: 'bg-white rounded-2xl shadow-xl overflow-hidden border border-[#eef2e9]' },
       header: { class: 'bg-white border-b border-[#eef2e9] p-6 flex justify-between items-center' },
       content: { class: 'p-6 bg-white max-h-[65vh] overflow-y-auto' },
-      footer: { class: 'bg-white border-t border-[#eef2e9] p-6 flex justify-between items-center' }
+      footer: { class: 'bg-white border-t border-[#eef2e9] p-6 flex justify-between items-center' },
     }"
   >
     <template #header>
       <div class="flex items-center justify-between w-full pr-4">
-        <h2 class="text-[26px] font-semibold text-[#1a2e1f]">
-          Apertura de venta
-        </h2>
+        <h2 class="text-[26px] font-semibold text-[#1a2e1f]">Apertura de venta</h2>
 
         <div class="flex items-center gap-2">
           <span class="text-[14px] text-[#4b5563]">Estado:</span>
@@ -32,11 +30,14 @@
     </template>
 
     <!-- Referencia del fondo fijo -->
-    <div class="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-[#f2f5ef] border border-[#e2e8dd]">
+    <div
+      class="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-[#f2f5ef] border border-[#e2e8dd]"
+    >
       <i class="pi pi-info-circle text-[#2b5e3b]"></i>
       <span class="text-[13px] text-[#1e3a2f]">
         Cuenta el dinero heredado del turno anterior. El fondo fijo de operación es
-        <strong>{{ formatCurrency(fondoFijoNumero) }}</strong>.
+        <strong>{{ formatCurrency(fondoFijoNumero) }}</strong
+        >.
       </span>
     </div>
 
@@ -45,7 +46,9 @@
         <thead>
           <tr class="border-b border-[#eef2e9] bg-[#eef2e9]/50">
             <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f]">Monedas / Billetes</th>
-            <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-center w-36">Cantidad</th>
+            <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-center w-36">
+              Cantidad
+            </th>
             <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-right">Dinero</th>
           </tr>
         </thead>
@@ -146,10 +149,7 @@ import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
-import { 
-  mostrarAlertaConfirmar,
-  mostrarCargando
-} from '@/utils/SweetAlertService'
+import { mostrarAlertaConfirmar, mostrarCargando } from '@/utils/SweetAlertService'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -159,7 +159,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:visible', 'open-cash-register'])
-
 
 const crearDenominaciones = () => [
   { id: 'c1', label: '$0.01 (centavo)', value: 0.01, cents: 1, qty: 0 },
@@ -202,7 +201,6 @@ const totalCash = computed(() => totalCents.value / 100)
 const fondoFijoNumero = computed(() => parseFloat(props.fondoFijo) || 0)
 const fondoFijoCents = computed(() => Math.round(fondoFijoNumero.value * 100))
 
-
 const requiereJustificacion = computed(
   () => totalCents.value > 0 && totalCents.value !== fondoFijoCents.value,
 )
@@ -236,7 +234,7 @@ const handleOpenCash = () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Arqueo en cero',
-      mensajeHtml: 'Ingresa el conteo físico de monedas y billetes para aperturar la caja.'
+      mensajeHtml: 'Ingresa el conteo físico de monedas y billetes para aperturar la caja.',
     })
     return
   }
@@ -245,7 +243,10 @@ const handleOpenCash = () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Justificación obligatoria',
-      mensajeHtml: 'El conteo no coincide con el fondo fijo ($' + fondoFijoNumero.value.toFixed(2) + '). Debes agregar una justificación.'
+      mensajeHtml:
+        'El conteo no coincide con el fondo fijo ($' +
+        fondoFijoNumero.value.toFixed(2) +
+        '). Debes agregar una justificación.',
     })
     return
   }
@@ -271,7 +272,6 @@ defineExpose({ reset })
 </script>
 
 <style>
-
 .swal2-container {
   z-index: 999999 !important;
 }

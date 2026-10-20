@@ -1,8 +1,6 @@
 <template>
   <div class="bg-[#eef2e9] min-h-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif]">
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL ENCABEZADO (Solo Teléfono / Tablet)        -->
-    <!-- ======================================================= -->
+    <!--VISTA DE MOVIL-->
     <div class="block lg:hidden mb-4">
       <div class="flex flex-col gap-3">
         <!-- Encabezado Móvil -->
@@ -54,9 +52,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-    <!-- ======================================================= -->
+    <!--VISTA DE PC-->
     <div class="hidden lg:flex items-center justify-between gap-4 mb-6">
       <!-- Título con Icono PC -->
       <div class="flex items-center gap-3">
@@ -110,9 +106,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL / TABLET (< 1024px)                        -->
-    <!-- ======================================================= -->
+    <!--VISTA DE PC Y PARA LA TABLET-->
     <div class="block lg:hidden space-y-4">
       <!-- ADMINISTRADOR MÓVIL: Tarjetas de Monto en Pareja (2x2 Inline) -->
       <div v-if="esAdministrador" class="grid grid-cols-2 gap-3">
@@ -378,9 +372,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO / PC (>= 1024px)                      -->
-    <!-- ======================================================= -->
+    <!--VISTA DE PC-->
     <div class="hidden lg:block space-y-6">
       <!-- ADMINISTRADOR PC: 4 Tarjetas en 1 Fila -->
       <div v-if="esAdministrador" class="grid grid-cols-4 gap-4 w-full">
@@ -516,9 +508,9 @@
       </div>
 
       <!-- CAJERO / ADMIN PC: Acciones y Tabla de Movimientos -->
-      <div :class="esCajero ? 'grid grid-cols-3 gap-6' : 'w-full'">
+      <div :class="esCajero ? 'flex gap-6 items-start' : 'w-full'">
         <!-- Columna Acciones Cajero -->
-        <div v-if="esCajero" class="col-span-1 space-y-6">
+        <div v-if="esCajero" class="w-72 shrink-0 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-[#e2e8dd] shadow-2xs">
             <p
               class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2"
@@ -577,10 +569,10 @@
         </div>
 
         <!-- Tabla Movimientos PC -->
-        <div :class="esCajero ? 'col-span-2' : 'w-full'">
-          <div class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden">
-            <div class="bg-[#fbfdf9] px-6 py-4 border-b border-[#e2e8dd]">
-              <h3 class="font-bold text-[#1a2e1f] text-base flex items-center gap-2 m-0">
+        <div class="flex-1 min-w-0">
+          <div class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden" style="min-height: 30rem">
+            <div class="bg-[#fbfdf9] px-6 py-5 border-b border-[#e2e8dd]">
+              <h3 class="font-bold text-[#1a2e1f] text-lg flex items-center gap-2 m-0">
                 <i class="pi pi-history text-[#a17923]"></i> Movimientos del Turno
               </h3>
             </div>
@@ -591,9 +583,9 @@
               class="p-datatable-custom text-sm w-full"
             >
               <template #empty>
-                <div class="flex flex-col items-center justify-center py-10 text-gray-400">
-                  <i class="pi pi-inbox text-4xl mb-2 opacity-40" />
-                  <span class="text-sm font-medium">
+                <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+                  <i class="pi pi-inbox text-5xl mb-2 opacity-40" />
+                  <span class="text-base font-medium">
                     {{
                       turnoAbierto ? 'No hay movimientos en este turno' : 'No hay un turno abierto'
                     }}
@@ -603,7 +595,7 @@
 
               <Column field="hora" header="Hora" class="min-w-[7rem]">
                 <template #body="slotProps">
-                  <span class="font-mono text-xs text-gray-600 font-semibold">{{
+                  <span class="font-mono text-sm text-gray-600 font-semibold">{{
                     slotProps.data.hora
                   }}</span>
                 </template>
@@ -612,7 +604,7 @@
               <Column field="concepto" header="Concepto" class="min-w-[14rem]">
                 <template #body="slotProps">
                   <span
-                    class="text-xs text-[#1a2e1f] font-medium"
+                    class="text-base text-[#1a2e1f] font-medium"
                     :class="{ 'line-through opacity-60': slotProps.data.esAnulado }"
                   >
                     {{ slotProps.data.concepto }}
@@ -623,7 +615,7 @@
               <Column field="monto" header="Monto" class="min-w-[9rem]">
                 <template #body="slotProps">
                   <span
-                    class="font-mono text-xs font-bold"
+                    class="font-mono text-base font-bold"
                     :class="[
                       slotProps.data.tipo === 'Ingreso' ? 'text-[#2b5e3b]' : 'text-red-600',
                       { 'line-through opacity-60': slotProps.data.esAnulado },
@@ -641,14 +633,14 @@
                       :value="slotProps.data.tipo"
                       :severity="slotProps.data.tipo === 'Ingreso' ? 'success' : 'danger'"
                       rounded
-                      class="!text-xs !px-2.5"
+                      class="!text-sm !px-3 !py-1"
                     />
                     <Tag
                       v-if="slotProps.data.esAnulado"
                       value="Anulado"
                       severity="secondary"
                       rounded
-                      class="!text-xs !px-2.5"
+                      class="!text-sm !px-3 !py-1"
                     />
                   </div>
                 </template>
@@ -952,15 +944,15 @@ const onCierreExitoso = async () => {
   background-color: #fbfdf9 !important;
   color: #2b5e3b !important;
   font-weight: 600 !important;
-  font-size: 0.8rem !important;
-  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  padding: 1rem 1.25rem !important;
   border-bottom: 1px solid #e2e8dd !important;
   white-space: nowrap !important;
 }
 
 .p-datatable-custom .p-datatable-tbody > tr > td {
-  padding: 0.75rem 1rem !important;
-  font-size: 0.85rem !important;
+  padding: 1rem 1.25rem !important;
+  font-size: 1rem !important;
   border-bottom: 1px solid #f1f5f0 !important;
 }
 

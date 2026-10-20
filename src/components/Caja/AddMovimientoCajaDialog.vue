@@ -10,11 +10,8 @@
     :pt="{ root: { class: '!rounded-2xl overflow-hidden shadow-2xl' } }"
     @hide="cerrarDialog"
   >
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL (< 640px)                                   -->
-    <!-- ======================================================= -->
+    <!--VISTA DE MOVIL-->
     <div class="block sm:hidden bg-white p-4 text-[#1a2e1f] space-y-4 font-['Inter',sans-serif]">
-      
       <!-- Selector Entrada/Salida -->
       <div class="flex w-full rounded-xl overflow-hidden border border-[#dee6d6]">
         <button
@@ -53,7 +50,8 @@
       >
         <i class="pi pi-info-circle text-[#2b5e3b] text-xs"></i>
         <span class="text-[11px] text-[#1e3a2f]">
-          Disponible para retiro: <strong>${{ formatearMoneda(saldoRetirable) }}</strong> (Fondo fijo protegido:${{ formatearMoneda(fondoFijo) }}).
+          Disponible para retiro: <strong>${{ formatearMoneda(saldoRetirable) }}</strong> (Fondo
+          fijo protegido:${{ formatearMoneda(fondoFijo) }}).
         </span>
       </div>
 
@@ -86,7 +84,9 @@
         />
         <div class="flex justify-between items-center text-[10px] text-[#6d8f60]">
           <span>Describa el motivo</span>
-          <span :class="concepto.length >= 180 ? 'text-red-500 font-bold' : ''">{{ concepto.length }}/200</span>
+          <span :class="concepto.length >= 180 ? 'text-red-500 font-bold' : ''"
+            >{{ concepto.length }}/200</span
+          >
         </div>
       </div>
 
@@ -98,7 +98,9 @@
         <i class="pi pi-ban text-red-600 text-base mt-0.5"></i>
         <div class="flex flex-col gap-0.5">
           <span class="text-xs font-bold text-red-700">Monto excede saldo disponible</span>
-          <span class="text-[11px] text-red-700">Dejaría la caja por debajo del fondo fijo de resguardo.</span>
+          <span class="text-[11px] text-red-700"
+            >Dejaría la caja por debajo del fondo fijo de resguardo.</span
+          >
         </div>
       </div>
 
@@ -122,18 +124,19 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO (>= 640px)                             -->
-    <!-- ======================================================= -->
-    <div class="hidden sm:flex bg-white p-5 text-[#1a2e1f] flex-col gap-4 font-['Inter',sans-serif]">
-      
+    <!--VISTA DE ESCRITORIO-->
+    <div
+      class="hidden sm:flex bg-white p-5 text-[#1a2e1f] flex-col gap-4 font-['Inter',sans-serif]"
+    >
       <!-- Selector Entrada/Salida -->
       <div class="flex w-full rounded-xl overflow-hidden border border-[#dee6d6]">
         <button
           @click="tipoMovimiento = 'ENTRADA'"
           :class="[
             'flex-1 py-2.5 text-sm font-semibold transition-all cursor-pointer',
-            tipoMovimiento === 'ENTRADA' ? 'bg-[#2b5e3b] text-white' : 'bg-white text-[#6d8f60] hover:bg-gray-50',
+            tipoMovimiento === 'ENTRADA'
+              ? 'bg-[#2b5e3b] text-white'
+              : 'bg-white text-[#6d8f60] hover:bg-gray-50',
           ]"
         >
           <i class="pi pi-arrow-up mr-1 text-xs"></i> ENTRADA
@@ -142,7 +145,9 @@
           @click="tipoMovimiento = 'SALIDA'"
           :class="[
             'flex-1 py-2.5 text-sm font-semibold transition-all cursor-pointer',
-            tipoMovimiento === 'SALIDA' ? 'bg-red-600 text-white' : 'bg-white text-[#6d8f60] hover:bg-gray-50',
+            tipoMovimiento === 'SALIDA'
+              ? 'bg-red-600 text-white'
+              : 'bg-white text-[#6d8f60] hover:bg-gray-50',
           ]"
         >
           <i class="pi pi-arrow-down mr-1 text-xs"></i> SALIDA
@@ -165,7 +170,10 @@
       >
         <i class="pi pi-info-circle text-[#2b5e3b] text-sm"></i>
         <span class="text-xs text-[#1e3a2f]">
-          Saldo disponible para retiro: <strong>${{ formatearMoneda(saldoRetirable) }}</strong> (fondo fijo protegido de${{ formatearMoneda(fondoFijo) }}).
+          Saldo disponible para retiro:
+          <strong>${{ formatearMoneda(saldoRetirable) }}</strong> (fondo fijo protegido de${{
+            formatearMoneda(fondoFijo)
+          }}).
         </span>
       </div>
 
@@ -202,7 +210,9 @@
         />
         <div class="flex justify-between items-center text-xs text-[#6d8f60]">
           <span>Describa el motivo del movimiento</span>
-          <span :class="concepto.length >= 180 ? 'text-red-500 font-semibold' : ''">{{ concepto.length }}/200</span>
+          <span :class="concepto.length >= 180 ? 'text-red-500 font-semibold' : ''"
+            >{{ concepto.length }}/200</span
+          >
         </div>
       </div>
 
@@ -213,8 +223,14 @@
       >
         <i class="pi pi-ban text-red-600 text-lg mt-0.5"></i>
         <div class="flex flex-col gap-1">
-          <span class="text-xs font-bold text-red-700">Monto excede el saldo disponible para retiro</span>
-          <span class="text-xs text-red-700">Dejaría la caja por debajo del fondo fijo protegido (${{ formatearMoneda(fondoFijo) }}).</span>
+          <span class="text-xs font-bold text-red-700"
+            >Monto excede el saldo disponible para retiro</span
+          >
+          <span class="text-xs text-red-700"
+            >Dejaría la caja por debajo del fondo fijo protegido (${{
+              formatearMoneda(fondoFijo)
+            }}).</span
+          >
         </div>
       </div>
 
@@ -243,12 +259,12 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { createMovimiento, getResumenTurno } from '@/services/movimientoCajaService'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado, 
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
+  mostrarCargando,
 } from '@/utils/SweetAlertService'
 
 const props = defineProps({
@@ -263,7 +279,7 @@ const monto = ref(null)
 const concepto = ref('')
 
 const esEntrada = computed(() => tipoMovimiento.value === 'ENTRADA')
-  
+
 const fondoFijo = ref(0)
 const efectivoDisponible = ref(0)
 const saldoRetirable = computed(() => Math.max(0, efectivoDisponible.value - fondoFijo.value))
@@ -278,7 +294,7 @@ watch(
     visibleLocal.value = val
     if (val) cargarResumenTurno()
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(visibleLocal, (val) => {
@@ -314,7 +330,7 @@ const registrarMovimiento = async () => {
       titulo: montoVacio ? 'Monto requerido' : 'Motivo requerido',
       mensajeHtml: montoVacio
         ? 'El monto es requerido para registrar el movimiento.'
-        : 'El motivo debe tener al menos 3 caracteres.'
+        : 'El motivo debe tener al menos 3 caracteres.',
     })
     return
   }
@@ -338,7 +354,7 @@ const registrarMovimiento = async () => {
 
     mostrarExito(
       tipoRegistrado === 'ENTRADA' ? '¡Ingreso registrado!' : '¡Salida registrada!',
-      `El movimiento por $${formatearMoneda(monto.value)} fue guardado correctamente.`
+      `El movimiento por $${formatearMoneda(monto.value)} fue guardado correctamente.`,
     )
   } catch (error) {
     const status = error.response?.status

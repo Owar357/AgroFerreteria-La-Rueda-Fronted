@@ -313,8 +313,7 @@ export const usePosStore = defineStore('pos', () => {
       const cambioVentaStr = parseFloat(respuestaBackend?.cambio ?? cambio.value).toFixed(2)
       const fueEfectivo = tipoPago.value === 'EFECTIVO'
 
-  
-     const result = await Swal.fire({
+      const result = await Swal.fire({
         title: '¡Venta realizada con éxito!',
         html: `
           <div style="text-align:left; font-size:14px; color:#374151">
