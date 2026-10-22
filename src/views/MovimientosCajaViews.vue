@@ -1,22 +1,24 @@
 <template>
-  <div class="p-3 sm:p-6 font-['Inter',sans-serif] bg-[#eef2e9] min-h-screen w-full overflow-x-hidden text-[#1a2e1f]">
-
+  <div
+    class="p-3 sm:p-6 font-['Inter',sans-serif] bg-[#eef2e9] min-h-screen w-full overflow-x-hidden text-[#1a2e1f]"
+  >
     <!-- ENCABEZADO CON ICONO Y ESTILO -->
     <div class="flex items-center gap-3 mb-3">
-      <div class="!w-10 !h-10 rounded-xl bg-[#2b5e3b] text-white flex items-center justify-center shadow-md">
+      <div
+        class="!w-10 !h-10 rounded-xl bg-[#2b5e3b] text-white flex items-center justify-center shadow-md"
+      >
         <i class="pi pi-arrow-right-arrow-left text-lg"></i>
       </div>
       <div>
         <h1 class="text-2xl font-bold text-[#1a2e1f] m-0">Movimientos de caja</h1>
-        <p class="text-xs sm:text-sm text-[#6d8f60] m-0">Historial de entradas y salidas de efectivo</p>
+        <p class="text-xs sm:text-sm text-[#6d8f60] m-0">
+          Historial de entradas y salidas de efectivo
+        </p>
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA MÓVIL / TABLET (< 1024px)                         -->
-    <!-- ======================================================= -->
+    <!--VISTA MOVIL-->>
     <div class="block lg:hidden space-y-4 w-full">
-
       <!-- Encabezado Móvil -->
       <div class="flex flex-col gap-3">
         <!-- Botón Agregar Móvil -->
@@ -117,11 +119,17 @@
       </div>
 
       <!-- Tarjetas de Lista Móvil -->
-      <div v-if="cargando" class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-[#e8efe1]">
+      <div
+        v-if="cargando"
+        class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-[#e8efe1]"
+      >
         <i class="pi pi-spin pi-spinner text-2xl"></i>
       </div>
 
-      <div v-else-if="movimientosFiltrados.length === 0" class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-[#e8efe1]">
+      <div
+        v-else-if="movimientosFiltrados.length === 0"
+        class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-[#e8efe1]"
+      >
         <i class="pi pi-inbox text-3xl mb-1 block"></i>
         <span class="text-xs">No hay movimientos registrados</span>
       </div>
@@ -138,13 +146,21 @@
               <span
                 :class="[
                   'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase',
-                  mov.tipo === 'ENTRADA' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
+                  mov.tipo === 'ENTRADA'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800',
                 ]"
               >
-                <i :class="mov.tipo === 'ENTRADA' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" class="text-[9px]"></i>
+                <i
+                  :class="mov.tipo === 'ENTRADA' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"
+                  class="text-[9px]"
+                ></i>
                 {{ mov.tipo }}
               </span>
-              <span v-if="mov.esAnulado" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-gray-200 text-gray-700">
+              <span
+                v-if="mov.esAnulado"
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-gray-200 text-gray-700"
+              >
                 ANULADO
               </span>
             </div>
@@ -161,20 +177,33 @@
           </div>
 
           <!-- Concepto en contenedor colapsable/desplegable Móvil -->
-          <details class="group border border-[#dee6d6] rounded-xl bg-[#f8faf7] p-2.5 text-xs transition-all">
-            <summary class="font-semibold text-[#1a2e1f] cursor-pointer flex justify-between items-center list-none">
+          <details
+            class="group border border-[#dee6d6] rounded-xl bg-[#f8faf7] p-2.5 text-xs transition-all"
+          >
+            <summary
+              class="font-semibold text-[#1a2e1f] cursor-pointer flex justify-between items-center list-none"
+            >
               <span class="flex items-center gap-1 text-[#2b5e3b]">
                 <i class="pi pi-align-left text-[11px]"></i> Ver concepto / descripción
               </span>
-              <i class="pi pi-chevron-down text-[10px] text-[#6d8f60] transition-transform group-open:rotate-180"></i>
+              <i
+                class="pi pi-chevron-down text-[10px] text-[#6d8f60] transition-transform group-open:rotate-180"
+              ></i>
             </summary>
-            <p class="mt-2 text-gray-600 leading-relaxed border-t border-[#e2e8dd] pt-2 m-0 whitespace-normal break-words" :class="{ 'line-through': mov.esAnulado }">
+            <p
+              class="mt-2 text-gray-600 leading-relaxed border-t border-[#e2e8dd] pt-2 m-0 whitespace-normal break-words"
+              :class="{ 'line-through': mov.esAnulado }"
+            >
               {{ mov.concepto }}
             </p>
           </details>
 
-          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-100">
-            <span class="truncate max-w-[150px]"><i class="pi pi-user text-[10px] mr-1"></i>{{ mov.usuario }}</span>
+          <div
+            class="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-100"
+          >
+            <span class="truncate max-w-[150px]"
+              ><i class="pi pi-user text-[10px] mr-1"></i>{{ mov.usuario }}</span
+            >
             <span>{{ mov.fecha }} {{ mov.hora }}</span>
           </div>
 
@@ -216,14 +245,10 @@
         class="border border-[#e8efe1] !bg-white !rounded-2xl"
         @page="onPagina"
       />
-
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO (>= 1024px) - PRIMEVUE 4 + TAILWIND    -->
-    <!-- ======================================================= -->
+    <!--VISTA DE ESCRITORIO-->
     <div class="hidden lg:block space-y-6 w-full">
-      
       <!-- Aviso PC -->
       <div
         v-if="cajaStore.estadoCargado && !cajaStore.puedeOperar"
@@ -235,11 +260,9 @@
 
       <!-- CONTENEDOR UNIFICADO (FILTROS + DATATABLE) ESTILO CATEGORIAS TABLE -->
       <div class="bg-white rounded-2xl shadow-xs border border-[#e8efe1] overflow-hidden w-full">
-        
         <!-- Apartado de Filtros Estático Superior PC -->
         <div class="p-5 border-b border-[#e2e8dd] bg-white">
           <div class="flex flex-col xl:flex-row items-center justify-between w-full gap-4">
-            
             <!-- Grupo de Búsqueda y Fechas -->
             <div class="flex items-center gap-3 flex-wrap w-full xl:w-auto">
               <!-- Búsqueda -->
@@ -253,7 +276,9 @@
               </IconField>
 
               <!-- Fechas -->
-              <div class="flex items-center gap-2 bg-white border border-[#cbd5e1] rounded-lg px-3 h-[2.625rem]">
+              <div
+                class="flex items-center gap-2 bg-white border border-[#cbd5e1] rounded-lg px-3 h-[2.625rem]"
+              >
                 <i class="pi pi-calendar text-[#6b7280] text-sm"></i>
                 <span class="text-xs text-[#6b7280] font-medium">Desde</span>
                 <input
@@ -263,7 +288,9 @@
                 />
               </div>
 
-              <div class="flex items-center gap-2 bg-white border border-[#cbd5e1] rounded-lg px-3 h-[2.625rem]">
+              <div
+                class="flex items-center gap-2 bg-white border border-[#cbd5e1] rounded-lg px-3 h-[2.625rem]"
+              >
                 <i class="pi pi-calendar text-[#6b7280] text-sm"></i>
                 <span class="text-xs text-[#6b7280] font-medium">Hasta</span>
                 <input
@@ -328,7 +355,6 @@
                 @click="dialogVisible = true"
               />
             </div>
-
           </div>
         </div>
 
@@ -383,7 +409,9 @@
                   { 'line-through': slotProps.data.esAnulado },
                 ]"
               >
-                {{ slotProps.data.tipo === 'ENTRADA' ? '+' : '-' }}${{ formatNumber(slotProps.data.monto) }}
+                {{ slotProps.data.tipo === 'ENTRADA' ? '+' : '-' }}${{
+                  formatNumber(slotProps.data.monto)
+                }}
               </span>
             </template>
           </Column>
@@ -410,7 +438,13 @@
           <!-- Columna ACCIONES -->
           <Column header="ACCIONES" class="text-right w-[9rem]">
             <template #body="slotProps">
-              <Skeleton v-if="cargando" width="5rem" height="2rem" borderRadius="0.5rem" class="ml-auto" />
+              <Skeleton
+                v-if="cargando"
+                width="5rem"
+                height="2rem"
+                borderRadius="0.5rem"
+                class="ml-auto"
+              />
               <Button
                 v-else-if="puedeAnular(slotProps.data)"
                 icon="pi pi-ban"
@@ -429,7 +463,10 @@
                 <span class="text-xs font-bold uppercase text-[#2b5e3b] tracking-wider block mb-1">
                   <i class="pi pi-file-edit mr-1"></i> Concepto / Descripción
                 </span>
-                <p class="text-sm text-gray-700 leading-relaxed m-0 whitespace-normal break-words" :class="{ 'line-through': slotProps.data.esAnulado }">
+                <p
+                  class="text-sm text-gray-700 leading-relaxed m-0 whitespace-normal break-words"
+                  :class="{ 'line-through': slotProps.data.esAnulado }"
+                >
                   {{ slotProps.data.concepto }}
                 </p>
               </div>
@@ -471,13 +508,14 @@
             </span>
           </div>
         </div>
-
       </div>
-
     </div>
 
     <!-- Componentes Auxiliares -->
-    <AddMovimientoCaja v-model:visible="dialogVisible" @movimientoRegistrado="onMovimientoRegistrado" />
+    <AddMovimientoCaja
+      v-model:visible="dialogVisible"
+      @movimientoRegistrado="onMovimientoRegistrado"
+    />
 
     <AdminAuthDialog
       ref="adminAuthAnularRef"
@@ -504,11 +542,11 @@ import { getMovimientos, anularMovimiento } from '@/services/movimientoCajaServi
 import { useCajaStore } from '@/stores/cajaStore'
 import AddMovimientoCaja from '@/components/Caja/AddMovimientoCajaDialog.vue'
 import AdminAuthDialog from '@/components/Caja/AdminAuthDialog.vue'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado, 
-  mostrarAlertaConfirmar 
+import {
+  mostrarExito,
+  mostrarError,
+  mostrarAccesoDenegado,
+  mostrarAlertaConfirmar,
 } from '@/utils/SweetAlertService'
 
 const POR_PAGINA = 7
@@ -631,7 +669,7 @@ const pedirAnulacion = async (mov) => {
     titulo: '¿Anular movimiento?',
     mensajeHtml: `¿Desea anular la <strong>${mov.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}</strong> de <strong>$${formatNumber(mov.monto)}</strong>?<br><span class="text-xs text-gray-500">${mov.concepto}</span>`,
     textoConfirmar: 'Sí, anular',
-    textoCancelar: 'Cancelar'
+    textoCancelar: 'Cancelar',
   })
 
   if (!confirmado) return

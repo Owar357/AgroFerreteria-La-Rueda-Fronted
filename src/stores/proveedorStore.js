@@ -15,7 +15,12 @@ export const useProveedorStore = defineStore('proveedor', () => {
   const currentPage = ref(1)
   const perPage = ref(7)
 
-  const cargarProveedores = async (page = 1, rows = perPage.value, search = '', estado = 'TODOS') => {
+  const cargarProveedores = async (
+    page = 1,
+    rows = perPage.value,
+    search = '',
+    estado = 'TODOS',
+  ) => {
     cargando.value = true
     try {
       const response = await getProveedores(page, rows, search, estado)
@@ -94,7 +99,7 @@ export const useProveedorStore = defineStore('proveedor', () => {
     }
   }
 
-   const activarProveedor = async (id) => {
+  const activarProveedor = async (id) => {
     try {
       const response = await activarProveedorService(id)
       const index = proveedores.value.findIndex((p) => p.id === id)

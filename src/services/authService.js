@@ -34,8 +34,6 @@ function getHomeRouteByRole(role) {
   }
 }
 
-// El objeto authService y sus métodos (login, logout, isAuthenticated, etc.) 
-// permanecen exactamente igual, consumiendo el objeto "api" importado.
 const authService = {
   async login(identity, password) {
     try {

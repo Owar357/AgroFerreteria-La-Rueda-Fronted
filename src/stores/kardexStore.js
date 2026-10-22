@@ -8,7 +8,7 @@ export const useKardexStore = defineStore('kardex', () => {
     total_entradas: 0,
     total_salidas: 0,
     monto_total_entradas: 0,
-    monto_total_salidas: 0
+    monto_total_salidas: 0,
   })
   const cargando = ref(false)
   const totalRecords = ref(0)
@@ -39,12 +39,12 @@ export const useKardexStore = defineStore('kardex', () => {
         total_entradas: 0,
         total_salidas: 0,
         monto_total_entradas: 0,
-        monto_total_salidas: 0
+        monto_total_salidas: 0,
       }
       return {
         ok: false,
         status: error.response?.status,
-        error: error.response?.data?.message || 'No se pudo cargar el historial del Kardex.'
+        error: error.response?.data?.message || 'No se pudo cargar el historial del Kardex.',
       }
     } finally {
       cargando.value = false
@@ -59,7 +59,7 @@ export const useKardexStore = defineStore('kardex', () => {
       total_entradas: 0,
       total_salidas: 0,
       monto_total_entradas: 0,
-      monto_total_salidas: 0
+      monto_total_salidas: 0,
     }
   }
 
@@ -71,6 +71,6 @@ export const useKardexStore = defineStore('kardex', () => {
     currentPage,
     perPage,
     cargarKardex,
-    limpiarKardex
+    limpiarKardex,
   }
 })

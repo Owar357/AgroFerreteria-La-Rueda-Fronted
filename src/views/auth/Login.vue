@@ -1,10 +1,9 @@
 <template>
-
   <div
     class="relative h-dvh overflow-hidden bg-[#14291d] bg-cover bg-center bg-no-repeat flex items-center justify-center p-4 sm:p-6 md:p-8 font-['Inter',sans-serif]"
     :style="{ backgroundImage: `url(${fondoLogin})` }"
   >
-<!-- Capa verde oscura sobre la foto de fondo -->
+    <!-- Capa verde oscura sobre la foto de fondo -->
     <div class="absolute inset-0 bg-[#14291d]/65 backdrop-blur-[2px]"></div>
 
     <!-- Contenedor principal adaptativo -->

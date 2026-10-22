@@ -4,23 +4,23 @@
   >
     <!-- Encabezado Corregido (Sin botón de actualización) -->
     <div class="flex flex-row items-center gap-4 mb-8 w-full">
-      
       <!-- Icono: Cuadrado perfecto 1:1 con bordes redondeados armónicos -->
       <div
         class="w-14 h-14 rounded-xl bg-white shadow-xs flex items-center justify-center text-[#1e3a2f] flex-shrink-0 border border-gray-200/50"
       >
         <i class="pi pi-chart-line text-2xl"></i>
       </div>
-      
+
       <!-- Textos: Título más grande y descripción horizontal sin encimarse -->
       <div class="flex flex-col min-w-0">
         <h1 class="text-3xl font-bold text-[#1e3a2f] m-0 tracking-tight">Dashboard</h1>
         <p class="text-sm text-[#6b7280] m-0 mt-0.5 whitespace-nowrap">
           Resumen del negocio, actualizado automáticamente.
-          <span v-if="horaActualizacion" class="ml-1">Última lectura a las {{ horaActualizacion }}.</span>
+          <span v-if="horaActualizacion" class="ml-1"
+            >Última lectura a las {{ horaActualizacion }}.</span
+          >
         </p>
       </div>
-
     </div>
 
     <!-- Error -->

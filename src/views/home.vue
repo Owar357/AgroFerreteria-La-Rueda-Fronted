@@ -1,13 +1,11 @@
 <template>
   <!-- Contenedor principal global dinámico libre de scrolls hacia el navegador -->
   <div class="h-dvh max-h-screen overflow-hidden flex flex-col">
-
     <!-- Barra de navegación superior -->
     <NavBar @toggleSidebar="sidebarOpen = !sidebarOpen" />
 
     <!-- Cuerpo intermedio flexible -->
     <div class="flex-1 flex overflow-hidden">
-
       <!-- Menú lateral izquierdo con transición responsiva -->
       <transition name="sidebar-slide">
         <SideBar v-if="sidebarOpen" class="shrink-0" />
@@ -15,8 +13,6 @@
 
       <!-- Contenedor central del contenido y el pie de página -->
       <div class="flex-1 flex flex-col overflow-hidden bg-transparent">
-
-        
         <!-- Zona con scroll inteligente exclusivo para renderizar los 12 reportes -->
         <div class="flex-1 min-h-0 overflow-y-auto">
           <router-view />
@@ -24,13 +20,10 @@
 
         <!-- Pie de página estático -->
         <Footer />
-        
       </div>
-
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
@@ -55,7 +48,9 @@ onUnmounted(() => window.removeEventListener('resize', updateWidth))
 <style scoped>
 .sidebar-slide-enter-active,
 .sidebar-slide-leave-active {
-  transition: width 0.25s ease, opacity 0.25s ease;
+  transition:
+    width 0.25s ease,
+    opacity 0.25s ease;
   overflow: hidden;
 }
 .sidebar-slide-enter-from,

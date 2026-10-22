@@ -6,10 +6,7 @@
       @open-detail="abrirModalDetalle"
     />
 
-    <AddProveedores
-      v-model="showAddForm"
-      @guardar="onGuardarNuevo"
-    />
+    <AddProveedores v-model="showAddForm" @guardar="onGuardarNuevo" />
 
     <EditProveedores
       v-model="showEditForm"
@@ -32,11 +29,7 @@ import ProveedoresTable from '../components/Proveedores/ProveedoresTable.vue'
 import AddProveedores from '../components/Proveedores/AddProveedores.vue'
 import EditProveedores from '../components/Proveedores/EditProveedores.vue'
 import DetalleProveedores from '@/components/Proveedores/DetalleProveedores.vue'
-import { 
-  mostrarExito, 
-  mostrarError, 
-  mostrarAccesoDenegado 
-} from '@/utils/SweetAlertService'
+import { mostrarExito, mostrarError, mostrarAccesoDenegado } from '@/utils/SweetAlertService'
 
 const store = useProveedorStore()
 
@@ -76,7 +69,7 @@ async function onGuardarNuevo(payload) {
 
 async function onActualizarExistente(payload) {
   const result = await store.actualizarProveedor(payload.id, payload)
-  
+
   if (result?.ok) {
     showEditForm.value = false
     mostrarExito('Proveedor actualizado', 'Los datos se actualizaron correctamente.')

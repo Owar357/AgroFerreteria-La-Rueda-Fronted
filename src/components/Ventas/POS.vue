@@ -1,13 +1,9 @@
+<!-- CÓDIGO CORREGIDO -->
 <template>
   <div
-    class="flex flex-col"
-    style="
-      font-family: 'Inter', sans-serif;
-      background-color: #eef2e9;
-      height: 100vh;
-      overflow: hidden;
-      padding: 12px;
-    "
+    class="flex flex-col box-border bg-cover bg-center bg-no-repeat h-full overflow-hidden p-3"
+    :style="!cajaStore.puedeOperar ? fondoStyle : {}"
+    style="font-family: 'Inter', sans-serif; background-color: #eef2e9"
   >
     <div
       v-if="!cajaStore.puedeOperar"
@@ -48,18 +44,26 @@
     >
       <!-- COLUMNA IZQUIERDA -->
       <div class="flex flex-col overflow-hidden" style="padding: 20px">
-        
         <!-- CABECERA ACTUALIZADA (CON ICONO VERDE Y DISEÑO NUEVO) -->
         <div
           class="flex items-center justify-between mb-4 pb-4"
           style="border-bottom: 1px solid #e2e8dd"
         >
           <div class="flex items-center gap-3">
-            <div class="!w-10 !h-10 rounded-xl bg-[#2b5e3b] text-white flex items-center justify-center shadow-md shrink-0">
+            <div
+              class="!w-10 !h-10 rounded-xl bg-[#2b5e3b] text-white flex items-center justify-center shadow-md shrink-0"
+            >
               <i class="pi pi-shopping-cart text-lg"></i>
             </div>
             <div>
-              <span style="font-size: 18px; font-weight: 700; color: #1a2e1f; display: block; line-height: 1.2;"
+              <span
+                style="
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #1a2e1f;
+                  display: block;
+                  line-height: 1.2;
+                "
                 >Punto de Venta</span
               >
               <span style="font-size: 12px; color: #6d8f60">{{ fechaActual }}</span>
@@ -111,7 +115,9 @@
               <template #option="{ option }">
                 <span class="text-sm">
                   <span class="font-semibold text-[#1a2e1f]">{{ option.nombre }}</span>
-                  <span v-if="option.fabricante" class="text-gray-500"> - {{ option.fabricante }}</span>
+                  <span v-if="option.fabricante" class="text-gray-500">
+                    - {{ option.fabricante }}</span
+                  >
                 </span>
               </template>
             </AutoComplete>
@@ -219,13 +225,13 @@
       <div style="background-color: #e2e8dd"></div>
 
       <!-- COLUMNA DERECHA -->
-      <div class="flex flex-col overflow-hidden" style="padding: 20px">
-        <div class="flex items-center gap-3 mb-4 pb-4" style="border-bottom: 1px solid #e2e8dd">
+      <div class="flex flex-col min-h-0 overflow-y-auto" style="padding: 16px 20px">
+        <div class="flex items-center gap-3 mb-3 pb-3" style="border-bottom: 1px solid #e2e8dd">
           <i class="pi pi-credit-card" style="color: #e0b354; font-size: 20px"></i>
           <span style="font-size: 18px; font-weight: 600; color: #1a2e1f">Cobro y Pago</span>
         </div>
 
-        <div class="flex flex-col gap-4 flex-1">
+        <div class="flex flex-col gap-3 flex-1">
           <!-- Cliente -->
           <div class="flex gap-2 items-center">
             <InputText
@@ -319,7 +325,7 @@
             </div>
           </div>
 
-          <div class="flex flex-col gap-2" style="margin-top: 24px">
+          <div class="flex flex-col gap-2" style="margin-top: 8px">
             <Button
               label="Registrar venta"
               icon="pi pi-check"
@@ -331,7 +337,7 @@
                 color: #ffffff;
                 font-size: 14px;
                 font-weight: 600;
-                padding: 12px 24px;
+                padding: 10px 24px;
                 width: 100%;
               "
             />
@@ -346,7 +352,7 @@
                 color: #1a2e1f;
                 font-size: 14px;
                 font-weight: 600;
-                padding: 12px 24px;
+                padding: 10px 24px;
                 width: 100%;
               "
             />
@@ -366,6 +372,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { fondoStyle } from '@/utils/fondoReportes'
+
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
@@ -378,10 +386,7 @@ import DialogAddCliente from '@/components/Clientes/AddClienteDialog.vue'
 import { useCajaStore } from '@/stores/cajaStore'
 import { usePosStore } from '@/stores/posStore'
 import { buscarProductos } from '@/services/ventaService'
-import { 
-  mostrarAlertaConfirmar, 
-  mostrarCargando 
-} from '@/utils/SweetAlertService'
+import { mostrarAlertaConfirmar, mostrarCargando } from '@/utils/SweetAlertService'
 
 const router = useRouter()
 const cajaStore = useCajaStore()
@@ -481,7 +486,7 @@ const handleAgregarProducto = () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Selecciona un producto',
-      mensajeHtml: 'Por favor busca y selecciona un producto del catálogo.'
+      mensajeHtml: 'Por favor busca y selecciona un producto del catálogo.',
     })
     return
   }
@@ -490,7 +495,7 @@ const handleAgregarProducto = () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Selecciona una presentación',
-      mensajeHtml: 'Debes indicar el tipo de presentación a vender.'
+      mensajeHtml: 'Debes indicar el tipo de presentación a vender.',
     })
     return
   }
@@ -508,7 +513,7 @@ const procesarVentaConLoading = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Carrito vacío',
-      mensajeHtml: 'Agrega al menos un producto antes de registrar la venta.'
+      mensajeHtml: 'Agrega al menos un producto antes de registrar la venta.',
     })
     return
   }
@@ -517,7 +522,7 @@ const procesarVentaConLoading = async () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Efectivo insuficiente',
-      mensajeHtml: `El monto entregado ($${posStore.efectivoRecibido.toFixed(2)}) debe ser igual o mayor al total ($${posStore.total.toFixed(2)}).`
+      mensajeHtml: `El monto entregado ($${posStore.efectivoRecibido.toFixed(2)}) debe ser igual o mayor al total ($${posStore.total.toFixed(2)}).`,
     })
     return
   }
@@ -526,7 +531,7 @@ const procesarVentaConLoading = async () => {
 
   await Promise.all([
     posStore.procesarVenta(router),
-    new Promise((resolve) => setTimeout(resolve, 500))
+    new Promise((resolve) => setTimeout(resolve, 500)),
   ])
 }
 

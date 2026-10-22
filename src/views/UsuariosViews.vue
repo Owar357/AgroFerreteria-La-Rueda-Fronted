@@ -1,18 +1,10 @@
 <template>
   <div>
-    <UserTable
-      @open-add="showAddModal = true"
-      @open-edit="prepararEdicion"
-    />
+    <UserTable @open-add="showAddModal = true" @open-edit="prepararEdicion" />
 
-    <AddUserDialog
-      v-model:visible="showAddModal"
-    />
+    <AddUserDialog v-model:visible="showAddModal" />
 
-    <EditUserDialog
-      v-model:visible="showEditModal"
-      :user="userToEdit"
-    />
+    <EditUserDialog v-model:visible="showEditModal" :user="userToEdit" />
   </div>
 </template>
 

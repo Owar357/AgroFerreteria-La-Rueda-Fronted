@@ -18,7 +18,7 @@ export const useUnidadMedidaStore = defineStore('unidadMedida', () => {
       return {
         ok: false,
         status,
-        error: msg
+        error: msg,
       }
     } finally {
       cargando.value = false
@@ -33,6 +33,6 @@ export const useUnidadMedidaStore = defineStore('unidadMedida', () => {
     unidades,
     cargando,
     cargarUnidades,
-    getUnidadesByMagnitud
+    getUnidadesByMagnitud,
   }
 })

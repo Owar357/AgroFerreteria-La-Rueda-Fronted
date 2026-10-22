@@ -1,4 +1,4 @@
-  <template>
+<template>
   <Dialog
     :visible="visible"
     @update:visible="emit('update:visible', $event)"
@@ -26,7 +26,9 @@
         <thead>
           <tr class="border-b border-[#eef2e9] bg-[#eef2e9]/50">
             <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f]">Monedas / Billetes</th>
-            <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-center w-36">Cantidad</th>
+            <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-center w-36">
+              Cantidad
+            </th>
             <th class="py-3 px-4 text-[13px] font-semibold text-[#1e3a2f] text-right">Dinero</th>
           </tr>
         </thead>
@@ -136,7 +138,11 @@ const fmt = (val) =>
 const focusNextInput = (currentIndex) => {
   const next = inputRefs.value[currentIndex + 1]
   if (next) next.$el.querySelector('input')?.focus()
-  else document.activeElement?.blur()
+  else {
+    // Último campo ($100): Enter confirma y abre el cuadre
+    document.activeElement?.blur()
+    onCuadrar()
+  }
 }
 
 // Restaura un conteo guardado (al volver desde el resumen del cierre)
@@ -156,7 +162,8 @@ const onCuadrar = () => {
     mostrarAlertaConfirmar({
       tipo: 'advertencia',
       titulo: 'Conteo en cero',
-      mensajeHtml: 'Por favor ingresa las cantidades físicas de dinero en caja antes de realizar el cuadre final.'
+      mensajeHtml:
+        'Por favor ingresa las cantidades físicas de dinero en caja antes de realizar el cuadre final.',
     })
     return
   }

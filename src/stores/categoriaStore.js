@@ -28,10 +28,10 @@ export const useCategoriaStore = defineStore('categoria', () => {
         totalRegistros.value = 0
         return { ok: true, data: [] }
       }
-      return { 
-        ok: false, 
-        status: error.response?.status, 
-        error: error.response?.data?.message || 'Error al cargar las categorías.' 
+      return {
+        ok: false,
+        status: error.response?.status,
+        error: error.response?.data?.message || 'Error al cargar las categorías.',
       }
     } finally {
       cargando.value = false

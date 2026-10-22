@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { abrirCaja, abrirVenta, cuadrarVenta, cerrarVentaCaja, getEstadoCaja } from '../services/cajaService'
+import {
+  abrirCaja,
+  abrirVenta,
+  cuadrarVenta,
+  cerrarVentaCaja,
+  getEstadoCaja,
+} from '../services/cajaService'
 
 // Solo se usa hasta que llega el valor real desde el backend (/caja/estado)
 const FONDO_FIJO_DEFECTO = '75.00'
@@ -22,10 +28,10 @@ const resultadoError = (error, porDefecto = 'Error interno del servidor.') => ({
 
 export const useCajaStore = defineStore('caja', () => {
   const cajaAbierta = ref(false)
-  const ventaAbierta = ref(false) // true = el turno abierto es MÍO
+  const ventaAbierta = ref(false) 
   const montoInicial = ref(0)
   const fondoFijo = ref(FONDO_FIJO_DEFECTO)
-  const turnoActivo = ref(null) // { id, cajero_id, cajero_nombre, es_mio, fecha_hora_apertura } | null
+  const turnoActivo = ref(null) 
   const cargando = ref(false)
   const estadoCargado = ref(false)
   const errorEstado = ref(false)
@@ -116,7 +122,7 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // payload: { email, password, denominaciones }
+  
   const cuadrarTurnoVenta = async (payload) => {
     cargando.value = true
     try {
@@ -132,7 +138,7 @@ export const useCajaStore = defineStore('caja', () => {
     }
   }
 
-  // payload: { token_autorizacion, justificacion? }
+  
   const cerrarTurnoVentaCaja = async (payload) => {
     cargando.value = true
     try {
