@@ -1,44 +1,45 @@
 <template>
   <section class="bg-white rounded-2xl border border-[#e2e8dd] shadow-sm p-5 flex flex-col gap-4 min-w-0">
-    <header class="flex flex-wrap items-start justify-between gap-3">
+    <header class="flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-semibold text-[#1e3a2f] m-0">Ventas y compras por mes</h2>
-        <p class="text-sm text-[#6b7280] m-0 mt-1">
-          Ventas procesadas frente a compras no anuladas.
-        </p>
+        <h2 class="text-lg font-semibold text-[#1e3a2f] m-0">Últimas ventas</h2>
+        <p class="text-sm text-[#6b7280] m-0 mt-1">Las 8 más recientes.</p>
       </div>
-      <Select
-        v-model="anio"
-        :options="aniosDisponibles"
-        class="w-28"
-        aria-label="Año"
-        :disabled="cargando"
-      />
+      <button class="text-sm font-medium text-[#6b7280] hover:text-[#1e3a2f] transition-colors">
+        Ver historial
+      </button>
     </header>
 
-    <div class="flex flex-wrap gap-6">
-      <div>
-        <p class="text-xs text-[#6b7280] m-0">Ventas de {{ anio }}</p>
-        <p class="text-xl font-bold text-[#4A8C3F] m-0">{{ moneda(totalVentas) }}</p>
-      </div>
-      <div>
-        <p class="text-xs text-[#6b7280] m-0">Compras de {{ anio }}</p>
-        <p class="text-xl font-bold text-[#C0392B] m-0">{{ moneda(totalCompras) }}</p>
-      </div>
-    </div>
-
-    <div class="relative" :class="cargando ? 'opacity-50 transition-opacity' : ''">
-      <Chart v-if="hayDatos" type="bar" :data="datosGrafica" :options="opciones" class="h-72" />
-      <div
-        v-else
-        class="h-72 flex flex-col items-center justify-center text-center text-[#6b7280] gap-2"
+    <div class="flex flex-col gap-3">
+      <!-- Bucle de las ventas con la corrección estructural implementada -->
+      <div 
+        v-for="venta in ventas" 
+        :key="venta.id" 
+        class="flex items-center justify-between p-3 rounded-xl border border-[#e9ede4] bg-white gap-3"
       >
-        <i class="pi pi-chart-bar text-3xl text-[#9ca3af]"></i>
-        <p class="m-0 text-sm">Sin movimientos registrados en {{ anio }}.</p>
+        <!-- CONTENEDOR DEL ICONO FIJO (shrink-0 previene que se estire a lo largo) -->
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-500 shrink-0">
+          <i class="pi pi-credit-card"></i>
+        </div>
+
+        <!-- CONTENEDOR DE TEXTO FLEXIBLE -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-[#1e3a2f] truncate m-0">
+            Venta...
+          </p>
+          <p class="text-xs text-[#6b7280] m-0">
+            1...
+          </p>
+        </div>
+
+        <!-- PRECIO / MONTO -->
+        <div class="text-right shrink-0">
+          <p class="text-sm font-bold text-[#1e3a2f] m-0">
+            $50.00
+          </p>
+        </div>
       </div>
     </div>
-
-    <p v-if="error" class="m-0 text-sm text-[#C0392B]">{{ error }}</p>
   </section>
 </template>
 
