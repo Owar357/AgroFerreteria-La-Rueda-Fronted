@@ -42,6 +42,15 @@ const authService = {
         password,
       })
 
+      // Solo reportar falta de rol si el backend autenticó y entregó un token.
+      // Una respuesta exitosa sin token no representa una sesión válida.
+      if (!data?.access_token) {
+        return {
+          success: false,
+          message: data?.message || 'Correo o contraseña incorrectos.',
+        }
+      }
+
       const role = normalizeRole(data.roles)
       if (!role) {
         return { success: false, message: 'El usuario no tiene un rol asignado.' }
