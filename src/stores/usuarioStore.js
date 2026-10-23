@@ -91,19 +91,38 @@ export const useUserStore = defineStore('userStore', () => {
   const desactivarUsuario = async (id) => {
     try {
       const response = await desactivarUsuarioService(id)
+      const responseData = response?.data
+      const mensaje = responseData?.message || ''
+      const turnoAbierto =
+        responseData?.turno_abierto === true ||
+        /caja\s+aperturada|turno\s+de\s+caja\s+abierto/i.test(mensaje)
+
+      if (turnoAbierto) {
+        return {
+          ok: false,
+          status: 409,
+          turnoAbierto: true,
+          error: mensaje || 'No se puede desactivar el usuario porque tiene una caja abierta.',
+        }
+      }
 
       const index = users.value.findIndex((u) => u.id === id)
       if (index !== -1) users.value[index].activo = false
 
-      return { ok: true, data: response?.data }
+      return { ok: true, data: responseData }
     } catch (error) {
       const status = error.response?.status
       const responseData = error.response?.data
+      const mensaje = responseData?.message || ''
+      const turnoAbierto =
+        responseData?.turno_abierto === true ||
+        /caja\s+aperturada|turno\s+de\s+caja\s+abierto/i.test(mensaje)
 
       return {
         ok: false,
-        status,
-        error: responseData?.message || 'Error al desactivar el usuario.',
+        status: turnoAbierto ? 409 : status,
+        turnoAbierto,
+        error: mensaje || 'Error al desactivar el usuario.',
       }
     }
   }
