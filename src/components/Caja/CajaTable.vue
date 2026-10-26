@@ -570,7 +570,10 @@
 
         <!-- Tabla Movimientos PC -->
         <div class="flex-1 min-w-0">
-          <div class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden" style="min-height: 30rem">
+          <div
+            class="bg-white rounded-2xl shadow-2xs border border-[#e2e8dd] overflow-hidden"
+            style="min-height: 30rem"
+          >
             <div class="bg-[#fbfdf9] px-6 py-5 border-b border-[#e2e8dd]">
               <h3 class="font-bold text-[#1a2e1f] text-lg flex items-center gap-2 m-0">
                 <i class="pi pi-history text-[#a17923]"></i> Movimientos del Turno

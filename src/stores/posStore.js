@@ -158,29 +158,43 @@ export const usePosStore = defineStore('pos', () => {
 
   // Operaciones de API
   const buscarCliente = async () => {
-    if (!busquedaCliente.value.trim()) return
-    try {
-      const response = await buscarClientePorDocumento(String(busquedaCliente.value))
-      const cliente = response.data.data
-      nombreCliente.value = cliente.nombre || cliente.razon_social
-      clienteId.value = cliente.id
-    } catch (error) {
-      if (error.response?.status === 403) {
-        mostrarAccesoDenegado()
-      } else if (error.response?.status === 404) {
-        const registrar = await mostrarAlertaConfirmar({
-          tipo: 'pregunta',
-          titulo: 'Cliente no encontrado',
-          mensajeHtml: '¿Desea registrar un nuevo cliente?',
-          textoConfirmar: 'Registrar',
-          textoCancelar: 'Cancelar',
-        })
-        if (registrar) mostrarModalCliente.value = true
-      } else {
-        mostrarError('Error de consulta', 'Ocurrió un error al buscar la información del cliente.')
-      }
+  if (!busquedaCliente.value.trim()) return
+
+  const ofrecerRegistro = async () => {
+    const registrar = await mostrarAlertaConfirmar({
+      tipo: 'pregunta',
+      titulo: 'Cliente no encontrado',
+      mensajeHtml: '¿Desea registrar un nuevo cliente?',
+      textoConfirmar: 'Registrar',
+      textoCancelar: 'Cancelar',
+    })
+    if (registrar) mostrarModalCliente.value = true
+  }
+
+  try {
+    const response = await buscarClientePorDocumento(String(busquedaCliente.value))
+    const cliente = response.data?.data
+
+    if (!cliente) {
+      await ofrecerRegistro()
+      return
+    }
+
+    nombreCliente.value = cliente.nombre || cliente.razon_social
+    clienteId.value = cliente.id
+  } catch (error) {
+    console.error('ERROR BUSCAR CLIENTE:', error, error.response?.status, error.response?.data)
+
+    const status = error.response?.status
+    if (status === 403) {
+      mostrarAccesoDenegado()
+    } else if (status === 404) {
+      await ofrecerRegistro()
+    } else {
+      mostrarError('Error de consulta', 'Ocurrió un error al buscar la información del cliente.')
     }
   }
+}
 
   // El ticket exige token: se pide por axios como blob y se abre desde un object URL
   const imprimirTicket = async (ventaId) => {

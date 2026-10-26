@@ -1,5 +1,8 @@
 <template>
-<div class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto" :style="fondoStyle">
+  <div
+    class="bg-[#eef2e9] bg-cover bg-center bg-no-repeat flex-1 w-full p-3 sm:p-6 md:p-8 text-[#1a2e1f] font-['Inter',sans-serif] overflow-x-hidden overflow-y-auto"
+    :style="fondoStyle"
+  >
     <!-- ======================================================= -->
     <!-- VISTA MÓVIL                                            -->
     <!-- ======================================================= -->
@@ -38,26 +41,14 @@
           Este reporte es un corte del inventario actual, no requiere seleccionar fechas.
         </p>
 
-        <!-- Categoría Móvil -->
+        <!-- Categoría Móvil (fija, no desplegable) -->
         <div class="flex flex-col gap-1 w-full">
-          <label class="text-xs font-semibold text-gray-600">Categoría (opcional)</label>
-          <Select
-            v-model="categoriaId"
-            :options="categorias"
-            optionLabel="nombre"
-            optionValue="id"
-            placeholder="Todas las categorías"
-            showClear
-            filter
-            filterPlaceholder="Buscar categoría..."
-            scrollHeight="200px"
-            class="!w-full"
-            :pt="{
-              input: {
-                class: '!text-xs !py-2.5 !px-3 !border-[#cbd5e1] !bg-white !rounded-xl !w-full',
-              },
-            }"
-          />
+          <label class="text-xs font-semibold text-gray-600">Categoría</label>
+          <div
+            class="w-full flex items-center justify-between text-xs py-2.5 px-3 border border-[#cbd5e1] bg-white rounded-xl text-gray-600 select-none cursor-default"
+          >
+            <span>Todas las categorías</span>
+          </div>
         </div>
 
         <!-- Botones Móvil -->
@@ -68,14 +59,6 @@
             :loading="generandoPDF"
             class="!bg-[#2b5e3b] hover:!bg-[#1f482d] !border-[#2b5e3b] !text-white !text-xs !py-2.5 !rounded-xl !w-full font-bold shadow-2xs cursor-pointer"
             @click="generarPDF"
-          />
-          <Button
-            label="Limpiar"
-            icon="pi pi-times"
-            severity="secondary"
-            outlined
-            class="!text-xs !py-2.5 !border-[#cbd5e1] !text-gray-600 !rounded-xl !w-full font-semibold cursor-pointer"
-            @click="limpiarFiltros"
           />
         </div>
       </div>
@@ -120,22 +103,14 @@
         </p>
 
         <div class="flex flex-wrap items-end gap-4 mt-4">
-          <!-- Categoría PC -->
+          <!-- Categoría PC (fija, no desplegable) -->
           <div class="flex flex-col gap-1 flex-1 min-w-[220px]">
-            <label class="text-sm font-medium text-gray-600">Categoría (opcional)</label>
-            <Select
-              v-model="categoriaId"
-              :options="categorias"
-              optionLabel="nombre"
-              optionValue="id"
-              placeholder="Todas las categorías"
-              showClear
-              filter
-              filterPlaceholder="Buscar categoría..."
-              scrollHeight="200px"
-              class="!w-full"
-              :pt="{ input: { class: '!text-sm !py-2 !px-3 !w-full' } }"
-            />
+            <label class="text-sm font-medium text-gray-600">Categoría</label>
+            <div
+              class="w-full flex items-center justify-between text-sm py-2 px-3 border border-[#cbd5e1] bg-white rounded-md text-gray-600 select-none cursor-default"
+            >
+              <span>Todas las categorías</span>
+            </div>
           </div>
 
           <!-- Botones PC -->
@@ -147,14 +122,6 @@
               class="!bg-[#5F6B52] hover:!bg-[#4d5742] !border-[#5F6B52] !text-white !text-sm !px-5 !py-2 cursor-pointer"
               @click="generarPDF"
             />
-            <Button
-              label="Limpiar"
-              icon="pi pi-times"
-              severity="secondary"
-              outlined
-              class="!text-sm !px-5 !py-2 !border-gray-300 !text-gray-600 cursor-pointer"
-              @click="limpiarFiltros"
-            />
           </div>
         </div>
       </div>
@@ -163,10 +130,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import Button from 'primevue/button'
-import Select from 'primevue/select'
-import api from '@/services/axios'
 import { generarReporteInventarioValorizado } from '@/services/reporteService'
 import { fondoStyle } from '@/utils/fondoReportes'
 import {
@@ -176,35 +141,18 @@ import {
   mostrarCargando,
 } from '@/utils/SweetAlertService'
 
-const emit = defineEmits(['volver'])
+defineEmits(['volver'])
 
-const categoriaId = ref(null)
-const categorias = ref([])
 const generandoPDF = ref(false)
-
-const cargarCategorias = async () => {
-  try {
-    const res = await api.get('/categorias', { params: { per_page: 100 } })
-    categorias.value = res.data.data ?? []
-  } catch (error) {
-    categorias.value = []
-    if (error.response?.status === 403) {
-      mostrarAccesoDenegado()
-    }
-  }
-}
-
-onMounted(cargarCategorias)
 
 const generarPDF = async () => {
   generandoPDF.value = true
   mostrarCargando('Generando reporte PDF...', 'Procesando los datos del inventario valorizado')
 
   try {
-    const [resultado] = await Promise.all([
-      generarReporteInventarioValorizado({
-        categoriaId: categoriaId.value,
-      }),
+    await Promise.all([
+      // Sin filtro de categoría: el reporte incluye todo el inventario
+      generarReporteInventarioValorizado({ categoriaId: null }),
       new Promise((resolve) => setTimeout(resolve, 500)),
     ])
 
@@ -225,22 +173,9 @@ const generarPDF = async () => {
     generandoPDF.value = false
   }
 }
-
-const limpiarFiltros = () => {
-  categoriaId.value = null
-}
 </script>
 
 <style scoped>
-:deep(.p-select .p-select-label) {
-  border-color: #cbd5e1;
-}
-
-:deep(.p-select:not(.p-disabled).p-focus) {
-  box-shadow: none !important;
-  border-color: #2b5e3b !important;
-}
-
 :global(.swal2-container) {
   z-index: 999999 !important;
 }
