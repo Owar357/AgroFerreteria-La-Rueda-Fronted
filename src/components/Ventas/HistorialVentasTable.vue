@@ -15,9 +15,7 @@
       </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- VISTA ESCRITORIO ENCABEZADO (Solo PC >= 1024px)        -->
-    <!-- ======================================================= -->
+    
     <div class="hidden lg:flex items-center gap-3 mb-6">
       <div class="!w-[2.5rem] !h-[2.5rem] rounded-xl bg-white border border-[#e2e8dd] shadow-sm flex items-center justify-center shrink-0">
         <i class="pi pi-receipt text-[#2b5e3b] text-xl"></i>

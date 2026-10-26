@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <!--VISTA MOVIL-->>
+    <!--VISTA MOVIL-->
     <div class="block lg:hidden space-y-4 w-full">
       <!-- Encabezado Móvil -->
       <div class="flex flex-col gap-3">
